@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{CA7D2187-3104-40F6-B279-C2178C007AF7}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>OSRBuddy</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(ProjectDir)SDK;DX9bLink\Include\;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <TargetName>osrbuddy</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Include</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x64;$(LibraryPath)</LibraryPath>
+    <TargetName>graphics-hook32.dll</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(ProjectDir)SDK;DX9bLink\Include\;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <TargetName>osrbuddy</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Include</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x64;$(LibraryPath)</LibraryPath>
+    <TargetName>graphics-hook32.dll</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_ATUM_CLIENT;WIN32;_LIB;_WINDOWS;BUDDY_EXPORTS;NOMINMAX</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile />
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <Bscmake />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_ATUM_CLIENT;WIN32;_LIB;_WINDOWS;NOMINMAX</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile />
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <Bscmake />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_ATUM_CLIENT;BUDDY_EXPORTS;NOMINMAX</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile />
+      <Optimization>MaxSpeed</Optimization>
+      <LanguageStandard>Default</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <Bscmake />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_ATUM_CLIENT;;NOMINMAX</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile />
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <Bscmake />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="AntiAntiCheat.h" />
+    <ClInclude Include="AtumDateTime.h" />
+    <ClInclude Include="AtumError.h" />
+    <ClInclude Include="AtumTypedef.h" />
+    <ClInclude Include="BuddyAPI.h" />
+    <ClInclude Include="OsrItemInfo.h" />
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="D3DHanFont.h" />
+    <ClInclude Include="D3DInternalBase.h" />
+    <ClInclude Include="d3dutil.h" />
+    <ClInclude Include="BuddyFeatureBase.h" />
+    <ClInclude Include="EnchantBot.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="HookedFunction.h" />
+    <ClInclude Include="GambleBot.h" />
+    <ClInclude Include="ImGuiBase.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_addition.h" />
+    <ClInclude Include="imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="imgui\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="MarsenneTwister.h" />
+    <ClInclude Include="OSRBuddyDefine.h" />
+    <ClInclude Include="KitBot.h" />
+    <ClInclude Include="Offset.h" />
+    <ClInclude Include="OSRAPI.h" />
+    <ClInclude Include="OSRBuddy.h" />
+    <ClInclude Include="OSRImGuiMenu.h" />
+    <ClInclude Include="SDK\AppEffectData.h" />
+    <ClInclude Include="SDK\AtumApplication.h" />
+    <ClInclude Include="SDK\AtumData.h" />
+    <ClInclude Include="SDK\AtumDatabase.h" />
+    <ClInclude Include="SDK\AtumDateTime.h" />
+    <ClInclude Include="SDK\AtumDefine.h" />
+    <ClInclude Include="SDK\AtumNode.h" />
+    <ClInclude Include="SDK\AtumParam.h" />
+    <ClInclude Include="SDK\AtumTypedef.h" />
+    <ClInclude Include="SDK\Background.h" />
+    <ClInclude Include="SDK\Camera.h" />
+    <ClInclude Include="SDK\CharacterInfo.h" />
+    <ClInclude Include="SDK\ClientParty.h" />
+    <ClInclude Include="SDK\D3dapp.h" />
+    <ClInclude Include="SDK\D3DHanFont.h" />
+    <ClInclude Include="SDK\d3dutil.h" />
+    <ClInclude Include="SDK\d3dx9.h" />
+    <ClInclude Include="SDK\d3dx9anim.h" />
+    <ClInclude Include="SDK\d3dx9core.h" />
+    <ClInclude Include="SDK\d3dx9effect.h" />
+    <ClInclude Include="SDK\d3dx9math.h" />
+    <ClInclude Include="SDK\d3dx9mesh.h" />
+    <ClInclude Include="SDK\d3dx9shader.h" />
+    <ClInclude Include="SDK\d3dx9shape.h" />
+    <ClInclude Include="SDK\d3dx9tex.h" />
+    <ClInclude Include="SDK\dxerr9.h" />
+    <ClInclude Include="SDK\dxfile.h" />
+    <ClInclude Include="SDK\effect.h" />
+    <ClInclude Include="SDK\EnemyData.h" />
+    <ClInclude Include="SDK\FieldWinSocket.h" />
+    <ClInclude Include="SDK\FieldWinSocketManager.h" />
+    <ClInclude Include="SDK\IMEKey.h" />
+    <ClInclude Include="SDK\INFBase.h" />
+    <ClInclude Include="SDK\INFCityBase.h" />
+    <ClInclude Include="SDK\INFCityLab.h" />
+    <ClInclude Include="SDK\INFGameMain.h" />
+    <ClInclude Include="SDK\INFInvenExtend.h" />
+    <ClInclude Include="SDK\Interface.h" />
+    <ClInclude Include="SDK\ItemInfo.h" />
+    <ClInclude Include="SDK\MeshRender.h" />
+    <ClInclude Include="SDK\MonsterData.h" />
+    <ClInclude Include="SDK\mt_stl.h" />
+    <ClInclude Include="SDK\ObjectChild.h" />
+    <ClInclude Include="SDK\ObjectDefine.h" />
+    <ClInclude Include="SDK\ObjRender.h" />
+    <ClInclude Include="SDK\SceneData.h" />
+    <ClInclude Include="SDK\ShuttleChild.h" />
+    <ClInclude Include="SDK\Skill.h" />
+    <ClInclude Include="SDK\SkillInfo.h" />
+    <ClInclude Include="SDK\SkinnedMesh.h" />
+    <ClInclude Include="SDK\StoreData.h" />
+    <ClInclude Include="SDK\Structs.h" />
+    <ClInclude Include="SDK\UnitData.h" />
+    <ClInclude Include="SDK\WeaponItemInfo.h" />
+    <ClInclude Include="SDK\WinPacket.h" />
+    <ClInclude Include="SDK\WinSocket.h" />
+    <ClInclude Include="TestItemUse.h" />
+    <ClInclude Include="Trampoline.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="Visuals.h" />
+    <ClInclude Include="VMTHook.h" />
+    <ClInclude Include="WatermelonBot.h" />
+    <ClInclude Include="WinPacket.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AntiAntiCheat.cpp" />
+    <ClCompile Include="BuddyFeatureBase.cpp" />
+    <ClCompile Include="OsrItemInfo.cpp" />
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="D3DInternalBase.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="EnchantBot.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GambleBot.cpp" />
+    <ClCompile Include="ImGuiBase.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_addition.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="KitBot.cpp" />
+    <ClCompile Include="OSRAPI.cpp" />
+    <ClCompile Include="OSRBuddy.cpp" />
+    <ClCompile Include="OSRImGuiMenu.cpp" />
+    <ClCompile Include="PatternManager.cpp" />
+    <ClCompile Include="TestItemUse.cpp" />
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="Visuals.cpp" />
+    <ClCompile Include="WatermelonBot.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDK\d3dx9math.inl" />
+    <None Include="SDK\d3dxmath.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

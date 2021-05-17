@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{3d9bd5a2-f948-482b-a222-bf9481c64711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{c42a2de4-f911-4eaa-9d9d-06c0b5ff2458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{4ca42d78-4e0f-4ea0-b5cd-c3bca1f84f10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{e1f1e774-730d-4d54-a3b0-3d24b26e99a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features">
+      <UniqueIdentifier>{27731048-97d5-4f44-bb28-48e74610b178}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_dx9.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumApplication.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumParam.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\D3dapp.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9core.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9math.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\IMEKey.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ShuttleChild.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="AtumDateTime.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\mt_stl.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumDefine.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumDateTime.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9anim.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9effect.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9mesh.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9shader.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9shape.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dx9tex.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\dxerr9.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\dxfile.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ObjectDefine.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DHanFont.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dutil.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\D3DHanFont.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\d3dutil.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Camera.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\EnemyData.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\UnitData.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumData.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumNode.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AppEffectData.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\effect.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ItemInfo.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Structs.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\CharacterInfo.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiBase.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="OSRImGuiMenu.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\StoreData.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="AtumTypedef.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumTypedef.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interface.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFGameMain.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DInternalBase.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="OSRAPI.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="OSRBuddy.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="KitBot.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="TestItemUse.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="BuddyFeatureBase.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="VMTHook.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Trampoline.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Offset.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="OSRBuddyDefine.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFBase.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFCityBase.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFCityLab.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFInvenExtend.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="GambleBot.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="AntiAntiCheat.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumDatabase.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_addition.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="EnchantBot.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="BuddyAPI.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\FieldWinSocket.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\FieldWinSocketManager.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\WinSocket.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="MarsenneTwister.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="WinPacket.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\WeaponItemInfo.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\WinPacket.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\SceneData.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\MonsterData.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Skill.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\SkillInfo.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ObjRender.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\SkinnedMesh.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\MeshRender.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ObjectChild.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Background.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ClientParty.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="HookedFunction.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="WatermelonBot.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Visuals.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="AtumError.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="OsrItemInfo.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_dx9.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="OSRBuddy.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DInternalBase.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiBase.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="OSRImGuiMenu.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="OSRAPI.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="KitBot.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="TestItemUse.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="GambleBot.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="AntiAntiCheat.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_addition.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="EnchantBot.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="WatermelonBot.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="BuddyFeatureBase.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternManager.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Visuals.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="OsrItemInfo.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDK\d3dx9math.inl">
+      <Filter>SDK</Filter>
+    </None>
+    <None Include="SDK\d3dxmath.inl">
+      <Filter>SDK</Filter>
+    </None>
+  </ItemGroup>
+</Project>
