@@ -194,10 +194,12 @@
     <ClInclude Include="d3dutil.h" />
     <ClInclude Include="BuddyFeatureBase.h" />
     <ClInclude Include="EnchantBot.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="HookedFunction.h" />
+    <ClInclude Include="HookedFunction.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="GambleBot.h" />
     <ClInclude Include="ImGuiBase.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -287,7 +289,7 @@
     <ClCompile Include="D3DInternalBase.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EnchantBot.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GambleBot.cpp" />
