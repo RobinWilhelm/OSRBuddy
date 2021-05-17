@@ -251,10 +251,13 @@ bool OSRBuddyMain::Start()
         return false;
     }
 
-    while (!m_doUnload)
+    while (!m_doUnload || OSR_API->GetAtumApplication()->m_bShutDown || OSR_API->GetAtumApplication()->m_bClientQuit)
     {
         std::this_thread::sleep_for(10ms);
     }
+
+    bool test = OSR_API->GetAtumApplication()->m_bShutDown;
+    bool test2 = OSR_API->GetAtumApplication()->m_bClientQuit;
 
     for (auto& elem : m_features)
     {
