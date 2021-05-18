@@ -358,7 +358,7 @@ public:
 	CD3DHanFont* m_pFontToolTip;
 	CD3DHanFont* m_pFontTimeLimit;
 	CD3DHanFont* m_pFontDrawMent;
-	char m_pad01[16];
+	char m_pad01[20];
 
 	// 2010. 04. 28 by hsLee 인피니티 필드 2차 난이도 조절.
 	char				m_szSave_ToolTip[1024];
