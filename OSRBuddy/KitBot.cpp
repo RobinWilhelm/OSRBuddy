@@ -564,7 +564,7 @@ bool KitBuffBot::TryUseSkill(PlayerSkillInfo* skillinfo)
         return false;
     }
 
-    // only allow a skill to be used every 400ms
+    // only allow a skill to be used every 400ms because quickslot bar can only be used every 400ms
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());  
     if ((current - skillinfo->last_use) < 400ms) {
         return false;

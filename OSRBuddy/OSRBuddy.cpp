@@ -100,7 +100,7 @@ LRESULT OSRBuddyMain::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
             InitiateAppShutdown();
             break;   
         case WM_MOUSEMOVE:
-            if (m_emule_mouse)
+            if (m_emulate_mouse)
             {
                 m_cur_mousepos.x = GET_X_LPARAM(lParam);
                 m_cur_mousepos.y = GET_Y_LPARAM(lParam);
@@ -158,7 +158,7 @@ OSRBuddyMain::OSRBuddyMain()
     g_osrbuddy = this;
     m_lastTick = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     m_cur_mousepos = POINT();
-    m_emule_mouse = false;
+    m_emulate_mouse = false;
     m_fieldsockethooks = nullptr;
     m_interfacehook = nullptr;
     m_lastTick = 0ms;
@@ -485,13 +485,23 @@ std::chrono::microseconds OSRBuddyMain::GetTickTime()
 
 void OSRBuddyMain::EnableMouseEmulation(bool on)
 {
-    m_orig_OnGetCursorPos(&m_cur_mousepos);
-    m_emule_mouse = on;
+    if (m_emulate_mouse == on) {
+        return;
+    }
+
+    if (on) {
+        m_orig_OnGetCursorPos(&m_cur_mousepos);
+    }       
+    m_emulate_mouse = on;
+
+    if (!on) {
+        m_orig_OnSetCursorPos(m_cur_mousepos.x, m_cur_mousepos.y);
+    }
 }
 
 bool OSRBuddyMain::SetCursorPosition(int x, int y)
 {
-    if (m_emule_mouse)
+    if (m_emulate_mouse)
     {
         m_cur_mousepos.x = x;
         m_cur_mousepos.y = y;   
@@ -501,6 +511,7 @@ bool OSRBuddyMain::SetCursorPosition(int x, int y)
     {
         return m_orig_OnSetCursorPos(x, y);
 
+        /*
         INPUT input;
         ZeroMemory(&input, sizeof(input));
         input.type = INPUT_MOUSE;
@@ -509,12 +520,13 @@ bool OSRBuddyMain::SetCursorPosition(int x, int y)
         input.mi.dy = y;
         ::SendInput(1, &input, sizeof(INPUT));
         return true;
+        */
     } 
 }
 
 bool OSRBuddyMain::GetCursorPosition(LPPOINT pos)
 {
-    if (m_emule_mouse)
+    if (m_emulate_mouse)
     {
         *pos = m_cur_mousepos;
         return true;

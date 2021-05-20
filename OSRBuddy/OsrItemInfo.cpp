@@ -20,12 +20,12 @@ OsrItemInfo::~OsrItemInfo()
 
 bool OsrItemInfo::Update(UID64_t uid)
 {
-	if (uid != 0)
-	{
+	if (uid != 0) {
 		m_UID = uid;
 	}  
 
-	if (!UpdateItemInfo()) {
+	if (!UpdateItemInfo()) 
+	{
 		m_UID = 0;
 		return false;
 	}

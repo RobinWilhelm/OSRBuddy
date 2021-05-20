@@ -213,7 +213,10 @@ bool OldSchoolRivalsAPI::IsHitablePrimary(CUnitData* target)
 	D3DXVECTOR3 vTargetVel;
 	D3DXVECTOR3 vTargetPosObject, vTargetPosGround;
 		
-	D3DXVec3Normalize(&vTargetVel, &(vTargetPos - vShuttlePos));
+
+	D3DXVECTOR3 delta = vTargetPos - vShuttlePos;
+
+	D3DXVec3Normalize(&vTargetVel, &delta);
 
 	CUnitData* pTarget = target;
 	CMonsterData* pMonster = NULL;

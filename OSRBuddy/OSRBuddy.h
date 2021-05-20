@@ -109,7 +109,7 @@ private:
 	std::unique_ptr<TrampolineHook<CWinSocketWriteType>> m_OnWritePackethook;
 	CWinSocketWriteType m_orig_OnWritePacket;
 	
-	// START MOUSE MOVEMENT EMULATION
+	// Start Section MOUSE MOVEMENT EMULATION
 	std::unique_ptr<TrampolineHook<GetCursorPosType>> m_OnGetCursorPos;
 	GetCursorPosType m_orig_OnGetCursorPos;
 
@@ -117,8 +117,8 @@ private:
 	SetCursorPosType m_orig_OnSetCursorPos;
 
 	POINT m_cur_mousepos;
-	bool m_emule_mouse;
-	// END MOUSE MOVEMENT
+	bool m_emulate_mouse;
+	// End Section MOUSE MOVEMENT EMULATION
 
 	FeatureContainer m_features;
 

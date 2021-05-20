@@ -5,6 +5,8 @@
 #include "SDK/ObjectDefine.h"	// INVEN_DISPLAY_INFO
 #include "OSRAPI.h"
 
+#include "OsrItemInfo.h"
+
 
 class CItemInfo;
 
@@ -12,10 +14,7 @@ enum class GambleBotState
 {
 	NOT_IN_LABORATORY = 0,
 	STANDBY,
-	WAIT_FOR_TARGET,
-	GAMBLE_SINGLE,
-	GAMBLE_AUTOMATIC, 
-	RESET
+	GAMBLING,
 };
 
 enum class GambleItem
@@ -71,9 +70,8 @@ private:
 
 	void SetGambleBotState(GambleBotState state);
 	GambleBotState GetGambleBotState();
-	void ReturnToPreviousGambleBotState();
 
-	void SetGambleItem(CItemInfo* gambleItem);
+	void SetGambleItem(UID64_t uid);
 	void ResetCurrentWeapon();
 	bool TryTargetItemToInventory();
 	   
@@ -97,18 +95,16 @@ private:
 	bool FixIsInList(int codenum, const int* fixlist, size_t arraysize);
 
 	bool PrepareNextGamble();
-	bool DetermineNextAction();
+	GambleAction DetermineNextAction();
+
+	void Reset();
 
 private:
 	GambleBotState			m_state;
-	GambleBotState			m_prev_state;
-	INVEN_DISPLAY_INFO*		m_lastSelectedItem;
-	CItemInfo*				m_lastSelectedItemInfo;
+	bool					m_auto_gamble;
 	
-	std::string				m_fullItemName;
-	CItemInfo*				m_currentGambleItem;
-	UID64_t					m_currentGambleItemUID;	
-	bool					m_selectNewWeapon;
+	UID64_t					m_current_gambleitem_uid; // if this is 0 -> we dont have a valid gamble item	
+	bool					m_select_new_weapon;
 
 	bool					m_doPrefixGamble;
 	bool					m_doSuffixGamble;
@@ -118,16 +114,12 @@ private:
 	GambleAction			m_nextGambleAction;
 	int						m_nextActionPrepare;
 	int						m_actionsToPrepareCount;
+	bool					m_waiting_for_answer;
 
 	float					m_gambleCheckTime;	
 	float					m_internalActionCheckTime;	// button clicks and item movement 
  
-	bool					m_isAdvancedWeapon;
-	std::string				m_weaponName;
-	std::string				m_prefixName;
-	std::string				m_suffixName;
-	ImColor					m_prefixColor;
-	ImColor					m_suffixColor;
+	bool					m_isAdvancedWeapon;	
 	   
 	int						m_amount_SG_ADV_Prefix;
 	int						m_amount_SG_ADV_Suffix;
@@ -141,5 +133,7 @@ private:
 
 	FixSelection			m_SuffixSelection;
 	FixSelection			m_PrefixSelection;		 
+
+	OsrItemInfo				m_gamble_item;
 };
 
