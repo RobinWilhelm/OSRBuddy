@@ -395,7 +395,7 @@ CMonsterData* WatermelonBot::FindNewTarget(float max_distance, bool front_only)
                 delta.x = curPos.x - monster->m_nObjScreenX;
                 delta.y = curPos.y - monster->m_nObjScreenY;
 
-                float cursor_dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y + delta.y));
+                float cursor_dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
 
                 if (cursor_dist < min_cursor_distance)
                 {
@@ -424,7 +424,7 @@ CMonsterData* WatermelonBot::FindNewTarget(float max_distance, bool front_only)
                 delta.x = curPos.x - monster.second->m_nObjScreenX;
                 delta.y = curPos.y - monster.second->m_nObjScreenY;
 
-                float cursor_dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y + delta.y));
+                float cursor_dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
 
                 if (cursor_dist < min_cursor_distance)
                 {
@@ -460,7 +460,7 @@ void WatermelonBot::AimAtTarget(CMonsterData* m_target)
         {
             //SetCursorPos(targetPos.x, targetPos.y);
             //SendMouseMove(delta_x, delta_y);
-            m_buddy->SetCursorPosition(targetPos.x, targetPos.y);
+            m_buddy->SetCursorPosition(delta_x, delta_y);
         }
         else
         {
