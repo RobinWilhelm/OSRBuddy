@@ -65,7 +65,7 @@
 #define T_FN_SKILL_USE_SKILL_OK					(MessageType_t)((T0_FN_SKILL<<8)|T1_FN_SKILL_USE_SKILL_OK)
 
 #define TARGET_LOCK_THRESHOLD    45.0f
-#define TARGETING_SPEED 0.5f
+#define TARGETING_SPEED 1.0f
 #define INVENTORY_CLEAN_ACTION_MIN_TIME 2000
 
 typedef struct
@@ -460,7 +460,8 @@ void WatermelonBot::AimAtTarget(CMonsterData* m_target)
         {
             //SetCursorPos(targetPos.x, targetPos.y);
             //SendMouseMove(delta_x, delta_y);
-            m_buddy->SetCursorPosition(delta_x, delta_y);
+            //m_buddy->SetCursorPosition(delta_x, delta_y);
+            m_buddy->SetCursorPosition(curPos.x + delta_x, curPos.y + delta_y);
         }
         else
         {
