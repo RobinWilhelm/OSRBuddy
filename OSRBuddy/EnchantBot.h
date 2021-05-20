@@ -100,6 +100,7 @@ private:
 	EnchantBotState			m_state;
 	bool					m_auto_enchant;
 	bool					m_optimiseEnchanting;
+	bool					m_withLuckyCard;
 
 	INVEN_DISPLAY_INFO*		m_lastSelectedItem;		
 	UID64_t					m_currentEnchantItemUID;

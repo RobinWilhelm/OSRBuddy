@@ -373,6 +373,7 @@ void EnchantBot::DrawSettings()
 	ImGui::Dummy(ImVec2(0, 15));   
 	// use e1 prots for e6 and e7
 	ImGui::FancyCheckbox("Optimise Enchants", &m_optimiseEnchanting); 
+	ImGui::FancyCheckbox("Use Chance Cards", &m_withLuckyCard);
 	ImGui::FancyCheckbox("Automatic Enchanting", &m_auto_enchant);
 
 	ImGui::Dummy(ImVec2(0, 5));
@@ -561,8 +562,10 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		}
 		break;
 	case EnchantAction::Add_PercentageCard: // next and optional item is an enchant chance card
-		// todo
-		return true;
+		if (m_withLuckyCard && m_enchant_item.GetItemInfo()->m_nEnchantNumber == 10)
+		{
+			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantChance8P, m_enchantTargetKind, OSR_API->GetPlayerGearType());
+		}
 		break;	 
 	case EnchantAction::Use_OkButton:
 		OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
@@ -728,8 +731,8 @@ EnchantAction EnchantBot::GetNextAction()
 			}  			
 			break;
 		case EnchantAction::Add_ProtectCard:
-			//return PrepareAction::Add_PercentageCard;
-			last_action = EnchantAction::Add_PercentageCard;
+			return EnchantAction::Add_PercentageCard;
+			//last_action = EnchantAction::Add_PercentageCard;
 			break;
 		case EnchantAction::Add_PercentageCard:
 			return EnchantAction::Use_OkButton;
