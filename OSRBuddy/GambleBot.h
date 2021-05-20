@@ -12,10 +12,7 @@ enum class GambleBotState
 {
 	NOT_IN_LABORATORY = 0,
 	STANDBY,
-	WAIT_FOR_TARGET,
-	GAMBLE_SINGLE,
-	GAMBLE_AUTOMATIC, 
-	RESET
+	GAMBLING,
 };
 
 enum class GambleItem
@@ -97,13 +94,16 @@ private:
 	bool FixIsInList(int codenum, const int* fixlist, size_t arraysize);
 
 	bool PrepareNextGamble();
-	bool DetermineNextAction();
+	GambleAction DetermineNextAction();
+
+	void Reset();
 
 private:
 	GambleBotState			m_state;
 	GambleBotState			m_prev_state;
 	INVEN_DISPLAY_INFO*		m_lastSelectedItem;
 	CItemInfo*				m_lastSelectedItemInfo;
+	bool					m_auto_gamble;
 	
 	std::string				m_fullItemName;
 	CItemInfo*				m_currentGambleItem;
@@ -118,6 +118,7 @@ private:
 	GambleAction			m_nextGambleAction;
 	int						m_nextActionPrepare;
 	int						m_actionsToPrepareCount;
+	bool					m_waiting_for_answer;
 
 	float					m_gambleCheckTime;	
 	float					m_internalActionCheckTime;	// button clicks and item movement 
@@ -141,5 +142,6 @@ private:
 
 	FixSelection			m_SuffixSelection;
 	FixSelection			m_PrefixSelection;		 
+
 };
 

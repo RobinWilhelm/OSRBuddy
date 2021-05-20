@@ -38,80 +38,45 @@ void GambleBot::Tick()
 	switch (GetGambleBotState())
 	{
 	case GambleBotState::NOT_IN_LABORATORY:
-		if (character_in_laboratory) {
-			DetermineNextAction();
+		if (character_in_laboratory) 
+		{
+			//DetermineNextAction();
 			SetGambleBotState(GambleBotState::STANDBY);
 		}
 		break;
 
-	case GambleBotState::STANDBY:  		
-		if (m_selectNewWeapon) 
+	case GambleBotState::STANDBY:
+		if (m_selectNewWeapon)
 		{
 			selected = OSR_API->GetSelectedItem();
-			if (selected && selected != m_lastSelectedItem && IS_WEAPON(selected->pItem->Kind))	{
+			if (selected && selected != m_lastSelectedItem && IS_WEAPON(selected->pItem->Kind)) {
 				m_lastSelectedItemInfo = OSR_API->FindItemInInventoryByUniqueNumber(selected->pItem->UniqueNumber);
 				SetGambleItem(m_lastSelectedItemInfo);
-				DetermineNextAction();
+				m_nextGambleAction = DetermineNextAction();
 				m_selectNewWeapon = false;
 			}
 		}
 		break;
 
-	case GambleBotState::GAMBLE_SINGLE:	  
-		if (m_prev_state == GambleBotState::STANDBY)
+	case GambleBotState::GAMBLING:
+		if (m_waiting_for_answer) // maybe rework this into recieved packet code
 		{
-			if (TryGamble()) {
-				SetGambleBotState(GambleBotState::WAIT_FOR_TARGET);
+			CItemInfo* targetitem = OSR_API->FindItemFromTarget(m_currentGambleItemUID);
+			if (targetitem && TryTargetItemToInventory())
+			{
+				m_nextGambleAction = DetermineNextAction();
+				if (!m_auto_gamble) {
+					SetGambleBotState(GambleBotState::STANDBY);
+				}
+				m_waiting_for_answer = false;
 			}
 		}
-		else if (m_prev_state == GambleBotState::WAIT_FOR_TARGET)
-		{
-			if (TryTargetItemToInventory()) 
-			{
-				DetermineNextAction();
-				SetGambleBotState(GambleBotState::STANDBY);
-			} 		
-		}
-	
-		break;
-
-	case GambleBotState::WAIT_FOR_TARGET: 
-	{
-		CItemInfo* targetitem = OSR_API->FindItemFromTarget(m_currentGambleItemUID);
-		if (targetitem) {
-			ReturnToPreviousGambleBotState();
-		}
-		break;
-	}
-
-	case GambleBotState::GAMBLE_AUTOMATIC:
-		if (m_nextGambleAction == GambleAction::NONE) {
-			SetGambleBotState(GambleBotState::STANDBY);
-		} 
-
-		if (m_prev_state == GambleBotState::WAIT_FOR_TARGET) 
-		{
-			if (TryTargetItemToInventory())
-			{
-				DetermineNextAction();
-				m_prev_state = GambleBotState::GAMBLE_AUTOMATIC; 
-			}
-		}	 	
 		else if (TryGamble()) {
-			SetGambleBotState(GambleBotState::WAIT_FOR_TARGET);
+			m_waiting_for_answer = true;
 		}
 		break;
-
-	case GambleBotState::RESET:
-		if (TrySimulateButtonClick(LabButtonCode::Cancel)) 
-		{	
-			m_nextActionPrepare = 0;  			
-			SetGambleItem(OSR_API->FindItemInInventoryByUniqueNumber(m_currentGambleItemUID));
-			SetGambleBotState(GambleBotState::STANDBY);
-			DetermineNextAction();
-		} 
-		break;
 	}
+
 }
 
 void GambleBot::RenderImGui()
@@ -191,28 +156,14 @@ void GambleBot::RenderImGui()
 	ImGui::Text(GetGambleActionString(m_nextGambleAction));
 	ImGui::Spacing();
 
-	if (m_currentGambleItem)
+	ImGui::Checkbox("Automatic", &m_auto_gamble);
+	if (ImGui::FancyButton("Gamble"))
 	{
-		if (m_state == GambleBotState::GAMBLE_AUTOMATIC || (m_state == GambleBotState::WAIT_FOR_TARGET && m_prev_state == GambleBotState::GAMBLE_AUTOMATIC))
-		{
-			ImGui::Text("Autogamble active");
-			if (ImGui::FancyButton("Stop Gambling")) {
-				SetGambleBotState(GambleBotState::RESET); // need to reset the laboratory to the default state 
-			}
+		if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
+			SetGambleBotState(GambleBotState::GAMBLING);
 		}
-		else 
-		{
-			if (ImGui::FancyButton("Gamble single"))
-			{
-				if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
-					SetGambleBotState(GambleBotState::GAMBLE_SINGLE);
-				}
-			}
-			if (ImGui::FancyButton("Automatic gambling")) {
-				SetGambleBotState(GambleBotState::GAMBLE_AUTOMATIC);
-			}
-		}
-	} 
+	}
+
 	ImGui::Spacing();
 	ImGui::EndGroupPanel();
 	ImGui::EndGroup();
@@ -239,7 +190,7 @@ void GambleBot::DrawSettings()
 	if (ImGui::FancyCheckbox("Gambling active", &m_doPrefixGambleTemp)) 
 	{
 		if (m_state == GambleBotState::STANDBY) {
-			DetermineNextAction();
+			m_nextGambleAction = DetermineNextAction();
 		}
 	}
 	ImGui::Dummy(ImVec2(0, 10));
@@ -339,8 +290,7 @@ void GambleBot::DrawColoredGambleItemAmount(int amount)
 }
   						 
 void GambleBot::SetGambleBotState(GambleBotState state)
-{
-	m_prev_state = m_state;
+{	 
 	m_state = state;
 }
 
@@ -911,7 +861,8 @@ bool GambleBot::PrepareNextGamble()
 		return false;
 	}
 
-	if (m_nextActionPrepare == 0) {
+	if (m_nextActionPrepare == 0)
+	{
 		OSR_API->InvenToSourceItem(m_currentGambleItem, 1, false);
 		return true;
 	} 
@@ -925,8 +876,10 @@ bool GambleBot::PrepareNextGamble()
 
 	case GambleAction::ADD_PREFIX:		
 		prefixitem = (m_isAdvancedWeapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_PREFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_PREFIX);
-		if (!prefixitem) {
-			SetGambleBotState(GambleBotState::RESET);
+		if (!prefixitem) 
+		{
+			Reset();
+			SetGambleBotState(GambleBotState::STANDBY);
 			return false;	// item not found
 		}
 
@@ -938,8 +891,10 @@ bool GambleBot::PrepareNextGamble()
 
 	case GambleAction::ADD_SUFFIX:
 		suffixitem = (m_isAdvancedWeapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_SUFFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_SUFFIX);
-		if (!suffixitem) {
-			SetGambleBotState(GambleBotState::RESET);
+		if (!suffixitem) 
+		{
+			Reset();
+			SetGambleBotState(GambleBotState::STANDBY);
 			return false;  // item not found
 		}
 		if (m_nextActionPrepare == 1) {
@@ -951,8 +906,10 @@ bool GambleBot::PrepareNextGamble()
 	case GambleAction::ADD_PREFIX_AND_SUFFIX:
 		prefixitem = (m_isAdvancedWeapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_PREFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_PREFIX);
 		suffixitem = (m_isAdvancedWeapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_SUFFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_SUFFIX);
-		if (!prefixitem || !suffixitem) {
-			SetGambleBotState(GambleBotState::RESET);
+		if (!prefixitem || !suffixitem) 
+		{
+			Reset();
+			SetGambleBotState(GambleBotState::STANDBY);
 			return false;	// item not found
 		}
 		if (m_nextActionPrepare == 1) {
@@ -967,8 +924,10 @@ bool GambleBot::PrepareNextGamble()
 
 	case GambleAction::REMOVE_PREFIX:
 		prefixitem = FindGambleCardItemFromInventory(GambleItem::INIT_PREFIX);
-		if (!prefixitem) {
-			SetGambleBotState(GambleBotState::RESET);
+		if (!prefixitem) 
+		{
+			Reset();
+			SetGambleBotState(GambleBotState::STANDBY);
 			return false;	// item not found
 		}
 		if (m_nextActionPrepare == 1) {
@@ -979,8 +938,10 @@ bool GambleBot::PrepareNextGamble()
 
 	case GambleAction::REMOVE_SUFFIX:
 		suffixitem = FindGambleCardItemFromInventory(GambleItem::INIT_SUFFIX);
-		if (!suffixitem) {
-			SetGambleBotState(GambleBotState::RESET);
+		if (!suffixitem) 
+		{
+			Reset();
+			SetGambleBotState(GambleBotState::STANDBY);
 			return false;  // item not found
 		}
 		if (m_nextActionPrepare == 1) {
@@ -992,15 +953,19 @@ bool GambleBot::PrepareNextGamble()
 	case GambleAction::REMOVE_PREFIX_AND_SUFFIX:
 		prefixitem = FindGambleCardItemFromInventory(GambleItem::INIT_PREFIX);
 		suffixitem = FindGambleCardItemFromInventory(GambleItem::INIT_SUFFIX);
-		if (!prefixitem || !suffixitem) {
-			SetGambleBotState(GambleBotState::RESET);
+		if (!prefixitem || !suffixitem) 
+		{
+			Reset();
+			SetGambleBotState(GambleBotState::STANDBY);
 			return false;	// item not found
 		}
-		if (m_nextActionPrepare == 1) {
+		if (m_nextActionPrepare == 1)
+		{
 			OSR_API->InvenToSourceItem(prefixitem, 1, false);
 			return true;
 		}
-		if (m_nextActionPrepare == 2) {
+		if (m_nextActionPrepare == 2) 
+		{
 			OSR_API->InvenToSourceItem(suffixitem, 1, false);
 			return true;
 		}
@@ -1008,7 +973,7 @@ bool GambleBot::PrepareNextGamble()
 	}
 }
 
-bool GambleBot::DetermineNextAction()
+GambleAction GambleBot::DetermineNextAction()
 {
 	UpdateTotalGambleItemAmount();
 
@@ -1018,13 +983,11 @@ bool GambleBot::DetermineNextAction()
 	m_actionsToPrepareCount = 0;
 
 	if (!m_currentGambleItem) {
-		m_nextGambleAction = GambleAction::NONE;
-		return false;
+		return GambleAction::NONE;
 	}
 
 	if (!m_doPrefixGamble && !m_doSuffixGamble) {
-		m_nextGambleAction = GambleAction::NONE;
-		return true;
+		return GambleAction::NONE;
 	}
 
 	bool remove_prefix = false;
@@ -1092,42 +1055,60 @@ bool GambleBot::DetermineNextAction()
 		}
 	}
 	
-	if (add_prefix && add_suffix) {
-		m_nextGambleAction = GambleAction::ADD_PREFIX_AND_SUFFIX;
+	if (add_prefix && add_suffix) 
+	{			
 		m_actionsToPrepareCount = 3;
+		return GambleAction::ADD_PREFIX_AND_SUFFIX;
 	}
 
-	if (remove_prefix && remove_suffix)	{
-		m_nextGambleAction = GambleAction::REMOVE_PREFIX_AND_SUFFIX;
+	if (remove_prefix && remove_suffix)	
+	{		
 		m_actionsToPrepareCount = 3;
+		return GambleAction::REMOVE_PREFIX_AND_SUFFIX;
 	}												  
 
-	if (add_prefix && !add_suffix) {
-		m_nextGambleAction = GambleAction::ADD_PREFIX;
+	if (add_prefix && !add_suffix) 
+	{	 		
 		m_actionsToPrepareCount = 2;
+		return GambleAction::ADD_PREFIX;
 	}
 
-	if (remove_prefix && !remove_suffix) {
-		m_nextGambleAction = GambleAction::REMOVE_PREFIX;
+	if (remove_prefix && !remove_suffix) 
+	{		
 		m_actionsToPrepareCount = 2;
+		return GambleAction::REMOVE_PREFIX;
 	}
 
-	if (!add_prefix && add_suffix) {
-		m_nextGambleAction = GambleAction::ADD_SUFFIX;
+	if (!add_prefix && add_suffix) 
+	{  		
 		m_actionsToPrepareCount = 2;
+		return GambleAction::ADD_SUFFIX;
 	}
 
-	if (!remove_prefix && remove_suffix) {
-		m_nextGambleAction = GambleAction::REMOVE_SUFFIX;
+	if (!remove_prefix && remove_suffix) 
+	{  		
 		m_actionsToPrepareCount = 2;
+		return GambleAction::REMOVE_SUFFIX;
 	}  
 	
-	if (!remove_prefix && !remove_suffix && !add_prefix && !add_suffix) {
-		m_nextGambleAction = GambleAction::NONE;
+	if (!remove_prefix && !remove_suffix && !add_prefix && !add_suffix) 
+	{	  		
 		m_actionsToPrepareCount = 0;
+		return GambleAction::NONE;
 	}
 
-	return true;
+	return GambleAction::NONE;
+}
+
+void GambleBot::Reset()
+{
+	if (TrySimulateButtonClick(LabButtonCode::Cancel))
+	{
+		m_nextActionPrepare = 0;
+		SetGambleItem(OSR_API->FindItemInInventoryByUniqueNumber(m_currentGambleItemUID));
+		SetGambleBotState(GambleBotState::STANDBY);
+		DetermineNextAction();
+	}
 }
 
 FeatureType GambleBot::GetType() const
