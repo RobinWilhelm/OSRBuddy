@@ -19,6 +19,7 @@ enum class GambleBotState
 
 enum class GambleItem
 {
+	SOURCE_ITEM,
 	SG_ADV_PREFIX,
 	SG_ADV_SUFFIX,
 	SG_STD_PREFIX,
@@ -64,6 +65,12 @@ public:
 	virtual void OnEnable() override;
 
 private:
+	//bool PrepareNextGamble();
+	bool TryDoGambleAction();
+	GambleAction DetermineNextAction();
+	void AddNeededSourceItems(GambleAction action);
+	void Reset();
+
 	void DrawSettings();
 	void DrawFullWeaponName();
 	void DrawColoredGambleItemAmount(int amount);
@@ -72,9 +79,9 @@ private:
 	GambleBotState GetGambleBotState();
 
 	void SetGambleItem(UID64_t uid);
-	void ResetCurrentWeapon();
-	bool TryTargetItemToInventory();
-	   
+	void ResetGambleItem();
+
+	bool TryTargetItemToInventory();			   
 	void UpdateCheckTime(float elapsedTime);
 	bool GambleCheckTimeReady();
 	bool InternalActionCheckTimeReady();
@@ -83,43 +90,33 @@ private:
 	bool CheckRarePrefix(CItemInfo* weapon);
 	bool CheckRareSuffix(CItemInfo* weapon);
 	const char* GetGambleActionString(GambleAction);
-
-	void UpdateTotalGambleItemAmount();
-	int GetTotalInventoryAmount(GambleItem gambleItem);
-
-	bool TrySimulateButtonClick(LabButtonCode button);
-	bool TryGamble();
-	CItemInfo* FindGambleCardItemFromInventory(GambleItem gambleitem);
-
 	void Notify();
 	bool FixIsInList(int codenum, const int* fixlist, size_t arraysize);
-
-	bool PrepareNextGamble();
-	GambleAction DetermineNextAction();
-
-	void Reset();
+	void UpdateTotalGambleItemAmount();
+	int GetTotalInventoryAmount(GambleItem gambleItem);
+	bool TrySimulateButtonClick(LabButtonCode button); 
+	CItemInfo* FindGambleItemFromInventory(GambleItem gambleitem);
 
 private:
 	GambleBotState			m_state;
 	bool					m_auto_gamble;
 	
 	UID64_t					m_current_gambleitem_uid; // if this is 0 -> we dont have a valid gamble item	
+	OsrItemInfo				m_gamble_item;
+	bool					m_is_advanced_weapon;
 	bool					m_select_new_weapon;
 
-	bool					m_doPrefixGamble;
-	bool					m_doSuffixGamble;
-	bool					m_doPrefixGambleTemp;
-	bool					m_doSuffixGambleTemp;
+	bool					m_do_prefix_gamble;
+	bool					m_do_suffix_gamble;
+	bool					m_do_prefix_gamble_temp;
+	bool					m_do_suffix_gamble_temp;
 
-	GambleAction			m_nextGambleAction;
-	int						m_nextActionPrepare;
-	int						m_actionsToPrepareCount;
+	GambleAction			m_next_gamble_action;
+	std::queue<GambleItem>	m_needed_source_items;
 	bool					m_waiting_for_answer;
 
-	float					m_gambleCheckTime;	
-	float					m_internalActionCheckTime;	// button clicks and item movement 
- 
-	bool					m_isAdvancedWeapon;	
+	float					m_gamble_check_time;			// time between two complete gambles	
+	float					m_internal_action_check_time;	// time between two button clicks and item movement   	
 	   
 	int						m_amount_SG_ADV_Prefix;
 	int						m_amount_SG_ADV_Suffix;
@@ -128,12 +125,10 @@ private:
 	int						m_amount_removal_Prefix;
 	int						m_amount_removal_Suffix;	   
 	
-	bool					m_notfiySound;
-	bool					m_notfiyMB;
+	bool					m_notfiy_sound;
+	bool					m_notfiy_popup;
 
-	FixSelection			m_SuffixSelection;
-	FixSelection			m_PrefixSelection;		 
-
-	OsrItemInfo				m_gamble_item;
+	FixSelection			m_suffix_selection;
+	FixSelection			m_prefix_selection;		
 };
 
