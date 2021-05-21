@@ -99,7 +99,7 @@ void EnchantBot::RenderImGui()
 	}
 	
 	/*
-	if(ImGui::FancyCheckbox("Active", &m_enabled))
+	if(ImGui::Checkbox("Active", &m_enabled))
 	{
 		// dont allow the EnchantBot to be turned on if the GambleBot is aktive right now
 		if (m_active) 
@@ -122,7 +122,7 @@ void EnchantBot::RenderImGui()
 	}
 
 	ImGui::BeginGroupPanel("Item Selection", ImVec2(400, 100));
-	if (ImGui::FancyButton("Select New", 2.f))
+	if (ImGui::Button("Select New"))
 	{
 		ResetCurrentEnchantItem();
 		m_selectNewEnchantItem = true;
@@ -365,21 +365,21 @@ void EnchantBot::DrawSettings()
 
 	ImGui::BeginGroupPanel("Notifications", ImVec2(200, 100));
 	ImGui::Dummy(ImVec2(0, 5));
-	ImGui::FancyCheckbox("Play sound", &m_notify_sound);
-	ImGui::FancyCheckbox("Show Popup", &m_notify_messagebox);
+	ImGui::Checkbox("Play sound", &m_notify_sound);
+	ImGui::Checkbox("Show Popup", &m_notify_messagebox);
 	ImGui::Dummy(ImVec2(0, 5));
 	ImGui::EndGroupPanel();
 
 	ImGui::Dummy(ImVec2(0, 15));   
 	// use e1 prots for e6 and e7
-	ImGui::FancyCheckbox("Optimise Enchants", &m_optimiseEnchanting); 
-	ImGui::FancyCheckbox("Use Chance Cards", &m_withLuckyCard);
-	ImGui::FancyCheckbox("Automatic Enchanting", &m_auto_enchant);
+	ImGui::Checkbox("Optimise Enchants", &m_optimiseEnchanting); 
+	ImGui::Checkbox("Use Chance Cards", &m_withLuckyCard);
+	ImGui::Checkbox("Automatic Enchanting", &m_auto_enchant);
 
 	ImGui::Dummy(ImVec2(0, 5));
 	if (m_currentEnchantItemUID != 0)
 	{
-		if (ImGui::FancyButton("Enchant"))
+		if (ImGui::Button("Enchant"))
 		{
 			if (m_state == EnchantBotState::STANDBY && EnchantCheckTimeReady()) {
 				SetEnchantBotState(EnchantBotState::ENCHANT_SINGLE);
@@ -402,48 +402,48 @@ void EnchantBot::DrawEnchantButtons()
 					   
 	if ((m_currentEnchantItemUID != 0 && m_enchant_item.IsWeapon()) || m_currentEnchantItemUID == 0)
 	{
-		if (ImGui::FancyButton("Reattack Card", 0, ImVec2(100, 20)) && wantend_enchant_count < 13) {
+		if (ImGui::Button("Reattack Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Reattack, m_wantedEnchants);
 		}
-		if (ImGui::FancyButton("Accuracy Card", 0, ImVec2(100, 20)) && wantend_enchant_count < 13) {
+		if (ImGui::Button("Accuracy Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Accuracy, m_wantedEnchants);
 		}
-		if (ImGui::FancyButton("Attack Card", 0, ImVec2(100, 20)) && wantend_enchant_count < 13) {
+		if (ImGui::Button("Attack Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::MinMax, m_wantedEnchants);
 		}
 		if ((m_currentEnchantItemUID != 0 && IS_SECONDARY_WEAPON_1(m_enchant_item.GetItemInfo()->Kind)) || !m_currentEnchantItemUID == 0)
 		{
-			if (ImGui::FancyButton("Speed Card", 0, ImVec2(100, 20)) && wantend_enchant_count < 13) {
+			if (ImGui::Button("Speed Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 				AddEnchantToList(EnchantItemType::Speed, m_wantedEnchants);
 			}
 		}		
 		
-		if (ImGui::FancyButton("Weight Card", 0, ImVec2(100, 20)) && wantend_enchant_count <= 13) {
+		if (ImGui::Button("Weight Card", ImVec2(100, 20)) && wantend_enchant_count <= 13) {
 			AddEnchantToList(EnchantItemType::Weight, m_wantedEnchants);
 		}
-		if (ImGui::FancyButton("Range Card", 0, ImVec2(100, 20)) && wantend_enchant_count <= 13) {
+		if (ImGui::Button("Range Card", ImVec2(100, 20)) && wantend_enchant_count <= 13) {
 			AddEnchantToList(EnchantItemType::Range, m_wantedEnchants);
 		}
-		if (ImGui::FancyButton("Time Card", 0, ImVec2(100, 20)) && wantend_enchant_count <= 13) {
+		if (ImGui::Button("Time Card", ImVec2(100, 20)) && wantend_enchant_count <= 13) {
 			AddEnchantToList(EnchantItemType::Time, m_wantedEnchants);
 		}
 		
 	}
 	else if ((m_currentEnchantItemUID != 0 && m_enchant_item.IsArmor()) || m_currentEnchantItemUID == 0)
 	{
-		if (ImGui::FancyButton("Shield Card", 0, ImVec2(100, 20)) && wantend_enchant_count < 13) {
+		if (ImGui::Button("Shield Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Shield, m_wantedEnchants);
 		}
-		if (ImGui::FancyButton("Energy Card", 0, ImVec2(100, 20)) && wantend_enchant_count < 13) {
+		if (ImGui::Button("Energy Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Energy, m_wantedEnchants);
 		}
-		if (ImGui::FancyButton("Energy/Shield Card", 0, ImVec2(100, 20)) && wantend_enchant_count < 13) {
+		if (ImGui::Button("Energy/Shield Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::EnergyShield, m_wantedEnchants);
 		}
 	}  	
 
 	ImGui::Dummy(ImVec2(0, 5));
-	if (ImGui::FancyButton("Reset",0, ImVec2(100, 20))) {
+	if (ImGui::Button("Reset",ImVec2(100, 20))) {
 		ResetEnchantList(m_wantedEnchants);
 	}
 }
@@ -451,7 +451,7 @@ void EnchantBot::DrawEnchantButtons()
 void EnchantBot::ResetEnchantList(EnchantListType& enchantlist)
 {
 	enchantlist.clear();
-	AddEnchantToList(EnchantItemType::None, enchantlist);
+	AddEnchantToList(EnchantItemType::None, enchantlist);	// dummy enchant
 }
 	
 void EnchantBot::AddEnchantToList(EnchantItemType enchanttype, EnchantListType& enchantlist)

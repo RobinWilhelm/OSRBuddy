@@ -22,7 +22,7 @@ void BuddyFeatureBase::Enable(bool enable)
 bool BuddyFeatureBase::DrawEnableCheckBox()
 {
 	bool enable = m_enabled;
-	if (ImGui::FancyCheckbox("Enable", &enable)) {
+	if (ImGui::Checkbox("Enable", &enable)) {
 		Enable(enable);
 	}
 	return enable;

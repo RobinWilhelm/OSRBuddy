@@ -18,14 +18,35 @@ void OSRImGuiMenu::Render()
 
     /*
     if (ImGui::CollapsingHeader("General Options", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_OpenOnArrow)) {
-        ImGui::FancyCheckbox("Block input when menu is open", &m_blockInput);                                                   7
+        ImGui::Checkbox("Block input when menu is open", &m_blockInput);                                                   7
     }
     */
 
-    ImGui::BeginTabBar("Features");
-    if (ImGui::BeginTabItem("General Options"))
-    {
-        ImGui::FancyCheckbox("Block input when menu is open", &m_blockInput);
+    ImGui::BeginTabBar("Features", ImGuiTabBarFlags_::ImGuiTabBarFlags_None);
+    if (ImGui::BeginTabItem("Settings"))
+    {    
+        ImGui::BeginChild("SettingsTab", ImVec2(), true);
+        ImGui::Columns(2, NULL, true);
+        ImGui::Checkbox("Block input when menu is open", &m_blockInput);
+        
+        ImGui::NextColumn();
+        ImGui::Text("UI Themes");
+
+        if (ImGui::Button("ImGui Standard"))
+        {
+            LoadStandardTheme();
+        }
+        if (ImGui::Button("Classic Steam"))
+        {
+            LoadClassicSteamTheme();
+        }
+
+        if (ImGui::Button("Corporate Grey"))
+        {
+            LoadCorporateGreyTheme();
+        }
+        ImGui::NextColumn();
+        ImGui::EndChild();
         ImGui::EndTabItem();
     } 
 
