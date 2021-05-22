@@ -562,10 +562,10 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		}
 		break;
 	case EnchantAction::Add_PercentageCard: // next and optional item is an enchant chance card
-		if (m_withLuckyCard && m_enchant_item.GetItemInfo()->m_nEnchantNumber == 10)
+		if (m_enchant_item.GetItemInfo()->m_nEnchantNumber == 10)
 		{
 			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantChance8P, m_enchantTargetKind, OSR_API->GetPlayerGearType());
-		}
+		} 	
 		break;	 
 	case EnchantAction::Use_OkButton:
 		OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
@@ -731,8 +731,10 @@ EnchantAction EnchantBot::GetNextAction()
 			}  			
 			break;
 		case EnchantAction::Add_ProtectCard:
-			return EnchantAction::Add_PercentageCard;
-			//last_action = EnchantAction::Add_PercentageCard;
+			if (m_withLuckyCard) {
+				return EnchantAction::Add_PercentageCard;
+			}			
+			last_action = EnchantAction::Add_PercentageCard;
 			break;
 		case EnchantAction::Add_PercentageCard:
 			return EnchantAction::Use_OkButton;

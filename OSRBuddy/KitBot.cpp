@@ -192,6 +192,9 @@ KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_lastUseEnergyKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     m_lastUseSkillKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     GrabPlayerSkills();
+
+    m_field_healings_active = false;
+    m_target_healings_active = false;
 }
 
 bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
@@ -723,157 +726,190 @@ void KitBuffBot::Tick()
     
     TickAutoKit();
     TickAutoBuff();
+    TickAutoHeals();
     TickAutoAmmo();
 }
      
 void KitBuffBot::RenderImGui()
 {   
     DrawEnableCheckBox();   
-    
-    //ImGui::BeginGroupPanel("Kitbot", ImVec2(200, 200));
     ImGui::BeginGroup();
     {
-        const char* items[] = { "Rage", "Humanized", "Sleepy" };
-        ImGui::ComboEx("Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
-        ImGui::SameLine();
-        ImGui::Dummy(ImVec2(5, 0));
-        ImGui::Dummy(ImVec2(0, 5));
 
-        ImGui::BeginGroupPanel("Shield", ImVec2(100, 100));
-        {
-            if (ImGui::Checkbox("S Type", &m_settings.use_shield_type_s))
-            {
-                if (m_settings.use_shield_type_s)
-                {
-                    m_settings.use_shield_type_a = true;
-                    m_settings.use_shield_type_b = true;
-                    m_settings.use_shield_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("A Type", &m_settings.use_shield_type_a))
-            {
-                if (m_settings.use_shield_type_a)
-                {
-                    m_settings.use_shield_type_b = true;
-                    m_settings.use_shield_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("B Type", &m_settings.use_shield_type_b))
-            {
-                if (m_settings.use_shield_type_b) {
-                    m_settings.use_shield_type_c = true;
-                }
-            }
-            ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
-        }
-        ImGui::EndGroupPanel();   
-        ImGui::SameLine();   
-        ImGui::BeginGroupPanel("Energy", ImVec2(100, 100));
-        {
-            if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
-            {
-                if (m_settings.use_energy_type_s)
-                {
-                    m_settings.use_energy_type_a = true;
-                    m_settings.use_energy_type_b = true;
-                    m_settings.use_energy_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("A Type##", &m_settings.use_energy_type_a))
-            {
-                if (m_settings.use_energy_type_a)
-                {
-                    m_settings.use_energy_type_b = true;
-                    m_settings.use_energy_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("B Type##", &m_settings.use_energy_type_b))
-            {
-                if (m_settings.use_energy_type_b) {
-                    m_settings.use_energy_type_c = true;
-                }
-            }
-            ImGui::Checkbox("C Type##", &m_settings.use_energy_type_c);
-        }
-        ImGui::EndGroupPanel();
-        ImGui::SameLine();
-        ImGui::BeginGroupPanel("Other");
-        {
-            ImGui::Checkbox("Ammo", &m_settings.use_ammobox);
-            ImGui::Checkbox("Fuel", &m_settings.use_fuel);
-        }
-        ImGui::EndGroupPanel();    
-    }
-    ImGui::EndGroup();
-    //ImGui::EndGroupPanel();    
-    ImGui::BeginGroupPanel("Autobuffs");  
-    {
+        //ImGui::BeginGroupPanel("Kitbot", ImVec2(200, 200));
         ImGui::BeginGroup();
-        for (auto skill : m_playerskills)
         {
-            switch (skill->type)
+            const char* items[] = { "Rage", "Humanized", "Sleepy" };
+            ImGui::ComboEx("Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
+            ImGui::SameLine();
+            ImGui::Dummy(ImVec2(5, 0));
+            ImGui::Dummy(ImVec2(0, 5));
+
+            ImGui::BeginGroupPanel("Shield", ImVec2(100, 100));
             {
-            case SkillType::Concentration:
-            case SkillType::Missile_Shot:
-            case SkillType::Fire_Shot:
-            case SkillType::Evasion_Up:
-            case::SkillType::Defense_Up:
-                if (skill->final) {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
-                }
-                if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                if (ImGui::Checkbox("S Type", &m_settings.use_shield_type_s))
                 {
-                    if (skill->autobuff) {
-                        AddAutoBuff(skill->type);
-                    }
-                    else {
-                        RemoveAutoBuff(skill->type);
+                    if (m_settings.use_shield_type_s)
+                    {
+                        m_settings.use_shield_type_a = true;
+                        m_settings.use_shield_type_b = true;
+                        m_settings.use_shield_type_c = true;
                     }
                 }
-                if (skill->final) {
-                    ImGui::PopStyleColor();
+                if (ImGui::Checkbox("A Type", &m_settings.use_shield_type_a))
+                {
+                    if (m_settings.use_shield_type_a)
+                    {
+                        m_settings.use_shield_type_b = true;
+                        m_settings.use_shield_type_c = true;
+                    }
                 }
+                if (ImGui::Checkbox("B Type", &m_settings.use_shield_type_b))
+                {
+                    if (m_settings.use_shield_type_b) {
+                        m_settings.use_shield_type_c = true;
+                    }
+                }
+                ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
             }
-        }
-        ImGui::EndGroup();  
-        ImGui::SameLine(); 
-        ImGui::BeginGroup();
-        for (auto skill : m_playerskills)
-        {
-            switch (skill->type)
+            ImGui::EndGroupPanel();
+            ImGui::SameLine();
+            ImGui::BeginGroupPanel("Energy", ImVec2(100, 100));
             {
-            case SkillType::Frenzy:
-            case SkillType::Elevation:
-            case SkillType::Raging_Defense:
-            case SkillType::Raging_Evasion:
-            case SkillType::Raging_Fire:
-                if (skill->final) {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
-                }
-                if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
                 {
-                    if (skill->autobuff) {
-                        AddAutoBuff(skill->type);
-                    }
-                    else {
-                        RemoveAutoBuff(skill->type);
+                    if (m_settings.use_energy_type_s)
+                    {
+                        m_settings.use_energy_type_a = true;
+                        m_settings.use_energy_type_b = true;
+                        m_settings.use_energy_type_c = true;
                     }
                 }
-                if (skill->final) {
-                    ImGui::PopStyleColor();
+                if (ImGui::Checkbox("A Type##", &m_settings.use_energy_type_a))
+                {
+                    if (m_settings.use_energy_type_a)
+                    {
+                        m_settings.use_energy_type_b = true;
+                        m_settings.use_energy_type_c = true;
+                    }
                 }
+                if (ImGui::Checkbox("B Type##", &m_settings.use_energy_type_b))
+                {
+                    if (m_settings.use_energy_type_b) {
+                        m_settings.use_energy_type_c = true;
+                    }
+                }
+                ImGui::Checkbox("C Type##", &m_settings.use_energy_type_c);
             }
+            ImGui::EndGroupPanel();
+            ImGui::SameLine();
+            ImGui::BeginGroupPanel("Other");
+            {
+                ImGui::Checkbox("Ammo", &m_settings.use_ammobox);
+                ImGui::Checkbox("Fuel", &m_settings.use_fuel);
+            }
+            ImGui::EndGroupPanel();
         }
         ImGui::EndGroup();
-    }
-    ImGui::EndGroupPanel();
-    /*
-    ImGui::Text("Shield Timer Game:"); ImGui::SameLine();                                                                                                 
-    ImGui::Text(std::to_string((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() - m_lastUseShieldKitTime)).count()).c_str());
+        //ImGui::EndGroupPanel();    
+        ImGui::BeginGroupPanel("Autobuffs");
+        {
+            ImGui::BeginGroup();
+            for (auto skill : m_playerskills)
+            {
+                switch (skill->type)
+                {
+                case SkillType::Concentration:
+                case SkillType::Missile_Shot:
+                case SkillType::Fire_Shot:
+                case SkillType::Evasion_Up:
+                case::SkillType::Defense_Up:
+                    if (skill->final) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
+                    }
+                    if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                    {
+                        if (skill->autobuff) {
+                            AddAutoBuff(skill->type);
+                        }
+                        else {
+                            RemoveAutoBuff(skill->type);
+                        }
+                    }
+                    if (skill->final) {
+                        ImGui::PopStyleColor();
+                    }
+                }
+            }
+            ImGui::EndGroup();
+            ImGui::SameLine();
+            ImGui::BeginGroup();
+            for (auto skill : m_playerskills)
+            {
+                switch (skill->type)
+                {
+                case SkillType::Frenzy:
+                case SkillType::Elevation:
+                case SkillType::Raging_Defense:
+                case SkillType::Raging_Evasion:
+                case SkillType::Raging_Fire:
+                    if (skill->final) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
+                    }
+                    if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                    {
+                        if (skill->autobuff) {
+                            AddAutoBuff(skill->type);
+                        }
+                        else {
+                            RemoveAutoBuff(skill->type);
+                        }
+                    }
+                    if (skill->final) {
+                        ImGui::PopStyleColor();
+                    }
+                }
+            }
+            ImGui::EndGroup();
+        }
+        ImGui::EndGroupPanel();
+        /*
+        ImGui::Text("Shield Timer Game:"); ImGui::SameLine();
+        ImGui::Text(std::to_string((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() - m_lastUseShieldKitTime)).count()).c_str());
 
-    ImGui::Text("Shield Timer Buddy:"); ImGui::SameLine();
-    ImGui::Text(std::to_string(m_buddy->GetTickTime().count()).c_str());  
-    */
+        ImGui::Text("Shield Timer Buddy:"); ImGui::SameLine();
+        ImGui::Text(std::to_string(m_buddy->GetTickTime().count()).c_str());
+        */
+    }
+    ImGui::EndGroup();
+    ImGui::SameLine();
+    ImGui::BeginGroup();
+    {
+        ImGui::BeginGroupPanel("Autohealings");
+        {
+            ImGui::Checkbox("Field Healings", &m_field_healings_active);
+            ImGui::Checkbox("Target Healings", &m_target_healings_active);
+            /*
+            if (!(OSR_API->GetPlayerGearType() == GearType::MGear))
+            {
+                ImGui::Text("Only available for MGear!");
+            }
+            else
+            */
+            ImGui::BeginGroupPanel("Priority Healing", ImVec2(400, 400));
+            {  
+                ImGui::Checkbox(OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterName, &m_target_heal_prio_myself);
+                for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+                {
+                    ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
+                    //ImGui::SliderInt(partymember->m_ImPartyMemberInfo.CharacterName, &partymember->m_bSpeakingAuth, 0, 5);
+                }
+            }
+            ImGui::EndGroupPanel();
+        }
+        ImGui::EndGroupPanel();
+    }
+    ImGui::EndGroup();
 }
 
 const char* KitBuffBot::GetName() const
@@ -1244,7 +1280,7 @@ void KitBuffBot::TickAutoBuff()
        
         for (auto pskill : m_playerskills)
         {
-            if (pskill->autobuff && !pskill->IsWaiting() && pskill->skillinfo->ItemInfo->ReqSP <= currentsp && pskill->skillinfo->m_fCheckEnableTime <= 0)
+            if (pskill->autobuff && !pskill->IsWaiting() && pskill->skillinfo->ItemInfo->ReqSP <= currentsp && pskill->skillinfo->m_fCheckEnableTime <= 1100)
             {
                 TryUseSkill(pskill);
                 currentsp -= pskill->skillinfo->ItemInfo->ReqSP;
@@ -1261,6 +1297,11 @@ void KitBuffBot::TickAutoAmmo()
     {
         TryUseAmmunitionBox();
     }
+}
+
+void KitBuffBot::TickAutoHeals()
+{
+
 }
 
 void KitBuffBot::GrabPlayerSkills()

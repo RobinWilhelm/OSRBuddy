@@ -172,6 +172,8 @@ private:
 	void TickAutoKit();
 	void TickAutoBuff();
 	void TickAutoAmmo();
+	void TickAutoHeals();
+
 	void GrabPlayerSkills();
 	bool TryUseSkill(PlayerSkillInfo* skillinfo);
 	void OnUseSkillAnswer(int itemnum);
@@ -209,4 +211,8 @@ private:
 	std::chrono::milliseconds m_lastSendEnergyKitTime;
 	std::chrono::milliseconds m_lastSendSkillKitTime;
 	std::chrono::milliseconds m_lastSendFuelKitTime;
+
+	bool m_field_healings_active;
+	bool m_target_healings_active;
+	bool m_target_heal_prio_myself;
 };
