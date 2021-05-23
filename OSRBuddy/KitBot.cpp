@@ -114,6 +114,17 @@
 
 typedef struct
 {
+    ItemID_t		SkillItemID;
+} MSG_FC_SKILL_PREPARE_USE;
+
+typedef struct
+{
+    ClientIndex_t	ClientIndex;
+    ItemID_t		SkillItemID;
+} MSG_FC_SKILL_PREPARE_USE_OK;
+
+typedef struct
+{
     ItemID_t		SkillItemID;			// 종료되는 스킬 정보
     INT				AttackSkillItemNum0;	// 2006-12-12 by cmkwon, 현재 스킬을 종료되게 하는 공격스킬 아이템넘버 
 } MSG_FC_SKILL_CANCEL_SKILL;
@@ -193,8 +204,6 @@ KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_lastUseSkillKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     GrabPlayerSkills();
 
-    m_field_healings_active = false;
-    m_target_healings_active = false;
 }
 
 bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
@@ -567,13 +576,36 @@ bool KitBuffBot::TryUseSkill(PlayerSkillInfo* skillinfo)
         return false;
     }
 
-    // only allow a skill to be used every 400ms because quickslot bar can only be used every 400ms
+    // only allow the same skill to be used every 400ms because quickslot bar can only be used every 400ms
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());  
     if ((current - skillinfo->last_use) < 400ms) {
         return false;
     }
 
     OSR_API->SendUseSkill(skillinfo->skillinfo);
+    return true;
+}
+
+bool KitBuffBot::TryUseTargetSkill(PlayerSkillInfo* skillinfo, ClientIndex_t target)
+{
+    if (!TryUseSkill(skillinfo)) {
+        return false;
+    }
+    auto skill = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pSkill;
+    skill->m_bSkillTargetState = FALSE;
+    skill->m_nTargetIndex = target; 
+    return true;
+}
+
+bool KitBuffBot::TryUseTargetSkill(PlayerSkillInfo* skillinfo, UID32_t characterUID)
+{
+    if (!TryUseSkill(skillinfo)) {
+        return false;
+    }
+    auto skill = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pSkill;
+    skill->m_bSkillTargetState = FALSE;
+    skill->m_nTargetIndex = 0;
+    skill->m_nCharacterUID = characterUID;
     return true;
 }
 
@@ -687,6 +719,160 @@ void KitBuffBot::OnUseSkillError(MSG_ERROR* error)
         // do something
     }
 }
+
+bool KitBuffBot::ShouldUseHealingField()
+{
+    // check if any party member in range has missing energy
+    int shield_missing = 0;
+    auto playerpos = OSR_API->GetShuttlePosition();
+    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 750) 
+    {
+        if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
+            return true;
+        }
+        shield_missing++;
+    }
+
+    for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!partymember->m_bUserLogOn || !partymember->m_pEnemyData) {
+            continue;
+        }
+
+        // first check if the member is in range for heals
+        D3DXVECTOR3 delta = partymember->m_pEnemyData->m_vPos - playerpos;
+        float distance = D3DXVec3Length(&delta);
+        if (distance <= 3000.0f)  // hardcoded for now, this value is accurate for all field healings above level 54
+        {
+            if (partymember->m_pEnemyData->m_infoCharacter.DP - partymember->m_pEnemyData->m_infoCharacter.CurrentDP >= 750)
+            {
+                shield_missing++;
+            }
+        }
+    }
+    // only use healing field if at two or more party members in range are missing energy
+    if (shield_missing < 2) {
+        return false;
+    }
+
+    return true;
+}
+
+bool KitBuffBot::ShouldUseEnergizeField()
+{
+    // check if any party member in range has missing energy
+    int energy_missing = 0;
+    auto playerpos = OSR_API->GetShuttlePosition();
+    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 500) 
+    {
+        if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
+            return true;
+        }
+        energy_missing++;
+    }
+
+    for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!partymember->m_bUserLogOn || !partymember->m_pEnemyData) {
+            continue;
+        }
+
+        // first check if the member is in range for heals
+        D3DXVECTOR3 delta = partymember->m_pEnemyData->m_vPos - playerpos;
+        float distance = D3DXVec3Length(&delta);
+        if (distance <= 3000.0f) // hardcoded for now, this value is accurate for all field healings above level 54
+        {
+            if (partymember->m_pEnemyData->m_infoCharacter.HP - partymember->m_pEnemyData->m_infoCharacter.CurrentHP >= 500)
+            {
+                energy_missing++;
+            }
+        }
+    }
+    // only use energize field if at two or more party members in range are missing energy
+    if (energy_missing < 2) {
+        return false;
+    }
+
+    return true;
+}
+
+UID32_t KitBuffBot::GetBestHealTarget()
+{
+    UID32_t target = 0;
+    UID32_t prio_target = 0;
+
+    // get healing target based on missing hp
+    int most_missing_energy = 500;
+    for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!member->m_bUserLogOn || !member->m_pEnemyData) {
+            continue;
+        }
+
+        int member_energy_missing = member->m_pEnemyData->m_infoCharacter.HP - member->m_pEnemyData->m_infoCharacter.CurrentHP;
+        if (member_energy_missing > most_missing_energy)
+        {
+            most_missing_energy = member_energy_missing;
+            target = member->m_nUniqueNumber;
+
+            if (member->m_bSpeakingAuth) {
+                prio_target = member->m_nUniqueNumber;
+            }
+        }
+    }
+
+    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 500)
+    {
+        target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        if (m_settings.target_heal_prio_myself) {
+            return OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        }
+    }
+
+    if (prio_target != 0) {
+        return prio_target;
+    } 
+    return target;
+}
+
+UID32_t KitBuffBot::GetBestEnergizeTarget()
+{
+    UID32_t target = 0;
+    UID32_t prio_target = 0;
+
+    // get healing target based on missing shield
+    int most_missing_shield = 0;
+    for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!member->m_bUserLogOn || !member->m_pEnemyData) {
+            continue;
+        }
+
+        int member_shield_missing = member->m_pEnemyData->m_infoCharacter.DP - member->m_pEnemyData->m_infoCharacter.CurrentDP;
+        if (member_shield_missing > most_missing_shield)
+        {
+            most_missing_shield = member_shield_missing;
+            target = member->m_nUniqueNumber;
+
+            if (member->m_bSpeakingAuth) {
+                prio_target = member->m_nUniqueNumber;
+            }
+        }
+    }
+
+    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 500)
+    {
+        target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        if (m_settings.target_heal_prio_myself) {
+            return OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        }
+    }
+
+    if (prio_target != 0) {
+        return prio_target;
+    }
+    return target;
+}
        
 PlayerSkillInfo* KitBuffBot::FindPlayerSkill(SkillType skilltype) const
 {
@@ -716,6 +902,12 @@ bool KitBuffBot::AutoBuffCheckTimerReady()
 {
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     return (current - m_lastAutoBuffCheck >= AUTOBUFF_CHECK_TIME);
+}
+
+bool KitBuffBot::AutoHealCheckTimerReady()
+{
+    std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    return (current - m_last_auto_heal_check >= AUTOHEAL_CHECK_TIME);
 }
 
 void KitBuffBot::Tick()
@@ -885,27 +1077,36 @@ void KitBuffBot::RenderImGui()
     ImGui::SameLine();
     ImGui::BeginGroup();
     {
-        ImGui::BeginGroupPanel("Autohealings");
-        {
-            ImGui::Checkbox("Field Healings", &m_field_healings_active);
-            ImGui::Checkbox("Target Healings", &m_target_healings_active);
-            /*
-            if (!(OSR_API->GetPlayerGearType() == GearType::MGear))
+        ImGui::BeginGroupPanel("Autohealings", ImVec2(400, 400));
+        { 
+            if (OSR_API->GetPlayerGearType() != GearType::MGear)
             {
-                ImGui::Text("Only available for MGear!");
+                ImGui::Text("Only available for MG!");
             }
             else
-            */
-            ImGui::BeginGroupPanel("Priority Healing", ImVec2(400, 400));
-            {  
-                ImGui::Checkbox(OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterName, &m_target_heal_prio_myself);
-                for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+            {
+                ImGui::Text("Field: \t");
+                ImGui::SameLine();
+                ImGui::Checkbox("Shield", &m_settings.field_healings_active);
+                ImGui::SameLine();
+                ImGui::Checkbox("Energy", &m_settings.field_energizings_active);
+                             
+                ImGui::Text("Target:\t");
+                ImGui::SameLine();
+                ImGui::Checkbox("Shield##targetShield", &m_settings.target_healings_active);
+                ImGui::SameLine();
+                ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_energizing_active);
+
+                ImGui::NewLine();
+                ImGui::BeginGroupPanel("Priority Healing", ImVec2(400, 400));
                 {
-                    ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
-                    //ImGui::SliderInt(partymember->m_ImPartyMemberInfo.CharacterName, &partymember->m_bSpeakingAuth, 0, 5);
+                    ImGui::Checkbox(OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterName, &m_settings.target_heal_prio_myself);
+                    for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo) {
+                        ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
+                    }
                 }
-            }
-            ImGui::EndGroupPanel();
+                ImGui::EndGroupPanel();
+            }             
         }
         ImGui::EndGroupPanel();
     }
@@ -1112,6 +1313,11 @@ bool KitBuffBot::OnWritePacket(unsigned short msgtype, byte* packet)
             }
             break;
         }
+    case T_FC_SKILL_PREPARE_USE:
+    case T_FC_SKILL_SETUP_SKILL:
+        {
+            MSG_FC_SKILL_PREPARE_USE* msg_prepare_skill = (MSG_FC_SKILL_PREPARE_USE*)packet;
+        }
     }
     return 0;
 }
@@ -1280,8 +1486,8 @@ void KitBuffBot::TickAutoBuff()
        
         for (auto pskill : m_playerskills)
         {
-            if (pskill->autobuff && !pskill->IsWaiting() && pskill->skillinfo->ItemInfo->ReqSP <= currentsp && pskill->skillinfo->m_fCheckEnableTime <= 1100)
-            {
+            if (pskill->autobuff && !pskill->IsWaiting() && pskill->skillinfo->ItemInfo->ReqSP <= currentsp && pskill->skillinfo->m_fCheckReattackTime <= 0.0f)
+            {   
                 TryUseSkill(pskill);
                 currentsp -= pskill->skillinfo->ItemInfo->ReqSP;
             }
@@ -1301,7 +1507,58 @@ void KitBuffBot::TickAutoAmmo()
 
 void KitBuffBot::TickAutoHeals()
 {
+    if (OSR_API->GetPlayerGearType() == GearType::MGear  && AutoHealCheckTimerReady())
+    {
+        int currentsp = OSR_API->GetCurrentSkillp();
 
+        if (m_settings.target_energizing_active)
+        {
+            UID32_t energize_target = GetBestEnergizeTarget();
+            if (energize_target != 0)
+            {
+                PlayerSkillInfo* energize_skill = FindPlayerSkill(SkillType::Energize_Target);
+                if (energize_skill && energize_skill->skillinfo->m_fCheckReattackTime <= 0.0f && energize_skill->skillinfo->ItemInfo->ReqSP <= currentsp) 
+                {
+                    TryUseTargetSkill(energize_skill, energize_target);
+                    currentsp -= energize_skill->skillinfo->ItemInfo->ReqSP;
+                }
+            }
+        }
+
+        if (m_settings.target_healings_active)
+        {
+            UID32_t heal_target = GetBestHealTarget();
+            if (heal_target != 0)
+            {
+                PlayerSkillInfo* heal_skill = FindPlayerSkill(SkillType::Heal_Target);
+                if (heal_skill && heal_skill->skillinfo->m_fCheckReattackTime <= 0.0f && heal_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
+                {
+                    TryUseTargetSkill(heal_skill, heal_target); 
+                    currentsp -= heal_skill->skillinfo->ItemInfo->ReqSP;
+                }
+            } 
+        } 
+
+        if (m_settings.field_energizings_active) 
+        {
+            PlayerSkillInfo* energizefield = FindPlayerSkill(SkillType::Energizing_Field);
+            if (energizefield && energizefield->skillinfo->m_fCheckReattackTime <= 0.0f && energizefield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseEnergizeField())
+            {
+                TryUseSkill(energizefield);
+                currentsp -= energizefield->skillinfo->ItemInfo->ReqSP;
+            }
+        } 
+
+        if (m_settings.field_healings_active)
+        {
+            PlayerSkillInfo* healingfield = FindPlayerSkill(SkillType::Healing_Field);
+            if (healingfield && healingfield->skillinfo->m_fCheckReattackTime <= 0.0f && healingfield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseHealingField())
+            {
+                TryUseSkill(healingfield);
+                currentsp -= healingfield->skillinfo->ItemInfo->ReqSP;
+            }            
+        }
+    }
 }
 
 void KitBuffBot::GrabPlayerSkills()
@@ -1320,7 +1577,7 @@ void KitBuffBot::GrabPlayerSkills()
             skill->skillinfo = skillinfo.second;
             skill->last_use = 0ms;
             skill->clean_name = std::string(skill->skillinfo->ItemInfo->ItemName);
-            if (skill->clean_name[0] == '\\')  // check if name has a colorcode in its name
+            if (skill->clean_name[0] == '\\')  // check if name has a colorcode
             {
                 skill->clean_name.erase(skill->clean_name.begin(), skill->clean_name.begin() + 2);
                 skill->clean_name.erase(skill->clean_name.end() - 2, skill->clean_name.end());
