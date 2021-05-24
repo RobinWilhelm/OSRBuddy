@@ -547,7 +547,10 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		if (m_enchant_item.GetItemInfo()->m_nEnchantNumber == 10)
 		{
 			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantChance8P, m_enchantTargetKind, OSR_API->GetPlayerGearType());
-		} 	
+		}
+		else {
+			return true;
+		}
 		break;	 
 	case EnchantAction::Use_OkButton:
 		OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
