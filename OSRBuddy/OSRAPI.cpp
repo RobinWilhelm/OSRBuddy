@@ -482,6 +482,28 @@ GearType OldSchoolRivalsAPI::GetPlayerGearType()
 	}
 }
 
+MapNumber OldSchoolRivalsAPI::GetCurrentMap()
+{
+	switch (m_atumapplication->m_pShuttleChild->m_myShuttleInfo.MapChannelIndex.MapIndex)
+	{
+		case 9002: return MapNumber::WatermelonIsland;
+		case 9050: return MapNumber::InvasionWorld;
+			// lazy
+	}
+
+	return MapNumber();
+}
+
+UID32_t OldSchoolRivalsAPI::GetPlayerUniqueNumber()
+{
+	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+}
+
+ClientIndex_t OldSchoolRivalsAPI::GetPlayerClientIndex()
+{
+	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.ClientIndex;
+}
+
 bool OldSchoolRivalsAPI::IsInBuilding()
 {
 	// m_nCurrentEnterBuildingIndex is set to -1 if not in building

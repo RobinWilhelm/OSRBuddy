@@ -119,24 +119,7 @@ void GambleBot::RenderImGui()
 		//return;
 	}
 
-	/*
-	if (ImGui::Checkbox("Active", &m_enabled))
-	{
-		// dont allow the GambleBot to be turned on if the EnchantBot is aktive right now
-		if (m_enabled)
-		{
-			const BuddyFeatureBase* enchantBot = m_buddy->GetFeatureByType(FeatureType::EnchantBot);
-			//if (enchantBot && enchantBot->IsActive()) {
-			//	m_active = false;
-			//}
-		}
-		// begin drawing in next frame
-		return;
-	}
-	*/
-
 	ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
 
 	if (m_state == GambleBotState::NOT_IN_LABORATORY) {
 		ImGui::Text("You are not at the laboratory! Bot wont work!");

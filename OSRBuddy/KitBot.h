@@ -99,9 +99,9 @@ public:
 			use_fuel = other.use_fuel;
 
 			field_healings_active = other.field_healings_active; 
-			field_energizings_active = other.field_energizings_active; 
+			field_repair_active = other.field_repair_active; 
 			target_healings_active = other.target_healings_active;						
-			target_energizing_active = other.target_energizing_active;	 
+			target_repair_active = other.target_repair_active;	 
 			target_heal_prio_myself = other.target_heal_prio_myself;
 
 			use_spkit_type_a = other.use_spkit_type_a;
@@ -127,9 +127,9 @@ public:
 		bool use_fuel;
 
 		bool field_healings_active;
-		bool field_energizings_active;
+		bool field_repair_active;
 		bool target_healings_active;
-		bool target_energizing_active;
+		bool target_repair_active;
 		bool target_heal_prio_myself; 
 
 		bool use_spkit_type_a;
@@ -203,7 +203,7 @@ private:
 	bool ShouldUseEnergizeField();
 
 	UID32_t GetBestHealTarget();
-	UID32_t GetBestEnergizeTarget();
+	UID32_t GetBestRepairTarget();
 
 private:   
 	KitSettings m_settings;
