@@ -566,6 +566,9 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		{
 			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantChance8P, m_enchantTargetKind, OSR_API->GetPlayerGearType());
 		}
+		else {
+			return true;
+		}
 		break;	 
 	case EnchantAction::Use_OkButton:
 		OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
