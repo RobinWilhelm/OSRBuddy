@@ -114,7 +114,7 @@ void EnchantBot::RenderImGui()
 	}
 	*/
 
-	ImGui::Dummy(ImVec2(0.0f, 20.0f));
+	ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 	if (GetEnchantBotState() == EnchantBotState::NOT_IN_LABORATORY) 
 	{

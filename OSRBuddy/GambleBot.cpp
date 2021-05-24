@@ -114,14 +114,14 @@ void GambleBot::Tick()
 }
 
 void GambleBot::RenderImGui()
-{			
+{
 	if (!DrawEnableCheckBox()) {
 		//return;
 	}
 
 	/*
 	if (ImGui::Checkbox("Active", &m_enabled))
-	{ 
+	{
 		// dont allow the GambleBot to be turned on if the EnchantBot is aktive right now
 		if (m_enabled)
 		{
@@ -134,72 +134,81 @@ void GambleBot::RenderImGui()
 		return;
 	}
 	*/
- 
-	ImGui::Dummy(ImVec2(0.0f, 20.0f));
-		    	 
+
+	ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
 
 	if (m_state == GambleBotState::NOT_IN_LABORATORY) {
 		ImGui::Text("You are not at the laboratory! Bot wont work!");
 	}
 
-	ImGui::BeginGroupPanel("Settings", ImVec2(400,400));
-	ImGui::Spacing();
-	DrawSettings();
-	ImGui::Spacing();
+	ImGui::BeginGroupPanel("Settings", ImVec2(400, 400));
+	{
+		DrawSettings();
+	}
 	ImGui::EndGroupPanel();
 	ImGui::SameLine();
 
 	ImGui::BeginGroup();
-	ImGui::BeginGroupPanel("Gambleitems Overview", ImVec2(400, 400));
-	ImGui::Spacing();
-	ImGui::BeginGroupPanel("Prefix", ImVec2(190, 400));
-	ImGui::Text("Supergamble Advanced");
-	ImGui::SameLine();
-	DrawColoredGambleItemAmount(m_amount_SG_ADV_Prefix);
-
-	ImGui::Text("Supergamble Standard");
-	ImGui::SameLine();
-	DrawColoredGambleItemAmount(m_amount_SG_STD_Prefix);
-
-	ImGui::Text("Removal cards");
-	ImGui::SameLine();
-	DrawColoredGambleItemAmount(m_amount_removal_Prefix);
-	ImGui::Dummy(ImVec2(0, 3));
-	ImGui::EndGroupPanel();	
-
-	ImGui::BeginGroupPanel("Suffix", ImVec2(190, 400));
-	ImGui::Text("Supergamble Advanced");
-	ImGui::SameLine();
-	DrawColoredGambleItemAmount(m_amount_SG_ADV_Suffix);
-
-	ImGui::Text("Supergamble Standard");
-	ImGui::SameLine();
-	DrawColoredGambleItemAmount(m_amount_SG_STD_Suffix);
-
-	ImGui::Text("Removal cards");
-	ImGui::SameLine();
-	DrawColoredGambleItemAmount(m_amount_removal_Suffix);
-	ImGui::Dummy(ImVec2(0, 3));
-	ImGui::EndGroupPanel();
-	ImGui::Spacing();
-	ImGui::EndGroupPanel();
-	   	
-	ImGui::BeginGroupPanel("Control", ImVec2(400, 400));   	
-	ImGui::Text("Next gamble action:");
-	ImGui::SameLine();
-	ImGui::Text(GetGambleActionString(m_next_gamble_action));
-	ImGui::Spacing();
-
-	ImGui::Checkbox("Automatic", &m_auto_gamble);
-	if (ImGui::Button("Gamble"))
 	{
-		if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
-			SetGambleBotState(GambleBotState::GAMBLING);
-		}
-	}
+		ImGui::BeginGroupPanel("Gambleitems Overview", ImVec2(200, 400));
+		{
+			ImGui::BeginGroupPanel("Prefix", ImVec2(190, 400));
+			{
+				ImGui::Text("Supergamble Advanced");
+				ImGui::SameLine();
+				DrawColoredGambleItemAmount(m_amount_SG_ADV_Prefix);
 
-	ImGui::Spacing();
-	ImGui::EndGroupPanel();
+				ImGui::Text("Supergamble Standard");
+				ImGui::SameLine();
+				DrawColoredGambleItemAmount(m_amount_SG_STD_Prefix);
+
+				ImGui::Text("Removal cards");
+				ImGui::SameLine();
+				DrawColoredGambleItemAmount(m_amount_removal_Prefix);
+			}
+			ImGui::EndGroupPanel();
+			ImGui::BeginGroupPanel("Suffix", ImVec2(190, 400));
+			{
+				ImGui::Text("Supergamble Advanced");
+				ImGui::SameLine();
+				DrawColoredGambleItemAmount(m_amount_SG_ADV_Suffix);
+
+				ImGui::Text("Supergamble Standard");
+				ImGui::SameLine();
+				DrawColoredGambleItemAmount(m_amount_SG_STD_Suffix);
+
+				ImGui::Text("Removal cards");
+				ImGui::SameLine();
+				DrawColoredGambleItemAmount(m_amount_removal_Suffix);
+			}
+			ImGui::EndGroupPanel();
+		}
+		ImGui::EndGroupPanel();
+
+		ImGui::BeginGroupPanel("Control", ImVec2(200, 400));
+		{
+			ImGui::Text("Next gamble action:");
+			ImGui::Text(GetGambleActionString(m_next_gamble_action));
+			ImGui::Spacing();
+
+			ImGui::Checkbox("Automatic", &m_auto_gamble);
+			ImGui::SameLine();
+			if (ImGui::Button("Gamble"))
+			{
+				if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
+					SetGambleBotState(GambleBotState::GAMBLING);
+				}
+			}
+		}
+		ImGui::EndGroupPanel();
+		ImGui::BeginGroupPanel("Notifications", ImVec2(200, 0));
+		{
+			ImGui::Checkbox("Play sound", &m_notfiy_sound);
+			ImGui::Checkbox("Messagebox", &m_notfiy_popup);
+		}
+		ImGui::EndGroupPanel();
+	}
 	ImGui::EndGroup();
 }
 
@@ -219,56 +228,54 @@ void GambleBot::DrawSettings()
 	}  	
 	const char* items[] = { "None", "Good", "Best" };
 
-	ImGui::BeginGroupPanel("Prefix Options", ImVec2(200, 400));		
-
-	if (ImGui::Checkbox("Gambling active", &m_do_prefix_gamble_temp)) 
+	ImGui::Dummy(ImVec2(0, 10));
+	ImGui::BeginGroup();
 	{
-		if (m_state == GambleBotState::STANDBY) {
-			m_next_gamble_action = DetermineNextAction();
+		ImGui::BeginGroupPanel("Prefix Options", ImVec2(200, 400));
+		{
+			if (ImGui::Checkbox("Gambling active", &m_do_prefix_gamble_temp))
+			{
+				if (m_state == GambleBotState::STANDBY) {
+					m_next_gamble_action = DetermineNextAction();
+				}
+			}
+			ImGui::Dummy(ImVec2(0, 10));
+			ImGui::Text("Stop autogamble at:");
+			ImGui::Checkbox("Any non-green Fix", &m_prefix_selection.AllNonGreen);
+			ImGui::Dummy(ImVec2(0, 10));
+			ImGui::PushItemWidth(100);
+			ImGui::ComboEx("Any Fix", reinterpret_cast<int*>(&m_prefix_selection.Any), items, 3, -1, false);
+			ImGui::ComboEx("Prob/Damage", reinterpret_cast<int*>(&m_prefix_selection.ProbDamage), items, 3, -1, false);
+			ImGui::ComboEx("Prob/Reattack", reinterpret_cast<int*>(&m_prefix_selection.ProbReattack), items, 3, -1, false);
+			ImGui::ComboEx("Reattack/Damage", reinterpret_cast<int*>(&m_prefix_selection.ReattackDamage), items, 3, -1, false);
+			ImGui::ComboEx("Pierce", reinterpret_cast<int*>(&m_prefix_selection.Pierce), items, 3, -1, false);
+			ImGui::PopItemWidth();
 		}
-	}
-	ImGui::Dummy(ImVec2(0, 10));
-	ImGui::Text("Stop autogamble at:");	
-	ImGui::Checkbox("Any non-green Fix", &m_prefix_selection.AllNonGreen);
-	ImGui::Dummy(ImVec2(0, 10));
-	ImGui::PushItemWidth(100);	 	
-	ImGui::ComboEx("Any Fix",			reinterpret_cast<int*>(&m_prefix_selection.Any), items, 3, -1, false);
-	ImGui::ComboEx("Prob/Damage",		reinterpret_cast<int*>(&m_prefix_selection.ProbDamage), items, 3, -1, false);
-	ImGui::ComboEx("Prob/Reattack",		reinterpret_cast<int*>(&m_prefix_selection.ProbReattack), items, 3, -1, false);
-	ImGui::ComboEx("Reattack/Damage",	reinterpret_cast<int*>(&m_prefix_selection.ReattackDamage), items, 3, -1, false);
-	ImGui::ComboEx("Pierce",				reinterpret_cast<int*>(&m_prefix_selection.Pierce), items, 3, -1, false);
-	ImGui::PopItemWidth();	  
-	ImGui::Dummy(ImVec2(0, 3));
-	ImGui::EndGroupPanel();
+		ImGui::EndGroupPanel();
+		ImGui::SameLine();
+		ImGui::BeginGroupPanel("Suffix Options", ImVec2(200, 400));
+		{
 
-	ImGui::SameLine();
-
-	ImGui::BeginGroupPanel("Suffix Options", ImVec2(200, 400));
-
-	if (ImGui::Checkbox("Gambling active##Suffix", &m_do_suffix_gamble_temp)) 
-	{
-		if (m_state == GambleBotState::STANDBY) {
-			m_next_gamble_action = DetermineNextAction();
+			if (ImGui::Checkbox("Gambling active##Suffix", &m_do_suffix_gamble_temp))
+			{
+				if (m_state == GambleBotState::STANDBY) {
+					m_next_gamble_action = DetermineNextAction();
+				}
+			}
+			ImGui::Dummy(ImVec2(0, 10));
+			ImGui::Text("Stop autogamble at:");
+			ImGui::Checkbox("Any non-green Fix##Suffix", &m_suffix_selection.AllNonGreen);
+			ImGui::Dummy(ImVec2(0, 10));
+			ImGui::PushItemWidth(100);
+			ImGui::ComboEx("Any Fix##Suffix", reinterpret_cast<int*>(&m_suffix_selection.Any), items, 3, -1, false);
+			ImGui::ComboEx("Prob/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbDamage), items, 3, -1, false);
+			ImGui::ComboEx("Prob/Reattack##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbReattack), items, 3, -1, false);
+			ImGui::ComboEx("Reattack/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ReattackDamage), items, 3, -1, false);
+			ImGui::PopItemWidth();
 		}
+		ImGui::EndGroupPanel();
 	}
-	ImGui::Dummy(ImVec2(0, 10));
-	ImGui::Text("Stop autogamble at:");	  
-	ImGui::Checkbox("Any non-green Fix##Suffix", &m_suffix_selection.AllNonGreen);
-	ImGui::Dummy(ImVec2(0, 10));
-	ImGui::PushItemWidth(100);
-	ImGui::ComboEx("Any Fix##Suffix",			reinterpret_cast<int*>(&m_suffix_selection.Any), items, 3, -1, false);
-	ImGui::ComboEx("Prob/Damage##Suffix",		reinterpret_cast<int*>(&m_suffix_selection.ProbDamage), items, 3, -1, false);
-	ImGui::ComboEx("Prob/Reattack##Suffix",		reinterpret_cast<int*>(&m_suffix_selection.ProbReattack), items, 3, -1, false);
-	ImGui::ComboEx("Reattack/Damage##Suffix",	reinterpret_cast<int*>(&m_suffix_selection.ReattackDamage), items, 3, -1, false);
-	ImGui::PopItemWidth(); 
-	ImGui::Dummy(ImVec2(0, 3));
-	ImGui::EndGroupPanel();
-
-	ImGui::BeginGroupPanel("When selected Fix has been found", ImVec2(400, 0));
-	ImGui::Checkbox("Play sound", &m_notfiy_sound);
-	ImGui::Checkbox("Messagebox", &m_notfiy_popup);
-	ImGui::Dummy(ImVec2(0, 3));
-	ImGui::EndGroupPanel();	  
+	ImGui::EndGroup();
 }
 
 void GambleBot::DrawFullWeaponName()
