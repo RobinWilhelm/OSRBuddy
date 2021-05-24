@@ -56,6 +56,8 @@ public:
 	float GetRadarRangePrimary();
 	float GetRadarRangeSecondary();
 
+	D3DXVECTOR3 GetShuttlePosition();
+
 	CWeaponItemInfo* GetPrimaryWeapon();
 	CWeaponItemInfo* GetSecondaryWeapon();
 
