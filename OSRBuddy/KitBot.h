@@ -7,6 +7,8 @@
 #include "SDK/SkillInfo.h"
 
 #define AUTOBUFF_CHECK_TIME 1s
+#define AUTOHEAL_CHECK_TIME 200ms
+
 #define FUEL_KIT_THRESHOLD 20
 
 #define SKILL_STATE_READY			0
@@ -51,17 +53,7 @@ enum class KitCategory : unsigned short
 	B_TYPE,
 	C_TYPE,
 };
-
-struct SkillpSettings
-{
-	byte min_percentage;
-	KitCategory category;
-
-	bool operator < (const SkillpSettings& other) const
-	{
-		return (min_percentage < other.min_percentage);
-	}
-};
+ 
 
 class CSkillInfo;	 
 
@@ -106,8 +98,19 @@ public:
 			use_ammobox = other.use_ammobox;
 			use_fuel = other.use_fuel;
 
-			spkit_usage = other.spkit_usage;
-			std::sort(spkit_usage.begin(), spkit_usage.end());
+			field_healings_active = other.field_healings_active; 
+			field_energizings_active = other.field_energizings_active; 
+			target_healings_active = other.target_healings_active;						
+			target_energizing_active = other.target_energizing_active;	 
+			target_heal_prio_myself = other.target_heal_prio_myself;
+
+			use_spkit_type_a = other.use_spkit_type_a;
+			use_spkit_type_b = other.use_spkit_type_b;
+			use_spkit_type_c = other.use_spkit_type_c;
+
+			spkit_type_a_percentage = other.spkit_type_a_percentage;
+			spkit_type_b_percentage = other.spkit_type_b_percentage;
+			spkit_type_c_percentage = other.spkit_type_c_percentage;
 			return *this;
 		}
 
@@ -122,7 +125,20 @@ public:
 		bool use_energy_type_c;
 		bool use_ammobox;
 		bool use_fuel;
-		std::vector<SkillpSettings> spkit_usage;
+
+		bool field_healings_active;
+		bool field_energizings_active;
+		bool target_healings_active;
+		bool target_energizing_active;
+		bool target_heal_prio_myself; 
+
+		bool use_spkit_type_a;
+		bool use_spkit_type_b;
+		bool use_spkit_type_c;
+							 
+		int spkit_type_a_percentage;
+		int spkit_type_b_percentage;
+		int spkit_type_c_percentage;
 	};
 
 public:
@@ -148,7 +164,11 @@ public:
 
 	// returns true when the skill usage has been sent to the server. This does not mean the skill has been successfully used.
 	// returns false when the skill is not available or the server has not answered the last request yet
-	bool TryUseSkill(SkillType skill);
+	bool TryUseSkill(SkillType skill);	
+	bool TryUseSkill(PlayerSkillInfo* skillinfo);
+
+	bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, ClientIndex_t target);
+	bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, UID32_t characterUID);
 
 	// returns true if skill is already toggled on, false when not
 	bool ToggleSKill(SkillType toggleskill, bool on);
@@ -157,6 +177,7 @@ public:
 	PlayerSkillInfo* FindPlayerSkill(SkillType skill) const;
 	PlayerSkillInfo* FindPlayerSkill(int itemnum) const;
 	bool AutoBuffCheckTimerReady();
+	bool AutoHealCheckTimerReady();
 
 protected:
 	// Geerbt über IBuddyFeature
@@ -167,16 +188,22 @@ protected:
 	virtual bool OnWritePacket(unsigned short msgtype, byte* packet) override;
 	virtual FeatureType GetType() const override;
 
-
 private:
 	void TickAutoKit();
 	void TickAutoBuff();
 	void TickAutoAmmo();
+	void TickAutoHeals();
+
 	void GrabPlayerSkills();
-	bool TryUseSkill(PlayerSkillInfo* skillinfo);
 	void OnUseSkillAnswer(int itemnum);
 	void OnUseEnergyError(MSG_ERROR* error);
 	void OnUseSkillError(MSG_ERROR* error);
+
+	bool ShouldUseHealingField();
+	bool ShouldUseEnergizeField();
+
+	UID32_t GetBestHealTarget();
+	UID32_t GetBestEnergizeTarget();
 
 private:   
 	KitSettings m_settings;
@@ -189,6 +216,7 @@ private:
 
 	std::vector<PlayerSkillInfo*> m_playerskills;
 	std::chrono::milliseconds m_lastAutoBuffCheck;
+	std::chrono::milliseconds m_last_auto_heal_check;
 
 	std::chrono::milliseconds m_shieldkit_firstuse_delay;
 	std::chrono::milliseconds m_energykit_firstuse_delay;

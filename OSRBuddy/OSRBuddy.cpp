@@ -213,11 +213,11 @@ bool OSRBuddyMain::Start()
         }
                  
         RegisterFeature(new KitBuffBot(this)); 
-        RegisterFeature(new WatermelonBot(this));
-        //RegisterFeature(new TestItemUse(this));
+        RegisterFeature(new WatermelonBot(this));          
         RegisterFeature(new GambleBot(this));
         RegisterFeature(new EnchantBot(this));
         //RegisterFeature(new AntiMTRandBot(this));
+        RegisterFeature(new TestItemUse(this));
 
         if (!InitTickHook()) {
             throw exception("TickHook failed to initialise");

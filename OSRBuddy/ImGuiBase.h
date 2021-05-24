@@ -3,6 +3,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_addition.h"
 
+
 class IDirect3DDevice9;
 
 class ImGuiBase
@@ -29,8 +30,13 @@ protected:
 
 	void Render(IDirect3DDevice9* device);
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);	 
+	 
+	void LoadStandardTheme();
+	void LoadClassicSteamTheme();
+	void LoadCorporateGreyTheme();
 
 protected:
+	ImGuiStyle m_standard_style;
 	bool m_isOpen;
 	HWND m_hWindow;
 	bool m_initialised;

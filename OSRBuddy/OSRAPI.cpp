@@ -190,6 +190,11 @@ float OldSchoolRivalsAPI::GetRadarRangeSecondary()
 	return m_atumapplication->m_pShuttleChild->m_pRadarItemInfo->m_pItemInfo->AbilityMax;
 }
 
+D3DXVECTOR3 OldSchoolRivalsAPI::GetShuttlePosition()
+{
+	return m_atumapplication->m_pShuttleChild->m_vPos;
+}
+
 CWeaponItemInfo* OldSchoolRivalsAPI::GetPrimaryWeapon()
 {
 	return m_atumapplication->m_pShuttleChild->m_pPrimaryWeapon;

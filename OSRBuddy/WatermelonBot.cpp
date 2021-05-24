@@ -533,22 +533,18 @@ void WatermelonBot::OnEnable()
     {   
         // set kit settings
         KitBuffBot::KitSettings kitbot_settings;
-        SkillpSettings skillpsettings;
         ZeroMemory(&kitbot_settings, sizeof(KitBuffBot::KitSettings));
-        ZeroMemory(&skillpsettings, sizeof(SkillpSettings));
 
         kitbot_settings.kitmode = KitBuffBot::Mode::Humanized;
         kitbot_settings.use_energy_type_c = true;
         kitbot_settings.use_shield_type_c = true;
         kitbot_settings.use_ammobox       = true;
-        
-        skillpsettings.category = KitCategory::C_TYPE;
-        skillpsettings.min_percentage = 66;   
-        kitbot_settings.spkit_usage.push_back(skillpsettings);
-                    
-        skillpsettings.category = KitCategory::B_TYPE;
-        skillpsettings.min_percentage = 20;
-        kitbot_settings.spkit_usage.push_back(skillpsettings);
+
+        kitbot_settings.use_spkit_type_c = true;
+        kitbot_settings.spkit_type_c_percentage = 66;  
+
+        kitbot_settings.use_spkit_type_b = true;
+        kitbot_settings.spkit_type_b_percentage = 33;
 
         m_kitbot->SetSettings(kitbot_settings);
         

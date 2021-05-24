@@ -2,6 +2,7 @@
 #include <string>
 #include "OSRBuddy.h"
 #include "OSRAPI.h"
+#include "KitBot.h"
 
 #define WEATHER_DEFAULT_FOG_START	50.0f
 #define WEATHER_DEFAULT_FOG_END		640.0f
@@ -47,6 +48,21 @@ void TestItemUse::Tick()
 void TestItemUse::RenderImGui()
 {
 	static OldSchoolRivalsAPI* osr = OSR_API;	   	   	  
+
+	// test 
+	if (ImGui::Button("Use Healing target")) 
+	{
+		KitBuffBot* kitbot = (KitBuffBot*)m_buddy->GetFeatureByType(FeatureType::KitBuffBot);
+		if (kitbot)
+		{
+			PlayerSkillInfo* pskill = kitbot->FindPlayerSkill(SkillType::Heal_Target);
+			kitbot->TryUseSkill(pskill);
+
+			auto skill = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pSkill;
+			skill->m_bSkillTargetState = FALSE;
+			skill->m_nTargetIndex = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.ClientIndex;
+		}
+	}
 
 	if(m_item_reattack > 0)
 		m_item_reattack -= osr->GetElapsedTime();

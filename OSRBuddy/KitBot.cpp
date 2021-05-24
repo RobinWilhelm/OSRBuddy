@@ -114,6 +114,17 @@
 
 typedef struct
 {
+    ItemID_t		SkillItemID;
+} MSG_FC_SKILL_PREPARE_USE;
+
+typedef struct
+{
+    ClientIndex_t	ClientIndex;
+    ItemID_t		SkillItemID;
+} MSG_FC_SKILL_PREPARE_USE_OK;
+
+typedef struct
+{
     ItemID_t		SkillItemID;			// 종료되는 스킬 정보
     INT				AttackSkillItemNum0;	// 2006-12-12 by cmkwon, 현재 스킬을 종료되게 하는 공격스킬 아이템넘버 
 } MSG_FC_SKILL_CANCEL_SKILL;
@@ -192,12 +203,14 @@ KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_lastUseEnergyKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     m_lastUseSkillKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     GrabPlayerSkills();
+
 }
 
 bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
 {   
     CItemInfo* invkit = nullptr;
     bool used_shieldkit = false, used_energykit = false, used_spkit = false;
+    bool is_mgear = OSR_API->GetPlayerGearType() == GearType::MGear;
 
     switch (type)
     {
@@ -210,40 +223,52 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
         {
         case KitCategory::S_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_ShieldKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_ShieldKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::A_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_ShieldKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_ShieldKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_ShieldKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_ShieldKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;  
         } 
@@ -257,40 +282,52 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
         {
         case KitCategory::S_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_RepairKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_RepairKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::A_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_RepairKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_RepairKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_RepairKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_RepairKit);
-            if (invkit)  {
+            if (invkit)  
+            {
                 OSR_API->SendUseItem(invkit);           
+                return true;
             }
             break;       
         } 
@@ -298,34 +335,72 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
     case KitType::SKILLPOINT:
         if (m_awaiting_Ok_skill) {
             return false;
-        }
+        }      
         switch (category)
         {
         case KitCategory::S_TYPE:
             break;
         case KitCategory::A_TYPE:
+            if (is_mgear)
+            {
+                invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPit_MG);
+                if (invkit) 
+                {
+                    OSR_API->SendUseItem(invkit);
+                    return true;
+                }
+            } 
+
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::B_TYPE:
+            if (is_mgear)
+            {
+                invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_SkillPKit_MG);
+                if (invkit)
+                {
+                    OSR_API->SendUseItem(invkit);
+                    return true;
+                }
+            }
+
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_SkillPKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
+            if (is_mgear)
+            {
+                invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_SkillPKit_MG);
+                if (invkit)
+                {
+                    OSR_API->SendUseItem(invkit);
+                    return true;
+                }
+            }
+
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_SkillPKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;    
         }
@@ -342,8 +417,10 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_CondensedFuel);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
@@ -564,13 +641,36 @@ bool KitBuffBot::TryUseSkill(PlayerSkillInfo* skillinfo)
         return false;
     }
 
-    // only allow a skill to be used every 400ms because quickslot bar can only be used every 400ms
+    // only allow the same skill to be used every 400ms because quickslot bar can only be used every 400ms
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());  
     if ((current - skillinfo->last_use) < 400ms) {
         return false;
     }
 
     OSR_API->SendUseSkill(skillinfo->skillinfo);
+    return true;
+}
+
+bool KitBuffBot::TryUseTargetSkill(PlayerSkillInfo* skillinfo, ClientIndex_t target)
+{
+    if (!TryUseSkill(skillinfo)) {
+        return false;
+    }
+    auto skill = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pSkill;
+    skill->m_bSkillTargetState = FALSE;
+    skill->m_nTargetIndex = target; 
+    return true;
+}
+
+bool KitBuffBot::TryUseTargetSkill(PlayerSkillInfo* skillinfo, UID32_t characterUID)
+{
+    if (!TryUseSkill(skillinfo)) {
+        return false;
+    }
+    auto skill = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pSkill;
+    skill->m_bSkillTargetState = FALSE;
+    skill->m_nTargetIndex = 0;
+    skill->m_nCharacterUID = characterUID;
     return true;
 }
 
@@ -684,6 +784,160 @@ void KitBuffBot::OnUseSkillError(MSG_ERROR* error)
         // do something
     }
 }
+
+bool KitBuffBot::ShouldUseHealingField()
+{
+    // check if any party member in range has missing energy
+    int shield_missing = 0;
+    auto playerpos = OSR_API->GetShuttlePosition();
+    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 750) 
+    {
+        if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
+            return true;
+        }
+        shield_missing++;
+    }
+
+    for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!partymember->m_bUserLogOn || !partymember->m_pEnemyData) {
+            continue;
+        }
+
+        // first check if the member is in range for heals
+        D3DXVECTOR3 delta = partymember->m_pEnemyData->m_vPos - playerpos;
+        float distance = D3DXVec3Length(&delta);
+        if (distance <= 3000.0f)  // hardcoded for now, this value is accurate for all field healings above level 54
+        {
+            if (partymember->m_pEnemyData->m_infoCharacter.DP - partymember->m_pEnemyData->m_infoCharacter.CurrentDP >= 750)
+            {
+                shield_missing++;
+            }
+        }
+    }
+    // only use healing field if at two or more party members in range are missing energy
+    if (shield_missing < 2) {
+        return false;
+    }
+
+    return true;
+}
+
+bool KitBuffBot::ShouldUseEnergizeField()
+{
+    // check if any party member in range has missing energy
+    int energy_missing = 0;
+    auto playerpos = OSR_API->GetShuttlePosition();
+    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 500) 
+    {
+        if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
+            return true;
+        }
+        energy_missing++;
+    }
+
+    for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!partymember->m_bUserLogOn || !partymember->m_pEnemyData) {
+            continue;
+        }
+
+        // first check if the member is in range for heals
+        D3DXVECTOR3 delta = partymember->m_pEnemyData->m_vPos - playerpos;
+        float distance = D3DXVec3Length(&delta);
+        if (distance <= 3000.0f) // hardcoded for now, this value is accurate for all field healings above level 54
+        {
+            if (partymember->m_pEnemyData->m_infoCharacter.HP - partymember->m_pEnemyData->m_infoCharacter.CurrentHP >= 500)
+            {
+                energy_missing++;
+            }
+        }
+    }
+    // only use energize field if at two or more party members in range are missing energy
+    if (energy_missing < 2) {
+        return false;
+    }
+
+    return true;
+}
+
+UID32_t KitBuffBot::GetBestHealTarget()
+{
+    UID32_t target = 0;
+    UID32_t prio_target = 0;
+
+    // get healing target based on missing hp
+    int most_missing_energy = 500;
+    for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!member->m_bUserLogOn || !member->m_pEnemyData) {
+            continue;
+        }
+
+        int member_energy_missing = member->m_pEnemyData->m_infoCharacter.HP - member->m_pEnemyData->m_infoCharacter.CurrentHP;
+        if (member_energy_missing > most_missing_energy)
+        {
+            most_missing_energy = member_energy_missing;
+            target = member->m_nUniqueNumber;
+
+            if (member->m_bSpeakingAuth) {
+                prio_target = member->m_nUniqueNumber;
+            }
+        }
+    }
+
+    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 500)
+    {
+        target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        if (m_settings.target_heal_prio_myself) {
+            return OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        }
+    }
+
+    if (prio_target != 0) {
+        return prio_target;
+    } 
+    return target;
+}
+
+UID32_t KitBuffBot::GetBestEnergizeTarget()
+{
+    UID32_t target = 0;
+    UID32_t prio_target = 0;
+
+    // get healing target based on missing shield
+    int most_missing_shield = 0;
+    for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+    {
+        if (!member->m_bUserLogOn || !member->m_pEnemyData) {
+            continue;
+        }
+
+        int member_shield_missing = member->m_pEnemyData->m_infoCharacter.DP - member->m_pEnemyData->m_infoCharacter.CurrentDP;
+        if (member_shield_missing > most_missing_shield)
+        {
+            most_missing_shield = member_shield_missing;
+            target = member->m_nUniqueNumber;
+
+            if (member->m_bSpeakingAuth) {
+                prio_target = member->m_nUniqueNumber;
+            }
+        }
+    }
+
+    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 500)
+    {
+        target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        if (m_settings.target_heal_prio_myself) {
+            return OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+        }
+    }
+
+    if (prio_target != 0) {
+        return prio_target;
+    }
+    return target;
+}
        
 PlayerSkillInfo* KitBuffBot::FindPlayerSkill(SkillType skilltype) const
 {
@@ -715,6 +969,12 @@ bool KitBuffBot::AutoBuffCheckTimerReady()
     return (current - m_lastAutoBuffCheck >= AUTOBUFF_CHECK_TIME);
 }
 
+bool KitBuffBot::AutoHealCheckTimerReady()
+{
+    std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    return (current - m_last_auto_heal_check >= AUTOHEAL_CHECK_TIME);
+}
+
 void KitBuffBot::Tick()
 { 
     if (!IsEnabled() || OSR_API->IsShuttleDead())  {
@@ -723,164 +983,207 @@ void KitBuffBot::Tick()
     
     TickAutoKit();
     TickAutoBuff();
+    TickAutoHeals();
     TickAutoAmmo();
 }
      
 void KitBuffBot::RenderImGui()
 {   
     DrawEnableCheckBox();   
-    
-    ImGui::BeginGroupPanel("Kitbot:", ImVec2(200, 100));
+    ImGui::BeginGroupPanel("Kits");
+    {  
+        const char* items[] = { "Rage", "Humanized", "Sleepy" };
+        ImGui::ComboEx("Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
+        ImGui::Dummy(ImVec2(0, 5));
 
-    const char* items[] = { "Rage", "Humanized", "Sleepy" };
-    ImGui::FancyCombo("Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 100);
-    ImGui::SameLine();
-    ImGui::Dummy(ImVec2(5, 0)); 
-    ImGui::Dummy(ImVec2(0, 5));
-
-    ImGui::BeginGroupPanel("Shield", ImVec2(100, 100));
-    if (ImGui::FancyCheckbox("S Type", &m_settings.use_shield_type_s))
-    {
-        if (m_settings.use_shield_type_s)
+        ImGui::BeginGroupPanel("Shield", ImVec2(100, 200));
         {
-            m_settings.use_shield_type_a = true;
-            m_settings.use_shield_type_b = true;
-            m_settings.use_shield_type_c = true;
-        }
-    }
-    if (ImGui::FancyCheckbox("A Type", &m_settings.use_shield_type_a))
-    {
-        if (m_settings.use_shield_type_a)
-        {
-            m_settings.use_shield_type_b = true;
-            m_settings.use_shield_type_c = true;
-        }
-    }
-    if (ImGui::FancyCheckbox("B Type", &m_settings.use_shield_type_b))
-    {
-        if (m_settings.use_shield_type_b) {
-            m_settings.use_shield_type_c = true;
-        }
-    }
-    ImGui::FancyCheckbox("C Type", &m_settings.use_shield_type_c);
-    ImGui::Dummy(ImVec2(0, 5));
-    ImGui::EndGroupPanel();
-
-    ImGui::SameLine();
-
-    ImGui::BeginGroupPanel("Energy", ImVec2(100, 100));
-    if (ImGui::FancyCheckbox("S Type##", &m_settings.use_energy_type_s))
-    {
-        if (m_settings.use_energy_type_s)
-        {
-            m_settings.use_energy_type_a = true;
-            m_settings.use_energy_type_b = true;
-            m_settings.use_energy_type_c = true;
-        }
-    }
-    if (ImGui::FancyCheckbox("A Type##", &m_settings.use_energy_type_a))
-    {
-        if (m_settings.use_energy_type_a)
-        {
-            m_settings.use_energy_type_b = true;
-            m_settings.use_energy_type_c = true;
-        }
-    }
-    if (ImGui::FancyCheckbox("B Type##", &m_settings.use_energy_type_b))
-    {
-        if (m_settings.use_energy_type_b) {
-            m_settings.use_energy_type_c = true;
-        }
-    }
-    ImGui::FancyCheckbox("C Type##", &m_settings.use_energy_type_c);
-    ImGui::Dummy(ImVec2(0, 5));
-    ImGui::EndGroupPanel();    
-
-    ImGui::SameLine();
-
-    ImGui::BeginGroupPanel("Other", ImVec2(100, 100));
-    ImGui::FancyCheckbox("Ammo", &m_settings.use_ammobox);
-    ImGui::FancyCheckbox("Fuel", &m_settings.use_fuel);
-
-    ImGui::Dummy(ImVec2(0, 5));
-    ImGui::EndGroupPanel();
-
-
-    ImGui::Dummy(ImVec2(0, 5));
-    ImGui::EndGroupPanel();
-
-    ImGui::BeginGroupPanel("BuffBot:", ImVec2(400, 100));
-    ImGui::BeginGroup();
-    for (auto skill : m_playerskills)
-    {
-        switch (skill->type)
-        {
-        case SkillType::Concentration:
-        case SkillType::Missile_Shot:
-        case SkillType::Fire_Shot:
-        case SkillType::Evasion_Up:
-        case::SkillType::Defense_Up:  
-            if (skill->final) {
-                ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
-            }
-            if (ImGui::FancyCheckbox(skill->clean_name.c_str(), &skill->autobuff))
+            if (ImGui::Checkbox("S Type", &m_settings.use_shield_type_s))
             {
-                if (skill->autobuff) {
-                    AddAutoBuff(skill->type);
+                if (m_settings.use_shield_type_s)
+                {
+                    m_settings.use_shield_type_a = true;
+                    m_settings.use_shield_type_b = true;
+                    m_settings.use_shield_type_c = true;
                 }
-                else {
-                    RemoveAutoBuff(skill->type);
-                }                    
             }
-            if (skill->final) {
-                ImGui::PopStyleColor();
-            }
-        }
-    }
-    ImGui::EndGroup();
-
-    ImGui::SameLine();
-
-    ImGui::BeginGroup();
-    for (auto skill : m_playerskills)
-    {
-        switch (skill->type)
-        {
-        case SkillType::Frenzy:    
-        case SkillType::Elevation:
-        case SkillType::Raging_Defense:
-        case SkillType::Raging_Evasion:
-        case SkillType::Raging_Fire:  
-            if (skill->final) {
-                ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
-            }
-            if (ImGui::FancyCheckbox(skill->clean_name.c_str(), &skill->autobuff))
+            if (ImGui::Checkbox("A Type", &m_settings.use_shield_type_a))
             {
-                if (skill->autobuff) {
-                    AddAutoBuff(skill->type);
-                }
-                else {
-                    RemoveAutoBuff(skill->type);
+                if (m_settings.use_shield_type_a)
+                {
+                    m_settings.use_shield_type_b = true;
+                    m_settings.use_shield_type_c = true;
                 }
             }
-            if (skill->final) {
-                ImGui::PopStyleColor();
+            if (ImGui::Checkbox("B Type", &m_settings.use_shield_type_b))
+            {
+                if (m_settings.use_shield_type_b) {
+                    m_settings.use_shield_type_c = true;
+                }
             }
+            ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
         }
+        ImGui::EndGroupPanel();
+        ImGui::SameLine();
+        ImGui::BeginGroupPanel("Energy", ImVec2(100, 200));
+        {
+            if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
+            {
+                if (m_settings.use_energy_type_s)
+                {
+                    m_settings.use_energy_type_a = true;
+                    m_settings.use_energy_type_b = true;
+                    m_settings.use_energy_type_c = true;
+                }
+            }
+            if (ImGui::Checkbox("A Type##", &m_settings.use_energy_type_a))
+            {
+                if (m_settings.use_energy_type_a)
+                {
+                    m_settings.use_energy_type_b = true;
+                    m_settings.use_energy_type_c = true;
+                }
+            }
+            if (ImGui::Checkbox("B Type##", &m_settings.use_energy_type_b))
+            {
+                if (m_settings.use_energy_type_b) {
+                    m_settings.use_energy_type_c = true;
+                }
+            }
+            ImGui::Checkbox("C Type##", &m_settings.use_energy_type_c);
+        }
+        ImGui::EndGroupPanel();
+        ImGui::SameLine();
+        ImGui::BeginGroupPanel("Other");
+        {
+            ImGui::Checkbox("Ammo", &m_settings.use_ammobox);
+            ImGui::Checkbox("Fuel", &m_settings.use_fuel);
+        }
+        ImGui::EndGroupPanel();
+        ImGui::BeginGroupPanel("Skillpoints", ImVec2(100, 200));
+        {
+            ImGui::Checkbox("A Type", &m_settings.use_spkit_type_a);
+            ImGui::SameLine();
+            ImGui::PushItemWidth(200);
+            ImGui::SliderInt("%##spkit_a_slider", &m_settings.spkit_type_a_percentage, 0, 99);
+            ImGui::PopItemWidth();
+
+            ImGui::Checkbox("B Type", &m_settings.use_spkit_type_b);
+            ImGui::SameLine();
+            ImGui::PushItemWidth(200);
+            ImGui::SliderInt("%##spkit_b_slider", &m_settings.spkit_type_b_percentage, 0, 99);
+            ImGui::PopItemWidth();
+
+            ImGui::Checkbox("C Type", &m_settings.use_spkit_type_c);
+            ImGui::SameLine();
+            ImGui::PushItemWidth(200);
+            ImGui::SliderInt("%##spkit_c_slider", &m_settings.spkit_type_c_percentage, 0, 99);     
+            ImGui::PopItemWidth();
+        }                         
+        ImGui::EndGroupPanel();    
     }
-    ImGui::EndGroup();
-
-
-
-    ImGui::Dummy(ImVec2(0, 5));
     ImGui::EndGroupPanel();
-    /*
-    ImGui::Text("Shield Timer Game:"); ImGui::SameLine();                                                                                                 
-    ImGui::Text(std::to_string((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() - m_lastUseShieldKitTime)).count()).c_str());
+    ImGui::SameLine();
+    ImGui::BeginGroupPanel("Buffs");
+    {   
+        //ImGui::EndGroupPanel();    
+        ImGui::BeginGroupPanel("Autobuffs", ImVec2(300, 0));
+        {
+            ImGui::BeginGroup();
+            for (auto skill : m_playerskills)
+            {
+                switch (skill->type)
+                {
+                case SkillType::Concentration:
+                case SkillType::Missile_Shot:
+                case SkillType::Fire_Shot:
+                case SkillType::Evasion_Up:
+                case::SkillType::Defense_Up:
+                    if (skill->final) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
+                    }
+                    if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                    {
+                        if (skill->autobuff) {
+                            AddAutoBuff(skill->type);
+                        }
+                        else {
+                            RemoveAutoBuff(skill->type);
+                        }
+                    }
+                    if (skill->final) {
+                        ImGui::PopStyleColor();
+                    }
+                }
+            }
+            ImGui::EndGroup();
+            ImGui::SameLine();
+            ImGui::BeginGroup();
+            {
+                for (auto skill : m_playerskills)
+                {
+                    switch (skill->type)
+                    {
+                    case SkillType::Frenzy:
+                    case SkillType::Elevation:
+                    case SkillType::Raging_Defense:
+                    case SkillType::Raging_Evasion:
+                    case SkillType::Raging_Fire:
+                        if (skill->final) {
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
+                        }
+                        if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                        {
+                            if (skill->autobuff) {
+                                AddAutoBuff(skill->type);
+                            }
+                            else {
+                                RemoveAutoBuff(skill->type);
+                            }
+                        }
+                        if (skill->final) {
+                            ImGui::PopStyleColor();
+                        }
+                    }
+                }
+            }
+            ImGui::EndGroup();
+        }
+        ImGui::EndGroupPanel(); 
+        ImGui::BeginGroupPanel("Autohealings");
+        { 
+            if (OSR_API->GetPlayerGearType() != GearType::MGear)
+            {
+                ImGui::Text("Only available for MG!");
+            }
+            else
+            {
+                ImGui::Text("Field: \t");
+                ImGui::SameLine();
+                ImGui::Checkbox("Shield", &m_settings.field_energizings_active);
+                ImGui::SameLine();
+                ImGui::Checkbox("Energy", &m_settings.field_healings_active);
+                             
+                ImGui::Text("Target:\t");
+                ImGui::SameLine();
+                ImGui::Checkbox("Shield##targetShield", &m_settings.target_energizing_active);
+                ImGui::SameLine();
+                ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_healings_active);
 
-    ImGui::Text("Shield Timer Buddy:"); ImGui::SameLine();
-    ImGui::Text(std::to_string(m_buddy->GetTickTime().count()).c_str());  
-    */
+                ImGui::NewLine();
+                ImGui::BeginGroupPanel("Priority Healing", ImVec2(290, 400));
+                {
+                    ImGui::Checkbox(OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterName, &m_settings.target_heal_prio_myself);
+                    for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo) {
+                        ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
+                    }
+                }
+                ImGui::EndGroupPanel();
+            }             
+        }
+        ImGui::EndGroupPanel();
+    }
+    ImGui::EndGroupPanel();
 }
 
 const char* KitBuffBot::GetName() const
@@ -1083,6 +1386,11 @@ bool KitBuffBot::OnWritePacket(unsigned short msgtype, byte* packet)
             }
             break;
         }
+    case T_FC_SKILL_PREPARE_USE:
+    case T_FC_SKILL_SETUP_SKILL:
+        {
+            MSG_FC_SKILL_PREPARE_USE* msg_prepare_skill = (MSG_FC_SKILL_PREPARE_USE*)packet;
+        }
     }
     return 0;
 }
@@ -1225,16 +1533,21 @@ void KitBuffBot::TickAutoKit()
     {
         // todo: SmartSP
 
+        bool sp_kit_used = false;
         int skillp_percentage = 100 * (static_cast<float>(std::max(OSR_API->GetCurrentSkillp(), 1)) / static_cast<float>(OSR_API->GetMaxSkillp()));
 
-        for (auto& skillp_usage : m_settings.spkit_usage)
-        {
-            if (skillp_percentage <= skillp_usage.min_percentage)
-            {
-                TryUseKit(KitType::SKILLPOINT, skillp_usage.category);
-                break;
-            }
+        if(m_settings.use_spkit_type_a && skillp_percentage <= m_settings.spkit_type_a_percentage)  
+        { 
+            sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::A_TYPE);  
         }
+        if (!sp_kit_used && m_settings.use_spkit_type_b && skillp_percentage <= m_settings.spkit_type_b_percentage) 
+        {
+            sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::B_TYPE);
+        }
+        if (!sp_kit_used && m_settings.use_spkit_type_c && skillp_percentage <= m_settings.spkit_type_c_percentage)
+        {
+            sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::C_TYPE);
+        }   
     }         
 
     // Fuelkits
@@ -1251,8 +1564,8 @@ void KitBuffBot::TickAutoBuff()
        
         for (auto pskill : m_playerskills)
         {
-            if (pskill->autobuff && !pskill->IsWaiting() && pskill->skillinfo->ItemInfo->ReqSP <= currentsp && pskill->skillinfo->m_fCheckEnableTime <= 0)
-            {
+            if (pskill->autobuff && !pskill->IsWaiting() && pskill->skillinfo->ItemInfo->ReqSP <= currentsp && pskill->skillinfo->m_fCheckReattackTime <= 0.0f)
+            {   
                 TryUseSkill(pskill);
                 currentsp -= pskill->skillinfo->ItemInfo->ReqSP;
             }
@@ -1267,6 +1580,62 @@ void KitBuffBot::TickAutoAmmo()
        (OSR_API->GetPrimaryWeaponAmmo() == 0 || OSR_API->GetSecondaryWeaponAmmo() == 0)) 
     {
         TryUseAmmunitionBox();
+    }
+}
+
+void KitBuffBot::TickAutoHeals()
+{
+    if (OSR_API->GetPlayerGearType() == GearType::MGear  && AutoHealCheckTimerReady())
+    {
+        int currentsp = OSR_API->GetCurrentSkillp();
+
+        if (m_settings.target_energizing_active)
+        {
+            UID32_t energize_target = GetBestEnergizeTarget();
+            if (energize_target != 0)
+            {
+                PlayerSkillInfo* energize_skill = FindPlayerSkill(SkillType::Energize_Target);
+                if (energize_skill && energize_skill->skillinfo->m_fCheckReattackTime <= 0.0f && energize_skill->skillinfo->ItemInfo->ReqSP <= currentsp) 
+                {
+                    TryUseTargetSkill(energize_skill, energize_target);
+                    currentsp -= energize_skill->skillinfo->ItemInfo->ReqSP;
+                }
+            }
+        }
+
+        if (m_settings.target_healings_active)
+        {
+            UID32_t heal_target = GetBestHealTarget();
+            if (heal_target != 0)
+            {
+                PlayerSkillInfo* heal_skill = FindPlayerSkill(SkillType::Heal_Target);
+                if (heal_skill && heal_skill->skillinfo->m_fCheckReattackTime <= 0.0f && heal_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
+                {
+                    TryUseTargetSkill(heal_skill, heal_target); 
+                    currentsp -= heal_skill->skillinfo->ItemInfo->ReqSP;
+                }
+            } 
+        } 
+
+        if (m_settings.field_energizings_active) 
+        {
+            PlayerSkillInfo* energizefield = FindPlayerSkill(SkillType::Energizing_Field);
+            if (energizefield && energizefield->skillinfo->m_fCheckReattackTime <= 0.0f && energizefield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseEnergizeField())
+            {
+                TryUseSkill(energizefield);
+                currentsp -= energizefield->skillinfo->ItemInfo->ReqSP;
+            }
+        } 
+
+        if (m_settings.field_healings_active)
+        {
+            PlayerSkillInfo* healingfield = FindPlayerSkill(SkillType::Healing_Field);
+            if (healingfield && healingfield->skillinfo->m_fCheckReattackTime <= 0.0f && healingfield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseHealingField())
+            {
+                TryUseSkill(healingfield);
+                currentsp -= healingfield->skillinfo->ItemInfo->ReqSP;
+            }            
+        }
     }
 }
 
@@ -1286,7 +1655,7 @@ void KitBuffBot::GrabPlayerSkills()
             skill->skillinfo = skillinfo.second;
             skill->last_use = 0ms;
             skill->clean_name = std::string(skill->skillinfo->ItemInfo->ItemName);
-            if (skill->clean_name[0] == '\\')  // check if name has a colorcode in its name
+            if (skill->clean_name[0] == '\\')  // check if name has a colorcode
             {
                 skill->clean_name.erase(skill->clean_name.begin(), skill->clean_name.begin() + 2);
                 skill->clean_name.erase(skill->clean_name.end() - 2, skill->clean_name.end());

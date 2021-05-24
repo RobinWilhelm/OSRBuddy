@@ -73,10 +73,13 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
     ImGui::PushItemWidth(ImMax(0.0f, itemWidth - frameHeight));
 
     s_GroupPanelLabelStack.push_back(ImRect(labelMin, labelMax));
+    ImGui::Dummy(ImVec2(0, 2.0f));
 }
+
 
 void ImGui::EndGroupPanel()
 {
+    ImGui::Dummy(ImVec2(0, 2.0f));
     ImGui::PopItemWidth();
 
     auto itemSpacing = ImGui::GetStyle().ItemSpacing;
@@ -335,9 +338,13 @@ static bool Items_ArrayGetter(void* data, int idx, const char** out_text)
 }
 
 
-bool ImGui::FancyCombo(const char* label, int* current_item, void* data, int items_count, int popup_max_height_in_items, bool leftSideText, float max_width)
+bool ImGui::ComboEx(const char* label, int* current_item, void* data, int items_count, int popup_max_height_in_items, bool leftSideText, float max_width)
 {
-    PushStyleVar(ImGuiStyleVar_FrameRounding, 5.f);
+    //PushStyleVar(ImGuiStyleVar_FrameRounding, 5.f);
+    if (max_width != 0)
+    {
+        ImGui::PushItemWidth(max_width);
+    }
 
     ImGuiContext& g = *GImGui;
 
@@ -359,14 +366,14 @@ bool ImGui::FancyCombo(const char* label, int* current_item, void* data, int ite
 
     if (leftSideText) {
         if (!BeginComboLeftSidedText(label, preview_value, ImGuiComboFlags_None)) {
-            PopStyleVar();
+            //PopStyleVar();
             return false;
         }
             
     }
     else {
         if (!BeginCombo(label, preview_value, ImGuiComboFlags_None)) {
-            PopStyleVar();
+            //PopStyleVar();
             return false;
         }
     }
@@ -393,7 +400,12 @@ bool ImGui::FancyCombo(const char* label, int* current_item, void* data, int ite
     }
 
     EndCombo();
-    PopStyleVar();
+    //PopStyleVar();
+
+    if (max_width != 0)
+    {
+        ImGui::PopItemWidth();
+    }
 
     return value_changed;
 }
