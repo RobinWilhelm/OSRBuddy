@@ -53,17 +53,7 @@ enum class KitCategory : unsigned short
 	B_TYPE,
 	C_TYPE,
 };
-
-struct SkillpSettings
-{
-	byte min_percentage;
-	KitCategory category;
-
-	bool operator < (const SkillpSettings& other) const
-	{
-		return (min_percentage < other.min_percentage);
-	}
-};
+ 
 
 class CSkillInfo;	 
 
@@ -109,15 +99,18 @@ public:
 			use_fuel = other.use_fuel;
 
 			field_healings_active = other.field_healings_active; 
-			field_energizings_active = other.field_energizings_active;
-
+			field_energizings_active = other.field_energizings_active; 
 			target_healings_active = other.target_healings_active;						
-			target_energizing_active = other.target_energizing_active;
-
+			target_energizing_active = other.target_energizing_active;	 
 			target_heal_prio_myself = other.target_heal_prio_myself;
 
-			spkit_usage = other.spkit_usage;
-			std::sort(spkit_usage.begin(), spkit_usage.end());
+			use_spkit_type_a = other.use_spkit_type_a;
+			use_spkit_type_b = other.use_spkit_type_b;
+			use_spkit_type_c = other.use_spkit_type_c;
+
+			spkit_type_a_percentage = other.spkit_type_a_percentage;
+			spkit_type_b_percentage = other.spkit_type_b_percentage;
+			spkit_type_c_percentage = other.spkit_type_c_percentage;
 			return *this;
 		}
 
@@ -137,9 +130,15 @@ public:
 		bool field_energizings_active;
 		bool target_healings_active;
 		bool target_energizing_active;
-		bool target_heal_prio_myself;
+		bool target_heal_prio_myself; 
 
-		std::vector<SkillpSettings> spkit_usage;
+		bool use_spkit_type_a;
+		bool use_spkit_type_b;
+		bool use_spkit_type_c;
+							 
+		int spkit_type_a_percentage;
+		int spkit_type_b_percentage;
+		int spkit_type_c_percentage;
 	};
 
 public:

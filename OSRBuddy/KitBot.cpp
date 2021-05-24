@@ -210,6 +210,7 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
 {   
     CItemInfo* invkit = nullptr;
     bool used_shieldkit = false, used_energykit = false, used_spkit = false;
+    bool is_mgear = OSR_API->GetPlayerGearType() == GearType::MGear;
 
     switch (type)
     {
@@ -222,40 +223,52 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
         {
         case KitCategory::S_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_ShieldKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_ShieldKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::A_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_ShieldKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_ShieldKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_ShieldKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_ShieldKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;  
         } 
@@ -269,40 +282,52 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
         {
         case KitCategory::S_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_RepairKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_RepairKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::A_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_RepairKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_RepairKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_RepairKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_RepairKit);
-            if (invkit)  {
+            if (invkit)  
+            {
                 OSR_API->SendUseItem(invkit);           
+                return true;
             }
             break;       
         } 
@@ -310,34 +335,72 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
     case KitType::SKILLPOINT:
         if (m_awaiting_Ok_skill) {
             return false;
-        }
+        }      
         switch (category)
         {
         case KitCategory::S_TYPE:
             break;
         case KitCategory::A_TYPE:
+            if (is_mgear)
+            {
+                invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPit_MG);
+                if (invkit) 
+                {
+                    OSR_API->SendUseItem(invkit);
+                    return true;
+                }
+            } 
+
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPKit_1);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPKit_2);
-                if (invkit) {
+                if (invkit) 
+                {
                     OSR_API->SendUseItem(invkit);
+                    return true;
                 }
             }
             break;
         case KitCategory::B_TYPE:
+            if (is_mgear)
+            {
+                invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_SkillPKit_MG);
+                if (invkit)
+                {
+                    OSR_API->SendUseItem(invkit);
+                    return true;
+                }
+            }
+
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_SkillPKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
+            if (is_mgear)
+            {
+                invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_SkillPKit_MG);
+                if (invkit)
+                {
+                    OSR_API->SendUseItem(invkit);
+                    return true;
+                }
+            }
+
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_SkillPKit);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;    
         }
@@ -354,8 +417,10 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_CondensedFuel);
-            if (invkit) {
+            if (invkit) 
+            {
                 OSR_API->SendUseItem(invkit);
+                return true;
             }
             break;
         case KitCategory::C_TYPE:
@@ -925,86 +990,104 @@ void KitBuffBot::Tick()
 void KitBuffBot::RenderImGui()
 {   
     DrawEnableCheckBox();   
-    ImGui::BeginGroup();
-    {
+    ImGui::BeginGroupPanel("Kits");
+    {  
+        const char* items[] = { "Rage", "Humanized", "Sleepy" };
+        ImGui::ComboEx("Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
+        ImGui::Dummy(ImVec2(0, 5));
 
-        //ImGui::BeginGroupPanel("Kitbot", ImVec2(200, 200));
-        ImGui::BeginGroup();
+        ImGui::BeginGroupPanel("Shield", ImVec2(100, 200));
         {
-            const char* items[] = { "Rage", "Humanized", "Sleepy" };
-            ImGui::ComboEx("Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
-            ImGui::SameLine();
-            ImGui::Dummy(ImVec2(5, 0));
-            ImGui::Dummy(ImVec2(0, 5));
-
-            ImGui::BeginGroupPanel("Shield", ImVec2(100, 100));
+            if (ImGui::Checkbox("S Type", &m_settings.use_shield_type_s))
             {
-                if (ImGui::Checkbox("S Type", &m_settings.use_shield_type_s))
+                if (m_settings.use_shield_type_s)
                 {
-                    if (m_settings.use_shield_type_s)
-                    {
-                        m_settings.use_shield_type_a = true;
-                        m_settings.use_shield_type_b = true;
-                        m_settings.use_shield_type_c = true;
-                    }
+                    m_settings.use_shield_type_a = true;
+                    m_settings.use_shield_type_b = true;
+                    m_settings.use_shield_type_c = true;
                 }
-                if (ImGui::Checkbox("A Type", &m_settings.use_shield_type_a))
-                {
-                    if (m_settings.use_shield_type_a)
-                    {
-                        m_settings.use_shield_type_b = true;
-                        m_settings.use_shield_type_c = true;
-                    }
-                }
-                if (ImGui::Checkbox("B Type", &m_settings.use_shield_type_b))
-                {
-                    if (m_settings.use_shield_type_b) {
-                        m_settings.use_shield_type_c = true;
-                    }
-                }
-                ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
             }
-            ImGui::EndGroupPanel();
-            ImGui::SameLine();
-            ImGui::BeginGroupPanel("Energy", ImVec2(100, 100));
+            if (ImGui::Checkbox("A Type", &m_settings.use_shield_type_a))
             {
-                if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
+                if (m_settings.use_shield_type_a)
                 {
-                    if (m_settings.use_energy_type_s)
-                    {
-                        m_settings.use_energy_type_a = true;
-                        m_settings.use_energy_type_b = true;
-                        m_settings.use_energy_type_c = true;
-                    }
+                    m_settings.use_shield_type_b = true;
+                    m_settings.use_shield_type_c = true;
                 }
-                if (ImGui::Checkbox("A Type##", &m_settings.use_energy_type_a))
-                {
-                    if (m_settings.use_energy_type_a)
-                    {
-                        m_settings.use_energy_type_b = true;
-                        m_settings.use_energy_type_c = true;
-                    }
-                }
-                if (ImGui::Checkbox("B Type##", &m_settings.use_energy_type_b))
-                {
-                    if (m_settings.use_energy_type_b) {
-                        m_settings.use_energy_type_c = true;
-                    }
-                }
-                ImGui::Checkbox("C Type##", &m_settings.use_energy_type_c);
             }
-            ImGui::EndGroupPanel();
-            ImGui::SameLine();
-            ImGui::BeginGroupPanel("Other");
+            if (ImGui::Checkbox("B Type", &m_settings.use_shield_type_b))
             {
-                ImGui::Checkbox("Ammo", &m_settings.use_ammobox);
-                ImGui::Checkbox("Fuel", &m_settings.use_fuel);
+                if (m_settings.use_shield_type_b) {
+                    m_settings.use_shield_type_c = true;
+                }
             }
-            ImGui::EndGroupPanel();
+            ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
         }
-        ImGui::EndGroup();
+        ImGui::EndGroupPanel();
+        ImGui::SameLine();
+        ImGui::BeginGroupPanel("Energy", ImVec2(100, 200));
+        {
+            if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
+            {
+                if (m_settings.use_energy_type_s)
+                {
+                    m_settings.use_energy_type_a = true;
+                    m_settings.use_energy_type_b = true;
+                    m_settings.use_energy_type_c = true;
+                }
+            }
+            if (ImGui::Checkbox("A Type##", &m_settings.use_energy_type_a))
+            {
+                if (m_settings.use_energy_type_a)
+                {
+                    m_settings.use_energy_type_b = true;
+                    m_settings.use_energy_type_c = true;
+                }
+            }
+            if (ImGui::Checkbox("B Type##", &m_settings.use_energy_type_b))
+            {
+                if (m_settings.use_energy_type_b) {
+                    m_settings.use_energy_type_c = true;
+                }
+            }
+            ImGui::Checkbox("C Type##", &m_settings.use_energy_type_c);
+        }
+        ImGui::EndGroupPanel();
+        ImGui::SameLine();
+        ImGui::BeginGroupPanel("Other");
+        {
+            ImGui::Checkbox("Ammo", &m_settings.use_ammobox);
+            ImGui::Checkbox("Fuel", &m_settings.use_fuel);
+        }
+        ImGui::EndGroupPanel();
+        ImGui::BeginGroupPanel("Skillpoints", ImVec2(100, 200));
+        {
+            ImGui::Checkbox("A Type", &m_settings.use_spkit_type_a);
+            ImGui::SameLine();
+            ImGui::PushItemWidth(200);
+            ImGui::SliderInt("%##spkit_a_slider", &m_settings.spkit_type_a_percentage, 0, 99);
+            ImGui::PopItemWidth();
+
+            ImGui::Checkbox("B Type", &m_settings.use_spkit_type_b);
+            ImGui::SameLine();
+            ImGui::PushItemWidth(200);
+            ImGui::SliderInt("%##spkit_b_slider", &m_settings.spkit_type_b_percentage, 0, 99);
+            ImGui::PopItemWidth();
+
+            ImGui::Checkbox("C Type", &m_settings.use_spkit_type_c);
+            ImGui::SameLine();
+            ImGui::PushItemWidth(200);
+            ImGui::SliderInt("%##spkit_c_slider", &m_settings.spkit_type_c_percentage, 0, 99);     
+            ImGui::PopItemWidth();
+        }                         
+        ImGui::EndGroupPanel();    
+    }
+    ImGui::EndGroupPanel();
+    ImGui::SameLine();
+    ImGui::BeginGroupPanel("Buffs");
+    {   
         //ImGui::EndGroupPanel();    
-        ImGui::BeginGroupPanel("Autobuffs");
+        ImGui::BeginGroupPanel("Autobuffs", ImVec2(300, 0));
         {
             ImGui::BeginGroup();
             for (auto skill : m_playerskills)
@@ -1036,48 +1119,38 @@ void KitBuffBot::RenderImGui()
             ImGui::EndGroup();
             ImGui::SameLine();
             ImGui::BeginGroup();
-            for (auto skill : m_playerskills)
             {
-                switch (skill->type)
+                for (auto skill : m_playerskills)
                 {
-                case SkillType::Frenzy:
-                case SkillType::Elevation:
-                case SkillType::Raging_Defense:
-                case SkillType::Raging_Evasion:
-                case SkillType::Raging_Fire:
-                    if (skill->final) {
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
-                    }
-                    if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                    switch (skill->type)
                     {
-                        if (skill->autobuff) {
-                            AddAutoBuff(skill->type);
+                    case SkillType::Frenzy:
+                    case SkillType::Elevation:
+                    case SkillType::Raging_Defense:
+                    case SkillType::Raging_Evasion:
+                    case SkillType::Raging_Fire:
+                        if (skill->final) {
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
                         }
-                        else {
-                            RemoveAutoBuff(skill->type);
+                        if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                        {
+                            if (skill->autobuff) {
+                                AddAutoBuff(skill->type);
+                            }
+                            else {
+                                RemoveAutoBuff(skill->type);
+                            }
                         }
-                    }
-                    if (skill->final) {
-                        ImGui::PopStyleColor();
+                        if (skill->final) {
+                            ImGui::PopStyleColor();
+                        }
                     }
                 }
             }
             ImGui::EndGroup();
         }
-        ImGui::EndGroupPanel();
-        /*
-        ImGui::Text("Shield Timer Game:"); ImGui::SameLine();
-        ImGui::Text(std::to_string((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() - m_lastUseShieldKitTime)).count()).c_str());
-
-        ImGui::Text("Shield Timer Buddy:"); ImGui::SameLine();
-        ImGui::Text(std::to_string(m_buddy->GetTickTime().count()).c_str());
-        */
-    }
-    ImGui::EndGroup();
-    ImGui::SameLine();
-    ImGui::BeginGroup();
-    {
-        ImGui::BeginGroupPanel("Autohealings", ImVec2(400, 400));
+        ImGui::EndGroupPanel(); 
+        ImGui::BeginGroupPanel("Autohealings");
         { 
             if (OSR_API->GetPlayerGearType() != GearType::MGear)
             {
@@ -1087,18 +1160,18 @@ void KitBuffBot::RenderImGui()
             {
                 ImGui::Text("Field: \t");
                 ImGui::SameLine();
-                ImGui::Checkbox("Shield", &m_settings.field_healings_active);
+                ImGui::Checkbox("Shield", &m_settings.field_energizings_active);
                 ImGui::SameLine();
-                ImGui::Checkbox("Energy", &m_settings.field_energizings_active);
+                ImGui::Checkbox("Energy", &m_settings.field_healings_active);
                              
                 ImGui::Text("Target:\t");
                 ImGui::SameLine();
-                ImGui::Checkbox("Shield##targetShield", &m_settings.target_healings_active);
+                ImGui::Checkbox("Shield##targetShield", &m_settings.target_energizing_active);
                 ImGui::SameLine();
-                ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_energizing_active);
+                ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_healings_active);
 
                 ImGui::NewLine();
-                ImGui::BeginGroupPanel("Priority Healing", ImVec2(400, 400));
+                ImGui::BeginGroupPanel("Priority Healing", ImVec2(290, 400));
                 {
                     ImGui::Checkbox(OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterName, &m_settings.target_heal_prio_myself);
                     for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo) {
@@ -1110,7 +1183,7 @@ void KitBuffBot::RenderImGui()
         }
         ImGui::EndGroupPanel();
     }
-    ImGui::EndGroup();
+    ImGui::EndGroupPanel();
 }
 
 const char* KitBuffBot::GetName() const
@@ -1460,16 +1533,21 @@ void KitBuffBot::TickAutoKit()
     {
         // todo: SmartSP
 
+        bool sp_kit_used = false;
         int skillp_percentage = 100 * (static_cast<float>(std::max(OSR_API->GetCurrentSkillp(), 1)) / static_cast<float>(OSR_API->GetMaxSkillp()));
 
-        for (auto& skillp_usage : m_settings.spkit_usage)
-        {
-            if (skillp_percentage <= skillp_usage.min_percentage)
-            {
-                TryUseKit(KitType::SKILLPOINT, skillp_usage.category);
-                break;
-            }
+        if(m_settings.use_spkit_type_a && skillp_percentage <= m_settings.spkit_type_a_percentage)  
+        { 
+            sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::A_TYPE);  
         }
+        if (!sp_kit_used && m_settings.use_spkit_type_b && skillp_percentage <= m_settings.spkit_type_b_percentage) 
+        {
+            sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::B_TYPE);
+        }
+        if (!sp_kit_used && m_settings.use_spkit_type_c && skillp_percentage <= m_settings.spkit_type_c_percentage)
+        {
+            sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::C_TYPE);
+        }   
     }         
 
     // Fuelkits
