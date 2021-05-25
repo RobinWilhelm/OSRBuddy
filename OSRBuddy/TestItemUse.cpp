@@ -203,7 +203,6 @@ const char* TestItemUse::GetName() const
 	return "Test";
 }
 
-
 void TestItemUse::DumpRareItemInfoToFile(FILE* fd)
 {
 	std::vector<RARE_ITEM_INFO*> rareitems;

@@ -66,6 +66,9 @@ public:
 	bool IsHitablePrimary(CUnitData* target);
 
 	GearType GetPlayerGearType();
+	MapNumber GetCurrentMap();
+	UID32_t GetPlayerUniqueNumber();
+	ClientIndex_t GetPlayerClientIndex();
 
 	// CINFCityBase
 	bool IsInBuilding();

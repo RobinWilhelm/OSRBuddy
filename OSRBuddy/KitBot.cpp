@@ -593,8 +593,8 @@ SkillType KitBuffBot::ResolveSkillItemName(const char* itemname)
     if (strstr(itemname, "Fuel replenish"))         return SkillType::Fuel_Replenish;
     if (strstr(itemname, "Reverse engine"))         return SkillType::Reverse_Engine;
     if (strstr(itemname, "Invincible"))             return SkillType::Invincible;
-    if (strstr(itemname, "Repair target"))          return SkillType::Energize_Target;
-    if (strstr(itemname, "Repair field"))           return SkillType::Energizing_Field;
+    if (strstr(itemname, "Repair target"))          return SkillType::Repair_Target;
+    if (strstr(itemname, "Repair field"))           return SkillType::Repair_Field;
     if (strstr(itemname, "Healing target"))         return SkillType::Heal_Target;
     if (strstr(itemname, "Release"))                return SkillType::Release;
     if (strstr(itemname, "Deploy Chaff"))           return SkillType::Deploy_Chaff;
@@ -874,6 +874,11 @@ UID32_t KitBuffBot::GetBestHealTarget()
             continue;
         }
 
+        if (member->m_pEnemyData->m_infoCharacter.CurrentHP <= 0) {
+            continue;
+        }
+
+
         int member_energy_missing = member->m_pEnemyData->m_infoCharacter.HP - member->m_pEnemyData->m_infoCharacter.CurrentHP;
         if (member_energy_missing > most_missing_energy)
         {
@@ -900,7 +905,7 @@ UID32_t KitBuffBot::GetBestHealTarget()
     return target;
 }
 
-UID32_t KitBuffBot::GetBestEnergizeTarget()
+UID32_t KitBuffBot::GetBestRepairTarget()
 {
     UID32_t target = 0;
     UID32_t prio_target = 0;
@@ -910,6 +915,10 @@ UID32_t KitBuffBot::GetBestEnergizeTarget()
     for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
     {
         if (!member->m_bUserLogOn || !member->m_pEnemyData) {
+            continue;
+        }
+
+        if (member->m_pEnemyData->m_infoCharacter.CurrentDP <= 0) {
             continue;
         }
 
@@ -1062,19 +1071,19 @@ void KitBuffBot::RenderImGui()
         ImGui::EndGroupPanel();
         ImGui::BeginGroupPanel("Skillpoints", ImVec2(100, 200));
         {
-            ImGui::Checkbox("A Type", &m_settings.use_spkit_type_a);
+            ImGui::Checkbox("A Type##atypespkit_chkb", &m_settings.use_spkit_type_a);
             ImGui::SameLine();
             ImGui::PushItemWidth(200);
             ImGui::SliderInt("%##spkit_a_slider", &m_settings.spkit_type_a_percentage, 0, 99);
             ImGui::PopItemWidth();
 
-            ImGui::Checkbox("B Type", &m_settings.use_spkit_type_b);
+            ImGui::Checkbox("B Type##btypespkit_chkb", &m_settings.use_spkit_type_b);
             ImGui::SameLine();
             ImGui::PushItemWidth(200);
             ImGui::SliderInt("%##spkit_b_slider", &m_settings.spkit_type_b_percentage, 0, 99);
             ImGui::PopItemWidth();
 
-            ImGui::Checkbox("C Type", &m_settings.use_spkit_type_c);
+            ImGui::Checkbox("C Type##ctypespkit_chkb", &m_settings.use_spkit_type_c);
             ImGui::SameLine();
             ImGui::PushItemWidth(200);
             ImGui::SliderInt("%##spkit_c_slider", &m_settings.spkit_type_c_percentage, 0, 99);     
@@ -1160,13 +1169,13 @@ void KitBuffBot::RenderImGui()
             {
                 ImGui::Text("Field: \t");
                 ImGui::SameLine();
-                ImGui::Checkbox("Shield", &m_settings.field_energizings_active);
+                ImGui::Checkbox("Shield", &m_settings.field_repair_active);
                 ImGui::SameLine();
                 ImGui::Checkbox("Energy", &m_settings.field_healings_active);
                              
                 ImGui::Text("Target:\t");
                 ImGui::SameLine();
-                ImGui::Checkbox("Shield##targetShield", &m_settings.target_energizing_active);
+                ImGui::Checkbox("Shield##targetShield", &m_settings.target_repair_active);
                 ImGui::SameLine();
                 ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_healings_active);
 
@@ -1299,6 +1308,8 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
     case T_FC_SKILL_USE_SKILL_OK: 
         {
             MSG_FC_SKILL_USE_SKILL_OK* use_skill_ok_msg = (MSG_FC_SKILL_USE_SKILL_OK*)packet;
+           
+
            //OnUseSkillAnswer(use_skill_ok_msg->SkillItemID.ItemNum);
             break;
         }
@@ -1588,22 +1599,25 @@ void KitBuffBot::TickAutoHeals()
     if (OSR_API->GetPlayerGearType() == GearType::MGear  && AutoHealCheckTimerReady())
     {
         int currentsp = OSR_API->GetCurrentSkillp();
+        PlayerSkillInfo* repair_skill = nullptr;
 
-        if (m_settings.target_energizing_active)
+        if (m_settings.target_repair_active )
         {
-            UID32_t energize_target = GetBestEnergizeTarget();
+            UID32_t energize_target = GetBestRepairTarget();
             if (energize_target != 0)
             {
-                PlayerSkillInfo* energize_skill = FindPlayerSkill(SkillType::Energize_Target);
-                if (energize_skill && energize_skill->skillinfo->m_fCheckReattackTime <= 0.0f && energize_skill->skillinfo->ItemInfo->ReqSP <= currentsp) 
+                repair_skill = FindPlayerSkill(SkillType::Repair_Target);
+                if (repair_skill && repair_skill->skillinfo->m_fCheckReattackTime <= 0.0f && repair_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
                 {
-                    TryUseTargetSkill(energize_skill, energize_target);
-                    currentsp -= energize_skill->skillinfo->ItemInfo->ReqSP;
+                    TryUseTargetSkill(repair_skill, energize_target);
+                    currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;
+                    if (energize_target != OSR_API->GetPlayerUniqueNumber()) {
+                    }
                 }
             }
         }
 
-        if (m_settings.target_healings_active)
+        if (m_settings.target_healings_active && !(repair_skill))
         {
             UID32_t heal_target = GetBestHealTarget();
             if (heal_target != 0)
@@ -1611,22 +1625,15 @@ void KitBuffBot::TickAutoHeals()
                 PlayerSkillInfo* heal_skill = FindPlayerSkill(SkillType::Heal_Target);
                 if (heal_skill && heal_skill->skillinfo->m_fCheckReattackTime <= 0.0f && heal_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
                 {
-                    TryUseTargetSkill(heal_skill, heal_target); 
+                    TryUseTargetSkill(heal_skill, heal_target);
                     currentsp -= heal_skill->skillinfo->ItemInfo->ReqSP;
+                    //used_target_heal = true;
                 }
-            } 
-        } 
-
-        if (m_settings.field_energizings_active) 
-        {
-            PlayerSkillInfo* energizefield = FindPlayerSkill(SkillType::Energizing_Field);
-            if (energizefield && energizefield->skillinfo->m_fCheckReattackTime <= 0.0f && energizefield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseEnergizeField())
-            {
-                TryUseSkill(energizefield);
-                currentsp -= energizefield->skillinfo->ItemInfo->ReqSP;
             }
-        } 
+        }           
 
+
+         
         if (m_settings.field_healings_active)
         {
             PlayerSkillInfo* healingfield = FindPlayerSkill(SkillType::Healing_Field);
@@ -1634,8 +1641,18 @@ void KitBuffBot::TickAutoHeals()
             {
                 TryUseSkill(healingfield);
                 currentsp -= healingfield->skillinfo->ItemInfo->ReqSP;
-            }            
+            }
         }
+
+        if (m_settings.field_repair_active) 
+        {
+            PlayerSkillInfo* energizefield = FindPlayerSkill(SkillType::Repair_Field);
+            if (energizefield && energizefield->skillinfo->m_fCheckReattackTime <= 0.0f && energizefield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseEnergizeField())
+            {
+                TryUseSkill(energizefield);
+                currentsp -= energizefield->skillinfo->ItemInfo->ReqSP;
+            }
+        } 
     }
 }
 

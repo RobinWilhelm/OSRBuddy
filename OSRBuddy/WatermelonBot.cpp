@@ -123,6 +123,10 @@ void WatermelonBot::Tick()
         return;
     }
 
+    if (OSR_API->GetCurrentMap() != MapNumber::WatermelonIsland) {
+        return;
+    }
+
     UpdateCheckTime();
 
     if (OSR_API->IsShuttleDead()) {
@@ -223,11 +227,12 @@ void WatermelonBot::RenderImGui()
         //return;
     }
 
-
-    if (OSR_API->GetPlayerGearType() != GearType::AGear) 
-    {
+    if (OSR_API->GetPlayerGearType() != GearType::AGear) {
         ImGui::Text("Switch to an A-GEAR if you want to use the bot!");
-        return;
+    }
+
+    if (OSR_API->GetCurrentMap() != MapNumber::WatermelonIsland) {
+        ImGui::Text("Wrong Map!");
     }
         
     switch (m_current_state)
@@ -251,7 +256,7 @@ void WatermelonBot::RenderImGui()
 
     ImGui::BeginGroupPanel("Settings", ImVec2(400, 400));
 
-    ImGui::FancyCheckbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
+    ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
 
     ImGui::Dummy(ImVec2(5, 0));
     ImGui::EndGroupPanel();
@@ -523,6 +528,12 @@ FeatureType WatermelonBot::GetType() const
 
 void WatermelonBot::OnEnable()
 {
+    if (OSR_API->GetCurrentMap() != MapNumber::WatermelonIsland) 
+    {
+        Enable(false);
+        return;
+    }
+
     // reset grinding timer
     m_grinding_time = 0ms;
     m_grinding_time_total = 0ms;

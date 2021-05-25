@@ -134,8 +134,8 @@ enum class SkillType : int
     Raging_Evasion,
     Raging_Defense,
     Raging_Fire,
-    Energize_Target,
-    Energizing_Field,
+    Repair_Target,
+    Repair_Field,
     Heal_Target,
     Release,
     Deploy_Chaff,
@@ -158,6 +158,13 @@ enum class GearType
     BGear,
     MGear,
     AGear
+};
+
+enum class MapNumber
+{
+    WatermelonIsland = 9002,
+    InvasionWorld = 9050,
+
 };
 
 enum class EnchantItemType
