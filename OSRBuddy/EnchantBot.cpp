@@ -98,30 +98,12 @@ void EnchantBot::Tick()
 		break;
 	}	  
 }
-
-
-
+		
 void EnchantBot::RenderImGui()
 {
 	if (!DrawEnableCheckBox()) {
 		//return;
-	}
-	
-	/*
-	if(ImGui::Checkbox("Active", &m_enabled))
-	{
-		// dont allow the EnchantBot to be turned on if the GambleBot is aktive right now
-		if (m_active) 
-		{
-			//const BuddyFeatureBase* gambleBot = m_buddy->GetFeatureByType(FeatureType::GambleBot);
-			//if (gambleBot && gambleBot->IsActive())	{
-			//	m_active = false;
-			//}
-		}
-		// begin drawing in next frame
-		return;
-	}
-	*/
+	}	 
 
 	ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
