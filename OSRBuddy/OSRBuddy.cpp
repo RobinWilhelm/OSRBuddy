@@ -10,7 +10,7 @@
 #include "WatermelonBot.h"
                                 
 #include "AntiAntiCheat.h"
-#include "Offset.h"
+#include "PatternManager.h"
 #include "Windowsx.h"  // get_x_lpraram && get_y_lparam
 
 /*

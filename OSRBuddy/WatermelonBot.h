@@ -4,10 +4,8 @@
 #include <string>		  
 #include "OSRAPI.h"
 #include <chrono>
-
-
-
-class KitBuffBot;
+   
+class KitBuffBot; 
 
 class WatermelonBot : public BuddyFeatureBase
 {
@@ -62,7 +60,9 @@ private:
 
 	std::chrono::milliseconds m_inv_action_check_time;
 
+	bool m_shoot_watermelon_tanks;
+	bool m_shoot_watermelon_z;
+
 	uint32_t m_killed_watermelon_tanks;
 	uint32_t m_killed_watermelon_z;
-	uint32_t m_killed_easter_egg;
 };

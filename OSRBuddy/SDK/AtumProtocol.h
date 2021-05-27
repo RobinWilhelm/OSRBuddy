@@ -9198,28 +9198,7 @@ struct MEX_MONSTER_INFO
 	UINT			SourceIndex;
 	BitFlag64_t		MPOption;			// 2010-01-11 by cmkwon, 몬스터 MPOption 64bit로 변경 - 기존(BYTE)
 	BYTE			ClickEvent;							// 2007-09-05 by dhjin, 몬스터 클릭 이벤트 추가
-	char			PortraitFileName[SIZE_MAX_FILE_NAME];	// 2010-03-31 by dhjin, 인피니티(기지방어) - 몬스터 초상화 파일
-
-	// operator overloading
-	MEX_MONSTER_INFO& operator=(const MONSTER_INFO& rhs)
-	{
-		this->MonsterUnitKind = rhs.MonsterUnitKind;
-		STRNCPY_MEMSET(this->MonsterName, rhs.MonsterName, SIZE_MAX_MONSTER_NAME);
-		this->Level = rhs.Level;
-		this->HP = rhs.MonsterHP;
-		this->Size = rhs.Size;
-		this->Belligerence = rhs.Belligerence;				// 호전성
-		this->AlphaBlending = rhs.AlphaBlending;
-		this->RenderIndex = rhs.RenderIndex;
-		this->ScaleValue = rhs.ScaleValue;
-		this->TextureIndex = rhs.TextureIndex;
-		this->SourceIndex = rhs.SourceIndex;
-		this->MPOption = rhs.MPOption;
-		this->ClickEvent = rhs.ClickEvent;				// 2007-09-05 by dhjin
-		STRNCPY_MEMSET(this->PortraitFileName, rhs.PortraitFileName, SIZE_MAX_FILE_NAME);	// 2010-03-31 by dhjin, 인피니티(기지방어) - 몬스터 초상화 파일
-
-		return *this;
-	}
+	char			PortraitFileName[SIZE_MAX_FILE_NAME];	// 2010-03-31 by dhjin, 인피니티(기지방어) - 몬스터 초상화 파일	 
 };
 
 typedef struct

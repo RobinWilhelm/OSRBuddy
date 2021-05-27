@@ -112,7 +112,6 @@ WatermelonBot::WatermelonBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_on_target = false;
     m_killed_watermelon_tanks = 0;
     m_killed_watermelon_z = 0;
-    m_killed_easter_egg = 0;
     m_target = nullptr;
     m_kitbot = nullptr;
     m_auto_clean_inventory = false;
@@ -151,6 +150,10 @@ void WatermelonBot::Tick()
             m_on_target = false;
             m_get_new_target = false;
         }
+        else
+        {
+            m_target = nullptr;
+        }
     }  
  
     switch (m_current_state)
@@ -186,6 +189,11 @@ void WatermelonBot::Tick()
             // only use secondary if in radar range          
             OSR_API->UseSecondaryWeapon(GetTargetDistance(m_target) < OSR_API->GetRadarRangeSecondary());        
         } 
+        else 
+        {
+            OSR_API->UsePrimaryWeapon(false);
+            OSR_API->UseSecondaryWeapon(false);
+        }
         break;
 
     case WatermelonBot::State::OVERHEATED: 
@@ -259,6 +267,9 @@ void WatermelonBot::RenderImGui()
 
     ImGui::BeginGroupPanel("Settings", ImVec2(400, 400));
 
+    ImGui::Checkbox("Shoot Watermelon Tanks", &m_shoot_watermelon_tanks);
+    ImGui::Checkbox("Shoot Watermelon Z", &m_shoot_watermelon_z);
+    ImGui::NewLine();
     ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
 
     ImGui::Dummy(ImVec2(5, 0));
@@ -271,6 +282,11 @@ void WatermelonBot::RenderImGui()
     ImGui::Text("Watermelon Tanks killed:");
     ImGui::SameLine();
     ImGui::Text(std::to_string(m_killed_watermelon_tanks).c_str());
+
+    ImGui::Text("Watermelon Z killed:");
+    ImGui::SameLine();
+    ImGui::Text(std::to_string(m_killed_watermelon_z).c_str());
+
     ImGui::Dummy(ImVec2(5, 0));
     ImGui::EndGroupPanel();
 }
@@ -292,18 +308,15 @@ bool WatermelonBot::OnReadPacket(unsigned short msgtype, byte* packet)
         {             
             if (((MSG_FC_MONSTER_CHANGE_HP*)packet)->CurrentHP <= 0)
             {
-                m_target->m_info.CurrentHP = ((MSG_FC_MONSTER_CHANGE_HP*)packet)->CurrentHP;
+                m_target->m_info.CurrentHP = 0;
 
-                switch (m_target->m_pMonsterInfo->SourceIndex)
+                switch (m_target->m_info.MonsterUnitKind)
                 {
                 case static_cast<UINT>(MonsterIndex::Watermelon_Tank) :
                     m_killed_watermelon_tanks++;
                     break;
                 case static_cast<UINT>(MonsterIndex::Watermelon_Z) :
                     m_killed_watermelon_z++;
-                    break;
-                case static_cast<UINT>(MonsterIndex::Easter_Egg) :
-                    m_killed_easter_egg++;
                     break;
                 }         
                 m_target = nullptr;
@@ -357,21 +370,27 @@ bool WatermelonBot::IsValidTargetMonster(CMonsterData* monster)
 {
     if (!monster) {
         return false;
-    }     
-
-    switch (monster->m_pMonsterInfo->SourceIndex)
-    {
-    case static_cast<UINT>(MonsterIndex::Watermelon_Tank) :
-    //case static_cast<UINT>(MonsterIndex::Watermelon_Z) :
-    //case static_cast<UINT>(MonsterIndex::Easter_Egg) :
-        break;
-    default:
-        return false;
-    }
+    }  
 
     if (monster->m_info.CurrentHP <= 0) {
         return false;
     }
+
+    switch (monster->m_info.MonsterUnitKind)
+    {
+    case static_cast<UINT>(MonsterIndex::Watermelon_Tank):
+        if (!m_shoot_watermelon_tanks) { 
+            return false; 
+        }
+        break;
+    case static_cast<UINT>(MonsterIndex::Watermelon_Z):
+        if (!m_shoot_watermelon_z) {
+            return false;
+        }
+        break;
+    default:
+        return false;
+    } 
 
     return true;
 }
@@ -468,7 +487,7 @@ void WatermelonBot::AimAtTarget(CMonsterData* m_target)
         {
             //SetCursorPos(targetPos.x, targetPos.y);
             //SendMouseMove(delta_x, delta_y);
-            //m_buddy->SetCursorPosition(delta_x, delta_y);
+            //m_buddy->SetCursorPosition(targetPos.x, targetPos.y);
             m_buddy->SetCursorPosition(curPos.x + delta_x, curPos.y + delta_y);
         }
         else
@@ -541,6 +560,7 @@ void WatermelonBot::OnEnable()
     m_grinding_time = 0ms;
     m_grinding_time_total = 0ms;
     m_killed_watermelon_tanks = 0;
+    m_killed_watermelon_z = 0;
 
     m_kitbot = static_cast<KitBuffBot*>(m_buddy->GetFeatureByType(FeatureType::KitBuffBot));
     if (m_kitbot)

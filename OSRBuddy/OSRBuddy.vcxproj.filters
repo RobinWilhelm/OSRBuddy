@@ -196,9 +196,6 @@
     <ClInclude Include="Trampoline.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Offset.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Console.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -303,6 +300,9 @@
     </ClInclude>
     <ClInclude Include="AtumProtocol.h">
       <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternManager.h">
+      <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

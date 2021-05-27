@@ -180,7 +180,7 @@
     <ClInclude Include="MarsenneTwister.h" />
     <ClInclude Include="OSRBuddyDefine.h" />
     <ClInclude Include="KitBot.h" />
-    <ClInclude Include="Offset.h" />
+    <ClInclude Include="PatternManager.h" />
     <ClInclude Include="OSRAPI.h" />
     <ClInclude Include="OSRBuddy.h" />
     <ClInclude Include="OSRImGuiMenu.h" />

@@ -1,7 +1,7 @@
 #include "OSRAPI.h"
 
 #include "Utility.h"
-#include "Offset.h"
+#include "PatternManager.h"
 
 #include "SDK/AtumApplication.h"
 #include "SDK/SceneData.h"
