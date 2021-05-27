@@ -89,7 +89,9 @@ LRESULT OSRBuddyMain::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 {       
     for (auto& feature : m_features) 
     {
-        feature->WindowProc(hwnd, msg, wParam, lParam);
+        if (feature->IsEnabled()) {
+            feature->WindowProc(hwnd, msg, wParam, lParam);
+        }
     }
     
     switch (msg)
@@ -112,9 +114,9 @@ LRESULT OSRBuddyMain::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 
 void _fastcall OSRBuddyMain::Tick_Hooked(CInterface* ecx, void* edx)
 {
-    Utility::PushCpuState();
+    PUSHCPUSTATE
     g_osrbuddy->Tick(); 
-    Utility::PopCpuState();
+    POPCPUSTATE
     g_osrbuddy->m_orig_tick(ecx);    
 }
 
@@ -127,17 +129,17 @@ BOOL __fastcall OSRBuddyMain::OnRecvdPacket_Hooked(CFieldWinSocket* ecx, void* e
 
 BOOL __fastcall OSRBuddyMain::OnReadPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType)
 {
-    Utility::PushCpuState();
+    PUSHCPUSTATE
     g_osrbuddy->OnReadPacket(wParam, nSocketNotifyType); 
-    Utility::PopCpuState();
+    POPCPUSTATE
     return g_osrbuddy->m_orig_OnRecvFieldSocketMessage(ecx, wParam, nSocketNotifyType);
 }
 
 int __fastcall OSRBuddyMain::OnWritePacket_Hooked(CWinSocket* ecx, void* edx, LPCSTR pPacket, int nLength)
 {
-    Utility::PushCpuState();
+    PUSHCPUSTATE
     g_osrbuddy->OnWritePacket(pPacket, nLength); 
-    Utility::PopCpuState();
+    POPCPUSTATE
     return g_osrbuddy->m_orig_OnWritePacket(ecx, pPacket, nLength);
 }
 

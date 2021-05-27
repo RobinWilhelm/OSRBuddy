@@ -313,7 +313,7 @@ bool WatermelonBot::OnReadPacket(unsigned short msgtype, byte* packet)
 }
 
 int WatermelonBot::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
+{ 
     switch (msg)
     {
     case WM_KEYUP:

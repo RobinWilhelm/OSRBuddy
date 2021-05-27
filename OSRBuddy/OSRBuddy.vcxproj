@@ -103,7 +103,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_ATUM_CLIENT;BUDDY_EXPORTS;NOMINMAX</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ATUM_CLIENT;BUDDY_EXPORTS;NOMINMAX;RELEASE</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -128,7 +128,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_ATUM_CLIENT;BUDDY_EXPORTS;NOMINMAX</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ATUM_CLIENT;BUDDY_EXPORTS;NOMINMAX;RELEASE_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>

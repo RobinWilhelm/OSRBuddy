@@ -39,12 +39,12 @@ public:
     } 
 
     static FORCEINLINE void PushCpuState()
-    {
+    {  
         __asm
         {
             pushad;
             pushf;
-        }
+        } 
     }
 
 
@@ -54,11 +54,19 @@ public:
         {
             popf;
             popad;
-        };
+        }
     }
 
     static void MoveMouse(uint32_t x, uint32_t y);
 };
+
+#ifdef RELEASE
+    #define PUSHCPUSTATE Utility::PushCpuState();
+    #define POPCPUSTATE Utility::PopCpuState();
+#else
+    #define PUSHCPUSTATE
+    #define POPCPUSTATE
+#endif
 
 
 

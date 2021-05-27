@@ -7,16 +7,6 @@
 #include "OsrItemInfo.h"
 
 
-// to do
-/*
-	Add buttons for onetime gamble and start autoenchant / stop autoenchant
-	Add tick logic for enchanting
-	Fix current enchants for EnergyShieldCards
-	Add support for enchant chance cards
-	Add enchant item count overview
-	Add presets
-*/
-
 class CItemInfo;
 			    
 enum class EnchantItemKind
@@ -73,8 +63,7 @@ private:
 	bool InternalActionCheckTimeReady();
 	bool EnchantCheckTimeReady();
 	void ResetInternalActionCheckTime(bool random = true);
-	void ResetEnchantCheckTime(bool random = true);
-	
+	void ResetEnchantCheckTime(bool random = true);		   	
 
 	bool IsValidEnchantItem(ITEM_BASE* enchantItem);
 	void SetEnchantItem(UID64_t uid);
@@ -120,6 +109,5 @@ private:
 	bool					m_notify_sound;
 	bool					m_notify_messagebox;
 	int						m_preEnch;
-	int                     m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
+	int                     m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} }; 
 };
-
