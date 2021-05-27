@@ -208,15 +208,15 @@ private:
 private:   
 	KitSettings m_settings;
 
-	bool m_awaiting_Ok_shield;
-	bool m_awaiting_Ok_energy;
-	bool m_awaiting_Ok_skill;		   
-	bool m_awaiting_Ok_ammobox;
-	bool m_awaiting_Ok_fuel;   
+	bool m_awaiting_server_ok_shield;
+	bool m_awaiting_server_ok_energy;
+	bool m_awaiting_server_ok_skill;		   
+	bool m_awaiting_server_ok_ammobox;
+	bool m_awaiting_server_ok_fuel;   
 
 	std::vector<PlayerSkillInfo*> m_playerskills;
-	std::chrono::milliseconds m_lastAutoBuffCheck;
-	std::chrono::milliseconds m_last_auto_heal_check;
+	std::chrono::milliseconds m_last_autobuff_check;
+	std::chrono::milliseconds m_last_autoheal_check;
 
 	std::chrono::milliseconds m_shieldkit_firstuse_delay;
 	std::chrono::milliseconds m_energykit_firstuse_delay;
@@ -227,14 +227,13 @@ private:
 	std::chrono::milliseconds m_skillpkit_reattack_time;
 	std::chrono::milliseconds m_fuelkit_reattack_time;
 
-	std::chrono::milliseconds m_lastUseShieldKitTime;
-	std::chrono::milliseconds m_lastUseEnergyKitTime;
-	std::chrono::milliseconds m_lastUseSkillKitTime;	   
-	std::chrono::milliseconds m_lastUseFuelKitTime;
+	std::chrono::milliseconds m_shieldkit_last_use;
+	std::chrono::milliseconds m_energykit_last_use;
+	std::chrono::milliseconds m_skillkit_last_use;	   
+	std::chrono::milliseconds m_fuelkit_last_use;			   
 
-
-	std::chrono::milliseconds m_lastSendShieldKitTime;
-	std::chrono::milliseconds m_lastSendEnergyKitTime;
-	std::chrono::milliseconds m_lastSendSkillKitTime;
-	std::chrono::milliseconds m_lastSendFuelKitTime;
+	std::chrono::milliseconds m_shieldkit_last_send;
+	std::chrono::milliseconds m_energykit_last_send;
+	std::chrono::milliseconds m_skillkit_last_send;
+	std::chrono::milliseconds m_fuelkit_last_send;
 };

@@ -112,8 +112,10 @@ LRESULT OSRBuddyMain::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 
 void _fastcall OSRBuddyMain::Tick_Hooked(CInterface* ecx, void* edx)
 {
-    g_osrbuddy->Tick();    
-    g_osrbuddy->m_orig_tick(ecx);
+    Utility::PushCpuState();
+    g_osrbuddy->Tick(); 
+    Utility::PopCpuState();
+    g_osrbuddy->m_orig_tick(ecx);    
 }
 
 BOOL __fastcall OSRBuddyMain::OnRecvdPacket_Hooked(CFieldWinSocket* ecx, void* edx, LPSTR pPacket, int nLength, BYTE nSeq)
@@ -125,18 +127,22 @@ BOOL __fastcall OSRBuddyMain::OnRecvdPacket_Hooked(CFieldWinSocket* ecx, void* e
 
 BOOL __fastcall OSRBuddyMain::OnReadPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType)
 {
-    g_osrbuddy->OnReadPacket(wParam, nSocketNotifyType);
+    Utility::PushCpuState();
+    g_osrbuddy->OnReadPacket(wParam, nSocketNotifyType); 
+    Utility::PopCpuState();
     return g_osrbuddy->m_orig_OnRecvFieldSocketMessage(ecx, wParam, nSocketNotifyType);
 }
 
 int __fastcall OSRBuddyMain::OnWritePacket_Hooked(CWinSocket* ecx, void* edx, LPCSTR pPacket, int nLength)
 {
-    g_osrbuddy->OnWritePacket(pPacket, nLength);
+    Utility::PushCpuState();
+    g_osrbuddy->OnWritePacket(pPacket, nLength); 
+    Utility::PopCpuState();
     return g_osrbuddy->m_orig_OnWritePacket(ecx, pPacket, nLength);
 }
 
 BOOL __stdcall OSRBuddyMain::OnGetCursorPos_Hooked(LPPOINT lpPoint)
-{
+{ 
     return g_osrbuddy->GetCursorPosition(lpPoint);
 }
 
@@ -539,29 +545,20 @@ bool OSRBuddyMain::GetCursorPosition(LPPOINT pos)
 
 void OSRBuddyMain::OnReadPacket(DWORD wParam, UINT nSocketNotifyType)
 {       
-    MessageType_t	nType = 0;     
-    //nType = *(MessageType_t*)pPacket;
-
-    CFieldWinSocket* pFieldSocket = OSR_API->GetFieldWinSocket(nSocketNotifyType);
-    if (NULL == pFieldSocket) {        
-        return;
-    }
-
-    if (pFieldSocket->m_queueRecvMessage.empty()) {
+    MessageType_t	nType = 0;       
+    CFieldWinSocket* pFieldSocket = OSR_API->GetFieldWinSocket(nSocketNotifyType);   
+    if (!pFieldSocket || pFieldSocket->m_queueRecvMessage.empty()) {
         return;
     }
     
-    std::queue<char*> packet_buffer = pFieldSocket->m_queueRecvMessage;
-    
-    char* packet = NULL;
+    std::queue<char*> packet_buffer = pFieldSocket->m_queueRecvMessage;     
+    char* packet = NULL;                
 
     while (!packet_buffer.empty())
     {
         packet = packet_buffer.front();
-        packet_buffer.pop();
-
-        nType = *(MessageType_t*)packet;
-
+        packet_buffer.pop();                                            
+        nType = *(MessageType_t*)packet;  
         for (auto feature : m_features)
         {
             if (feature->OnReadPacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)))) {

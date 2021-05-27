@@ -70,13 +70,13 @@ class CINFImageBtn;
 #define CITY_BASE_UP_BOX_HEIGHT				30
 //#define CITY_BASE_DOWN_BOX_HEIGHT			84
 #define CITY_BASE_DOWN_BOX_HEIGHT			62
-#define CITY_BASE_DOWN_BOX_START_Y			(g_pD3dApp->GetBackBufferDesc().Height-CITY_BASE_DOWN_BOX_HEIGHT)
+#define CITY_BASE_DOWN_BOX_START_Y			(Pointer_CD3DApplication->GetBackBufferDesc().Height-CITY_BASE_DOWN_BOX_HEIGHT)
 
 #define CITY_BASE_DOWN_NPC_INTERVAL			14//34
 #define CITY_BASE_NPC_BOX_SIZE_X			720
 #define CITY_BASE_NPC_BOX_SIZE_Y			104//84
-#define CITY_BASE_NPC_BOX_START_X			((g_pD3dApp->GetBackBufferDesc().Width - CITY_BASE_NPC_BOX_SIZE_X ) /2 )
-#define CITY_BASE_NPC_BOX_START_Y			(g_pD3dApp->GetBackBufferDesc().Height - \
+#define CITY_BASE_NPC_BOX_START_X			((Pointer_CD3DApplication->GetBackBufferDesc().Width - CITY_BASE_NPC_BOX_SIZE_X ) /2 )
+#define CITY_BASE_NPC_BOX_START_Y			(Pointer_CD3DApplication->GetBackBufferDesc().Height - \
 										(CITY_BASE_NPC_BOX_SIZE_Y+CITY_BASE_DOWN_NPC_INTERVAL+CITY_BASE_DOWN_BOX_HEIGHT) )
 #define CITY_BASE_NPC_BUTTON_START_X		(CITY_BASE_NPC_BOX_START_X+18)
 #define CITY_BASE_NPC_BUTTON_START_Y		(CITY_BASE_NPC_BOX_START_Y+77) // 57
@@ -122,11 +122,11 @@ class CINFImageBtn;
 #define NPC_BUTTON_NUMBER					11
 
 // x : 버튼의 개수
-#define CITY_BASE_DOWN_BUTTON_START_X(x)	(g_pD3dApp->GetBackBufferDesc().Width/2 - \
+#define CITY_BASE_DOWN_BUTTON_START_X(x)	(Pointer_CD3DApplication->GetBackBufferDesc().Width/2 - \
 											((x/2*CITY_BASE_NPC_BUTTON_POS_X_INTERVAL-1) + \
 											 ((x%2)*(CITY_BASE_BUTTON_SIZE_X+1)/2)))
 #define CITY_BASE_DOWN_BUTTON_START_Y		(CITY_BASE_DOWN_BOX_START_Y + 8)
-#define CITY_BASE_DOWN_OUTDOOR_BUTTON_START_X	(g_pD3dApp->GetBackBufferDesc().Width - 81)
+#define CITY_BASE_DOWN_OUTDOOR_BUTTON_START_X	(Pointer_CD3DApplication->GetBackBufferDesc().Width - 81)
 
 #define SKILL_SHOP_SPI_START_X				(CITY_BASE_NPC_BOX_START_X+301)
 #define SKILL_SHOP_SPI_START_Y				(CITY_BASE_NPC_BOX_START_Y - SIZE_NORMAL_WINDOW_Y + 235)

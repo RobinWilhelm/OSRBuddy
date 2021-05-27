@@ -48,8 +48,8 @@
 // 캐쉬상점관련 렌더링 위치
 #define CHAT_MENU_CASH_START_W		65
 #define CHAT_MENU_CASH_START_H		19
-#define CHAT_MENU_CASH_START_X		(g_pD3dApp->GetBackBufferDesc().Width-CHAT_MENU_CASH_START_W)
-#define CHAT_MENU_CASH_START_Y		(g_pD3dApp->GetBackBufferDesc().Height-CHAT_MENU_CASH_START_H-42)
+#define CHAT_MENU_CASH_START_X		(Pointer_CD3DApplication->GetBackBufferDesc().Width-CHAT_MENU_CASH_START_W)
+#define CHAT_MENU_CASH_START_Y		(Pointer_CD3DApplication->GetBackBufferDesc().Height-CHAT_MENU_CASH_START_H-42)
 
 
 
@@ -163,7 +163,7 @@
 #define IS_WEAPON_ENABLESTATE(state,booster)	state == _NORMAL &&											\
 												booster != BOOSTER_TYPE_AIRBREAK	&&						\
 												!g_pGameMain->m_pTrade->m_bTrading &&						\
-												!g_pD3dApp->m_bChatMode &&									\
+												!Pointer_CD3DApplication->m_bChatMode &&									\
 												g_pGameMain->m_nLeftWindowInfo == LEFT_WINDOW_WEAPON &&		\
 												g_pGameMain->m_nRightWindowInfo == RIGHT_WINDOW_WEAPON &&	\
 												g_pShuttleChild->m_bRollUsed == FALSE &&					\
@@ -901,8 +901,8 @@ typedef DWORD InfUnitState_t;
 #define WEB_WIDTH		660		// 720
 #define WEB_HEIGHT		550		// 338// 2009-03-03 by bhsohn 일본웹페이지 크기 변경
 // end 2009-02-24 by bhsohn 캐쉬샵 충전 웹페이지 추가
-#define WEB_START_X		((g_pD3dApp->GetBackBufferDesc().Width-WEB_WIDTH)/2)
-#define WEB_START_Y		((g_pD3dApp->GetBackBufferDesc().Height-WEB_HEIGHT)/2)
+#define WEB_START_X		((Pointer_CD3DApplication->GetBackBufferDesc().Width-WEB_WIDTH)/2)
+#define WEB_START_Y		((Pointer_CD3DApplication->GetBackBufferDesc().Height-WEB_HEIGHT)/2)
 
 
 
@@ -938,8 +938,8 @@ enum { ALPHA_WAVE, ALPHA_DELAY_WAVE, ALPHA_FADE_IN, ALPHA_FADE_OUT };
 // 미션 메세지 보내기( 이미지 렌더링 후 )
 #define SENDMESSAGE_MISSION_COMPLETE		1
 #define SENDMESSAGE_MISSION_CANCER			2
-#define SET_MISSION_RESAULT_IMG_X			((g_pD3dApp->GetBackBufferDesc().Width/2)-142)
-#define SET_MISSION_RESAULT_IMG_Y			((g_pD3dApp->GetBackBufferDesc().Height/3)-24)
+#define SET_MISSION_RESAULT_IMG_X			((Pointer_CD3DApplication->GetBackBufferDesc().Width/2)-142)
+#define SET_MISSION_RESAULT_IMG_Y			((Pointer_CD3DApplication->GetBackBufferDesc().Height/3)-24)
 
 // 2005-07-27 by ispark
 // Picking 오브젝트

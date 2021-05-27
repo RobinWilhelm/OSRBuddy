@@ -19,7 +19,7 @@ bool OldSchoolRivalsAPI::CreateAndCheckConsistence()
 		return false;
 	}
 	 
-	CAtumApplication*** pppatumapplication = reinterpret_cast<CAtumApplication***>(PatternManager::Get(OffsetIdentifier::g_pD3dApp).address);
+	CAtumApplication*** pppatumapplication = reinterpret_cast<CAtumApplication***>(PatternManager::Get(OffsetIdentifier::Pointer_CD3DApplication).address);
 	CAtumApplication* atumapplication = **pppatumapplication;
 	
 	if (!atumapplication) {

@@ -133,4 +133,7 @@ private:
 	CalcObjectSourceScreenCoordsType m_CalcObjectSourceScreenCoords;
 };
 
+#ifndef OSR_API
 #define OSR_API OldSchoolRivalsAPI::GetInstance()
+#endif // !OSR_API
+

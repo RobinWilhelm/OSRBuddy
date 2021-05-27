@@ -38,6 +38,25 @@ public:
         return out.str();
     } 
 
+    static FORCEINLINE void PushCpuState()
+    {
+        __asm
+        {
+            pushad;
+            pushf;
+        }
+    }
+
+
+    static FORCEINLINE void PopCpuState()
+    {
+        __asm
+        {
+            popf;
+            popad;
+        };
+    }
+
     static void MoveMouse(uint32_t x, uint32_t y);
 };
 

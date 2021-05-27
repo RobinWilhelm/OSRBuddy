@@ -195,13 +195,13 @@ KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_energykit_reattack_time = 0ms;
     m_skillpkit_reattack_time = 0ms;
 
-    m_lastUseShieldKitTime = 0ms;
-    m_lastUseEnergyKitTime = 0ms;
-    m_lastUseSkillKitTime = 0ms;
+    m_shieldkit_last_use = 0ms;
+    m_energykit_last_use = 0ms;
+    m_skillkit_last_use = 0ms;
 
-    m_lastUseShieldKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    m_lastUseEnergyKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    m_lastUseSkillKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    m_shieldkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    m_energykit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    m_skillkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     GrabPlayerSkills();
 
 }
@@ -215,7 +215,7 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
     switch (type)
     {
     case KitType::SHIELD:
-        if (m_awaiting_Ok_shield) {
+        if (m_awaiting_server_ok_shield) {
             return false;
         }
 
@@ -274,7 +274,7 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
         } 
         break;
     case KitType::ENERGY:
-        if (m_awaiting_Ok_energy) {
+        if (m_awaiting_server_ok_energy) {
             return false;
         }
 
@@ -333,7 +333,7 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
         } 
         break;
     case KitType::SKILLPOINT:
-        if (m_awaiting_Ok_skill) {
+        if (m_awaiting_server_ok_skill) {
             return false;
         }      
         switch (category)
@@ -406,7 +406,7 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
         }
         break;
     case KitType::FUEL:
-        if (m_awaiting_Ok_fuel) {
+        if (m_awaiting_server_ok_fuel) {
             return false;
         }
         switch (category)
@@ -439,16 +439,16 @@ bool KitBuffBot::KitTimerReady(KitType kittype)
     switch (kittype)
     {
     case KitType::SHIELD:
-        return ((current - m_lastUseShieldKitTime) >= m_shieldkit_reattack_time);
+        return ((current - m_shieldkit_last_use) >= m_shieldkit_reattack_time);
         break;
     case KitType::ENERGY:
-        return ((current - m_lastUseEnergyKitTime) >= m_energykit_reattack_time);
+        return ((current - m_energykit_last_use) >= m_energykit_reattack_time);
         break;
     case KitType::SKILLPOINT:
-        return ((current - m_lastUseSkillKitTime) >= m_skillpkit_reattack_time);
+        return ((current - m_skillkit_last_use) >= m_skillpkit_reattack_time);
         break;
     case KitType::FUEL:
-        return ((current - m_lastUseFuelKitTime) >= m_fuelkit_reattack_time);
+        return ((current - m_fuelkit_last_use) >= m_fuelkit_reattack_time);
         break;
     default:
         return false;
@@ -463,7 +463,7 @@ bool KitBuffBot::TryUseAmmunitionBox()
         return false;
  
     OSR_API->SendUseItem(ammobox);
-    m_awaiting_Ok_ammobox = true;
+    m_awaiting_server_ok_ammobox = true;
     return true;
 }
 
@@ -688,21 +688,21 @@ void KitBuffBot::OnUseEnergyError(MSG_ERROR* error)
         // HP item
         case ERR_PROTOCOL_AREADY_FULL_HP:
         case ERR_DEBUFF_SKILL_APPLYING_NOT_HP_RECOVERY:
-            m_awaiting_Ok_energy = false;
+            m_awaiting_server_ok_energy = false;
             break; 
         // DP item
         case ERR_PROTOCOL_AREADY_FULL_DP:
         case ERR_DEBUFF_SKILL_APPLYING_NOT_DP_RECOVERY:
-            m_awaiting_Ok_shield = false;
+            m_awaiting_server_ok_shield = false;
             break;
         // EP item
         case ERR_PROTOCOL_AREADY_FULL_EP:
-            m_awaiting_Ok_fuel = false;
+            m_awaiting_server_ok_fuel = false;
             break;                     
         // SP item
         case ERR_DEBUFF_SKILL_APPLYING_NOT_SP_RECOVERY:
         case ERR_PROTOCOL_AREADY_FULL_SP:
-            m_awaiting_Ok_skill = false;
+            m_awaiting_server_ok_skill = false;
             break;
         // no number
         case ERR_USING_BAZAAR:
@@ -711,10 +711,10 @@ void KitBuffBot::OnUseEnergyError(MSG_ERROR* error)
         case ERR_PROTOCOL_ITEM_CANNOT_TRANSFER: 
         case ERR_PROTOCOL_CANNOT_USE_ITEM_IN_ARENA:  
         case ERR_PROTOCOL_CANNOT_USE_ITEM: 
-            m_awaiting_Ok_energy = false;
-            m_awaiting_Ok_shield = false;
-            m_awaiting_Ok_fuel   = false;
-            m_awaiting_Ok_skill  = false;
+            m_awaiting_server_ok_energy = false;
+            m_awaiting_server_ok_shield = false;
+            m_awaiting_server_ok_fuel   = false;
+            m_awaiting_server_ok_skill  = false;
             break;
         // unique itemnum
         case ERR_ITEM_TRADING:
@@ -733,16 +733,16 @@ void KitBuffBot::OnUseEnergyError(MSG_ERROR* error)
                 switch (GetKitTypeFromItem(item))
                 {
                 case KitType::SHIELD:
-                    m_awaiting_Ok_shield = false;
+                    m_awaiting_server_ok_shield = false;
                     break;
                 case KitType::ENERGY:
-                    m_awaiting_Ok_energy = false;
+                    m_awaiting_server_ok_energy = false;
                     break;
                 case KitType::FUEL:
-                    m_awaiting_Ok_fuel = false;
+                    m_awaiting_server_ok_fuel = false;
                     break;
                 case KitType::SKILLPOINT:
-                    m_awaiting_Ok_skill = false;
+                    m_awaiting_server_ok_skill = false;
                     break;
                 }
             }
@@ -757,16 +757,16 @@ void KitBuffBot::OnUseEnergyError(MSG_ERROR* error)
             errorstr[error->StringLength] = '\0';
 
             if (strstr(errorstr, "Shield")) {
-                m_awaiting_Ok_shield = false;
+                m_awaiting_server_ok_shield = false;
             }                    
             else if (strstr(errorstr, "Energy") || strstr(errorstr, "Repair")) {
-                m_awaiting_Ok_energy = false;
+                m_awaiting_server_ok_energy = false;
             }
             else if (strstr(errorstr, "SP kit")) {
-                m_awaiting_Ok_skill = false;
+                m_awaiting_server_ok_skill = false;
             }
             else if (strstr(errorstr, "fuel")) {
-                m_awaiting_Ok_fuel = false;
+                m_awaiting_server_ok_fuel = false;
             }
         }
     }
@@ -952,8 +952,7 @@ PlayerSkillInfo* KitBuffBot::FindPlayerSkill(SkillType skilltype) const
 {
     for (auto playerskill : m_playerskills)
     {
-        if (playerskill->type == skilltype)
-        {
+        if (playerskill->type == skilltype) {
             return playerskill;
         }
     }
@@ -964,8 +963,7 @@ PlayerSkillInfo* KitBuffBot::FindPlayerSkill(int itemnum) const
 {
     for (auto playerskill : m_playerskills)
     {
-        if (playerskill->skillinfo->ItemInfo->ItemNum == itemnum)
-        {
+        if (playerskill->skillinfo->ItemInfo->ItemNum == itemnum) {
             return playerskill;
         }
     }
@@ -975,13 +973,13 @@ PlayerSkillInfo* KitBuffBot::FindPlayerSkill(int itemnum) const
 bool KitBuffBot::AutoBuffCheckTimerReady()
 {
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    return (current - m_lastAutoBuffCheck >= AUTOBUFF_CHECK_TIME);
+    return (current - m_last_autobuff_check >= AUTOBUFF_CHECK_TIME);
 }
 
 bool KitBuffBot::AutoHealCheckTimerReady()
 {
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    return (current - m_last_auto_heal_check >= AUTOHEAL_CHECK_TIME);
+    return (current - m_last_autoheal_check >= AUTOHEAL_CHECK_TIME);
 }
 
 void KitBuffBot::Tick()
@@ -1231,8 +1229,8 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                     break;
                 }
                 m_energykit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
-                m_lastUseEnergyKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-                m_awaiting_Ok_energy = false;
+                m_energykit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                m_awaiting_server_ok_energy = false;
             }
             break;
         case ItemNumber::S_Type_ShieldKit_1:
@@ -1256,8 +1254,8 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                     break;
                 }
                 m_shieldkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
-                m_lastUseShieldKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-                m_awaiting_Ok_shield = false;
+                m_shieldkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                m_awaiting_server_ok_shield = false;
             }
             break;
         case ItemNumber::A_Type_SkillPKit_1:
@@ -1282,8 +1280,8 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                     break;
                 }
                 m_skillpkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
-                m_lastUseSkillKitTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-                m_awaiting_Ok_skill = false;
+                m_skillkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                m_awaiting_server_ok_skill = false;
             }
             break;
     
@@ -1291,7 +1289,7 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
         case ItemNumber::C_Type_CondensedFuel:
         case ItemNumber::D_Type_CondensedFuel:
         case ItemNumber::E_Type_CondensedFuel:
-            m_awaiting_Ok_fuel = false;
+            m_awaiting_server_ok_fuel = false;
             break;
         }
         break;
@@ -1300,29 +1298,24 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
     case T_FC_BATTLE_SEC_BULLET_RELOADED:
     {
         MSG_FC_BATTLE_PRI_BULLET_RELOADED* reloaded_msg = (MSG_FC_BATTLE_PRI_BULLET_RELOADED*)packet;
-        if (reloaded_msg->RechargeType == BULLET_RECHARGE_TYPE_BULLET_ITEM && m_awaiting_Ok_ammobox) {
-            m_awaiting_Ok_ammobox = false;
+        if (reloaded_msg->RechargeType == BULLET_RECHARGE_TYPE_BULLET_ITEM && m_awaiting_server_ok_ammobox) {
+            m_awaiting_server_ok_ammobox = false;
         }
         break;
     }   
     case T_FC_SKILL_USE_SKILL_OK: 
         {
             MSG_FC_SKILL_USE_SKILL_OK* use_skill_ok_msg = (MSG_FC_SKILL_USE_SKILL_OK*)packet;
-           
-
-           //OnUseSkillAnswer(use_skill_ok_msg->SkillItemID.ItemNum);
             break;
         }
     case  T_FC_SKILL_CANCEL_SKILL_OK:
         {
             MSG_FC_SKILL_CANCEL_SKILL_OK* cancel_skill_ok_msg = (MSG_FC_SKILL_CANCEL_SKILL_OK*)packet;
-            //OnUseSkillAnswer(cancel_skill_ok_msg->SkillItemID.ItemNum);
             break;
         }
     case T_FC_SKILL_INVALIDATE_SKILL:
         {
             MSG_FC_SKILL_INVALIDATE_SKILL* invalidate_skill_msg = (MSG_FC_SKILL_INVALIDATE_SKILL*)packet;
-            //OnUseSkillAnswer(invalidate_skill_msg->SkillItemID.ItemNum);
             break;
         } 
     case T_ERROR:  
@@ -1361,20 +1354,20 @@ bool KitBuffBot::OnWritePacket(unsigned short msgtype, byte* packet)
             case KitType::NONE:
                 break;
             case KitType::SHIELD:
-                m_awaiting_Ok_shield = true;
-                m_lastSendShieldKitTime = current;
+                m_awaiting_server_ok_shield = true;
+                m_shieldkit_last_send = current;
                 break;
             case KitType::ENERGY:
-                m_awaiting_Ok_energy = true;
-                m_lastSendEnergyKitTime = current;
+                m_awaiting_server_ok_energy = true;
+                m_energykit_last_send = current;
                 break;
             case KitType::SKILLPOINT:
-                m_awaiting_Ok_skill = true;
-                m_lastSendSkillKitTime = current;
+                m_awaiting_server_ok_skill = true;
+                m_skillkit_last_send = current;
                 break;
             case KitType::FUEL:
-                m_awaiting_Ok_fuel = true;
-                m_lastSendFuelKitTime = current;
+                m_awaiting_server_ok_fuel = true;
+                m_fuelkit_last_send = current;
                 break;
             }
         }
@@ -1396,9 +1389,12 @@ bool KitBuffBot::OnWritePacket(unsigned short msgtype, byte* packet)
                 pskill->last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
             }
             break;
-        }
+        }                         
+    case T_FC_SKILL_SETUP_SKILL_OK:
+    case T_FC_SKILL_CONFIRM_USE:
     case T_FC_SKILL_PREPARE_USE:
     case T_FC_SKILL_SETUP_SKILL:
+    case T_FC_SKILL_USE_SKILLPOINT:
         {
             MSG_FC_SKILL_PREPARE_USE* msg_prepare_skill = (MSG_FC_SKILL_PREPARE_USE*)packet;
         }
@@ -1415,9 +1411,9 @@ void KitBuffBot::TickAutoKit()
 {
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
 
-    bool shieldtimer_ready = ((current - m_lastUseShieldKitTime) > m_shieldkit_reattack_time);
-    bool energytimer_ready = ((current - m_lastUseEnergyKitTime) > m_energykit_reattack_time);
-    bool skillptimer_ready = ((current - m_lastUseSkillKitTime) > m_skillpkit_reattack_time);
+    bool shieldtimer_ready = ((current - m_shieldkit_last_use) > m_shieldkit_reattack_time);
+    bool energytimer_ready = ((current - m_energykit_last_use) > m_energykit_reattack_time);
+    bool skillptimer_ready = ((current - m_skillkit_last_use) > m_skillpkit_reattack_time);
 
     int missing_shield = OSR_API->GetMaxShield() - OSR_API->GetCurrentShield();
     int missing_energy = OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy();
@@ -1426,17 +1422,14 @@ void KitBuffBot::TickAutoKit()
     // m_awaiting_Ok == true => sent kit already but server did not aknowledge it yet or kit timer on server was slower -_-ö
     // try to send again after 25ms
     // this will account for lag, e.g. Mothership war
-    if (m_awaiting_Ok_shield && ((current - m_lastSendShieldKitTime) > KIT_RESEND_TIME))
-    {
-        m_awaiting_Ok_shield = false;
+    if (m_awaiting_server_ok_shield && ((current - m_shieldkit_last_send) > KIT_RESEND_TIME)) {
+        m_awaiting_server_ok_shield = false;
     }
-    if (m_awaiting_Ok_energy && ((current - m_lastSendEnergyKitTime) > KIT_RESEND_TIME))
-    {
-        m_awaiting_Ok_energy =  false;
+    if (m_awaiting_server_ok_energy && ((current - m_energykit_last_send) > KIT_RESEND_TIME)) {
+        m_awaiting_server_ok_energy =  false;
     }
-    if (m_awaiting_Ok_skill && ((current - m_lastSendSkillKitTime) > KIT_RESEND_TIME))
-    {
-        m_awaiting_Ok_skill = false;
+    if (m_awaiting_server_ok_skill && ((current - m_skillkit_last_send) > KIT_RESEND_TIME)) {
+        m_awaiting_server_ok_skill = false;
     }
 
     // Shield Kits
@@ -1562,7 +1555,7 @@ void KitBuffBot::TickAutoKit()
     }         
 
     // Fuelkits
-    if (m_settings.use_fuel && !m_awaiting_Ok_fuel && OSR_API->GetCurrentFuel() < FUEL_KIT_THRESHOLD) {
+    if (m_settings.use_fuel && !m_awaiting_server_ok_fuel && OSR_API->GetCurrentFuel() < FUEL_KIT_THRESHOLD) {
         TryUseKit(KitType::FUEL, KitCategory::B_TYPE);
     }
 }       
@@ -1581,13 +1574,13 @@ void KitBuffBot::TickAutoBuff()
                 currentsp -= pskill->skillinfo->ItemInfo->ReqSP;
             }
         } 
-        m_lastAutoBuffCheck = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+        m_last_autobuff_check = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     }      
 }
 
 void KitBuffBot::TickAutoAmmo()
 {
-    if (m_settings.use_ammobox && !m_awaiting_Ok_ammobox && 
+    if (m_settings.use_ammobox && !m_awaiting_server_ok_ammobox && 
        (OSR_API->GetPrimaryWeaponAmmo() == 0 || OSR_API->GetSecondaryWeaponAmmo() == 0)) 
     {
         TryUseAmmunitionBox();
@@ -1610,9 +1603,7 @@ void KitBuffBot::TickAutoHeals()
                 if (repair_skill && repair_skill->skillinfo->m_fCheckReattackTime <= 0.0f && repair_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
                 {
                     TryUseTargetSkill(repair_skill, energize_target);
-                    currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;
-                    if (energize_target != OSR_API->GetPlayerUniqueNumber()) {
-                    }
+                    currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;          
                 }
             }
         }
@@ -1627,12 +1618,9 @@ void KitBuffBot::TickAutoHeals()
                 {
                     TryUseTargetSkill(heal_skill, heal_target);
                     currentsp -= heal_skill->skillinfo->ItemInfo->ReqSP;
-                    //used_target_heal = true;
                 }
             }
-        }           
-
-
+        }    
          
         if (m_settings.field_healings_active)
         {
