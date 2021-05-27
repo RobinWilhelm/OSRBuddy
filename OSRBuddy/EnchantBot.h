@@ -64,6 +64,7 @@ public:
 	virtual void OnEnable() override;
 
 private:
+	std::string GetRatio(int i, int j);
 	EnchantBotState GetEnchantBotState();
 	void SetEnchantBotState(EnchantBotState);
 	void ResetCurrentEnchantItem();
@@ -118,5 +119,7 @@ private:
 
 	bool					m_notify_sound;
 	bool					m_notify_messagebox;
+	int						m_preEnch;
+	int                     m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 };
 

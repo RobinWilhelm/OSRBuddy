@@ -60,9 +60,7 @@ void EnchantBot::Tick()
 			{
 				// item should be in inventory now, set the current enchant item again					
 				SetEnchantItem(m_currentEnchantItemUID);				
-				
 				m_next_action = EnchantAction::Add_EnchantItem;
-
 				if (!m_auto_enchant) {
 					SetEnchantBotState(EnchantBotState::STANDBY);
 				}
@@ -72,7 +70,18 @@ void EnchantBot::Tick()
 					Notify(NotifyType::ENCHANTING_FINISHED);
 					SetEnchantBotState(EnchantBotState::STANDBY);
 				}
-
+				int postEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
+				if (m_preEnch >= 5) {
+					if (postEnch <= m_preEnch)
+					{
+						m_enchantStats[m_preEnch - 5][0] += 1;
+						m_enchantStats[m_preEnch - 5][1] += 1;
+					}
+					else
+					{
+						m_enchantStats[m_preEnch - 5][0] += 1;
+					}
+				}
 				m_waiting_for_answer = false;
 			}
 		}
@@ -127,6 +136,28 @@ void EnchantBot::RenderImGui()
 	ImGui::EndGroupPanel();
 	ImGui::SameLine();	   
 
+	ImGui::BeginGroupPanel("Run View", ImVec2(140, 100));
+	for (int i = 0; i < 6;  i++) 
+	{
+		if(i!=5)
+		{
+			std::string enchstep = "e" + std::to_string(i + 5) + "-" + std::to_string(i + 6) + ":";
+			ImGui::Text(enchstep.c_str());
+			ImGui::SameLine();
+			std::string ratio = GetRatio(m_enchantStats[i][0], m_enchantStats[i][1]);
+			ImGui::Text(ratio.c_str());
+		}
+		else
+		{
+			std::string enchstep = "e" + std::to_string(i + 5) + ": ";
+			ImGui::Text(enchstep.c_str());
+			ImGui::SameLine();
+			ImGui::Text(std::to_string(m_enchantStats[i][0]).c_str());
+		}
+	}
+	ImGui::EndGroupPanel();
+	ImGui::SameLine();
+	
 	int current_idx = 0;
 	ImGui::BeginGroupPanel("Current Enchants", ImVec2(140, 100));
 	
@@ -148,6 +179,28 @@ void EnchantBot::RenderImGui()
 const char* EnchantBot::GetName() const
 {
 	return "EnchantBot ALPHA2";
+}
+
+std::string EnchantBot::GetRatio(int i, int j)
+{
+	std::string ratio = std::to_string(i) + "-" + std::to_string(j);
+	std::string percentage = "/";
+	if (i != 0)
+	{
+		if (j == 0) {
+			percentage = "100%%";
+		}
+		else if (i == j) {
+			percentage = "0%%";
+		}
+		else
+		{
+			float x = (1 - (float)j / (float)i) * 100;
+			std::string pCalc = Utility::to_string_with_precision<float>(x, 1);
+			percentage = pCalc + "%%";
+		}
+	}
+	return ratio + ", " + percentage;
 }
 
 EnchantBotState EnchantBot::GetEnchantBotState()
@@ -507,7 +560,7 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		return false;
 	}
 		   
-	CItemInfo* enchantitem = nullptr; 
+	CItemInfo* enchantitem = nullptr;
 
 	// move items to source, step by step
 	switch (action)
@@ -553,6 +606,7 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		}
 		break;	 
 	case EnchantAction::Use_OkButton:
+		m_preEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
 		OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
 		m_waiting_for_answer = true;
 		return true;
