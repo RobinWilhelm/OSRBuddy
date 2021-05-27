@@ -6,6 +6,12 @@
 
 #include "OsrItemInfo.h"
 
+#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (2000)
+#define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (400)	// button clicks and item movement
+
+#define COLOR_ENCHANTITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green
+#define COLOR_ENCHANTITEM_LT_100 (ImColor(0xFF, 0xBB, 0x33).Value) // orange
+#define COLOR_ENCHANTITEM_EQ_0	(ImColor(0xFF, 0x00, 0x00).Value) // red
 
 class CItemInfo;
 			    

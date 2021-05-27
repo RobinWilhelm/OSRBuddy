@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "UnitData.h"
+#include "AtumProtocol.h"
 
 class CUnitRender;
 class CCharacterRender;						// 2005-07-21 by ispark
@@ -17,6 +18,7 @@ class CShuttleRender;
 class CPkNormalTimer;
 class CChatMoveData;
 
+/*
 struct MEX_OTHER_CHARACTER_INFO
 {
 	// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - 아래와 같이 필드 순서를 정렬한다.
@@ -45,6 +47,7 @@ struct MEX_OTHER_CHARACTER_INFO
 	BYTE			CityWarTeamType;	// 
 	BYTE			Status;				// 신분
 };
+
 
 typedef struct
 {
@@ -81,6 +84,7 @@ typedef struct
 
 	
 } CHARACTER_RENDER_INFO;
+*/
 
 typedef struct _ENEMYINFO
 {

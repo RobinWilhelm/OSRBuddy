@@ -12,9 +12,12 @@
 
 #include "AtumParam.h"
 #include "SDK/ObjectDefine.h"
+#include "AtumProtocol.h"
+
 
 class CEnemyData;
 
+/*
 typedef struct _IM_PARTY_MEMBER_INFO
 {
 	UID32_t		CharacterUniqueNumber;
@@ -27,7 +30,7 @@ typedef struct _IM_PARTY_MEMBER_INFO
 	MAP_CHANNEL_INDEX	MapChannelIndex;	// IsValid()이 FALSE이면, 파티 소속이나 게임중이 아닌 캐릭임(죽어서 나간 캐릭터 등)
 	EN_CHECK_TYPE	VoipType;		// 2008-07-16 by dhjin, EP3 - Voip 정보	 
 } IM_PARTY_MEMBER_INFO;
-
+  */
 
 // 2009. 09. 21 by ckPark 인피니티 필드 몬스터 스킬 구현
 struct sDebuffDotInfo
@@ -62,11 +65,13 @@ typedef struct
 	// end 2009. 09. 21 by ckPark 인피니티 필드 몬스터 스킬 구현
 } PARTYENEMYINFO;
 
+/*
 struct PEER_PARTY_MEMBER
 {
 	ClientIndex_t	ClientIndex;
 	UID32_t			CharacterUniqueNumber;
 };
+*/
 
 typedef struct
 {

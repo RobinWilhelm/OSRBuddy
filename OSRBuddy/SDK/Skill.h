@@ -14,6 +14,7 @@
 #define SCAN_ITEM						1
 #define MAX_SCAN						2
 
+/*
 struct MSG_FC_SKILL_CONFIRM_USE			// 2005-12-02 by cmkwon
 {
 	char				szAttackCharacterName[SIZE_MAX_CHARACTER_NAME];	// 스킬 사용자의 CharacterName;
@@ -23,6 +24,7 @@ struct MSG_FC_SKILL_CONFIRM_USE			// 2005-12-02 by cmkwon
 	MAP_CHANNEL_INDEX	MapChannelIndex;		// 스킬 사용자의 MapChannelIndex
 	int					SkillConfirmUseUID;		// 2009-04-06 by cmkwon, 콜오브 히어로 스킬 시스템 변경 - 해당 요청의 UID
 };
+*/
 
 class CAppEffectData;
 class CUnitData;

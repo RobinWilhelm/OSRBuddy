@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 
+#include "AtumProtocol.h"
 #include "Structs.h"	
 #include "AtumTypedef.h"
 #include "AtumDefine.h"	

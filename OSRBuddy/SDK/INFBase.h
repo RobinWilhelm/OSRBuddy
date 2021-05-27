@@ -11,6 +11,7 @@
 
 #include "AtumNode.h"
 
+/*
 struct SCITY_WARINFO_OUTPOST
 {// 2007-12-03 by dhjin, 전진기지 정보 
 	BYTE			Influence;
@@ -20,6 +21,7 @@ struct SCITY_WARINFO_OUTPOST
 	CHAR			GuildName[SIZE_MAX_GUILD_NAME];
 	ATUM_DATE_TIME	OutpostDate;
 };
+*/
 
 // 아레나 모드.
 enum {

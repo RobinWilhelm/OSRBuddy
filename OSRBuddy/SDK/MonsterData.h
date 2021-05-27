@@ -11,6 +11,7 @@
 
 #include "UnitData.h"
 
+/*
 typedef struct
 {
 	ClientIndex_t	MonsterIndex;
@@ -22,11 +23,7 @@ typedef struct
 	BodyCond_t		BodyCondition;
 	INT				MaxHP;
 } MSG_FC_CHARACTER_GET_MONSTER_INFO_OK;
-
-
-
-
-
+*/
 
 class CCinema;
 class CMonRender;

@@ -11,6 +11,7 @@
 #include "EnemyData.h"
 #include "Skill.h"
 #include "ClientParty.h"
+#include "AtumProtocol.h"
 
 
 
@@ -107,11 +108,13 @@ struct INVEN_WEAPON_MESH
 };
 typedef vector<INVEN_WEAPON_MESH>		vectINVEN_WEAPON_MESH;
 
+/*
 typedef struct
 {
 	MAP_CHANNEL_INDEX	MapChannel;		// ¿©´ÜÀüÀÌ ÀÏ¾î³ª´Â ¸Ê
 	UID32_t				PeerGuildUID;	// »ó´ë ±æµåÀÇ ±æµå ¹øÈ£
 } MSG_FC_GUILD_GET_WAR_INFO_OK;
+
 
 struct MSG_FC_CHARACTER_OBSERVER_INFO
 {// 2007-03-27 by dhjin, ¿ÉÀú¹ö¿¡°Ô Á¦°øµÇ´Â Á¤º¸
@@ -125,6 +128,7 @@ struct MSG_FC_CHARACTER_OBSERVER_INFO
 	SHORT				CurrentSP;
 	float				CurrentEP;
 };
+*/
 
 // 2007-03-20 by dgwoo ÀÓ½Ã ¿ÉÀú¹ö ¸ðµå.
 struct stOBSERVE
@@ -148,6 +152,7 @@ typedef stOBSERVE stOPERATION;
 
 class CGameData;
 class CObjectChild;
+class PK_TARGET;
 
 class CShuttleChild : public CUnitData
 {

@@ -5,7 +5,6 @@
 #include "ObjectDefine.h"
 //#include "Contents.h"
 
-
 #define OPTION_DEFAULT_SOUNDVOLUME			-2000	// 家府 
 #define OPTION_DEFAULT_STAGE_EFFECT_SOUNDVOLUME	-1000	// 家府 
 #define OPTION_DEFAULT_MUSICVOLUME			8//-2000	// 澜厩

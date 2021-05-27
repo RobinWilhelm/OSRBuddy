@@ -67,6 +67,7 @@ public:
 
 	GearType GetPlayerGearType();
 	MapNumber GetCurrentMap();
+	MAP_CHANNEL_INDEX GetCurrentMapChannelIndex();
 	UID32_t GetPlayerUniqueNumber();
 	ClientIndex_t GetPlayerClientIndex();
 

@@ -301,6 +301,9 @@
     <ClInclude Include="OsrItemInfo.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="AtumProtocol.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

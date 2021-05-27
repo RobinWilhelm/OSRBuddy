@@ -6,6 +6,7 @@
 #include <chrono>
 
 
+
 class KitBuffBot;
 
 class WatermelonBot : public BuddyFeatureBase
@@ -28,6 +29,7 @@ public:
 	virtual FeatureType GetType() const override;
 	virtual void OnEnable() override;
 	virtual void OnDisable() override;
+
 	void ChangeState(WatermelonBot::State newState);
 								
 private:

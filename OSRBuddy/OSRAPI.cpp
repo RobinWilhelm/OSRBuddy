@@ -494,6 +494,11 @@ MapNumber OldSchoolRivalsAPI::GetCurrentMap()
 	return MapNumber();
 }
 
+MAP_CHANNEL_INDEX OldSchoolRivalsAPI::GetCurrentMapChannelIndex()
+{
+	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.MapChannelIndex;
+}
+
 UID32_t OldSchoolRivalsAPI::GetPlayerUniqueNumber()
 {
 	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;

@@ -12,7 +12,8 @@
 #include "AntiAntiCheat.h"
 #include "Offset.h"
 #include "Windowsx.h"  // get_x_lpraram && get_y_lparam
-                                      
+
+/*
 #define T0_FC_CHARACTER				0x32
 #define T0_FC_TIMER					0x44
 
@@ -81,6 +82,7 @@ typedef struct
     MEX_TIMER_EVENT		TimerEvent;
 } MSG_FC_TIMER_START_TIMER;
 
+*/
 
 OSRBuddyMain* g_osrbuddy = nullptr;  // for the static hook methods
 

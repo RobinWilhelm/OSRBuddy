@@ -5,26 +5,17 @@
 #include <algorithm>
 #include <queue>
 #include "SDK/SkillInfo.h"
+#include "SDk/AtumDefine.h"
+#include "SDK/AtumParam.h"
+#include "SDK/AtumProtocol.h"
 
 #define AUTOBUFF_CHECK_TIME 1s
 #define AUTOHEAL_CHECK_TIME 200ms
 
+#define TARGETHEAL_SPECIAL_REATTACK 3000ms // reattack time if a mgear uses target heal or target repair on someone else than himself
 #define FUEL_KIT_THRESHOLD 20
-
-#define SKILL_STATE_READY			0
-#define SKILL_STATE_WAITING_PREPARE	1
-#define SKILL_STATE_PREPARE			2
-#define SKILL_STATE_WAITING			3
-#define SKILL_STATE_USING			4
-#define SKILL_STATE_WAIT_REATTACK	5
-#define SKILL_STATE_RELEASE			6
-
-#define SKILLTYPE_PERMANENT		0	// 지속형
-#define SKILLTYPE_CLICK			1	// 클릭형
-#define SKILLTYPE_TIMELIMIT		2	// 시간형
-#define SKILLTYPE_TOGGLE		3	// 토글형
-#define SKILLTYPE_CHARGING		4	// 차징형, 스킬 사용 이후 바로 다음의 동작(발사 등)에만 1회 적용되는 스킬
-
+  
+/*
 typedef struct
 {
 	MessageType_t	MsgType;	// 에러가 일어났을 때 처리중이었던 Message Type
@@ -35,6 +26,9 @@ typedef struct
 	USHORT			StringLength;		// 2 bytes
 	//char*	String;				// error string
 } MSG_ERROR;
+*/
+
+
 
 enum class KitType : unsigned short
 {	 
@@ -43,7 +37,6 @@ enum class KitType : unsigned short
 	ENERGY,
 	SKILLPOINT,
 	FUEL,
-	
 };
 
 enum class KitCategory : unsigned short
@@ -54,7 +47,6 @@ enum class KitCategory : unsigned short
 	C_TYPE,
 };
  
-
 class CSkillInfo;	 
 
 struct PlayerSkillInfo
@@ -64,7 +56,7 @@ struct PlayerSkillInfo
 	std::string clean_name;
 	bool final;			 
 	bool autobuff;
-	std::chrono::milliseconds last_use;
+	std::chrono::milliseconds last_send;
 
 	inline bool IsWaiting() {
 		return skillinfo->m_dwState == SKILL_STATE_WAITING || skillinfo->m_dwState == SKILL_STATE_PREPARE;
@@ -173,7 +165,6 @@ public:
 	// returns true if skill is already toggled on, false when not
 	bool ToggleSKill(SkillType toggleskill, bool on);
 	
-
 	PlayerSkillInfo* FindPlayerSkill(SkillType skill) const;
 	PlayerSkillInfo* FindPlayerSkill(int itemnum) const;
 	bool AutoBuffCheckTimerReady();
@@ -236,4 +227,6 @@ private:
 	std::chrono::milliseconds m_energykit_last_send;
 	std::chrono::milliseconds m_skillkit_last_send;
 	std::chrono::milliseconds m_fuelkit_last_send;
+
+	std::chrono::milliseconds m_mgear_targetheal_last_send;
 };

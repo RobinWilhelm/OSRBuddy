@@ -150,6 +150,7 @@
     <ClInclude Include="AntiAntiCheat.h" />
     <ClInclude Include="AtumDateTime.h" />
     <ClInclude Include="AtumError.h" />
+    <ClInclude Include="AtumProtocol.h" />
     <ClInclude Include="AtumTypedef.h" />
     <ClInclude Include="BuddyAPI.h" />
     <ClInclude Include="OsrItemInfo.h" />

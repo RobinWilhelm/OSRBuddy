@@ -4,12 +4,12 @@
 #include "OSRBuddy.h"
 #include "OSRBuddyDefine.h"
 #include <chrono>
-#include <algorithm>
-
-#include "AtumError.h"
+#include <algorithm>    
+#include "AtumError.h" 
+#include "AtumProtocol.h"
 
 #define KIT_RESEND_TIME 100ms
-
+/*
 #define T0_FC_SKILL					0x41
 #define T0_FC_BATTLE				0x12		// 2008-02-13 by cmkwon, 프로토콜 변경, 꼭 클라이언트와 같이 업데이트 해야함
 #define T0_FC_ITEM					0x39
@@ -187,6 +187,8 @@ typedef struct
     MEX_TIMER_EVENT		TimerEvent;
 } MSG_FC_TIMER_START_TIMER;			// F->C, TIMER_EVENT 시작
 
+*/
+
 KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {       
     ZeroMemory(&m_settings, sizeof(KitBuffBot::KitSettings));
@@ -204,6 +206,7 @@ KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_skillkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     GrabPlayerSkills();
 
+    m_mgear_targetheal_last_send = 0ms;
 }
 
 bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
@@ -643,7 +646,7 @@ bool KitBuffBot::TryUseSkill(PlayerSkillInfo* skillinfo)
 
     // only allow the same skill to be used every 400ms because quickslot bar can only be used every 400ms
     std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());  
-    if ((current - skillinfo->last_use) < 400ms) {
+    if ((current - skillinfo->last_send) < 400ms) {
         return false;
     }
 
@@ -915,6 +918,10 @@ UID32_t KitBuffBot::GetBestRepairTarget()
     for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
     {
         if (!member->m_bUserLogOn || !member->m_pEnemyData) {
+            continue;
+        }
+
+        if (member->m_pEnemyData->m_infoCharacter.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex())  {
             continue;
         }
 
@@ -1306,6 +1313,19 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
     case T_FC_SKILL_USE_SKILL_OK: 
         {
             MSG_FC_SKILL_USE_SKILL_OK* use_skill_ok_msg = (MSG_FC_SKILL_USE_SKILL_OK*)packet;
+            PlayerSkillInfo* pskill = FindPlayerSkill(use_skill_ok_msg->SkillItemID.ItemNum);
+            if (pskill)
+            {
+                switch (pskill->type)
+                {
+                case SkillType::Heal_Target:
+                case SkillType::Repair_Target:
+                    if (use_skill_ok_msg->AttackIndex != use_skill_ok_msg->TargetIndex) {
+                        m_mgear_targetheal_last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                    }    
+                    break;
+                }
+            }
             break;
         }
     case  T_FC_SKILL_CANCEL_SKILL_OK:
@@ -1377,7 +1397,7 @@ bool KitBuffBot::OnWritePacket(unsigned short msgtype, byte* packet)
             MSG_FC_SKILL_USE_SKILL* msg_use_skill = (MSG_FC_SKILL_USE_SKILL*)packet;
             PlayerSkillInfo* pskill = FindPlayerSkill(msg_use_skill->SkillItemID.ItemNum);
             if (pskill) {
-                pskill->last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                pskill->last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
             }
             break;
         }    
@@ -1386,7 +1406,7 @@ bool KitBuffBot::OnWritePacket(unsigned short msgtype, byte* packet)
             MSG_FC_SKILL_CANCEL_SKILL* msg_cancel_skill = (MSG_FC_SKILL_CANCEL_SKILL*)packet;
             PlayerSkillInfo* pskill = FindPlayerSkill(msg_cancel_skill->SkillItemID.ItemNum);
             if (pskill) {
-                pskill->last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                pskill->last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
             }
             break;
         }                         
@@ -1593,19 +1613,25 @@ void KitBuffBot::TickAutoHeals()
     {
         int currentsp = OSR_API->GetCurrentSkillp();
         PlayerSkillInfo* repair_skill = nullptr;
+        std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
 
         if (m_settings.target_repair_active )
-        {
-            UID32_t energize_target = GetBestRepairTarget();
-            if (energize_target != 0)
-            {
-                repair_skill = FindPlayerSkill(SkillType::Repair_Target);
-                if (repair_skill && repair_skill->skillinfo->m_fCheckReattackTime <= 0.0f && repair_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
+        {        
+            repair_skill = FindPlayerSkill(SkillType::Repair_Target);
+            if (repair_skill && repair_skill->skillinfo->m_fCheckReattackTime <= 0.0f && repair_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
+            {     
+                // target repair and target heal has an extra timer if you heal someone else than yourself
+                if (current - m_mgear_targetheal_last_send >= TARGETHEAL_SPECIAL_REATTACK)
                 {
-                    TryUseTargetSkill(repair_skill, energize_target);
-                    currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;          
+                    UID32_t energize_target = GetBestRepairTarget();
+                    if (energize_target != 0)
+                    {
+                        TryUseTargetSkill(repair_skill, energize_target);
+                        currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;
+                    }
                 }
             }
+            
         }
 
         if (m_settings.target_healings_active && !(repair_skill))
@@ -1658,7 +1684,7 @@ void KitBuffBot::GrabPlayerSkills()
         {
             skill->autobuff = false;
             skill->skillinfo = skillinfo.second;
-            skill->last_use = 0ms;
+            skill->last_send = 0ms;
             skill->clean_name = std::string(skill->skillinfo->ItemInfo->ItemName);
             if (skill->clean_name[0] == '\\')  // check if name has a colorcode
             {

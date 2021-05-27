@@ -5,6 +5,11 @@
 #include <string> 
 #include "KitBot.h"
 
+#define TARGET_LOCK_THRESHOLD    45.0f
+#define TARGETING_SPEED 1.0f
+#define INVENTORY_CLEAN_ACTION_MIN_TIME 2000
+
+/*
 #define SKILL_STATE_READY			0
 #define SKILL_STATE_WAITING_PREPARE	1
 #define SKILL_STATE_PREPARE			2
@@ -64,9 +69,7 @@
 #define T_FN_SKILL_USE_SKILL					(MessageType_t)((T0_FN_SKILL<<8)|T1_FN_SKILL_USE_SKILL)
 #define T_FN_SKILL_USE_SKILL_OK					(MessageType_t)((T0_FN_SKILL<<8)|T1_FN_SKILL_USE_SKILL_OK)
 
-#define TARGET_LOCK_THRESHOLD    45.0f
-#define TARGETING_SPEED 1.0f
-#define INVENTORY_CLEAN_ACTION_MIN_TIME 2000
+
 
 typedef struct
 {
@@ -101,7 +104,7 @@ typedef struct
     ItemID_t		SkillItemID;
     ClientIndex_t	ClientIndex;
 } MSG_FC_SKILL_INVALIDATE_SKILL;	//
-
+*/
 
 WatermelonBot::WatermelonBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {

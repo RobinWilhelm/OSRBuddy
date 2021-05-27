@@ -7,6 +7,12 @@
 
 #include "OsrItemInfo.h"
 
+#define GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES (1500)           // minimum time between to complete gamble actions (add/remove fix) 
+#define GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (400)	// button clicks and item movement
+
+#define COLOR_GAMBLEITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green
+#define COLOR_GAMBLEITEM_LT_100 (ImColor(0xFF, 0xBB, 0x33).Value) // orange
+#define COLOR_GAMBLEITEM_EQ_0	(ImColor(0xFF, 0x00, 0x00).Value) // red
 
 class CItemInfo;
 

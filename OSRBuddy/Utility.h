@@ -10,9 +10,7 @@ class Utility
 {
 public:
     static HWND FindWindowFromProcessId(DWORD dwProcessId);
-
-
-   
+          
     // from learn_more https://github.com/learn-more/findpattern-bench/blob/master/patterns/learn_more.h
     static PBYTE FindPattern(const PBYTE rangeStart, const PBYTE rangeEnd, const char* pattern);
 

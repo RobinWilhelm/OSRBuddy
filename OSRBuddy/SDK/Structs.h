@@ -1,8 +1,14 @@
 #pragma once
 #include <windows.h>
 #include "AtumParam.h"
+#include "AtumProtocol.h"
+
+
+
 
 typedef UINT32	UID32_t;
+
+/*
 
 typedef struct PK_TARGET
 {
@@ -80,16 +86,7 @@ struct MSG_FC_CHARACTER_CASH_PREMIUM_CARD_INFO
 	float			fExpRepairRate1;
 };
 
-struct BitS_CParamFactor
-{
-	UINT	pfb_SKILL_ROLLING_TIME : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
-	UINT	pfb_SKILL_Barrier : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
-	UINT	pfb_SKILL_SHIELD_PARALYZE : 1;		// 2009-09-09 ~ 2010-02-18 by dhjin, 인피니티 - Debuff 체크도 추가 // 2009-09-09 ~ 2010 by dhjin, 인피니티 - Debuff 체크로 변경	// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
-	UINT	pfb_SKILL_Invincible : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
-	UINT	pfb_SKILL_DamageDistribution : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 추가함
-	UINT	pfb_ITEM_IgnoreDefence : 1;		// 203, // 2009-09-09 ~ 2010 by dhjin, 인피니티 - 방어력 무시 아이템 사용 체크
-	UINT	pfb_ITEM_IgnoreAvoid : 1;		// 204, // 2009-09-09 ~ 2010 by dhjin, 인피니티 - 회피력 무시 아이템 사용 체크
-};
+
 
 struct MEX_TARGET_INFO
 {
@@ -119,7 +116,18 @@ typedef struct
 	UINT			SkillNum;			// 스킬 사용 시 사용
 	ClientIndex_t	DelegateClientIdx;	// 2009-09-09 ~ 2010 by dhjin, 인피니티 - 몬스터 간 2형 무기 폭팔 처리 할 위임 클라이언트
 } MSG_FC_BATTLE_ATTACK_OK;
+  */
 
+struct BitS_CParamFactor
+{
+	UINT	pfb_SKILL_ROLLING_TIME : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
+	UINT	pfb_SKILL_Barrier : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
+	UINT	pfb_SKILL_SHIELD_PARALYZE : 1;		// 2009-09-09 ~ 2010-02-18 by dhjin, 인피니티 - Debuff 체크도 추가 // 2009-09-09 ~ 2010 by dhjin, 인피니티 - Debuff 체크로 변경	// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
+	UINT	pfb_SKILL_Invincible : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 
+	UINT	pfb_SKILL_DamageDistribution : 1;		// 2009-08-03 by cmkwon, EP3-4 편대 대형 스킬 구현 - 기존 BOOL 변수를 비트구조체로 변경, 추가함
+	UINT	pfb_ITEM_IgnoreDefence : 1;		// 203, // 2009-09-09 ~ 2010 by dhjin, 인피니티 - 방어력 무시 아이템 사용 체크
+	UINT	pfb_ITEM_IgnoreAvoid : 1;		// 204, // 2009-09-09 ~ 2010 by dhjin, 인피니티 - 회피력 무시 아이템 사용 체크
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \class		CParamFactor
@@ -257,7 +265,8 @@ public:
 	float			pfm_PLUS_WARPOINT_RATE;			// 234, // 2010-05-18 by cmkwon, WarPoint 증가 아이템 구현(일본요청) - 
 	ParamValue_t	pf_ITEMS_MOVE_SPEED_RATE;		// 239, // 2010-12-21 by jskim, 마을 이동 속도 증가 아이템 구현
 };
-  
+
+/*
 struct MEX_MONSTER_INFO
 {
 	INT				MonsterUnitKind;					// 몬스터 고유번호
@@ -288,6 +297,7 @@ struct MEX_OTHER_GUILD_INFO
 #endif // _ATUM_IM_SERVER
 };
 
+
 struct MEX_QUEST_INFO						// Character의 퀘스트 정보
 {
 	INT				QuestIndex;				// 퀘스트 번호
@@ -295,7 +305,7 @@ struct MEX_QUEST_INFO						// Character의 퀘스트 정보
 	LONGLONG		QuestPlayTimeStamp;		// 퀘스트 시작 시의 TotalPlayTime
 	char			szCityWarServerGroupName[SIZE_MAX_SERVER_NAME];
 };
-
+ 
 
 struct WARP_TARGET_MAP_INFO_4_EXCHANGE
 {
@@ -309,3 +319,4 @@ struct MEX_CHANNEL_INFO {
 	ChannelIndex_t	ChannelIndex;
 	INT				Crowdedness;		// 혼잡도, 0% ~ 100%??, check: 정확한 방식 결정해야 함
 };
+*/
