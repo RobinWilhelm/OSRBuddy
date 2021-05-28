@@ -125,7 +125,7 @@ void WatermelonBot::Tick()
         return;
     }
 
-    if (OSR_API->GetCurrentMap() != MapNumber::WatermelonIsland) {
+    if (OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland) {
         return;
     }
 
@@ -242,7 +242,7 @@ void WatermelonBot::RenderImGui()
         ImGui::Text("Switch to an A-GEAR if you want to use the bot!");
     }
 
-    if (OSR_API->GetCurrentMap() != MapNumber::WatermelonIsland) {
+    if (OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland) {
         ImGui::Text("Wrong Map!");
     }
         
@@ -312,10 +312,10 @@ bool WatermelonBot::OnReadPacket(unsigned short msgtype, byte* packet)
 
                 switch (m_target->m_info.MonsterUnitKind)
                 {
-                case static_cast<UINT>(MonsterIndex::Watermelon_Tank) :
+                case static_cast<UINT>(MonsterUnitKind::Watermelon_Tank) :
                     m_killed_watermelon_tanks++;
                     break;
-                case static_cast<UINT>(MonsterIndex::Watermelon_Z) :
+                case static_cast<UINT>(MonsterUnitKind::Watermelon_Z) :
                     m_killed_watermelon_z++;
                     break;
                 }         
@@ -378,12 +378,12 @@ bool WatermelonBot::IsValidTargetMonster(CMonsterData* monster)
 
     switch (monster->m_info.MonsterUnitKind)
     {
-    case static_cast<UINT>(MonsterIndex::Watermelon_Tank):
+    case static_cast<UINT>(MonsterUnitKind::Watermelon_Tank):
         if (!m_shoot_watermelon_tanks) { 
             return false; 
         }
         break;
-    case static_cast<UINT>(MonsterIndex::Watermelon_Z):
+    case static_cast<UINT>(MonsterUnitKind::Watermelon_Z):
         if (!m_shoot_watermelon_z) {
             return false;
         }
@@ -550,7 +550,7 @@ FeatureType WatermelonBot::GetType() const
 
 void WatermelonBot::OnEnable()
 {
-    if (OSR_API->GetCurrentMap() != MapNumber::WatermelonIsland) 
+    if (OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland) 
     {
         Enable(false);
         return;

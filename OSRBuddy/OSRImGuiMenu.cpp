@@ -10,18 +10,12 @@
 
 void OSRImGuiMenu::Render()
 {      
-    ImGui::Begin("OSRBuddy Alpha", &m_isOpen);
+    ImGui::Begin("OSRBuddy", &m_isOpen);
 
     if (ImGui::Button("Unload")) {
         m_osrbuddy->InitiateAppShutdown();
     }
-
-    /*
-    if (ImGui::CollapsingHeader("General Options", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_OpenOnArrow)) {
-        ImGui::Checkbox("Block input when menu is open", &m_blockInput);                                                   7
-    }
-    */
-
+      
     ImGui::BeginTabBar("Features", ImGuiTabBarFlags_::ImGuiTabBarFlags_None);
     if (ImGui::BeginTabItem("Settings"))
     {    

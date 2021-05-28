@@ -9,16 +9,12 @@
 #include <d3d9.h>
 #pragma comment(lib,"d3d9.lib")
 
-
-
 																				 
 using EndSceneType	= HRESULT(__stdcall*)(IDirect3DDevice9*);	  
 using PresentType	= HRESULT(__stdcall*)(IDirect3DDevice9* , const RECT *, const RECT *, HWND, const RGNDATA *);
 using ResetType		= HRESULT(__stdcall*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-																				  
-using EndSceneTypeNew	= HRESULT(IDirect3DDevice9::*)(void);
-using PresentTypeNew	= HRESULT(IDirect3DDevice9::*)(const RECT*, const RECT*, HWND, const RGNDATA*);
-using ResetTypeNew		= HRESULT(IDirect3DDevice9::*)(D3DPRESENT_PARAMETERS*);
+																  
+
 
 enum class RenderHookOption
 {

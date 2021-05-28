@@ -2,17 +2,13 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-// GambleBot
-
-
-
-
-// EnchantBot  
-
-
+    
 #define TO_ENUM(enumtype, number) (static_cast<enumtype>(number))
 #define TO_INT(enumnum) (static_cast<int>(enumnum))
+
+   
+
+
 
 /*
 enum class SkillType
@@ -152,11 +148,10 @@ enum class GearType
     AGear
 };
 
-enum class MapNumber
+enum class MapIndex
 {
     WatermelonIsland = 9002,
-    InvasionWorld = 9050,
-
+    InvasionWorld = 9050, 
 };
 
 enum class EnchantItemType
@@ -662,7 +657,7 @@ enum class ItemNumber : int
     BG_Fire_Shot_1 = 7800011,           
 };
 
-enum class MonsterIndex : unsigned int
+enum class MonsterUnitKind : unsigned int
 {
     Watermelon_Z = 2090600,
     Watermelon_Tank = 2090700,

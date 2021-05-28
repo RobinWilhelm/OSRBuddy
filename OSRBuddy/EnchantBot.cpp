@@ -4,6 +4,7 @@
 #include "Utility.h"
 
 #include "OsrItemInfo.h"
+#include "OSRAPI.h"
 
 
 EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
@@ -107,52 +108,54 @@ void EnchantBot::RenderImGui()
 
 	ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-	if (GetEnchantBotState() == EnchantBotState::NOT_IN_LABORATORY) 
-	{
+	if (GetEnchantBotState() == EnchantBotState::NOT_IN_LABORATORY) {
 		ImGui::Text("You are not at the laboratory! Bot wont work!");
 	}
 
-	ImGui::BeginGroupPanel("Item Selection", ImVec2(400, 100));
-	if (ImGui::Button("Select New"))
+	ImGui::BeginGroupPanel("Item Selection", ImVec2(500, 100));
 	{
-		ResetCurrentEnchantItem();
-		m_selectNewEnchantItem = true;
-		SetEnchantBotState(EnchantBotState::STANDBY);
+		if (ImGui::Button("Select New"))
+		{
+			ResetCurrentEnchantItem();
+			m_selectNewEnchantItem = true;
+			SetEnchantBotState(EnchantBotState::STANDBY);
+		}
+		ImGui::SameLine();
+		if (!m_currentEnchantItemUID || m_selectNewEnchantItem) {
+			ImGui::Text("waiting for selection...");
+		}
+		else {
+			DrawEnchantItemText();
+		}
 	}
-
-	if (m_selectNewEnchantItem) {
-		ImGui::Text("waiting for selection...");
-	}
-
-	ImGui::Dummy(ImVec2(0, 2));
-	DrawEnchantItemText();
-	ImGui::Dummy(ImVec2(0, 5));
 	ImGui::EndGroupPanel();
-
 	ImGui::BeginGroupPanel("Settings", ImVec2(300, 400));
-	ImGui::Spacing();
-	DrawSettings();
-	ImGui::Spacing();
+	{
+		ImGui::Spacing();
+		DrawSettings();
+		ImGui::Spacing();
+	}
 	ImGui::EndGroupPanel();
 	ImGui::SameLine();	   
-
 	ImGui::BeginGroupPanel("Run View", ImVec2(140, 100));
-	for (int i = 0; i < 6;  i++) 
 	{
-		if(i!=5)
+		for (int i = 0; i < 6; i++)
 		{
-			std::string enchstep = "e" + std::to_string(i + 5) + "-" + std::to_string(i + 6) + ":";
-			ImGui::Text(enchstep.c_str());
-			ImGui::SameLine();
-			std::string ratio = GetRatio(m_enchantStats[i][0], m_enchantStats[i][1]);
-			ImGui::Text(ratio.c_str());
-		}
-		else
-		{
-			std::string enchstep = "e" + std::to_string(i + 5) + ": ";
-			ImGui::Text(enchstep.c_str());
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(m_enchantStats[i][0]).c_str());
+			if (i != 5)
+			{
+				std::string enchstep = "e" + std::to_string(i + 5) + "-" + std::to_string(i + 6) + ":";
+				ImGui::Text(enchstep.c_str());
+				ImGui::SameLine();
+				std::string ratio = GetRatio(m_enchantStats[i][0], m_enchantStats[i][1]);
+				ImGui::Text(ratio.c_str());
+			}
+			else
+			{
+				std::string enchstep = "e" + std::to_string(i + 5) + ": ";
+				ImGui::Text(enchstep.c_str());
+				ImGui::SameLine();
+				ImGui::Text(std::to_string(m_enchantStats[i][0]).c_str());
+			}
 		}
 	}
 	ImGui::EndGroupPanel();
@@ -160,25 +163,18 @@ void EnchantBot::RenderImGui()
 	
 	int current_idx = 0;
 	ImGui::BeginGroupPanel("Current Enchants", ImVec2(140, 100));
-	
-	ImGui::Dummy(ImVec2(0, 5));
-
-	ImGui::BeginGroup();
-	ImGui::Dummy(ImVec2(130, 0));
-	ImGui::Dummy(ImVec2(0, 220));
-	ImGui::SameLine();
-	ImGui::PushItemWidth(110);
-	ImGui::EnchantList("##current_enchants", &current_idx, m_currentEnchants, 13);
-	ImGui::PopItemWidth();
-	ImGui::EndGroup();
-
-	ImGui::Dummy(ImVec2(0, 3));
+	{
+		ImGui::SameLine();
+		ImGui::PushItemWidth(110);
+		ImGui::EnchantList("##current_enchants", &current_idx, m_currentEnchants, 13);
+		ImGui::PopItemWidth();
+	}
 	ImGui::EndGroupPanel();		  
 }
 
 const char* EnchantBot::GetName() const
 {
-	return "EnchantBot ALPHA2";
+	return "EnchantBot";
 }
 
 std::string EnchantBot::GetRatio(int i, int j)
@@ -371,56 +367,50 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
   
 void EnchantBot::DrawSettings()
 {	
-	int wanted_idx = 0;
-
+	int wanted_idx = 0;		  
 	ImGui::BeginGroupPanel("Wanted Enchants", ImVec2(260, 100));
-	ImGui::Dummy(ImVec2(0, 5));	
-
-	ImGui::BeginGroup(); 	
-	ImGui::Dummy(ImVec2(130, 0));
-	ImGui::Dummy(ImVec2(0, 220));
-	ImGui::SameLine();
-	ImGui::PushItemWidth(110);		
-	ImGui::EnchantList("##wanted_enchants", &wanted_idx, m_wantedEnchants, 13);
-	ImGui::PopItemWidth();
-	ImGui::EndGroup(); 
-
-	ImGui::SameLine();	 
-
-	ImGui::BeginGroup(); 
-	DrawEnchantButtons();
-	ImGui::EndGroup();
-						 	
-	ImGui::Dummy(ImVec2(0, 3));	  
-	ImGui::EndGroupPanel();
-
-	ImGui::SameLine();
-
-	ImGui::BeginGroup();
-
-	ImGui::BeginGroupPanel("Notifications", ImVec2(200, 100));
-	ImGui::Dummy(ImVec2(0, 5));
-	ImGui::Checkbox("Play sound", &m_notify_sound);
-	ImGui::Checkbox("Show Popup", &m_notify_messagebox);
-	ImGui::Dummy(ImVec2(0, 5));
-	ImGui::EndGroupPanel();
-
-	ImGui::Dummy(ImVec2(0, 15));   
-	// use e1 prots for e6 and e7
-	ImGui::Checkbox("Optimise Enchants", &m_optimiseEnchanting); 
-	ImGui::Checkbox("Use Chance Cards", &m_withLuckyCard);
-	ImGui::Checkbox("Automatic Enchanting", &m_auto_enchant);
-
-	ImGui::Dummy(ImVec2(0, 5));
-	if (m_currentEnchantItemUID != 0)
 	{
-		if (ImGui::Button("Enchant"))
+		ImGui::BeginGroup();
 		{
-			if (m_state == EnchantBotState::STANDBY && EnchantCheckTimeReady()) {
-				SetEnchantBotState(EnchantBotState::ENCHANT_SINGLE);
+			ImGui::SameLine();
+			ImGui::PushItemWidth(110);
+			ImGui::EnchantList("##wanted_enchants", &wanted_idx, m_wantedEnchants, 13);
+			ImGui::PopItemWidth();
+		}
+		ImGui::EndGroup();
+		ImGui::SameLine();
+		ImGui::BeginGroup();
+		{
+			DrawEnchantButtons();
+		}
+		ImGui::EndGroup();
+	}
+	ImGui::EndGroupPanel();
+	ImGui::SameLine();	   
+	ImGui::BeginGroup();
+	{
+		ImGui::BeginGroupPanel("Notifications", ImVec2(200, 100));
+		{
+			ImGui::Checkbox("Play sound", &m_notify_sound);
+			ImGui::Checkbox("Show Popup", &m_notify_messagebox);
+		}
+		ImGui::EndGroupPanel();
+
+		// use e1 prots for e6 and e7
+		ImGui::Checkbox("Optimise Enchants", &m_optimiseEnchanting);
+		ImGui::Checkbox("Use Chance Cards", &m_withLuckyCard);
+		ImGui::Checkbox("Automatic Enchanting", &m_auto_enchant);
+
+		if (m_currentEnchantItemUID != 0)
+		{
+			if (ImGui::Button("Enchant"))
+			{
+				if (m_state == EnchantBotState::STANDBY && EnchantCheckTimeReady()) {
+					SetEnchantBotState(EnchantBotState::ENCHANT_SINGLE);
+				}
 			}
 		}
-	}  
+	}
 	ImGui::EndGroup();		
 }
 

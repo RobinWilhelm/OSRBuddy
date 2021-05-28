@@ -125,6 +125,23 @@ void GambleBot::RenderImGui()
 		ImGui::Text("You are not at the laboratory! Bot wont work!");
 	}
 
+	ImGui::BeginGroupPanel("Item Selection", ImVec2(500, 100));
+	{
+		if (ImGui::Button("Select New"))
+		{
+			ResetGambleItem();
+			m_select_new_weapon = true;
+		}
+		ImGui::SameLine();
+		if (!m_current_gambleitem_uid || m_select_new_weapon) {
+			ImGui::Text("waiting for selection...");
+		}
+		else {
+			DrawFullWeaponName();
+		}
+	}
+	ImGui::EndGroupPanel();
+
 	ImGui::BeginGroupPanel("Settings", ImVec2(400, 400));
 	{
 		DrawSettings();
@@ -201,14 +218,7 @@ const char* GambleBot::GetName()  const
 }
 
 void GambleBot::DrawSettings()
-{  
-	ImGui::Text("Gamble Item: ");
-	DrawFullWeaponName();
-
-	if (ImGui::Button("Select New")) {
-		ResetGambleItem();
-		m_select_new_weapon = true;
-	}  	
+{  	
 	const char* items[] = { "None", "Good", "Best" };
 
 	ImGui::Dummy(ImVec2(0, 10));
@@ -828,145 +838,6 @@ bool GambleBot::FixIsInList(int codenum, const int* fixlist, size_t arraysize)
 	}
 	return false;
 }
-
-/*
-bool GambleBot::PrepareNextGamble()
-{ 	
-	if (!InternalActionCheckTimeReady()) {
-		return false;
-	}
-	else {
-		ResetInternalActionCheckTime(true);
-	}
-
-	if (!m_gamble_item.GetItemInfo()) {
-		return false;
-	}
-
-	if (m_next_action_prepare == 0)
-	{
-		OSR_API->InvenToSourceItem(m_gamble_item.GetItemInfo(), 1, false);
-		return true;
-	} 
-
-	switch (m_next_action_prepare)
-	{
-	default:
-		break;
-	}
-	
-	CItemInfo* prefixitem = nullptr;
-	CItemInfo* suffixitem = nullptr;
-
-	switch (m_next_gamble_action) {
-	case GambleAction::NONE:
-		return false;
-
-	case GambleAction::ADD_PREFIX:		
-		prefixitem = (m_is_advanced_weapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_PREFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_PREFIX);
-		if (!prefixitem) 
-		{
-			Reset();
-			SetGambleBotState(GambleBotState::STANDBY);
-			return false;	// item not found
-		}
-
-		if (m_next_action_prepare == 1)
-		{
-			OSR_API->InvenToSourceItem(prefixitem, 1, false);
-			return true;
-		}		
-		break;
-
-	case GambleAction::ADD_SUFFIX:
-		suffixitem = (m_is_advanced_weapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_SUFFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_SUFFIX);
-		if (!suffixitem) 
-		{
-			Reset();
-			SetGambleBotState(GambleBotState::STANDBY);
-			return false;  // item not found
-		}
-		if (m_next_action_prepare == 1) 
-		{
-			OSR_API->InvenToSourceItem(suffixitem, 1, false);
-			return true;
-		}
-		break;
-
-	case GambleAction::ADD_PREFIX_AND_SUFFIX:
-		prefixitem = (m_is_advanced_weapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_PREFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_PREFIX);
-		suffixitem = (m_is_advanced_weapon) ? FindGambleCardItemFromInventory(GambleItem::SG_ADV_SUFFIX) : FindGambleCardItemFromInventory(GambleItem::SG_STD_SUFFIX);
-		if (!prefixitem || !suffixitem) 
-		{
-			Reset();
-			SetGambleBotState(GambleBotState::STANDBY);
-			return false;	// item not found
-		}
-		if (m_next_action_prepare == 1) 
-		{
-			OSR_API->InvenToSourceItem(prefixitem, 1, false);
-			return true;
-		}
-		if (m_next_action_prepare == 2) 
-		{
-			OSR_API->InvenToSourceItem(suffixitem, 1, false);
-			return true;
-		}
-		break;
-
-	case GambleAction::REMOVE_PREFIX:
-		prefixitem = FindGambleCardItemFromInventory(GambleItem::INIT_PREFIX);
-		if (!prefixitem) 
-		{
-			Reset();
-			SetGambleBotState(GambleBotState::STANDBY);
-			return false;	// item not found
-		}
-		if (m_next_action_prepare == 1) 
-		{
-			OSR_API->InvenToSourceItem(prefixitem, 1, false);
-			return true;
-		}
-		break;
-
-	case GambleAction::REMOVE_SUFFIX:
-		suffixitem = FindGambleCardItemFromInventory(GambleItem::INIT_SUFFIX);
-		if (!suffixitem) 
-		{
-			Reset();
-			SetGambleBotState(GambleBotState::STANDBY);
-			return false;  // item not found
-		}
-		if (m_next_action_prepare == 1) 
-		{
-			OSR_API->InvenToSourceItem(suffixitem, 1, false);
-			return true;
-		}
-		break;
-
-	case GambleAction::REMOVE_PREFIX_AND_SUFFIX:
-		prefixitem = FindGambleCardItemFromInventory(GambleItem::INIT_PREFIX);
-		suffixitem = FindGambleCardItemFromInventory(GambleItem::INIT_SUFFIX);
-		if (!prefixitem || !suffixitem) 
-		{
-			Reset();
-			SetGambleBotState(GambleBotState::STANDBY);
-			return false;	// item not found
-		}
-		if (m_next_action_prepare == 1)
-		{
-			OSR_API->InvenToSourceItem(prefixitem, 1, false);
-			return true;
-		}
-		if (m_next_action_prepare == 2) 
-		{
-			OSR_API->InvenToSourceItem(suffixitem, 1, false);
-			return true;
-		}
-		break;
-	}
-}
-*/
 
 GambleAction GambleBot::DetermineNextAction()
 {

@@ -482,16 +482,16 @@ GearType OldSchoolRivalsAPI::GetPlayerGearType()
 	}
 }
 
-MapNumber OldSchoolRivalsAPI::GetCurrentMap()
+MapIndex OldSchoolRivalsAPI::GetCurrentMap()
 {
 	switch (m_atumapplication->m_pShuttleChild->m_myShuttleInfo.MapChannelIndex.MapIndex)
 	{
-		case 9002: return MapNumber::WatermelonIsland;
-		case 9050: return MapNumber::InvasionWorld;
+		case 9002: return MapIndex::WatermelonIsland;
+		case 9050: return MapIndex::InvasionWorld;
 			// lazy
 	}
 
-	return MapNumber();
+	return MapIndex();
 }
 
 MAP_CHANNEL_INDEX OldSchoolRivalsAPI::GetCurrentMapChannelIndex()

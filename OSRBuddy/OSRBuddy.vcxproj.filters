@@ -283,9 +283,6 @@
     <ClInclude Include="SDK\ClientParty.h">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="HookedFunction.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="WatermelonBot.h">
       <Filter>Features</Filter>
     </ClInclude>

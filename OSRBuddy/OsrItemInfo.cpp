@@ -35,7 +35,7 @@ bool OsrItemInfo::Update(UID64_t uid)
 	{
 		m_name_color = OSRImGuiMenu::TranslateAceCharToColor(m_clean_item_name[1]);
 		m_clean_item_name.erase(m_clean_item_name.begin(), m_clean_item_name.begin() + 2);
-		m_clean_item_name.erase(m_clean_item_name.end() - 2, m_clean_item_name.end());
+		//m_clean_item_name.erase(m_clean_item_name.end() - 2, m_clean_item_name.end());
 	}
 	else
 	{

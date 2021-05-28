@@ -9,25 +9,6 @@
 #include "SDK/AtumParam.h"
 #include "SDK/AtumProtocol.h"
 
-#define AUTOBUFF_CHECK_TIME 1s
-#define AUTOHEAL_CHECK_TIME 200ms
-
-#define TARGETHEAL_SPECIAL_REATTACK 3000ms // reattack time if a mgear uses target heal or target repair on someone else than himself
-#define FUEL_KIT_THRESHOLD 20
-  
-/*
-typedef struct
-{
-	MessageType_t	MsgType;	// 에러가 일어났을 때 처리중이었던 Message Type
-	Err_t			ErrorCode;			// 2 bytes
-	BOOL			CloseConnection;	// Client에서 연결을 끊을지에 대한 여부
-	INT				ErrParam1;			// general-purpose err parameter 1
-	INT				ErrParam2;			// general-purpose err parameter 2
-	USHORT			StringLength;		// 2 bytes
-	//char*	String;				// error string
-} MSG_ERROR;
-*/
-
 
 
 enum class KitType : unsigned short

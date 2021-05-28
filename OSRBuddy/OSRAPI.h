@@ -2,6 +2,15 @@
 #include "SDK/AtumApplication.h"
 #include <memory>
 #include "OSRBuddyDefine.h"
+#include <d3d9.h>
+   
+using SendUseItemType = void(__thiscall*)(CINFInvenExtend * ecx, ITEM_BASE * item);
+using SendUseSkillType = void(__thiscall*)(CINFCharacterInfoExtend * ecx, ITEM_BASE * skill);
+using OnButtonClickType = void(__thiscall*)(CINFCityLab * ecx, int button);
+using InvenToSourceItemType = void(__thiscall*)(CINFCityLab * ecx, CItemInfo * pItemInfo, int nCount, bool useMacroSource);
+using GetServerRareItemInfoType = RARE_ITEM_INFO * (__thiscall*)(CAtumDatabase * ecx, int nCodeNum);
+using ChangeSkillState = void(__thiscall*)(CSkillInfo * ecx, int dwState, int nTempSkillItemNum);
+using CalcObjectSourceScreenCoordsType = void(__thiscall*)(CAtumApplication * ecx, D3DXVECTOR3 vObjPos, int iScreenWidth, int iScreenHeight, int& iCoordX, int& iCoordY, int& iCoordW);
 
 enum class LabButtonCode : int
 {
@@ -9,14 +18,6 @@ enum class LabButtonCode : int
 	Cancel,
 	Ok,
 };
-
-using SendUseItemType					= void(__thiscall*)(CINFInvenExtend * ecx, ITEM_BASE * item);
-using SendUseSkillType					= void(__thiscall*)(CINFCharacterInfoExtend * ecx, ITEM_BASE * skill);
-using OnButtonClickType					= void(__thiscall*)(CINFCityLab* ecx, int button);
-using InvenToSourceItemType				= void(__thiscall*)(CINFCityLab* ecx, CItemInfo* pItemInfo, int nCount, bool useMacroSource);
-using GetServerRareItemInfoType			= RARE_ITEM_INFO* (__thiscall*)(CAtumDatabase* ecx, int nCodeNum);
-using ChangeSkillState					= void(__thiscall*)(CSkillInfo * ecx, int dwState, int nTempSkillItemNum);
-using CalcObjectSourceScreenCoordsType	= void(__thiscall*)(CAtumApplication * ecx, D3DXVECTOR3 vObjPos, int iScreenWidth, int iScreenHeight, int& iCoordX, int& iCoordY, int& iCoordW);
 
 class OldSchoolRivalsAPI
 {			
@@ -66,7 +67,7 @@ public:
 	bool IsHitablePrimary(CUnitData* target);
 
 	GearType GetPlayerGearType();
-	MapNumber GetCurrentMap();
+	MapIndex GetCurrentMap();
 	MAP_CHANNEL_INDEX GetCurrentMapChannelIndex();
 	UID32_t GetPlayerUniqueNumber();
 	ClientIndex_t GetPlayerClientIndex();

@@ -9,185 +9,12 @@
 #include "AtumProtocol.h"
 
 #define KIT_RESEND_TIME 100ms
-/*
-#define T0_FC_SKILL					0x41
-#define T0_FC_BATTLE				0x12		// 2008-02-13 by cmkwon, 프로토콜 변경, 꼭 클라이언트와 같이 업데이트 해야함
-#define T0_FC_ITEM					0x39
-                                                    
-// FN_SKILL
-#define T1_FN_SKILL_USE_SKILL				0x00
-#define T1_FN_SKILL_USE_SKILL_OK			0x01
-#define T1_FC_ITEM_USE_ENERGY							0x0D       
-#define T1_FC_ITEM_USE_ENERGY_OK						0x0E	// F->C
-#define T1_FC_BATTLE_PRI_BULLET_RELOADED		0x23
-#define T1_FC_BATTLE_SEC_BULLET_RELOADED		0x24
+#define AUTOBUFF_CHECK_TIME 1s
+#define AUTOHEAL_CHECK_TIME 200ms
 
-// FC_SKILL
-#define T1_FC_SKILL_USE_SKILLPOINT			0x00
-#define T1_FC_SKILL_USE_SKILLPOINT_OK		0x01
-#define T1_FC_SKILL_SETUP_SKILL				0x02
-#define T1_FC_SKILL_SETUP_SKILL_OK_HEADER	0x03
-#define T1_FC_SKILL_SETUP_SKILL_OK			0x04
-#define T1_FC_SKILL_SETUP_SKILL_OK_DONE		0x05
-#define T1_FC_SKILL_USE_SKILL				0x06
-#define T1_FC_SKILL_USE_SKILL_OK			0x07
-#define T1_FC_SKILL_CANCEL_SKILL			0x08
-#define T1_FC_SKILL_INVALIDATE_SKILL		0x09
-#define T1_FC_SKILL_PREPARE_USE				0x0A
-#define T1_FC_SKILL_PREPARE_USE_OK			0x0B
-#define T1_FC_SKILL_CANCEL_PREPARE			0x0C
-#define T1_FC_SKILL_CANCEL_PREPARE_OK		0x0D
-#define T1_FC_SKILL_CONFIRM_USE				0x0F		// 2005-12-02 by cmkwon, C->F, F->C
-#define T1_FC_SKILL_CONFIRM_USE_ACK			0x10		// 2005-12-02 by cmkwon, C->F, F->C
-#define T1_FC_SKILL_CANCEL_SKILL_OK			0x11		// 2006-11-28 by dhjin, F->C
+#define TARGETHEAL_SPECIAL_REATTACK 3200ms // reattack time if a mgear uses target heal or target repair on someone else than himself
+#define FUEL_KIT_THRESHOLD 20
 
-
-#define T_FC_ITEM_USE_ENERGY_OK					(MessageType_t)((T0_FC_ITEM<<8)|T1_FC_ITEM_USE_ENERGY_OK)    
-#define T_FC_BATTLE_PRI_BULLET_RELOADED			(MessageType_t)((T0_FC_BATTLE<<8)|T1_FC_BATTLE_PRI_BULLET_RELOADED)	// 1형 무기의 탄알이 리로드되었음
-#define T_FC_BATTLE_SEC_BULLET_RELOADED			(MessageType_t)((T0_FC_BATTLE<<8)|T1_FC_BATTLE_SEC_BULLET_RELOADED)	// 2형 무기의 탄알이 리로드되었음
-
-#define T_FC_SKILL_USE_SKILLPOINT				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILLPOINT)
-#define T_FC_SKILL_USE_SKILLPOINT_OK			(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILLPOINT_OK)
-#define T_FC_SKILL_SETUP_SKILL					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL)
-#define T_FC_SKILL_SETUP_SKILL_OK_HEADER		(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL_OK_HEADER)
-#define T_FC_SKILL_SETUP_SKILL_OK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL_OK)
-#define T_FC_SKILL_SETUP_SKILL_OK_DONE			(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL_OK_DONE)
-#define T_FC_SKILL_USE_SKILL					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILL)
-#define T_FC_SKILL_USE_SKILL_OK					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILL_OK)
-#define T_FC_SKILL_CANCEL_SKILL					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_SKILL)
-#define T_FC_SKILL_CANCEL_SKILL_OK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_SKILL_OK)
-#define T_FC_SKILL_INVALIDATE_SKILL				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_INVALIDATE_SKILL)
-#define T_FC_SKILL_PREPARE_USE					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_PREPARE_USE)
-#define T_FC_SKILL_PREPARE_USE_OK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_PREPARE_USE_OK)
-#define T_FC_SKILL_CANCEL_PREPARE				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_PREPARE)
-#define T_FC_SKILL_CANCEL_PREPARE_OK			(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_PREPARE_OK)
-#define T_FC_SKILL_CONFIRM_USE					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CONFIRM_USE)		// 2005-12-02 by cmkwon, C->F, F->C
-#define T_FC_SKILL_CONFIRM_USE_ACK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CONFIRM_USE_ACK)	// 2005-12-02 by cmkwon, C->F, F->C
-
-#define T_FC_ITEM_USE_ENERGY					(MessageType_t)((T0_FC_ITEM<<8)|T1_FC_ITEM_USE_ENERGY)
-
-
-#define T1_ERROR								0x00
-#define T0_ERROR					0xFE
-#define T_ERROR									(MessageType_t)((T0_ERROR<<8)|T1_ERROR)
-
-#define BULLET_RECHARGE_TYPE_NORMAL			((BYTE)0)
-#define BULLET_RECHARGE_TYPE_REPAIR_SHOP	((BYTE)1)
-#define BULLET_RECHARGE_TYPE_BULLET_ITEM	((BYTE)2)
-#define BULLET_RECHARGE_TYPE_ADMIN_COMMAND	((BYTE)3)
-
-// FC_TIMER
-#define T1_FC_TIMER_START_TIMER					0x00	// F->C, TIMER_EVENT 시작
-#define T1_FC_TIMER_STOP_TIMER					0x01	// F->C, TIMER_EVENT 정지
-#define T1_FC_TIMER_UPDATE_TIMER				0x02	// F->C, TIMER_EVENT 갱신(시간 연장)
-#define T1_FC_TIMER_PAUSE_TIMER					0x03	// F->C, TIMER_EVENT 일시 정지
-#define T1_FC_TIMER_CONTINUE_TIMER				0x04	// F->C, TIMER_EVENT 재시작
-#define T1_FC_TIMER_TIMEOUT						0x05	// C->F, 시간이 다 됨을 알림
-
-#define T0_FC_TIMER					0x44
-#define T_FC_TIMER_START_TIMER					(MessageType_t)((T0_FC_TIMER<<8)|T1_FC_TIMER_START_TIMER)		// F->C, TIMER_EVENT 시작
-#define T_FC_TIMER_STOP_TIMER					(MessageType_t)((T0_FC_TIMER<<8)|T1_FC_TIMER_STOP_TIMER)		// F->C, TIMER_EVENT 정지
-#define T_FC_TIMER_UPDATE_TIMER					(MessageType_t)((T0_FC_TIMER<<8)|T1_FC_TIMER_UPDATE_TIMER)		// F->C, TIMER_EVENT 갱신(시간 연장)
-#define T_FC_TIMER_PAUSE_TIMER					(MessageType_t)((T0_FC_TIMER<<8)|T1_FC_TIMER_PAUSE_TIMER)		// F->C, TIMER_EVENT 일시 정지
-#define T_FC_TIMER_CONTINUE_TIMER				(MessageType_t)((T0_FC_TIMER<<8)|T1_FC_TIMER_CONTINUE_TIMER)	// F->C, TIMER_EVENT 재시작
-#define T_FC_TIMER_TIMEOUT						(MessageType_t)((T0_FC_TIMER<<8)|T1_FC_TIMER_TIMEOUT)			// C->F, 시간이 다 됨을 알림
-
-
-#define TE_TYPE_DELETE_DUMMY			(TimerEventType)6
-#define TE_TYPE_DELETE_FIXER			(TimerEventType)7
-#define TE_TYPE_DELETE_DECOY			(TimerEventType)8		// 디코이는 TimeOut발생 시 CurrentCount를 줄이고, CurrentCount=0까지 반복함
-#define TE_TYPE_GRADUAL_SHIELD_UP		(TimerEventType)9		// 2-2형 무기 쉴드, interval은 무조건 1000 ms
-#define TE_TYPE_RECOVER_HP				(TimerEventType)10		// 착륙했을 때만 채움(5초당 3)
-#define TE_TYPE_RECOVER_DP				(TimerEventType)11		// 착륙했을 때만 채움
-#define TE_TYPE_RECOVER_SP				(TimerEventType)12
-#define TE_TYPE_GRADUAL_HP_UP			(TimerEventType)13		// interval은 무조건 1000 ms, ITEM_GENERAL.Endurance가 0이 될 때까지 반복함
-#define TE_TYPE_GRADUAL_DP_UP			(TimerEventType)14		// interval은 무조건 1000 ms, ITEM_GENERAL.Endurance가 0이 될 때까지 반복함
-#define TE_TYPE_GRADUAL_SP_UP			(TimerEventType)15		// interval은 무조건 1000 ms, ITEM_GENERAL.Endurance가 0이 될 때까지 반복함, not used yet: SP는 자동으로 회복됨, TE_TYPE_RECOVER_SP를 사용
-#define TE_TYPE_GRADUAL_EP_UP			(TimerEventType)16		// interval은 무조건 1000 ms, ITEM_GENERAL.Endurance가 0이 될 때까지 반복함
-#define TE_TYPE_IMMEDIATE_HP_UP			(TimerEventType)17		// 사용시 바로 채우고 Time 동안 재사용이 안된다
-#define TE_TYPE_IMMEDIATE_DP_UP			(TimerEventType)18		// 사용시 바로 채우고 Time 동안 재사용이 안된다
-#define TE_TYPE_IMMEDIATE_SP_UP			(TimerEventType)19		// 사용시 바로 채우고 Time 동안 재사용이 안된다
-#define TE_TYPE_IMMEDIATE_EP_UP			(TimerEventType)20		// 사용시 바로 채우고 Time 동안 재사용이 안된다
-#define TE_TYPE_REQUEST_TIMEOUT			(TimerEventType)21		// 거래, 파티전, 일대일대결 등의 요청에 대한 TimeOut
-#define TE_TYPE_DECREASE_SP				(TimerEventType)22		// TOGGLE형 스킬 사용 시, SP를 ReqSP만큼 소모, SP 소진 시 스킬 자동 취소
-#define TE_TYPE_DO_MINUTELY_WORK		(TimerEventType)23		// 1분에 한번씩 발행하는 타이머
-
-typedef struct
-{
-    ItemID_t		SkillItemID;
-} MSG_FC_SKILL_PREPARE_USE;
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    ItemID_t		SkillItemID;
-} MSG_FC_SKILL_PREPARE_USE_OK;
-
-typedef struct
-{
-    ItemID_t		SkillItemID;			// 종료되는 스킬 정보
-    INT				AttackSkillItemNum0;	// 2006-12-12 by cmkwon, 현재 스킬을 종료되게 하는 공격스킬 아이템넘버 
-} MSG_FC_SKILL_CANCEL_SKILL;
-
-typedef struct
-{
-    ItemID_t		SkillItemID;
-    ClientIndex_t	AttackIndex;
-    ClientIndex_t	TargetIndex;	// target이 없는 skill인 경우 0
-    UID32_t			TargetCharUID;	// 2005-11-24 by cmkwon, target있지만 TargetIndex가 0일때 사용됨, TargetIndex가 편대원 1명 소환 스킬시 사용한다.
-} MSG_FC_SKILL_USE_SKILL;
-
-typedef struct
-{
-    ItemID_t		SkillItemID;
-    ClientIndex_t	AttackIndex;
-    ClientIndex_t	TargetIndex;	// target이 없는 skill인 경우 0
-    ATUM_DATE_TIME	UseTime;		// 2006-11-17 by dhjin, 2차 스킬 사용 시간
-//	BOOL			UseSkillTimeOk;	// 2006-11-17 by dhjin, 0 -> 2차 스킬 사용 대기 시간, 1 -> 2차 스킬 사용할 수 있다.
-} MSG_FC_SKILL_USE_SKILL_OK;
-  
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    ItemID_t		SkillItemID;
-    INT				AttackSkillItemNum0;	// 2006-12-12 by cmkwon, 현재 스킬을 종료되게 하는 공격스킬 아이템넘버
-} MSG_FC_SKILL_CANCEL_SKILL_OK;
-
-typedef struct
-{
-    ItemID_t		SkillItemID;
-    ClientIndex_t	ClientIndex;
-} MSG_FC_SKILL_INVALIDATE_SKILL;	//
-     
-struct MSG_FC_ITEM_USE_ENERGY_OK
-{
-    ClientIndex_t	ClientIndex;
-    INT				ItemNum;
-};
-
-struct  MSG_FC_BATTLE_PRI_BULLET_RELOADED
-{
-    USHORT			BulletCount;		// 무기의 reload된 총알의 최종 개수
-    USHORT			RechargeCount;		// 2007-08-07 by cmkwon, 1형/2형 무기 총알 충전 아이템 구현 - 추가된 필드
-    BYTE			RechargeType;		// 2007-08-07 by cmkwon, 1형/2형 무기 총알 충전 아이템 구현 - 추가된 필드(BULLET_RECHARGE_TYPE_XXX)
-};
-typedef MSG_FC_BATTLE_PRI_BULLET_RELOADED		 MSG_FC_BATTLE_SEC_BULLET_RELOADED;
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    UID64_t			ItemUniqueNumber;
-    INT				nParam1;				//
-} MSG_FC_ITEM_USE_ENERGY;
-
-
-
-typedef struct
-{
-    MEX_TIMER_EVENT		TimerEvent;
-} MSG_FC_TIMER_START_TIMER;			// F->C, TIMER_EVENT 시작
-
-*/
 
 KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {       
@@ -793,7 +620,7 @@ bool KitBuffBot::ShouldUseHealingField()
     // check if any party member in range has missing energy
     int shield_missing = 0;
     auto playerpos = OSR_API->GetShuttlePosition();
-    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 750) 
+    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 350) 
     {
         if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
             return true;
@@ -812,7 +639,7 @@ bool KitBuffBot::ShouldUseHealingField()
         float distance = D3DXVec3Length(&delta);
         if (distance <= 3000.0f)  // hardcoded for now, this value is accurate for all field healings above level 54
         {
-            if (partymember->m_pEnemyData->m_infoCharacter.DP - partymember->m_pEnemyData->m_infoCharacter.CurrentDP >= 750)
+            if (partymember->m_pEnemyData->m_infoCharacter.DP - partymember->m_pEnemyData->m_infoCharacter.CurrentDP >= 350)
             {
                 shield_missing++;
             }
@@ -831,7 +658,7 @@ bool KitBuffBot::ShouldUseEnergizeField()
     // check if any party member in range has missing energy
     int energy_missing = 0;
     auto playerpos = OSR_API->GetShuttlePosition();
-    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 500) 
+    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 200) 
     {
         if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
             return true;
@@ -850,7 +677,7 @@ bool KitBuffBot::ShouldUseEnergizeField()
         float distance = D3DXVec3Length(&delta);
         if (distance <= 3000.0f) // hardcoded for now, this value is accurate for all field healings above level 54
         {
-            if (partymember->m_pEnemyData->m_infoCharacter.HP - partymember->m_pEnemyData->m_infoCharacter.CurrentHP >= 500)
+            if (partymember->m_pEnemyData->m_infoCharacter.HP - partymember->m_pEnemyData->m_infoCharacter.CurrentHP >= 200)
             {
                 energy_missing++;
             }
@@ -870,7 +697,7 @@ UID32_t KitBuffBot::GetBestHealTarget()
     UID32_t prio_target = 0;
 
     // get healing target based on missing hp
-    int most_missing_energy = 500;
+    int most_missing_energy = 200;
     for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
     {
         if (!member->m_bUserLogOn || !member->m_pEnemyData) {
@@ -879,8 +706,7 @@ UID32_t KitBuffBot::GetBestHealTarget()
 
         if (member->m_pEnemyData->m_infoCharacter.CurrentHP <= 0) {
             continue;
-        }
-
+        }   
 
         int member_energy_missing = member->m_pEnemyData->m_infoCharacter.HP - member->m_pEnemyData->m_infoCharacter.CurrentHP;
         if (member_energy_missing > most_missing_energy)
@@ -894,7 +720,7 @@ UID32_t KitBuffBot::GetBestHealTarget()
         }
     }
 
-    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 500)
+    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 200)
     {
         target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
         if (m_settings.target_heal_prio_myself) {
@@ -914,7 +740,7 @@ UID32_t KitBuffBot::GetBestRepairTarget()
     UID32_t prio_target = 0;
 
     // get healing target based on missing shield
-    int most_missing_shield = 0;
+    int most_missing_shield = 350;
     for (auto member : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
     {
         if (!member->m_bUserLogOn || !member->m_pEnemyData) {
@@ -941,7 +767,7 @@ UID32_t KitBuffBot::GetBestRepairTarget()
         }
     }
 
-    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 500)
+    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 350)
     {
         target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
         if (m_settings.target_heal_prio_myself) {
@@ -1139,6 +965,8 @@ void KitBuffBot::RenderImGui()
                     switch (skill->type)
                     {
                     case SkillType::Frenzy:
+                    case SkillType::Smart_SP:
+                    case SkillType::Reduce_Damage:
                     case SkillType::Elevation:
                     case SkillType::Raging_Defense:
                     case SkillType::Raging_Evasion:
@@ -1166,8 +994,7 @@ void KitBuffBot::RenderImGui()
         ImGui::EndGroupPanel(); 
         ImGui::BeginGroupPanel("Autohealings");
         { 
-            if (OSR_API->GetPlayerGearType() != GearType::MGear)
-            {
+            if (OSR_API->GetPlayerGearType() != GearType::MGear) {
                 ImGui::Text("Only available for MG!");
             }
             else
@@ -1612,12 +1439,12 @@ void KitBuffBot::TickAutoHeals()
     if (OSR_API->GetPlayerGearType() == GearType::MGear  && AutoHealCheckTimerReady())
     {
         int currentsp = OSR_API->GetCurrentSkillp();
-        PlayerSkillInfo* repair_skill = nullptr;
         std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+        bool used_target_repair = false;
 
         if (m_settings.target_repair_active )
         {        
-            repair_skill = FindPlayerSkill(SkillType::Repair_Target);
+            PlayerSkillInfo* repair_skill = FindPlayerSkill(SkillType::Repair_Target);
             if (repair_skill && repair_skill->skillinfo->m_fCheckReattackTime <= 0.0f && repair_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
             {     
                 // target repair and target heal has an extra timer if you heal someone else than yourself
@@ -1626,24 +1453,33 @@ void KitBuffBot::TickAutoHeals()
                     UID32_t energize_target = GetBestRepairTarget();
                     if (energize_target != 0)
                     {
-                        TryUseTargetSkill(repair_skill, energize_target);
-                        currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;
+                        if (TryUseTargetSkill(repair_skill, energize_target))
+                        {
+                            currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;
+                            used_target_repair = true;
+                        }
                     }
                 }
             }
             
         }
 
-        if (m_settings.target_healings_active && !(repair_skill))
+        if (m_settings.target_healings_active && !used_target_repair)
         {
-            UID32_t heal_target = GetBestHealTarget();
-            if (heal_target != 0)
+            PlayerSkillInfo* heal_skill = FindPlayerSkill(SkillType::Heal_Target);
+            if (heal_skill && heal_skill->skillinfo->m_fCheckReattackTime <= 0.0f && heal_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
             {
-                PlayerSkillInfo* heal_skill = FindPlayerSkill(SkillType::Heal_Target);
-                if (heal_skill && heal_skill->skillinfo->m_fCheckReattackTime <= 0.0f && heal_skill->skillinfo->ItemInfo->ReqSP <= currentsp)
-                {
-                    TryUseTargetSkill(heal_skill, heal_target);
-                    currentsp -= heal_skill->skillinfo->ItemInfo->ReqSP;
+                // target repair and target heal has an extra timer if you heal someone else than yourself
+                if (current - m_mgear_targetheal_last_send >= TARGETHEAL_SPECIAL_REATTACK)
+                { 
+                    UID32_t heal_target = GetBestHealTarget();
+                    if (heal_target != 0)
+                    {
+                        if (TryUseTargetSkill(heal_skill, heal_target))
+                        {
+                            currentsp -= heal_skill->skillinfo->ItemInfo->ReqSP;
+                        }             
+                    }
                 }
             }
         }    
