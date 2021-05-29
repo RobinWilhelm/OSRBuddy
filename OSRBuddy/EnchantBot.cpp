@@ -137,30 +137,7 @@ void EnchantBot::RenderImGui()
 	}
 	ImGui::EndGroupPanel();
 	ImGui::SameLine();	   
-	ImGui::BeginGroupPanel("Run View", ImVec2(140, 100));
-	{
-		for (int i = 0; i < 6; i++)
-		{
-			if (i != 5)
-			{
-				std::string enchstep = "e" + std::to_string(i + 5) + "-" + std::to_string(i + 6) + ":";
-				ImGui::Text(enchstep.c_str());
-				ImGui::SameLine();
-				std::string ratio = GetRatio(m_enchantStats[i][0], m_enchantStats[i][1]);
-				ImGui::Text(ratio.c_str());
-			}
-			else
-			{
-				std::string enchstep = "e" + std::to_string(i + 5) + ": ";
-				ImGui::Text(enchstep.c_str());
-				ImGui::SameLine();
-				ImGui::Text(std::to_string(m_enchantStats[i][0]).c_str());
-			}
-		}
-	}
-	ImGui::EndGroupPanel();
-	ImGui::SameLine();
-	
+						  	
 	int current_idx = 0;
 	ImGui::BeginGroupPanel("Current Enchants", ImVec2(140, 100));
 	{
@@ -388,28 +365,40 @@ void EnchantBot::DrawSettings()
 	ImGui::EndGroupPanel();
 	ImGui::SameLine();	   
 	ImGui::BeginGroup();
-	{
-		ImGui::BeginGroupPanel("Notifications", ImVec2(200, 100));
-		{
-			ImGui::Checkbox("Play sound", &m_notify_sound);
-			ImGui::Checkbox("Show Popup", &m_notify_messagebox);
-		}
-		ImGui::EndGroupPanel();
-
+	{		
 		// use e1 prots for e6 and e7
 		ImGui::Checkbox("Optimise Enchants", &m_optimiseEnchanting);
 		ImGui::Checkbox("Use Chance Cards", &m_withLuckyCard);
-		ImGui::Checkbox("Automatic Enchanting", &m_auto_enchant);
-
-		if (m_currentEnchantItemUID != 0)
+		ImGui::Checkbox("Automatic Enchanting", &m_auto_enchant); 	
+		if (ImGui::Button("Enchant"))
 		{
-			if (ImGui::Button("Enchant"))
+			if (m_state == EnchantBotState::STANDBY && EnchantCheckTimeReady()) {
+				SetEnchantBotState(EnchantBotState::ENCHANT_SINGLE);
+			}
+		} 	
+		ImGui::Dummy(ImVec2(0, 10));
+		ImGui::BeginGroupPanel("Run View", ImVec2(200, 100));
+		{
+			for (int i = 0; i < 6; i++)
 			{
-				if (m_state == EnchantBotState::STANDBY && EnchantCheckTimeReady()) {
-					SetEnchantBotState(EnchantBotState::ENCHANT_SINGLE);
+				if (i != 5)
+				{
+					std::string enchstep = "e" + std::to_string(i + 5) + "-" + std::to_string(i + 6) + ":";
+					ImGui::Text(enchstep.c_str());
+					ImGui::SameLine();
+					std::string ratio = GetRatio(m_enchantStats[i][0], m_enchantStats[i][1]);
+					ImGui::Text(ratio.c_str());
+				}
+				else
+				{
+					std::string enchstep = "e" + std::to_string(i + 5) + ": ";
+					ImGui::Text(enchstep.c_str());
+					ImGui::SameLine();
+					ImGui::Text(std::to_string(m_enchantStats[i][0]).c_str());
 				}
 			}
 		}
+		ImGui::EndGroupPanel();
 	}
 	ImGui::EndGroup();		
 }
@@ -779,18 +768,18 @@ void EnchantBot::Notify(NotifyType type)
 	switch (type)
 	{
 	case NotifyType::MISSING_ITEM:
-		if (m_notify_sound) {
+		if (m_buddy->NotificationSoundAllowed()) {
 			MessageBeep(MB_ICONWARNING);
 		}
-		if (m_notify_messagebox) {
+		if (m_buddy->NotificationPopupAllowed()) {
 			MessageBox(0, "Missing items for enchant!", "EnchantBot", MB_SYSTEMMODAL);
 		} 		
 		break;
 	case NotifyType::ENCHANTING_FINISHED:
-		if (m_notify_sound) {
+		if (m_buddy->NotificationSoundAllowed()) {
 			MessageBeep(MB_OK);
 		}
-		if (m_notify_messagebox) {
+		if (m_buddy->NotificationPopupAllowed()) {
 			MessageBox(0, "Enchanting successfully finished", "EnchantBot", MB_SYSTEMMODAL);
 		}
 		break;

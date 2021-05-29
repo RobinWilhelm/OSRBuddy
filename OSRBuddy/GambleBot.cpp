@@ -27,9 +27,6 @@ GambleBot::GambleBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_gamble_check_time = 0.0f;			
 	m_internal_action_check_time = 0.0f;	
 
-	m_notfiy_sound = false;
-	m_notfiy_popup = false;
-
 	ZeroMemory(&m_suffix_selection, sizeof(FixSelection));
 	ZeroMemory(&m_prefix_selection, sizeof(FixSelection));
 }
@@ -201,13 +198,7 @@ void GambleBot::RenderImGui()
 				}
 			}
 		}
-		ImGui::EndGroupPanel();
-		ImGui::BeginGroupPanel("Notifications", ImVec2(200, 0));
-		{
-			ImGui::Checkbox("Play sound", &m_notfiy_sound);
-			ImGui::Checkbox("Messagebox", &m_notfiy_popup);
-		}
-		ImGui::EndGroupPanel();
+		ImGui::EndGroupPanel();	
 	}
 	ImGui::EndGroup();
 }
@@ -819,11 +810,11 @@ CItemInfo* GambleBot::FindGambleItemFromInventory(GambleItem gambleitemkind)
 
 void GambleBot::Notify()
 {
-	if (m_notfiy_sound) {
+	if (m_buddy->NotificationSoundAllowed()) {
 		MessageBeep(MB_OK);
 	}
 	
-	if (m_notfiy_popup) {
+	if (m_buddy->NotificationPopupAllowed()) {
 		MessageBox(0, "Fix has been found!", "GambleBot", MB_SYSTEMMODAL);
 	}	
 }

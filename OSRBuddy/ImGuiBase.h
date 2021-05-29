@@ -30,6 +30,7 @@ protected:
 
 	void Render(IDirect3DDevice9* device);
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);	 
+
 	 
 	void LoadStandardTheme();
 	void LoadClassicSteamTheme();

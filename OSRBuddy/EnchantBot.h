@@ -112,8 +112,6 @@ private:
 	EnchantListType			m_currentEnchants;
 	EnchantListType			m_wantedEnchants;
 
-	bool					m_notify_sound;
-	bool					m_notify_messagebox;
 	int						m_preEnch;
 	int                     m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} }; 
 };

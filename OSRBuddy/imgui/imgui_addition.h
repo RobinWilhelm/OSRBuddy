@@ -7,12 +7,17 @@
 #include <OSRBuddyDefine.h>
 
 static ImVector<ImRect> s_GroupPanelLabelStack;
-
+static bool s_disabled;
 
 
 
 namespace ImGui 
 {
+
+    void BeginDisabledMode(bool disabled);
+    void EndDisabledMode();
+
+
     //https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#arrays
     bool EnchantList(const char* label, int* currIndex, EnchantListType& values, int heightInItems = -1);
 

@@ -830,201 +830,246 @@ void KitBuffBot::Tick()
 void KitBuffBot::RenderImGui()
 {   
     DrawEnableCheckBox();   
-    ImGui::BeginGroupPanel("Kits");
-    {  
-        const char* items[] = { "Rage", "Humanized", "Sleepy" };
-        ImGui::ComboEx("Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
-        ImGui::Dummy(ImVec2(0, 5));
+    ImGui::NewLine();
+    ImGui::BeginColumns(NULL, 2);
+    {
+        ImGui::BeginChild("KitBot_Items", ImVec2(0,0), false);    
+        {
+            ImGui::Separator();
+            ImGui::Text("AutoKits");
+            ImGui::Separator();
 
-        ImGui::BeginGroupPanel("Shield", ImVec2(100, 200));
-        {
-            if (ImGui::Checkbox("S Type", &m_settings.use_shield_type_s))
-            {
-                if (m_settings.use_shield_type_s)
-                {
-                    m_settings.use_shield_type_a = true;
-                    m_settings.use_shield_type_b = true;
-                    m_settings.use_shield_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("A Type", &m_settings.use_shield_type_a))
-            {
-                if (m_settings.use_shield_type_a)
-                {
-                    m_settings.use_shield_type_b = true;
-                    m_settings.use_shield_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("B Type", &m_settings.use_shield_type_b))
-            {
-                if (m_settings.use_shield_type_b) {
-                    m_settings.use_shield_type_c = true;
-                }
-            }
-            ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
-        }
-        ImGui::EndGroupPanel();
-        ImGui::SameLine();
-        ImGui::BeginGroupPanel("Energy", ImVec2(100, 200));
-        {
-            if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
-            {
-                if (m_settings.use_energy_type_s)
-                {
-                    m_settings.use_energy_type_a = true;
-                    m_settings.use_energy_type_b = true;
-                    m_settings.use_energy_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("A Type##", &m_settings.use_energy_type_a))
-            {
-                if (m_settings.use_energy_type_a)
-                {
-                    m_settings.use_energy_type_b = true;
-                    m_settings.use_energy_type_c = true;
-                }
-            }
-            if (ImGui::Checkbox("B Type##", &m_settings.use_energy_type_b))
-            {
-                if (m_settings.use_energy_type_b) {
-                    m_settings.use_energy_type_c = true;
-                }
-            }
-            ImGui::Checkbox("C Type##", &m_settings.use_energy_type_c);
-        }
-        ImGui::EndGroupPanel();
-        ImGui::SameLine();
-        ImGui::BeginGroupPanel("Other");
-        {
-            ImGui::Checkbox("Ammo", &m_settings.use_ammobox);
-            ImGui::Checkbox("Fuel", &m_settings.use_fuel);
-        }
-        ImGui::EndGroupPanel();
-        ImGui::BeginGroupPanel("Skillpoints", ImVec2(100, 200));
-        {
-            ImGui::Checkbox("A Type##atypespkit_chkb", &m_settings.use_spkit_type_a);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(200);
-            ImGui::SliderInt("%##spkit_a_slider", &m_settings.spkit_type_a_percentage, 0, 99);
-            ImGui::PopItemWidth();
+            const char* items[] = { "Rage", "Humanized", "Sleepy" };
+            ImGui::ComboEx("Kit Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
+            ImGui::Dummy(ImVec2(0, 5));
 
-            ImGui::Checkbox("B Type##btypespkit_chkb", &m_settings.use_spkit_type_b);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(200);
-            ImGui::SliderInt("%##spkit_b_slider", &m_settings.spkit_type_b_percentage, 0, 99);
-            ImGui::PopItemWidth();
-
-            ImGui::Checkbox("C Type##ctypespkit_chkb", &m_settings.use_spkit_type_c);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(200);
-            ImGui::SliderInt("%##spkit_c_slider", &m_settings.spkit_type_c_percentage, 0, 99);     
-            ImGui::PopItemWidth();
-        }                         
-        ImGui::EndGroupPanel();    
-    }
-    ImGui::EndGroupPanel();
-    ImGui::SameLine();
-    ImGui::BeginGroupPanel("Buffs");
-    {   
-        //ImGui::EndGroupPanel();    
-        ImGui::BeginGroupPanel("Autobuffs", ImVec2(300, 0));
-        {
-            ImGui::BeginGroup();
-            for (auto skill : m_playerskills)
-            {
-                switch (skill->type)
-                {
-                case SkillType::Concentration:
-                case SkillType::Missile_Shot:
-                case SkillType::Fire_Shot:
-                case SkillType::Evasion_Up:
-                case::SkillType::Defense_Up:
-                    if (skill->final) {
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
-                    }
-                    if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
-                    {
-                        if (skill->autobuff) {
-                            AddAutoBuff(skill->type);
-                        }
-                        else {
-                            RemoveAutoBuff(skill->type);
-                        }
-                    }
-                    if (skill->final) {
-                        ImGui::PopStyleColor();
-                    }
-                }
-            }
-            ImGui::EndGroup();
-            ImGui::SameLine();
             ImGui::BeginGroup();
             {
-                for (auto skill : m_playerskills)
+               
+                ImGui::BeginColumns("ShieldEnergyColumns", 2, ImGuiColumnsFlags_NoResize);
+                {                       
+                    ImGui::Text("Shield:");
+                }
+                ImGui::NextColumn();
                 {
-                    switch (skill->type)
+                    ImGui::Text("Energy:");
+                    ImGui::Separator();
+                }
+                ImGui::NextColumn();
+                {
+                    if (ImGui::Checkbox("S Type", &m_settings.use_shield_type_s))
                     {
-                    case SkillType::Frenzy:
-                    case SkillType::Smart_SP:
-                    case SkillType::Reduce_Damage:
-                    case SkillType::Elevation:
-                    case SkillType::Raging_Defense:
-                    case SkillType::Raging_Evasion:
-                    case SkillType::Raging_Fire:
-                        if (skill->final) {
-                            ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
-                        }
-                        if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                        if (m_settings.use_shield_type_s)
                         {
-                            if (skill->autobuff) {
-                                AddAutoBuff(skill->type);
-                            }
-                            else {
-                                RemoveAutoBuff(skill->type);
-                            }
+                            m_settings.use_shield_type_a = true;
+                            m_settings.use_shield_type_b = true;
+                            m_settings.use_shield_type_c = true;
                         }
-                        if (skill->final) {
-                            ImGui::PopStyleColor();
+                    }
+                    if (ImGui::Checkbox("A Type", &m_settings.use_shield_type_a))
+                    {
+                        if (m_settings.use_shield_type_a)
+                        {
+                            m_settings.use_shield_type_b = true;
+                            m_settings.use_shield_type_c = true;
+                        }
+                    }
+                    if (ImGui::Checkbox("B Type", &m_settings.use_shield_type_b))
+                    {
+                        if (m_settings.use_shield_type_b) {
+                            m_settings.use_shield_type_c = true;
+                        }
+                    }
+                    ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
+                }
+                ImGui::NextColumn();
+                {
+                    if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
+                    {
+                        if (m_settings.use_energy_type_s)
+                        {
+                            m_settings.use_energy_type_a = true;
+                            m_settings.use_energy_type_b = true;
+                            m_settings.use_energy_type_c = true;
+                        }
+                    }
+                    if (ImGui::Checkbox("A Type##", &m_settings.use_energy_type_a))
+                    {
+                        if (m_settings.use_energy_type_a)
+                        {
+                            m_settings.use_energy_type_b = true;
+                            m_settings.use_energy_type_c = true;
+                        }
+                    }
+                    if (ImGui::Checkbox("B Type##", &m_settings.use_energy_type_b))
+                    {
+                        if (m_settings.use_energy_type_b) {
+                            m_settings.use_energy_type_c = true;
+                        }
+                    }
+                    ImGui::Checkbox("C Type##", &m_settings.use_energy_type_c);
+                }
+                ImGui::EndColumns();
+            }
+            ImGui::EndGroup();
+            ImGui::NewLine();     
+            ImGui::BeginGroup();
+            {
+                ImGui::Text("Skillpoints:");
+                ImGui::Separator();
+                ImGui::BeginColumns("SkillpointColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+                {
+                    ImGui::SetColumnWidth(0, 100);
+                    ImGui::Checkbox("A Type##atypespkit_chkb", &m_settings.use_spkit_type_a);
+                    ImGui::Checkbox("B Type##btypespkit_chkb", &m_settings.use_spkit_type_b);
+                    ImGui::Checkbox("C Type##ctypespkit_chkb", &m_settings.use_spkit_type_c);
+                }
+                ImGui::NextColumn();
+                {                      
+                    ImGui::PushItemWidth(200);
+                    ImGui::SliderInt("%##spkit_a_slider", &m_settings.spkit_type_a_percentage, 0, 99);
+                    ImGui::SliderInt("%##spkit_b_slider", &m_settings.spkit_type_b_percentage, 0, 99);
+                    ImGui::SliderInt("%##spkit_c_slider", &m_settings.spkit_type_c_percentage, 0, 99);
+                    ImGui::PopItemWidth();
+                }
+                ImGui::EndColumns();
+            }
+            ImGui::EndGroup();
+         
+            ImGui::NewLine();
+            ImGui::Separator();
+            ImGui::Text("Others");
+            ImGui::Separator();
+            ImGui::BeginColumns("OthersColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+            {
+                ImGui::Checkbox("Ammunition Box", &m_settings.use_ammobox);
+                ImGui::Checkbox("Fuel Kit", &m_settings.use_fuel);
+            }
+            ImGui::NextColumn();
+            {
+                ImGui::Checkbox("Stealthcard", &m_settings.use_stealthcard);
+                ImGui::Checkbox("Rabbit Necklace", &m_settings.use_rabbitnecklace);
+            }
+        }
+        ImGui::EndChild();
+        ImGui::NextColumn();
+        ImGui::BeginChild("KitBot_Buffs", ImVec2(0, 0), false);          
+        {
+            //ImGui::BeginChild("Autobuffs", ImVec2(0, 400), true);
+            ImGui::BeginGroup();
+            {
+                ImGui::Separator();
+                ImGui::Text("AutoBuffs");
+                ImGui::Separator(); 
+
+                ImGui::BeginColumns("AutobuffsColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder); // general buffs
+                {
+                    for (auto skill : m_playerskills)
+                    {
+                        switch (skill->type)
+                        {
+                        case SkillType::Concentration:
+                        case SkillType::Missile_Shot:
+                        case SkillType::Fire_Shot:
+                        case SkillType::Evasion_Up:
+                        case::SkillType::Defense_Up:
+                            if (skill->final) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
+                            }
+                            if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                            {
+                                if (skill->autobuff) {
+                                    AddAutoBuff(skill->type);
+                                }
+                                else {
+                                    RemoveAutoBuff(skill->type);
+                                }
+                            }
+                            if (skill->final) {
+                                ImGui::PopStyleColor();
+                            }
                         }
                     }
                 }
+                ImGui::NextColumn(); // special buffs
+                {
+                    for (auto skill : m_playerskills)
+                    {
+                        switch (skill->type)
+                        {
+                        case SkillType::Frenzy:
+                        case SkillType::Smart_SP:
+                        case SkillType::Reduce_Damage:
+                        case SkillType::Elevation:
+                        case SkillType::Raging_Defense:
+                        case SkillType::Raging_Evasion:
+                        case SkillType::Raging_Fire:
+                            if (skill->final) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0x00, 0xFF, 0xFF).Value);
+                            }
+                            if (ImGui::Checkbox(skill->clean_name.c_str(), &skill->autobuff))
+                            {
+                                if (skill->autobuff) {
+                                    AddAutoBuff(skill->type);
+                                }
+                                else {
+                                    RemoveAutoBuff(skill->type);
+                                }
+                            }
+                            if (skill->final) {
+                                ImGui::PopStyleColor();
+                            }
+                        }
+                    }
+                }
+                ImGui::EndColumns();
+            }
+            ImGui::EndGroup();
+            ImGui::NewLine();
+            ImGui::BeginGroup();
+            {
+                ImGui::Separator();
+                ImGui::Text("Autohealings");
+                ImGui::Separator();
+                
+                bool ismgear = OSR_API->GetPlayerGearType() != GearType::MGear;
+                ImGui::BeginDisabledMode(ismgear);
+                {                       
+                    ImGui::Text("Field: \t");
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Shield", &m_settings.field_repair_active);
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Energy", &m_settings.field_healings_active);
+
+                    ImGui::Text("Target:\t");
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Shield##targetShield", &m_settings.target_repair_active);
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_healings_active);
+
+                    ImGui::NewLine();
+
+                    ImGui::Text("Target Priorities:");
+                    ImGui::Separator();
+                    ImGui::BeginColumns("TargetPrioritysColumns", 2, ImGuiColumnsFlags_NoResize);
+                    { 
+                        ImGui::Checkbox(OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterName, &m_settings.target_heal_prio_myself);
+                        ImGui::NextColumn();
+                        for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
+                        {
+                            ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
+                            ImGui::NextColumn();
+                        }                                  
+                    }
+                    ImGui::EndColumns();
+                }
+                ImGui::EndDisabledMode();                  
             }
             ImGui::EndGroup();
         }
-        ImGui::EndGroupPanel(); 
-        ImGui::BeginGroupPanel("Autohealings");
-        { 
-            if (OSR_API->GetPlayerGearType() != GearType::MGear) {
-                ImGui::Text("Only available for MG!");
-            }
-            else
-            {
-                ImGui::Text("Field: \t");
-                ImGui::SameLine();
-                ImGui::Checkbox("Shield", &m_settings.field_repair_active);
-                ImGui::SameLine();
-                ImGui::Checkbox("Energy", &m_settings.field_healings_active);
-                             
-                ImGui::Text("Target:\t");
-                ImGui::SameLine();
-                ImGui::Checkbox("Shield##targetShield", &m_settings.target_repair_active);
-                ImGui::SameLine();
-                ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_healings_active);
-
-                ImGui::NewLine();
-                ImGui::BeginGroupPanel("Priority Healing", ImVec2(290, 400));
-                {
-                    ImGui::Checkbox(OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterName, &m_settings.target_heal_prio_myself);
-                    for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo) {
-                        ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
-                    }
-                }
-                ImGui::EndGroupPanel();
-            }             
-        }
-        ImGui::EndGroupPanel();
+        ImGui::EndChild();
     }
-    ImGui::EndGroupPanel();
+    ImGui::EndColumns();
 }
 
 const char* KitBuffBot::GetName() const

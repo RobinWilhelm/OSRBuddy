@@ -17,6 +17,26 @@ static auto vector_getter = [](void* vec, int idx, const char** out_text)
 };
 
 
+void ImGui::BeginDisabledMode(bool disabled)
+{    
+    s_disabled = disabled;
+    if (s_disabled)
+    {
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+    }
+}
+
+void ImGui::EndDisabledMode()
+{   
+    if (s_disabled)
+    {
+        ImGui::PopItemFlag();
+        ImGui::PopStyleVar();
+        s_disabled = false;
+    }
+}
+
 bool ImGui::EnchantList(const char* label, int* currIndex, EnchantListType& values, int heightInItems)
 {       
     if (values.empty()) { return false; }
@@ -30,7 +50,8 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
     ImGui::BeginGroup();
 
     auto cursorPos = ImGui::GetCursorScreenPos();
-    auto itemSpacing = ImGui::GetStyle().ItemSpacing;
+    auto itemSpacing = ImGui::GetStyle().ItemSpacing;               
+   
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 
@@ -73,7 +94,7 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
     ImGui::PushItemWidth(ImMax(0.0f, itemWidth - frameHeight));
 
     s_GroupPanelLabelStack.push_back(ImRect(labelMin, labelMax));
-    ImGui::Dummy(ImVec2(0, 2.0f));
+    ImGui::Dummy(ImVec2(0, 2.0f));      
 }
 
 

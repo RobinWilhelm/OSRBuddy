@@ -13,76 +13,6 @@
 #include "PatternManager.h"
 #include "Windowsx.h"  // get_x_lpraram && get_y_lparam
 
-/*
-#define T0_FC_CHARACTER				0x32
-#define T0_FC_TIMER					0x44
-
-#define T1_FC_CHARACTER_CHANGE_CURRENTHPDPSPEP		0x1F
-#define T1_FC_CHARACTER_CHANGE_CURRENTHP			0x20
-#define T1_FC_CHARACTER_CHANGE_CURRENTDP			0x21
-#define T1_FC_CHARACTER_CHANGE_CURRENTSP			0x22
-#define T1_FC_CHARACTER_CHANGE_CURRENTEP			0x23
-#define T1_FC_CHARACTER_CHANGE_HPDPSPEP				0x35
-#define T1_FC_TIMER_START_TIMER					    0x00
-
-
-#define T_FC_TIMER_START_TIMER					(MessageType_t)((T0_FC_TIMER<<8)|T1_FC_TIMER_START_TIMER)
-
-#define T_FC_CHARACTER_CHANGE_HPDPSPEP			(MessageType_t)((T0_FC_CHARACTER<<8)|T1_FC_CHARACTER_CHANGE_HPDPSPEP)
-#define T_FC_CHARACTER_CHANGE_CURRENTHPDPSPEP	(MessageType_t)((T0_FC_CHARACTER<<8)|T1_FC_CHARACTER_CHANGE_CURRENTHPDPSPEP)
-#define T_FC_CHARACTER_CHANGE_CURRENTHP			(MessageType_t)((T0_FC_CHARACTER<<8)|T1_FC_CHARACTER_CHANGE_CURRENTHP)
-#define T_FC_CHARACTER_CHANGE_CURRENTDP			(MessageType_t)((T0_FC_CHARACTER<<8)|T1_FC_CHARACTER_CHANGE_CURRENTDP)
-#define T_FC_CHARACTER_CHANGE_CURRENTSP			(MessageType_t)((T0_FC_CHARACTER<<8)|T1_FC_CHARACTER_CHANGE_CURRENTSP)
-#define T_FC_CHARACTER_CHANGE_CURRENTEP			(MessageType_t)((T0_FC_CHARACTER<<8)|T1_FC_CHARACTER_CHANGE_CURRENTEP)
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    float	CurrentHP;
-    float	CurrentDP;
-    SHORT	CurrentSP;
-    float	CurrentEP;
-} MSG_FC_CHARACTER_CHANGE_CURRENTHPDPSPEP;
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    SHORT	HP;
-    SHORT	DP;
-    SHORT	SP;
-    SHORT	EP;
-    float	CurrentHP;
-    float	CurrentDP;
-    SHORT	CurrentSP;
-    float	CurrentEP;
-} MSG_FC_CHARACTER_CHANGE_HPDPSPEP;
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    float			CurrentHP;
-} MSG_FC_CHARACTER_CHANGE_CURRENTHP;
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    float			CurrentDP;
-} MSG_FC_CHARACTER_CHANGE_CURRENTDP;
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    SHORT			CurrentSP;
-} MSG_FC_CHARACTER_CHANGE_CURRENTSP;
-
-
-
-typedef struct
-{
-    MEX_TIMER_EVENT		TimerEvent;
-} MSG_FC_TIMER_START_TIMER;
-
-*/
 
 OSRBuddyMain* g_osrbuddy = nullptr;  // for the static hook methods
 
@@ -227,7 +157,7 @@ bool OSRBuddyMain::Start()
         RegisterFeature(new GambleBot(this));
         RegisterFeature(new EnchantBot(this));
         //RegisterFeature(new AntiMTRandBot(this));
-        RegisterFeature(new TestItemUse(this));
+        //RegisterFeature(new TestItemUse(this));
 
         if (!InitTickHook()) {
             throw exception("TickHook failed to initialise");

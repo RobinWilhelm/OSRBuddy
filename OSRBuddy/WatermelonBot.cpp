@@ -8,104 +8,7 @@
 #define TARGET_LOCK_THRESHOLD    45.0f
 #define TARGETING_SPEED 1.0f
 #define INVENTORY_CLEAN_ACTION_MIN_TIME 2000
-
-/*
-#define SKILL_STATE_READY			0
-#define SKILL_STATE_WAITING_PREPARE	1
-#define SKILL_STATE_PREPARE			2
-#define SKILL_STATE_WAITING			3
-#define SKILL_STATE_USING			4
-#define SKILL_STATE_WAIT_REATTACK	5
-#define SKILL_STATE_RELEASE			6
-
-#define T0_FC_SKILL					0x41
-#define T0_FC_MONSTER				0x3A
-
-#define T1_FC_MONSTER_CHANGE_HP							0x05
-
-// FC_SKILL
-#define T1_FC_SKILL_USE_SKILLPOINT			0x00
-#define T1_FC_SKILL_USE_SKILLPOINT_OK		0x01
-#define T1_FC_SKILL_SETUP_SKILL				0x02
-#define T1_FC_SKILL_SETUP_SKILL_OK_HEADER	0x03
-#define T1_FC_SKILL_SETUP_SKILL_OK			0x04
-#define T1_FC_SKILL_SETUP_SKILL_OK_DONE		0x05
-#define T1_FC_SKILL_USE_SKILL				0x06
-#define T1_FC_SKILL_USE_SKILL_OK			0x07
-#define T1_FC_SKILL_CANCEL_SKILL			0x08
-#define T1_FC_SKILL_INVALIDATE_SKILL		0x09
-#define T1_FC_SKILL_PREPARE_USE				0x0A
-#define T1_FC_SKILL_PREPARE_USE_OK			0x0B
-#define T1_FC_SKILL_CANCEL_PREPARE			0x0C
-#define T1_FC_SKILL_CANCEL_PREPARE_OK		0x0D
-#define T1_FC_SKILL_CONFIRM_USE				0x0F		// 2005-12-02 by cmkwon, C->F, F->C
-#define T1_FC_SKILL_CONFIRM_USE_ACK			0x10		// 2005-12-02 by cmkwon, C->F, F->C
-#define T1_FC_SKILL_CANCEL_SKILL_OK			0x11		// 2006-11-28 by dhjin, F->C
-
-// FN_SKILL
-#define T1_FN_SKILL_USE_SKILL				0x00
-#define T1_FN_SKILL_USE_SKILL_OK			0x01
-
-#define T_FC_MONSTER_CHANGE_HP						(MessageType_t)((T0_FC_MONSTER<<8)|T1_FC_MONSTER_CHANGE_HP)
-
-#define T_FC_SKILL_USE_SKILLPOINT				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILLPOINT)
-#define T_FC_SKILL_USE_SKILLPOINT_OK			(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILLPOINT_OK)
-#define T_FC_SKILL_SETUP_SKILL					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL)
-#define T_FC_SKILL_SETUP_SKILL_OK_HEADER		(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL_OK_HEADER)
-#define T_FC_SKILL_SETUP_SKILL_OK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL_OK)
-#define T_FC_SKILL_SETUP_SKILL_OK_DONE			(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_SETUP_SKILL_OK_DONE)
-#define T_FC_SKILL_USE_SKILL					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILL)
-#define T_FC_SKILL_USE_SKILL_OK					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_USE_SKILL_OK)
-#define T_FC_SKILL_CANCEL_SKILL					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_SKILL)
-#define T_FC_SKILL_CANCEL_SKILL_OK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_SKILL_OK)
-#define T_FC_SKILL_INVALIDATE_SKILL				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_INVALIDATE_SKILL)
-#define T_FC_SKILL_PREPARE_USE					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_PREPARE_USE)
-#define T_FC_SKILL_PREPARE_USE_OK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_PREPARE_USE_OK)
-#define T_FC_SKILL_CANCEL_PREPARE				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_PREPARE)
-#define T_FC_SKILL_CANCEL_PREPARE_OK			(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CANCEL_PREPARE_OK)
-#define T_FC_SKILL_CONFIRM_USE					(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CONFIRM_USE)		// 2005-12-02 by cmkwon, C->F, F->C
-#define T_FC_SKILL_CONFIRM_USE_ACK				(MessageType_t)((T0_FC_SKILL<<8)|T1_FC_SKILL_CONFIRM_USE_ACK)	// 2005-12-02 by cmkwon, C->F, F->C
-
-#define T_FN_SKILL_USE_SKILL					(MessageType_t)((T0_FN_SKILL<<8)|T1_FN_SKILL_USE_SKILL)
-#define T_FN_SKILL_USE_SKILL_OK					(MessageType_t)((T0_FN_SKILL<<8)|T1_FN_SKILL_USE_SKILL_OK)
-
-
-
-typedef struct
-{
-    ClientIndex_t	ClientIndex;
-    ItemID_t		SkillItemID;
-    INT				AttackSkillItemNum0;	// 2006-12-12 by cmkwon, 현재 스킬을 종료되게 하는 공격스킬 아이템넘버
-} MSG_FC_SKILL_CANCEL_SKILL_OK;
-
-typedef struct
-{
-    ItemID_t		SkillItemID;
-    ClientIndex_t	AttackIndex;
-    ClientIndex_t	TargetIndex;	// target이 없는 skill인 경우 0
-    ATUM_DATE_TIME	UseTime;		// 2006-11-17 by dhjin, 2차 스킬 사용 시간
-//	BOOL			UseSkillTimeOk;	// 2006-11-17 by dhjin, 0 -> 2차 스킬 사용 대기 시간, 1 -> 2차 스킬 사용할 수 있다.
-} MSG_FC_SKILL_USE_SKILL_OK;
-
-typedef struct
-{
-    BYTE		ItemUpdateType;		// IUT_SHOP, IUT_LOADING, IUT_SKILL
-    ITEM_SKILL	ItemSkill;
-} MSG_FC_SKILL_SETUP_SKILL_OK;
-
-typedef struct
-{
-    ClientIndex_t	MonsterIndex;
-    INT				CurrentHP;
-} MSG_FC_MONSTER_CHANGE_HP;					// F -> C, 몬스터의 현재 HP를 전송함
-
-typedef struct
-{
-    ItemID_t		SkillItemID;
-    ClientIndex_t	ClientIndex;
-} MSG_FC_SKILL_INVALIDATE_SKILL;	//
-*/
-
+  
 WatermelonBot::WatermelonBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
     m_current_state = WatermelonBot::State::WAITING;
@@ -149,10 +52,11 @@ void WatermelonBot::Tick()
             OSR_API->SetTarget(m_target);
             m_on_target = false;
             m_get_new_target = false;
-        }
+        }  
         else
         {
-            m_target = nullptr;
+            OSR_API->UsePrimaryWeapon(false);
+            OSR_API->UseSecondaryWeapon(false);
         }
     }  
  
@@ -266,28 +170,26 @@ void WatermelonBot::RenderImGui()
     ImGui::Dummy(ImVec2(5, 0));
 
     ImGui::BeginGroupPanel("Settings", ImVec2(400, 400));
-
-    ImGui::Checkbox("Shoot Watermelon Tanks", &m_shoot_watermelon_tanks);
-    ImGui::Checkbox("Shoot Watermelon Z", &m_shoot_watermelon_z);
-    ImGui::NewLine();
-    ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
-
-    ImGui::Dummy(ImVec2(5, 0));
+    {
+        ImGui::Checkbox("Shoot Watermelon Tanks", &m_shoot_watermelon_tanks);
+        ImGui::Checkbox("Shoot Watermelon Z", &m_shoot_watermelon_z);
+        ImGui::NewLine();
+        ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
+        ImGui::Dummy(ImVec2(5, 0));
+    }
     ImGui::EndGroupPanel();
-
     ImGui::BeginGroupPanel("Statistics", ImVec2(400, 400));
-    std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
-    ImGui::Text(grindtime.c_str());
-
-    ImGui::Text("Watermelon Tanks killed:");
-    ImGui::SameLine();
-    ImGui::Text(std::to_string(m_killed_watermelon_tanks).c_str());
-
-    ImGui::Text("Watermelon Z killed:");
-    ImGui::SameLine();
-    ImGui::Text(std::to_string(m_killed_watermelon_z).c_str());
-
-    ImGui::Dummy(ImVec2(5, 0));
+    {
+        std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
+        ImGui::Text(grindtime.c_str()); 
+        ImGui::Text("Watermelon Tanks killed:");
+        ImGui::SameLine();
+        ImGui::Text(std::to_string(m_killed_watermelon_tanks).c_str()); 
+        ImGui::Text("Watermelon Z killed:");
+        ImGui::SameLine();
+        ImGui::Text(std::to_string(m_killed_watermelon_z).c_str());
+        ImGui::Dummy(ImVec2(5, 0));
+    }
     ImGui::EndGroupPanel();
 }
 

@@ -10,61 +10,71 @@
 
 void OSRImGuiMenu::Render()
 {      
-    ImGui::Begin("OSRBuddy", &m_isOpen);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(700, 500));
+    ImGui::Begin("OSRBuddy", &m_isOpen,ImGuiWindowFlags_NoResize);
 
     if (ImGui::Button("Unload")) {
         m_osrbuddy->InitiateAppShutdown();
     }
       
     ImGui::BeginTabBar("Features", ImGuiTabBarFlags_::ImGuiTabBarFlags_None);
-    if (ImGui::BeginTabItem("Settings"))
-    {    
-        ImGui::BeginChild("SettingsTab", ImVec2(), true);
-        ImGui::Columns(2, NULL, true);
-        ImGui::Checkbox("Block input when menu is open", &m_blockInput);
-        
-        ImGui::NextColumn();
-        ImGui::Text("UI Themes");
-
-        if (ImGui::Button("ImGui Standard"))
-        {
-            LoadStandardTheme();
-        }
-        if (ImGui::Button("Classic Steam"))
-        {
-            LoadClassicSteamTheme();
-        }
-
-        if (ImGui::Button("Corporate Grey"))
-        {
-            LoadCorporateGreyTheme();
-        }
-        ImGui::NextColumn();
-        ImGui::EndChild();
-        ImGui::EndTabItem();
-    } 
-
-    for (auto& feature : m_osrbuddy->GetAllFeatures())
     {
+        if (ImGui::BeginTabItem("Settings"))
+        {           
+            ImGui::BeginColumns("SettingsColumns", 2);
+            {
+                ImGui::BeginChild("SettingsTabCol1", ImVec2(), false);
+                {
+                    ImGui::Separator();
+                    ImGui::Text("Menu Settings");
+                    ImGui::Separator();
 
-        std::string tabname = feature->GetName();
-        if (ImGui::BeginTabItem(tabname.c_str()))
-        {
-            feature->RenderImGui();
+                    ImGui::Checkbox("Block input when menu is open", &m_blockInput);
+                    ImGui::NewLine();
+
+                    ImGui::Separator();
+                    ImGui::Text("Allow Notifications");
+                    ImGui::Separator();
+
+                    ImGui::Checkbox("Sound", &m_osrbuddy->m_allow_notify_sounds);
+                    ImGui::Checkbox("Messagebox", &m_osrbuddy->m_allow_notify_popups);
+                }  
+                ImGui::EndChild();
+            }
+            ImGui::NextColumn();
+            {
+                ImGui::BeginChild("SettingsTabCol2", ImVec2(), false);
+                {
+                    ImGui::Separator();
+                    ImGui::Text("UI Themes");
+                    ImGui::Separator();
+                    if (ImGui::Button("ImGui Standard")) {
+                        LoadStandardTheme();
+                    }
+                    if (ImGui::Button("Classic Steam")) {
+                        LoadClassicSteamTheme();
+                    }
+                }
+                ImGui::EndChild();
+            }
+            ImGui::EndColumns();
+  
             ImGui::EndTabItem();
         }
 
-
-        /*
-        if (ImGui::CollapsingHeader(feature->GetName(), ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_OpenOnArrow))
-        {  
-            feature->RenderImGui();
+        for (auto& feature : m_osrbuddy->GetAllFeatures())
+        {
+            std::string tabname = feature->GetName();
+            if (ImGui::BeginTabItem(tabname.c_str()))
+            {   
+                feature->RenderImGui();
+                ImGui::EndTabItem();
+            }
         }
-        */
-    } 
-
+    }
     ImGui::EndTabBar(); 
     ImGui::End();
+    ImGui::PopStyleVar(1);
 }
  
 ImColor OSRImGuiMenu::TranslateAceCharToColor(char color)

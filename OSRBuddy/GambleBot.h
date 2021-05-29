@@ -130,10 +130,7 @@ private:
 	int						m_amount_SG_STD_Suffix;
 	int						m_amount_removal_Prefix;
 	int						m_amount_removal_Suffix;	   
-	
-	bool					m_notfiy_sound;
-	bool					m_notfiy_popup;
-
+											
 	FixSelection			m_suffix_selection;
 	FixSelection			m_prefix_selection;		
 };

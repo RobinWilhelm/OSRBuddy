@@ -53,6 +53,9 @@ public:
 
 	// get the current cursor position
 	bool GetCursorPosition(LPPOINT pos);
+
+	bool NotificationSoundAllowed() { return m_allow_notify_sounds; };
+	bool NotificationPopupAllowed() { return m_allow_notify_popups; };
 	
 private:
 	// Geerbt über D3DInternalBase
@@ -124,4 +127,7 @@ private:
 
 	std::chrono::microseconds m_lastTick;
 	std::chrono::microseconds m_tickTime;
+
+	bool m_allow_notify_sounds;
+	bool m_allow_notify_popups;
 };
