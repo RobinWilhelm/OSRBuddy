@@ -1071,9 +1071,11 @@ void KitBuffBot::RenderImGui()
                         ImGui::NextColumn();
                         for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
                         {
-                            if (!partymember->m_bUserLogOn || partymember->m_pEnemyData->m_infoCharacter.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex()) {
+                            /*
+                            if (!partymember->m_bUserLogOn || !partymember->m_pEnemyData || partymember->m_pEnemyData->m_infoCharacter.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex()) {
                                 continue;
                             }
+                            */
 
                             ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
                             ImGui::NextColumn();
