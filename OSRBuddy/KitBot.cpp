@@ -831,7 +831,7 @@ void KitBuffBot::RenderImGui()
 {   
     DrawEnableCheckBox();   
     ImGui::NewLine();
-    ImGui::BeginColumns(NULL, 2);
+    ImGui::BeginColumns("KitBotColumns", 2);
     {
         ImGui::BeginChild("KitBot_Items", ImVec2(0,0), false);    
         {
@@ -844,15 +844,18 @@ void KitBuffBot::RenderImGui()
             ImGui::Dummy(ImVec2(0, 5));
 
             ImGui::BeginGroup();
-            {
-               
+            {                
                 ImGui::BeginColumns("ShieldEnergyColumns", 2, ImGuiColumnsFlags_NoResize);
-                {                       
+                {   
+                    ImGui::PushStyleColor(ImGuiCol_Text, SHIELDKIT_COLOR.Value);
                     ImGui::Text("Shield:");
+                    ImGui::PopStyleColor();
                 }
                 ImGui::NextColumn();
                 {
+                    ImGui::PushStyleColor(ImGuiCol_Text, ENERGYKIT_COLOR.Value);
                     ImGui::Text("Energy:");
+                    ImGui::PopStyleColor();
                     ImGui::Separator();
                 }
                 ImGui::NextColumn();
@@ -883,7 +886,7 @@ void KitBuffBot::RenderImGui()
                     ImGui::Checkbox("C Type", &m_settings.use_shield_type_c);
                 }
                 ImGui::NextColumn();
-                {
+                { 
                     if (ImGui::Checkbox("S Type##", &m_settings.use_energy_type_s))
                     {
                         if (m_settings.use_energy_type_s)
@@ -915,7 +918,9 @@ void KitBuffBot::RenderImGui()
             ImGui::NewLine();     
             ImGui::BeginGroup();
             {
+                ImGui::PushStyleColor(ImGuiCol_Text, SKILLPKIT_COLOR.Value);
                 ImGui::Text("Skillpoints:");
+                ImGui::PopStyleColor();
                 ImGui::Separator();
                 ImGui::BeginColumns("SkillpointColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
                 {
@@ -933,6 +938,7 @@ void KitBuffBot::RenderImGui()
                     ImGui::PopItemWidth();
                 }
                 ImGui::EndColumns();
+                
             }
             ImGui::EndGroup();
          
@@ -1037,15 +1043,23 @@ void KitBuffBot::RenderImGui()
                 {                       
                     ImGui::Text("Field: \t");
                     ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Text, SHIELDKIT_COLOR.Value);
                     ImGui::Checkbox("Shield", &m_settings.field_repair_active);
+                    ImGui::PopStyleColor();
                     ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Text, ENERGYKIT_COLOR.Value);
                     ImGui::Checkbox("Energy", &m_settings.field_healings_active);
+                    ImGui::PopStyleColor();
 
                     ImGui::Text("Target:\t");
                     ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Text, SHIELDKIT_COLOR.Value);
                     ImGui::Checkbox("Shield##targetShield", &m_settings.target_repair_active);
+                    ImGui::PopStyleColor();
                     ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Text, ENERGYKIT_COLOR.Value);
                     ImGui::Checkbox("Energy##targetEnergy", &m_settings.target_healings_active);
+                    ImGui::PopStyleColor();
 
                     ImGui::NewLine();
 
@@ -1057,6 +1071,10 @@ void KitBuffBot::RenderImGui()
                         ImGui::NextColumn();
                         for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
                         {
+                            if (!partymember->m_bUserLogOn || partymember->m_pEnemyData->m_infoCharacter.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex()) {
+                                continue;
+                            }
+
                             ImGui::Checkbox(partymember->m_ImPartyMemberInfo.CharacterName, (bool*)&partymember->m_bSpeakingAuth);
                             ImGui::NextColumn();
                         }                                  

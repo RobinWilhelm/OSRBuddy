@@ -140,57 +140,67 @@ void WatermelonBot::RenderImGui()
 {
     if (!DrawEnableCheckBox()) {
         //return;
-    }
+    } 
 
-    if (OSR_API->GetPlayerGearType() != GearType::AGear) {
-        ImGui::Text("Switch to an A-GEAR if you want to use the bot!");
-    }
+    ImGui::NewLine();
+    ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear || OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland);
+    {     
+        switch (m_current_state)
+        {
+        case WatermelonBot::State::WAITING:
+            ImGui::Text("Status: Standby");
+            break;
+        case WatermelonBot::State::SIEGEING:
+            ImGui::Text("Status: Grinding");
+            break;
+        case WatermelonBot::State::OVERHEATED:
+            ImGui::Text("Status: Overheated");
+            break;
+        default:
+            break;
+        }
 
-    if (OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland) {
-        ImGui::Text("Wrong Map!");
-    }
-        
-    switch (m_current_state)
-    {
-    case WatermelonBot::State::WAITING:
-        ImGui::Text("Status: Standby");
-        break;
-    case WatermelonBot::State::SIEGEING:
-        ImGui::Text("Status: Grinding");
-        break;
-    case WatermelonBot::State::OVERHEATED:
-        ImGui::Text("Status: Overheated");
-        break;
-    default:
-        break;
-    }
-
-    ImGui::Dummy(ImVec2(5, 0));
-    ImGui::Text("Start / Stop hotkey: \"U\"");
-    ImGui::Dummy(ImVec2(5, 0));
-
-    ImGui::BeginGroupPanel("Settings", ImVec2(400, 400));
-    {
-        ImGui::Checkbox("Shoot Watermelon Tanks", &m_shoot_watermelon_tanks);
-        ImGui::Checkbox("Shoot Watermelon Z", &m_shoot_watermelon_z);
         ImGui::NewLine();
-        ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
-        ImGui::Dummy(ImVec2(5, 0));
+        ImGui::Text("Start / Stop hotkey: \"U\"");
+        ImGui::NewLine();
+       
+        ImGui::BeginColumns("WatermelonBotColumns", 2, ImGuiColumnsFlags_NoResize);
+        {   
+            ImGui::BeginChild("WatermelonBotCol1", ImVec2(0,0), false);
+            {
+                ImGui::Separator();
+                ImGui::Text("Settings");
+                ImGui::Separator();
+
+                ImGui::Checkbox("Shoot Watermelon Tanks", &m_shoot_watermelon_tanks);
+                ImGui::Checkbox("Shoot Watermelon Z", &m_shoot_watermelon_z);
+                ImGui::NewLine();
+                ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
+            }
+            ImGui::EndChild();
+        }
+        ImGui::NextColumn();
+        {
+            ImGui::BeginChild("WatermelonBotCol2", ImVec2(0, 0), false);
+            {
+                ImGui::Separator();
+                ImGui::Text("Statistics");
+                ImGui::Separator();
+
+                std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
+                ImGui::Text(grindtime.c_str());
+                ImGui::Text("Watermelon Tanks killed:");
+                ImGui::SameLine();
+                ImGui::Text(std::to_string(m_killed_watermelon_tanks).c_str());
+                ImGui::Text("Watermelon Z killed:");
+                ImGui::SameLine();
+                ImGui::Text(std::to_string(m_killed_watermelon_z).c_str());
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndColumns();
     }
-    ImGui::EndGroupPanel();
-    ImGui::BeginGroupPanel("Statistics", ImVec2(400, 400));
-    {
-        std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
-        ImGui::Text(grindtime.c_str()); 
-        ImGui::Text("Watermelon Tanks killed:");
-        ImGui::SameLine();
-        ImGui::Text(std::to_string(m_killed_watermelon_tanks).c_str()); 
-        ImGui::Text("Watermelon Z killed:");
-        ImGui::SameLine();
-        ImGui::Text(std::to_string(m_killed_watermelon_z).c_str());
-        ImGui::Dummy(ImVec2(5, 0));
-    }
-    ImGui::EndGroupPanel();
+    ImGui::EndDisabledMode();
 }
 
 const char* WatermelonBot::GetName() const

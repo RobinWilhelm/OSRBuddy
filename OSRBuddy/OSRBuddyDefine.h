@@ -6,7 +6,7 @@
 #define TO_ENUM(enumtype, number) (static_cast<enumtype>(number))
 #define TO_INT(enumnum) (static_cast<int>(enumnum))
 
-   
+ 
 
 
 

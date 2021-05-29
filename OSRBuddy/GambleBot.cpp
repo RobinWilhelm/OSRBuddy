@@ -116,91 +116,115 @@ void GambleBot::RenderImGui()
 		//return;
 	}
 
-	ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-	if (m_state == GambleBotState::NOT_IN_LABORATORY) {
-		ImGui::Text("You are not at the laboratory! Bot wont work!");
-	}
-
-	ImGui::BeginGroupPanel("Item Selection", ImVec2(500, 100));
-	{
-		if (ImGui::Button("Select New"))
+	ImGui::NewLine();  
+	ImGui::BeginDisabledMode(m_state == GambleBotState::NOT_IN_LABORATORY || !IsEnabled());
+	{  
+		ImGui::BeginGroup(); // Weapon Selection
 		{
-			ResetGambleItem();
-			m_select_new_weapon = true;
-		}
-		ImGui::SameLine();
-		if (!m_current_gambleitem_uid || m_select_new_weapon) {
-			ImGui::Text("waiting for selection...");
-		}
-		else {
-			DrawFullWeaponName();
-		}
-	}
-	ImGui::EndGroupPanel();
+			ImGui::Separator();
+			ImGui::Text("Item Selection");
+			ImGui::Separator();
 
-	ImGui::BeginGroupPanel("Settings", ImVec2(400, 400));
-	{
-		DrawSettings();
-	}
-	ImGui::EndGroupPanel();
-	ImGui::SameLine();
-
-	ImGui::BeginGroup();
-	{
-		ImGui::BeginGroupPanel("Gambleitems Overview", ImVec2(200, 400));
-		{
-			ImGui::BeginGroupPanel("Prefix", ImVec2(190, 400));
+			if (ImGui::Button("Select New"))
 			{
-				ImGui::Text("Supergamble Advanced");
-				ImGui::SameLine();
-				DrawColoredGambleItemAmount(m_amount_SG_ADV_Prefix);
-
-				ImGui::Text("Supergamble Standard");
-				ImGui::SameLine();
-				DrawColoredGambleItemAmount(m_amount_SG_STD_Prefix);
-
-				ImGui::Text("Removal cards");
-				ImGui::SameLine();
-				DrawColoredGambleItemAmount(m_amount_removal_Prefix);
+				ResetGambleItem();
+				m_select_new_weapon = true;
 			}
-			ImGui::EndGroupPanel();
-			ImGui::BeginGroupPanel("Suffix", ImVec2(190, 400));
-			{
-				ImGui::Text("Supergamble Advanced");
-				ImGui::SameLine();
-				DrawColoredGambleItemAmount(m_amount_SG_ADV_Suffix);
-
-				ImGui::Text("Supergamble Standard");
-				ImGui::SameLine();
-				DrawColoredGambleItemAmount(m_amount_SG_STD_Suffix);
-
-				ImGui::Text("Removal cards");
-				ImGui::SameLine();
-				DrawColoredGambleItemAmount(m_amount_removal_Suffix);
-			}
-			ImGui::EndGroupPanel();
-		}
-		ImGui::EndGroupPanel();
-
-		ImGui::BeginGroupPanel("Control", ImVec2(200, 400));
-		{
-			ImGui::Text("Next gamble action:");
-			ImGui::Text(GetGambleActionString(m_next_gamble_action));
-			ImGui::Spacing();
-
-			ImGui::Checkbox("Automatic", &m_auto_gamble);
 			ImGui::SameLine();
-			if (ImGui::Button("Gamble"))
-			{
-				if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
-					SetGambleBotState(GambleBotState::GAMBLING);
-				}
+			if (!m_current_gambleitem_uid || m_select_new_weapon) {
+				ImGui::Text("waiting for selection...");
+			}
+			else {
+				DrawFullWeaponName();
 			}
 		}
-		ImGui::EndGroupPanel();	
+		ImGui::EndGroup();
+		ImGui::NewLine();
+
+		ImGui::BeginColumns("GambleBotColumns", 2, ImGuiColumnsFlags_NoResize);
+		{
+			ImGui::SetColumnWidth(0, 430);
+			ImGui::BeginChild("KitBotCol1", ImVec2(), false);
+			{ 				
+				ImGui::Separator();
+				ImGui::Text("Settings");
+				ImGui::Separator();
+
+				ImGui::NewLine();
+				DrawSettings();
+			}
+			ImGui::EndChild();
+		}
+		ImGui::NextColumn();
+		{
+			ImGui::BeginChild("KitBotCol2", ImVec2(), false);
+			{
+				ImGui::BeginGroup();
+				{
+					ImGui::Separator();
+					ImGui::Text("Gambleitems Overview");
+					ImGui::Separator();
+
+					ImGui::NewLine();
+					ImGui::BeginColumns("GambleItemsColumns", 3, ImGuiColumnsFlags_NoResize);
+					{
+						ImGui::SetColumnWidth(0, 75);
+						ImGui::SetColumnWidth(1, 110);
+						ImGui::Text("Prefix:");
+						ImGui::NewLine();
+						ImGui::NewLine();
+						ImGui::Text("Suffix:");
+						ImGui::NewLine();
+						ImGui::NewLine();
+					}
+					ImGui::NextColumn();
+					{
+						ImGui::Text("SG Advanced");
+						ImGui::Text("SG Standard");
+						ImGui::Text("Initialization");
+						ImGui::Text("SG Advanced");
+						ImGui::Text("SG Standard");
+						ImGui::Text("Initialization");
+					}
+					ImGui::NextColumn();
+					{
+						
+						DrawColoredGambleItemAmount(m_amount_SG_ADV_Prefix);
+						DrawColoredGambleItemAmount(m_amount_SG_STD_Prefix);
+						DrawColoredGambleItemAmount(m_amount_removal_Prefix);
+						DrawColoredGambleItemAmount(m_amount_SG_ADV_Suffix);
+						DrawColoredGambleItemAmount(m_amount_SG_STD_Suffix);
+						DrawColoredGambleItemAmount(m_amount_removal_Suffix);
+					}
+					ImGui::EndColumns();  
+				}
+				ImGui::EndGroup();
+				ImGui::NewLine();
+				ImGui::BeginGroup();
+				{
+					ImGui::Separator();
+					ImGui::Text("Control");
+					ImGui::Separator();
+
+					ImGui::Text("Next gamble action:");
+					ImGui::Text(GetGambleActionString(m_next_gamble_action));
+					ImGui::NewLine();
+
+					ImGui::Checkbox("Automatic Gambling", &m_auto_gamble);  					
+					if (ImGui::Button("Gamble"))
+					{
+						if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
+							SetGambleBotState(GambleBotState::GAMBLING);
+						}
+					}
+				}
+				ImGui::EndGroup();
+			}
+			ImGui::EndChild();
+		}
+		ImGui::EndColumns();
 	}
-	ImGui::EndGroup();
+	ImGui::EndDisabledMode();
 }
 
 const char* GambleBot::GetName()  const
@@ -212,92 +236,91 @@ void GambleBot::DrawSettings()
 {  	
 	const char* items[] = { "None", "Good", "Best" };
 
-	ImGui::Dummy(ImVec2(0, 10));
-	ImGui::BeginGroup();
-	{
-		ImGui::BeginGroupPanel("Prefix Options", ImVec2(200, 400));
+	ImGui::BeginColumns("SettingsColumns", 2, ImGuiColumnsFlags_NoResize);
+	{  
+		ImGui::BeginChild("PrefixOptions", ImVec2(0, 0), false);
 		{
+			ImGui::Text("Prefix Options:");
+			//ImGui::Separator();
+
 			if (ImGui::Checkbox("Gambling active", &m_do_prefix_gamble_temp))
 			{
 				if (m_state == GambleBotState::STANDBY) {
 					m_next_gamble_action = DetermineNextAction();
 				}
 			}
-			ImGui::Dummy(ImVec2(0, 10));
-			ImGui::Text("Stop autogamble at:");
-			ImGui::Checkbox("Any non-green Fix", &m_prefix_selection.AllNonGreen);
-			ImGui::Dummy(ImVec2(0, 10));
-			ImGui::PushItemWidth(100);
+			ImGui::NewLine();
+			ImGui::Text("Stop autogamble at:");		
+			ImGui::Checkbox("Any non-green Fix", &m_prefix_selection.AllNonGreen);		
+			ImGui::NewLine();
+			ImGui::PushItemWidth(80);
 			ImGui::ComboEx("Any Fix", reinterpret_cast<int*>(&m_prefix_selection.Any), items, 3, -1, false);
-			ImGui::ComboEx("Prob/Damage", reinterpret_cast<int*>(&m_prefix_selection.ProbDamage), items, 3, -1, false);
-			ImGui::ComboEx("Prob/Reattack", reinterpret_cast<int*>(&m_prefix_selection.ProbReattack), items, 3, -1, false);
-			ImGui::ComboEx("Reattack/Damage", reinterpret_cast<int*>(&m_prefix_selection.ReattackDamage), items, 3, -1, false);
-			ImGui::ComboEx("Pierce", reinterpret_cast<int*>(&m_prefix_selection.Pierce), items, 3, -1, false);
-			ImGui::PopItemWidth();
-		}
-		ImGui::EndGroupPanel();
-		ImGui::SameLine();
-		ImGui::BeginGroupPanel("Suffix Options", ImVec2(200, 400));
-		{
 
-			if (ImGui::Checkbox("Gambling active##Suffix", &m_do_suffix_gamble_temp))
-			{
-				if (m_state == GambleBotState::STANDBY) {
-					m_next_gamble_action = DetermineNextAction();
-				}
-			}
-			ImGui::Dummy(ImVec2(0, 10));
-			ImGui::Text("Stop autogamble at:");
-			ImGui::Checkbox("Any non-green Fix##Suffix", &m_suffix_selection.AllNonGreen);
-			ImGui::Dummy(ImVec2(0, 10));
-			ImGui::PushItemWidth(100);
-			ImGui::ComboEx("Any Fix##Suffix", reinterpret_cast<int*>(&m_suffix_selection.Any), items, 3, -1, false);
-			ImGui::ComboEx("Prob/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbDamage), items, 3, -1, false);
-			ImGui::ComboEx("Prob/Reattack##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbReattack), items, 3, -1, false);
-			ImGui::ComboEx("Reattack/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ReattackDamage), items, 3, -1, false);
+			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);
+			ImGui::ComboEx("Prob/Damage", reinterpret_cast<int*>(&m_prefix_selection.ProbDamage), items, 3, -1, false);
+			ImGui::PopStyleColor();
+
+			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('c').Value);
+			ImGui::ComboEx("Prob/Reattack", reinterpret_cast<int*>(&m_prefix_selection.ProbReattack), items, 3, -1, false);
+			ImGui::PopStyleColor();
+
+			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('r').Value);
+			ImGui::ComboEx("Reattack/Damage", reinterpret_cast<int*>(&m_prefix_selection.ReattackDamage), items, 3, -1, false);
+			ImGui::PopStyleColor();
+
+			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('y').Value);
+			ImGui::ComboEx("Pierce", reinterpret_cast<int*>(&m_prefix_selection.Pierce), items, 3, -1, false);
+			ImGui::PopStyleColor();
 			ImGui::PopItemWidth();
 		}
-		ImGui::EndGroupPanel();
+		ImGui::EndChild();
 	}
-	ImGui::EndGroup();
+	ImGui::NextColumn();
+	ImGui::BeginChild("SuffixOptions", ImVec2(0, 0), false);
+	{  
+		ImGui::Text("Suffix Options:");
+		//ImGui::Separator();
+
+		if (ImGui::Checkbox("Gambling active##Suffix", &m_do_suffix_gamble_temp))
+		{
+			if (m_state == GambleBotState::STANDBY) {
+				m_next_gamble_action = DetermineNextAction();
+			}
+		}
+		ImGui::NewLine();
+		ImGui::Text("Stop autogamble at:");						  
+		ImGui::Checkbox("Any non-green Fix##Suffix", &m_suffix_selection.AllNonGreen);	 
+
+		ImGui::NewLine();
+		ImGui::PushItemWidth(80);
+		ImGui::ComboEx("Any Fix##Suffix", reinterpret_cast<int*>(&m_suffix_selection.Any), items, 3, -1, false); 
+
+		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);
+		ImGui::ComboEx("Prob/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbDamage), items, 3, -1, false);
+		ImGui::PopStyleColor();
+
+		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('c').Value);
+		ImGui::ComboEx("Prob/Reattack##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbReattack), items, 3, -1, false);
+		ImGui::PopStyleColor();
+
+		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('r').Value);
+		ImGui::ComboEx("Reattack/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ReattackDamage), items, 3, -1, false);
+		ImGui::PopStyleColor();
+		ImGui::PopItemWidth();
+	}
+	ImGui::EndChild(); 
 }
 
 void GambleBot::DrawFullWeaponName()
 {
 	OSRImGuiMenu::DrawOsrItemName(m_gamble_item);
-
-	/*
-	if (!m_current_gambleitem) {
-		if (m_select_new_weapon) {
-			ImGui::Text("waiting for selection...");
-		}
-		return;
-	}
-
-	if (!m_prefixName.empty()) {
-		ImGui::PushStyleColor(ImGuiCol_Text, m_prefixColor.Value);
-		ImGui::Text(m_prefixName.c_str());
-		ImGui::SameLine();
-		ImGui::PopStyleColor();
-	}
-
-	ImGui::Text(m_weaponName.c_str());
-
-	if (!m_suffixName.empty()) {
-		ImGui::PushStyleColor(ImGuiCol_Text, m_suffixColor.Value);
-		ImGui::SameLine();
-		ImGui::Text(m_suffixName.c_str()); 		
-		ImGui::PopStyleColor();
-	}
-	*/
 }
 
 void GambleBot::DrawColoredGambleItemAmount(int amount)
 {
 	if (amount >= 100) 
 	{
-		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GAMBLEITEM_GT_100);
-		ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GAMBLEITEM_GT_100);	
 		ImGui::Text(std::to_string(amount).c_str());
 		ImGui::PopStyleColor();
 		
@@ -305,14 +328,12 @@ void GambleBot::DrawColoredGambleItemAmount(int amount)
 	else if (amount > 0 && amount < 100) 
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GAMBLEITEM_LT_100);
-		ImGui::SameLine();
 		ImGui::Text(std::to_string(amount).c_str());
 		ImGui::PopStyleColor();
 	}
 	else if (amount == 0) 
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GAMBLEITEM_EQ_0);
-		ImGui::SameLine();
 		ImGui::Text(std::to_string(amount).c_str());
 		ImGui::PopStyleColor();
 	}
