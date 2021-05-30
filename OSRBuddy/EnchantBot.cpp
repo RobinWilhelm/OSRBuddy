@@ -121,15 +121,23 @@ void EnchantBot::RenderImGui()
 				m_selectNewEnchantItem = true;
 				SetEnchantBotState(EnchantBotState::STANDBY);
 			}
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Press the \"Select New\" button and then click on an weapon/armor in inventory to select a new enchant item.");
+			}
 			ImGui::SameLine();
-			if (!m_currentEnchantItemUID || m_selectNewEnchantItem) {
+			if (m_selectNewEnchantItem) {
 				ImGui::Text("waiting for selection...");
+			}
+			else if (m_currentEnchantItemUID == 0) {
+				ImGui::Text("Select item to start enchanting.");
 			}
 			else {
 				DrawEnchantItemText();
 			}
 		}
 		ImGui::EndGroup();
+
+
 		ImGui::NewLine();
 		ImGui::BeginColumns("EnchantBotColumns", 2, ImGuiColumnsFlags_NoResize);
 		{
@@ -424,8 +432,17 @@ void EnchantBot::DrawSettings()
 
 				// use e1 prots for e6 and e7
 				ImGui::Checkbox("Optimise Enchants", &m_optimiseEnchanting);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Uses Basic Protect Cards (E1) to enchant to E6 and E7.");
+				}
 				ImGui::Checkbox("Use Chance Cards", &m_withLuckyCard);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Uses +8 Percent Enchant Chance Cards to enchant to E11.");
+				}
 				ImGui::Checkbox("Automatic Enchanting", &m_auto_enchant);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Enchants until the target is reached or there are no enchantment items left.");
+				}
 				if (ImGui::Button("Enchant"))
 				{
 					if (m_state == EnchantBotState::STANDBY && EnchantCheckTimeReady()) {

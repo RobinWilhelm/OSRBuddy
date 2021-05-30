@@ -176,6 +176,9 @@ void WatermelonBot::RenderImGui()
                 ImGui::Checkbox("Shoot Watermelon Z", &m_shoot_watermelon_z);
                 ImGui::NewLine();
                 ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Will automatically open watermelon gifts.");
+                }
             }
             ImGui::EndChild();
         }

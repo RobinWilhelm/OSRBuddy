@@ -129,16 +129,25 @@ void GambleBot::RenderImGui()
 			{
 				ResetGambleItem();
 				m_select_new_weapon = true;
+				SetGambleBotState(GambleBotState::STANDBY);
+			}  
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Press the \"Select New\" button and then click on an weapon in inventory to select a new gamble item.");
 			}
 			ImGui::SameLine();
-			if (!m_current_gambleitem_uid || m_select_new_weapon) {
-				ImGui::Text("waiting for selection...");
+			if (m_select_new_weapon) {
+				ImGui::Text("waiting for selection...");   
+			}
+			else if (m_current_gambleitem_uid == 0) {
+				ImGui::Text("Select item to start gambling.");
 			}
 			else {
 				DrawFullWeaponName();
 			}
 		}
 		ImGui::EndGroup();
+	
+
 		ImGui::NewLine();
 
 		ImGui::BeginColumns("GambleBotColumns", 2, ImGuiColumnsFlags_NoResize);
@@ -210,7 +219,10 @@ void GambleBot::RenderImGui()
 					ImGui::Text(GetGambleActionString(m_next_gamble_action));
 					ImGui::NewLine();
 
-					ImGui::Checkbox("Automatic Gambling", &m_auto_gamble);  					
+					ImGui::Checkbox("Automatic Gambling", &m_auto_gamble); 
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Will keep gambling until fix is found or there are no more gamble items");
+					}
 					if (ImGui::Button("Gamble"))
 					{
 						if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
@@ -251,25 +263,43 @@ void GambleBot::DrawSettings()
 			}
 			ImGui::NewLine();
 			ImGui::Text("Stop autogamble at:");		
-			ImGui::Checkbox("Any non-green Fix", &m_prefix_selection.AllNonGreen);		
+			ImGui::Checkbox("Any non-green Fix", &m_prefix_selection.AllNonGreen);	
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Stops at any fix that has not a green color");
+			}
 			ImGui::NewLine();
 			ImGui::PushItemWidth(80);
 			ImGui::ComboEx("Any Fix", reinterpret_cast<int*>(&m_prefix_selection.Any), items, 3, -1, false);
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Stops if any of the below good/best fixes are found");
+			}
 
 			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);
 			ImGui::ComboEx("Prob/Damage", reinterpret_cast<int*>(&m_prefix_selection.ProbDamage), items, 3, -1, false);
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit");
+			}
 			ImGui::PopStyleColor();
 
 			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('c').Value);
 			ImGui::ComboEx("Prob/Reattack", reinterpret_cast<int*>(&m_prefix_selection.ProbReattack), items, 3, -1, false);
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Best: Legend, Bio\nGood: Legend, Bio, Attack, Silence, Meteo");
+			}
 			ImGui::PopStyleColor();
 
 			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('r').Value);
 			ImGui::ComboEx("Reattack/Damage", reinterpret_cast<int*>(&m_prefix_selection.ReattackDamage), items, 3, -1, false);
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Best: Max, Squire\nGood: Max, Squire, Major, Rukieper");
+			}
 			ImGui::PopStyleColor();
 
 			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('y').Value);
 			ImGui::ComboEx("Pierce", reinterpret_cast<int*>(&m_prefix_selection.Pierce), items, 3, -1, false);
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Best: Bandit, Traitor\nGood: Bandit, Traitor, Archrival, Adversary, Bane, Challenger, Stronghold");
+			}
 			ImGui::PopStyleColor();
 			ImGui::PopItemWidth();
 		}
@@ -289,22 +319,37 @@ void GambleBot::DrawSettings()
 		}
 		ImGui::NewLine();
 		ImGui::Text("Stop autogamble at:");						  
-		ImGui::Checkbox("Any non-green Fix##Suffix", &m_suffix_selection.AllNonGreen);	 
+		ImGui::Checkbox("Any non-green Fix##Suffix", &m_suffix_selection.AllNonGreen);	
+		if (ImGui::IsItemHovered()) {
+			ImGui::SetTooltip("Stops at any fix that has not a green color");
+		}
 
 		ImGui::NewLine();
 		ImGui::PushItemWidth(80);
 		ImGui::ComboEx("Any Fix##Suffix", reinterpret_cast<int*>(&m_suffix_selection.Any), items, 3, -1, false); 
+		if (ImGui::IsItemHovered()) {
+			ImGui::SetTooltip("Stops if any of the below good/best fixes are found");
+		}
 
-		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);
+		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);	   
 		ImGui::ComboEx("Prob/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbDamage), items, 3, -1, false);
+		if (ImGui::IsItemHovered()) {
+			ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit");
+		}	  
 		ImGui::PopStyleColor();
 
 		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('c').Value);
 		ImGui::ComboEx("Prob/Reattack##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbReattack), items, 3, -1, false);
+		if (ImGui::IsItemHovered()) {
+			ImGui::SetTooltip("Best: Legend, Bio\nGood: Legend, Bio, Attack, Silence, Meteo");
+		}
 		ImGui::PopStyleColor();
 
 		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('r').Value);
 		ImGui::ComboEx("Reattack/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ReattackDamage), items, 3, -1, false);
+		if (ImGui::IsItemHovered()) {
+			ImGui::SetTooltip("Best: Max, Squire\nGood: Max, Squire, Major, Rukieper");
+		}
 		ImGui::PopStyleColor();
 		ImGui::PopItemWidth();
 	}
@@ -764,6 +809,10 @@ bool GambleBot::TryDoGambleAction()
 		}
 
 		OSR_API->InvenToSourceItem(item, 1, false);
+		if (needed_item == GambleItem::SOURCE_ITEM) {
+			m_gamble_item.UpdateItemInfo();
+		}
+
 		ResetInternalActionCheckTime(true);
 		return false;
 	}

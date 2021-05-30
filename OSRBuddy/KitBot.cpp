@@ -841,7 +841,10 @@ void KitBuffBot::RenderImGui()
 
             const char* items[] = { "Rage", "Humanized", "Sleepy" };
             ImGui::ComboEx("Kit Mode:", reinterpret_cast<int*>(&m_settings.kitmode), items, 3, -1, true, 150);
-            ImGui::Dummy(ImVec2(0, 5));
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Rage: No additional delay between kits and no delay on first kit used.\nHumanized: Will use small random delay between kits and a on the first kit.\nSleepy: Big random delays.");
+            }
+            ImGui::NewLine();
 
             ImGui::BeginGroup();
             {                
@@ -849,12 +852,18 @@ void KitBuffBot::RenderImGui()
                 {   
                     ImGui::PushStyleColor(ImGuiCol_Text, SHIELDKIT_COLOR.Value);
                     ImGui::Text("Shield:");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Select which shield kittypes should be used.\nThe bot will automatically use to most optimal kittype.");
+                    }
                     ImGui::PopStyleColor();
                 }
                 ImGui::NextColumn();
                 {
                     ImGui::PushStyleColor(ImGuiCol_Text, ENERGYKIT_COLOR.Value);
                     ImGui::Text("Energy:");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Select which energy kittypes should be used.\nThe bot will automatically use to most optimal kittype.");
+                    }
                     ImGui::PopStyleColor();
                     ImGui::Separator();
                 }
@@ -920,6 +929,9 @@ void KitBuffBot::RenderImGui()
             {
                 ImGui::PushStyleColor(ImGuiCol_Text, SKILLPKIT_COLOR.Value);
                 ImGui::Text("Skillpoints:");
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Use the slider to set when the sp kit should be used.\nThe sliders represent the percentage of SP to the total SP ");
+                }
                 ImGui::PopStyleColor();
                 ImGui::Separator();
                 ImGui::BeginColumns("SkillpointColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
@@ -938,6 +950,7 @@ void KitBuffBot::RenderImGui()
                     ImGui::PopItemWidth();
                 }
                 ImGui::EndColumns();
+
                 
             }
             ImGui::EndGroup();
@@ -1042,6 +1055,9 @@ void KitBuffBot::RenderImGui()
                 ImGui::BeginDisabledMode(ismgear);
                 {                       
                     ImGui::Text("Field: \t");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Uses field heals/repairs when two or more formation members need some shield/energy.");
+                    }
                     ImGui::SameLine();
                     ImGui::PushStyleColor(ImGuiCol_Text, SHIELDKIT_COLOR.Value);
                     ImGui::Checkbox("Shield", &m_settings.field_repair_active);
@@ -1064,6 +1080,9 @@ void KitBuffBot::RenderImGui()
                     ImGui::NewLine();
 
                     ImGui::Text("Target Priorities:");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Selected formation member will recieve healings first.");
+                    }
                     ImGui::Separator();
                     ImGui::BeginColumns("TargetPrioritysColumns", 2, ImGuiColumnsFlags_NoResize);
                     { 
