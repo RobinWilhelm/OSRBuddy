@@ -704,6 +704,10 @@ UID32_t KitBuffBot::GetBestHealTarget()
             continue;
         }
 
+        if (member->m_pEnemyData->m_infoCharacter.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex()) {
+            continue;
+        }
+
         if (member->m_pEnemyData->m_infoCharacter.CurrentHP <= 0) {
             continue;
         }   
