@@ -934,7 +934,7 @@ void KitBuffBot::RenderImGui()
                 ImGui::PushStyleColor(ImGuiCol_Text, SKILLPKIT_COLOR.Value);
                 ImGui::Text("Skillpoints:");
                 if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Use the slider to set when the sp kit should be used.\nThe sliders represent the percentage of SP to the total SP ");
+                    ImGui::SetTooltip("Use the slider to set when the sp kit should be used.\nThe sliders represent the minimum amount of SP at which the kits should be used");
                 }
                 ImGui::PopStyleColor();
                 ImGui::Separator();
