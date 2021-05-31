@@ -948,9 +948,9 @@ void KitBuffBot::RenderImGui()
                 ImGui::NextColumn();
                 {                      
                     ImGui::PushItemWidth(200);
-                    ImGui::SliderInt("%##spkit_a_slider", &m_settings.spkit_type_a_percentage, 0, 99);
-                    ImGui::SliderInt("%##spkit_b_slider", &m_settings.spkit_type_b_percentage, 0, 99);
-                    ImGui::SliderInt("%##spkit_c_slider", &m_settings.spkit_type_c_percentage, 0, 99);
+                    ImGui::SliderInt("##spkit_a_slider", &m_settings.spkit_type_a_minvalue, 0, OSR_API->GetMaxSkillp());
+                    ImGui::SliderInt("##spkit_b_slider", &m_settings.spkit_type_b_minvalue, 0, OSR_API->GetMaxSkillp());
+                    ImGui::SliderInt("##spkit_c_slider", &m_settings.spkit_type_c_minvalue, 0, OSR_API->GetMaxSkillp());
                     ImGui::PopItemWidth();
                 }
                 ImGui::EndColumns();
@@ -1473,17 +1473,17 @@ void KitBuffBot::TickAutoKit()
         // todo: SmartSP
 
         bool sp_kit_used = false;
-        int skillp_percentage = 100 * (static_cast<float>(std::max(OSR_API->GetCurrentSkillp(), 1)) / static_cast<float>(OSR_API->GetMaxSkillp()));
+        //int skillp_percentage = 100 * (static_cast<float>(std::max(OSR_API->GetCurrentSkillp(), 1)) / static_cast<float>(OSR_API->GetMaxSkillp()));
 
-        if(m_settings.use_spkit_type_a && skillp_percentage <= m_settings.spkit_type_a_percentage)  
+        if(m_settings.use_spkit_type_a && OSR_API->GetCurrentSkillp() <= m_settings.spkit_type_a_minvalue)
         { 
             sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::A_TYPE);  
         }
-        if (!sp_kit_used && m_settings.use_spkit_type_b && skillp_percentage <= m_settings.spkit_type_b_percentage) 
+        if (!sp_kit_used && m_settings.use_spkit_type_b && OSR_API->GetCurrentSkillp() <= m_settings.spkit_type_b_minvalue)
         {
             sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::B_TYPE);
         }
-        if (!sp_kit_used && m_settings.use_spkit_type_c && skillp_percentage <= m_settings.spkit_type_c_percentage)
+        if (!sp_kit_used && m_settings.use_spkit_type_c && OSR_API->GetCurrentSkillp() <= m_settings.spkit_type_c_minvalue)
         {
             sp_kit_used = TryUseKit(KitType::SKILLPOINT, KitCategory::C_TYPE);
         }   

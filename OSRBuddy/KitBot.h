@@ -83,9 +83,9 @@ public:
 			use_spkit_type_b = other.use_spkit_type_b;
 			use_spkit_type_c = other.use_spkit_type_c;
 
-			spkit_type_a_percentage = other.spkit_type_a_percentage;
-			spkit_type_b_percentage = other.spkit_type_b_percentage;
-			spkit_type_c_percentage = other.spkit_type_c_percentage;
+			spkit_type_a_minvalue = other.spkit_type_a_minvalue;
+			spkit_type_b_minvalue = other.spkit_type_b_minvalue;
+			spkit_type_c_minvalue = other.spkit_type_c_minvalue;
 			return *this;
 		}
 
@@ -113,9 +113,9 @@ public:
 		bool use_spkit_type_b;
 		bool use_spkit_type_c;
 							 
-		int spkit_type_a_percentage;
-		int spkit_type_b_percentage;
-		int spkit_type_c_percentage;
+		int spkit_type_a_minvalue;
+		int spkit_type_b_minvalue;
+		int spkit_type_c_minvalue;
 	};
 
 public:

@@ -201,29 +201,29 @@ const char* EnchantBot::GetName() const
 
 void EnchantBot::RenderSuccessPercentage(int enchstep, int total_tries, int fails)
 {  	
-	float percentage = 0.0f;
+	float success_ratio = 0.0f;
 	if (total_tries != 0 && total_tries != fails) {
-		percentage = (1 - (float)fails / (float)total_tries) ;
+		success_ratio = (1 - (float)fails / (float)total_tries) ;
 	} 
 
-	float current_probabiliy = g_Enchant_probabilities[enchstep] / 10000.0f;
-	float delta_perc = current_probabiliy - percentage;
-	std::string percentage_string = Utility::to_string_with_precision<float>(percentage * 100, 1) + "%%";
+	float probabiliy = g_Enchant_probabilities[enchstep] / 10000.0f;
+	float delta = probabiliy - success_ratio - 0.05f;
+	std::string success_percentage_string = Utility::to_string_with_precision<float>(success_ratio * 100, 1) + "%%";
 
 	ImColor color = ImColor(255,255,0,255);
-	float colorratio = std::max(1.0f / (current_probabiliy / fabs(delta_perc)) * 0.5f, 0.0f);
+	float color_ratio = std::min(1.0f, fabs(delta) / probabiliy * 10.0f);
 
-	if (delta_perc > 0) // bad -> gradually remove green
+	if (delta > 0) // bad -> gradually remove green
 	{
-		color.Value.y = colorratio;
+		color.Value.y = 1.0f - color_ratio;
 	}
 	else // good -> gradually remove red
 	{
-		color.Value.x = colorratio;
+		color.Value.x = 1.0f - color_ratio;
 	}
 
 	ImGui::PushStyleColor(ImGuiCol_Text, color.Value);
-	ImGui::DrawTextCentered(percentage_string, ImGui::GetColumnWidth());
+	ImGui::DrawTextCentered(success_percentage_string, ImGui::GetColumnWidth());
 	ImGui::PopStyleColor();
 
 	if (ImGui::IsItemHovered()) {
