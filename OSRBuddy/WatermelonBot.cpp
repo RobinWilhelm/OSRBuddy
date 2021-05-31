@@ -490,10 +490,10 @@ void WatermelonBot::OnEnable()
         kitbot_settings.use_ammobox       = true;
 
         kitbot_settings.use_spkit_type_c = true;
-        kitbot_settings.spkit_type_c_minvalue = 66;  
+        kitbot_settings.spkit_type_c_minvalue = OSR_API->GetMaxSkillp() * 0.6f;
 
         kitbot_settings.use_spkit_type_b = true;
-        kitbot_settings.spkit_type_b_minvalue = 33;
+        kitbot_settings.spkit_type_b_minvalue = OSR_API->GetMaxSkillp()* 0.2f;
 
         m_kitbot->SetSettings(kitbot_settings);
         
