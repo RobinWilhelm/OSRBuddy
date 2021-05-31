@@ -13,6 +13,8 @@
 #define COLOR_ENCHANTITEM_LT_100 (ImColor(0xFF, 0xBB, 0x33).Value) // orange
 #define COLOR_ENCHANTITEM_EQ_0	(ImColor(0xFF, 0x00, 0x00).Value) // red
 
+#define COST_ENCHANT_SINGLE 2800
+
 class CItemInfo;
 			    
 enum class EnchantItemKind
@@ -60,7 +62,7 @@ public:
 	virtual void OnEnable() override;
 
 private:
-	std::string GetRatio(int i, int j);
+	
 	EnchantBotState GetEnchantBotState();
 	void SetEnchantBotState(EnchantBotState);
 	void ResetCurrentEnchantItem();
@@ -74,16 +76,21 @@ private:
 	bool IsValidEnchantItem(ITEM_BASE* enchantItem);
 	void SetEnchantItem(UID64_t uid);
 	  
-	void DrawSettings();
-	void DrawEnchantItemText();
-	void DrawEnchantButtons();
+	void RenderSettings();
+	void RenderEnchantItemText();
+	void RenderEnchantButtons();
+	void RenderColoredEnchantItemAmount(int amount);
+	void RenderStatisticsPopup();
+	void RenderSuccessPercentage(int enchstep, int total_tries, int fails);
 
 	void ResetEnchantList(EnchantListType& enchantlist);
 	void AddEnchantToList(EnchantItemType enchanttype, EnchantListType& enchantlist);
 
 	bool DoEnchantAction(EnchantAction action);
 	CItemInfo* GetEnchantItemFromInventory(EnchantItemType enchantitem, EnchantItemKind itemkind, GearType geartype);
-	
+	void UpdateEnchantItemAmount();
+	void UpdateTotalCost();
+
 	bool TrySimulateButtonClick(LabButtonCode button);
 	bool TryTargetItemToInventory();
 
@@ -114,4 +121,21 @@ private:
 
 	int						m_preEnch;
 	int                     m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} }; 
+
+	int						m_amount_enchprot_e1;
+	int						m_amount_enchprot_e5;
+	int						m_amount_chancecard_8;
+
+	int						m_used_enchprots_e1;
+	int						m_used_enchprots_e5;
+	int						m_used_chancecards_8;
+	int						m_used_enchantcards;
+	int						m_used_speedcards;
+
+	bool					m_using_enchprot_e1;
+	bool					m_using_enchprot_e5;
+	bool					m_using_chancecard_8;
+	bool					m_using_speedcard;
+
+	std::string				m_total_cost_string;
 };

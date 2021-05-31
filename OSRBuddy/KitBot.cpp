@@ -835,7 +835,7 @@ void KitBuffBot::RenderImGui()
 {   
     DrawEnableCheckBox();   
     ImGui::NewLine();
-    ImGui::BeginColumns("KitBotColumns", 2);
+    ImGui::BeginColumns("KitBotColumns", 2, ImGuiColumnsFlags_NoResize);
     {
         ImGui::BeginChild("KitBot_Items", ImVec2(0,0), false);    
         {

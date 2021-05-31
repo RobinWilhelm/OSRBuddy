@@ -17,6 +17,7 @@ namespace ImGui
     void BeginDisabledMode(bool disabled);
     void EndDisabledMode();
 
+    void DrawTextCentered(std::string text, float total_width = ImGui::GetWindowSize().x);
 
     //https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#arrays
     bool EnchantList(const char* label, int* currIndex, EnchantListType& values, int heightInItems = -1);

@@ -37,6 +37,13 @@ void ImGui::EndDisabledMode()
     }
 }
 
+void ImGui::DrawTextCentered(std::string text, float total_width)
+{
+    float font_size = ImGui::GetFontSize() * text.size() / 2;
+    ImGui::SameLine(total_width / 2 - font_size + (font_size / 2));
+    ImGui::Text(text.c_str());
+}
+
 bool ImGui::EnchantList(const char* label, int* currIndex, EnchantListType& values, int heightInItems)
 {       
     if (values.empty()) { return false; }

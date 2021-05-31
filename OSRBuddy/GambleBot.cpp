@@ -196,8 +196,7 @@ void GambleBot::RenderImGui()
 						ImGui::Text("Initialization");
 					}
 					ImGui::NextColumn();
-					{
-						
+					{							
 						DrawColoredGambleItemAmount(m_amount_SG_ADV_Prefix);
 						DrawColoredGambleItemAmount(m_amount_SG_STD_Prefix);
 						DrawColoredGambleItemAmount(m_amount_removal_Prefix);

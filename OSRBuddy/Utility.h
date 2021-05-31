@@ -3,6 +3,7 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <locale>7
 
 
 
@@ -31,6 +32,7 @@ public:
     static std::string to_string_with_precision(const T a_value, const int n = 6)
     {
         std::ostringstream out;
+        out.imbue(std::locale(""));
         out.precision(n);
         out << std::fixed << a_value;
         return out.str();
