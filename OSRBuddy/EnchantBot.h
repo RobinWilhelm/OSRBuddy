@@ -47,6 +47,24 @@ enum class NotifyType
 	ENCHANTING_FINISHED,
 };
 
+struct EnchantStatistics
+{
+	int m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
+
+	int	m_used_enchprots_e1;
+	int	m_used_enchprots_e5;
+	int	m_used_chancecards_8;
+	int	m_used_enchantcards;
+	int	m_used_speedcards;
+
+	int	m_cost_enchprots_e1;
+	int	m_cost_enchprots_e5;
+	int	m_cost_chancecards_8;
+	int	m_cost_enchantcards;
+	int	m_cost_speedcards;
+	int	m_cost_total;
+};
+
 
 class EnchantBot : public BuddyFeatureBase
 {
@@ -61,8 +79,7 @@ public:
 	virtual FeatureType GetType() const override;
 	virtual void OnEnable() override;
 
-private:
-	
+private:	   	
 	EnchantBotState GetEnchantBotState();
 	void SetEnchantBotState(EnchantBotState);
 	void ResetCurrentEnchantItem();
@@ -119,23 +136,26 @@ private:
 	EnchantListType			m_currentEnchants;
 	EnchantListType			m_wantedEnchants;
 
-	int						m_preEnch;
-	int                     m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} }; 
+	int						m_previous_enchantnum;
 
+	// current amount of item in the inventory
 	int						m_amount_enchprot_e1;
 	int						m_amount_enchprot_e5;
 	int						m_amount_chancecard_8;
 
-	int						m_used_enchprots_e1;
-	int						m_used_enchprots_e5;
-	int						m_used_chancecards_8;
-	int						m_used_enchantcards;
-	int						m_used_speedcards;
-
+	// true if the item is in the lab source window
 	bool					m_using_enchprot_e1;
 	bool					m_using_enchprot_e5;
 	bool					m_using_chancecard_8;
 	bool					m_using_speedcard;
 
-	std::string				m_total_cost_string;
+	EnchantStatistics       m_statistics;
+
+	// for buffering
+	std::string				m_cost_total_string;
+	std::string				m_cost_enchprots_e1_string;
+	std::string				m_cost_enchprots_e5_string;
+	std::string				m_cost_chancecards_8_string;
+	std::string				m_cost_enchantcards_string;
+	std::string				m_cost_speedcards_string;
 };

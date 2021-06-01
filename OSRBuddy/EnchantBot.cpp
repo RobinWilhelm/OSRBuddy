@@ -16,21 +16,18 @@ EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_amount_enchprot_e1 = 0;
 	m_amount_enchprot_e5 = 0;
 	m_next_action = EnchantAction::Add_EnchantItem;
-	m_preEnch = 0;
+	m_previous_enchantnum = 0;
 	m_waiting_for_answer = false;
 	m_currentEnchantItemUID = 0;
 	m_optimiseEnchanting = false;
 	m_withLuckyCard = false;
-	m_auto_enchant = false;
-   	m_used_enchprots_e1 = 0;
-	m_used_enchprots_e5 = 0;
-	m_used_chancecards_8 = 0;
-	m_used_enchantcards = 0;
-	m_used_speedcards = 0;
+	m_auto_enchant = false;	  
 	m_using_chancecard_8 = false;
 	m_using_enchprot_e1 = false;
 	m_using_enchprot_e5 = false;
 	m_using_speedcard = false;
+
+	ZeroMemory(&m_statistics, sizeof(EnchantStatistics));
 }
 
 EnchantBot::~EnchantBot()
@@ -92,15 +89,15 @@ void EnchantBot::Tick()
 					SetEnchantBotState(EnchantBotState::STANDBY);
 				}
 				int postEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
-				if (m_preEnch >= 5) {
-					if (postEnch <= m_preEnch)
+				if (m_previous_enchantnum >= 5) {
+					if (postEnch <= m_previous_enchantnum)
 					{
-						m_enchantStats[m_preEnch - 5][0] += 1;
-						m_enchantStats[m_preEnch - 5][1] += 1;
+						m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
+						m_statistics.m_enchantStats[m_previous_enchantnum - 5][1] += 1;
 					}
 					else
 					{
-						m_enchantStats[m_preEnch - 5][0] += 1;
+						m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
 					}
 				}
 				m_waiting_for_answer = false;
@@ -207,7 +204,7 @@ void EnchantBot::RenderSuccessPercentage(int enchstep, int total_tries, int fail
 	} 
 
 	float probabiliy = g_Enchant_probabilities[enchstep] / 10000.0f;
-	float delta = probabiliy - success_ratio - 0.05f;
+	float delta = probabiliy - success_ratio - 0.03f;
 	std::string success_percentage_string = Utility::to_string_with_precision<float>(success_ratio * 100, 1) + "%%";
 
 	ImColor color = ImColor(255,255,0,255);
@@ -585,13 +582,13 @@ void EnchantBot::RenderStatisticsPopup()
 					std::string enchstep = "E" + std::to_string(i + 5) + " -> " + "E" + std::to_string(i + 6) + ":";
 					ImGui::Text(enchstep.c_str());
 					ImGui::NextColumn();
-					std::string triesfails = std::to_string(m_enchantStats[i][0]) + " - " + std::to_string(m_enchantStats[i][1]);
+					std::string triesfails = std::to_string(m_statistics.m_enchantStats[i][0]) + " - " + std::to_string(m_statistics.m_enchantStats[i][1]);
 					ImGui::DrawTextCentered(triesfails, ImGui::GetColumnWidth());
 					if (ImGui::IsItemHovered()) {
 						ImGui::SetTooltip("total tries - total fails");
 					}
 					ImGui::NextColumn();
-					RenderSuccessPercentage(i + 5, m_enchantStats[i][0], m_enchantStats[i][1]);
+					RenderSuccessPercentage(i + 5, m_statistics.m_enchantStats[i][0], m_statistics.m_enchantStats[i][1]);
 					ImGui::NextColumn();
 				}
 			}
@@ -603,7 +600,7 @@ void EnchantBot::RenderStatisticsPopup()
 		{
 			ImGui::Text("Used Items and Cost:");
 			ImGui::Separator();
-			ImGui::BeginColumns("RunViewColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+			ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 			{
 				ImGui::Text("E1 Protects");
 				ImGui::Text("E5 Protects");
@@ -614,18 +611,26 @@ void EnchantBot::RenderStatisticsPopup()
 			}
 			ImGui::NextColumn();
 			{
-				ImGui::Text(std::to_string(m_used_enchprots_e1).c_str());
-				ImGui::Text(std::to_string(m_used_enchprots_e5).c_str());
-				ImGui::Text(std::to_string(m_used_chancecards_8).c_str());
-				ImGui::Text(std::to_string(m_used_enchantcards).c_str());
-				ImGui::Text(std::to_string(m_used_speedcards).c_str());
+				ImGui::Text(std::to_string(m_statistics.m_used_enchprots_e1).c_str());
+				ImGui::Text(std::to_string(m_statistics.m_used_enchprots_e5).c_str());
+				ImGui::Text(std::to_string(m_statistics.m_used_chancecards_8).c_str());
+				ImGui::Text(std::to_string(m_statistics.m_used_enchantcards).c_str());
+				ImGui::Text(std::to_string(m_statistics.m_used_speedcards).c_str());
 			}	
+			ImGui::NextColumn();
+			{
+				ImGui::Text(m_cost_enchprots_e1_string.c_str());
+				ImGui::Text(m_cost_enchprots_e5_string.c_str());
+				ImGui::Text(m_cost_chancecards_8_string.c_str());
+				ImGui::Text(m_cost_enchantcards_string.c_str());
+				ImGui::Text(m_cost_speedcards_string.c_str());
+			} 
 			ImGui::EndColumns();
 			ImGui::NewLine();
 			ImGui::Separator();
 			ImGui::Text("Total spi cost:");
 			ImGui::SameLine(); 		
-			ImGui::Text(m_total_cost_string.c_str());
+			ImGui::Text(m_cost_total_string.c_str());
 			ImGui::Separator();
 		}
 		ImGui::EndGroup();
@@ -772,27 +777,27 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		}
 		break;
 	case EnchantAction::Use_OkButton:
-		m_preEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
+		m_previous_enchantnum = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
 		OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
 		m_waiting_for_answer = true;
 
 		if (m_using_chancecard_8) {
-			m_used_chancecards_8++;
+			m_statistics.m_used_chancecards_8++;
 		}
 
 		if (m_using_enchprot_e1) {
-			m_used_enchprots_e1++;
+			m_statistics.m_used_enchprots_e1++;
 		}
 
 		if (m_using_enchprot_e5){
-			m_used_enchprots_e5++;
+			m_statistics.m_used_enchprots_e5++;
 		}
 
 		if (m_using_speedcard) {
-			m_used_speedcards++;
+			m_statistics.m_used_speedcards++;
 		}
 		else {
-			m_used_enchantcards++;
+			m_statistics.m_used_enchantcards++;
 		}
 
 		UpdateTotalCost();
@@ -936,15 +941,22 @@ void EnchantBot::UpdateEnchantItemAmount()
 
 void EnchantBot::UpdateTotalCost()
 {
-	int total_cost_spi = m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1 +
-					m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5 +
-					m_used_chancecards_8 * COST_ENCHANT_CHANCE_8 +
-					m_used_enchantcards * COST_ENCHANTCARD_COMMON +
-					m_used_speedcards * COST_ENCHANTCARD_SPEED +
-					(m_used_speedcards + m_used_enchantcards) * COST_ENCHANT_SINGLE;
+	m_statistics.m_cost_enchprots_e1	= m_statistics.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
+	m_statistics.m_cost_enchprots_e5	= m_statistics.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
+	m_statistics.m_cost_chancecards_8	= m_statistics.m_used_chancecards_8 * COST_ENCHANT_CHANCE_8;
+	m_statistics.m_cost_enchantcards	= m_statistics.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
+	m_statistics.m_cost_speedcards		= m_statistics.m_used_speedcards * COST_ENCHANTCARD_SPEED;
 
-	float millions = total_cost_spi / 1000000.0f;
-	m_total_cost_string = Utility::to_string_with_precision<float>(millions, 1) + "kk";
+	m_statistics.m_cost_total = m_statistics.m_cost_enchprots_e1 + m_statistics.m_cost_enchprots_e5 +
+		m_statistics.m_cost_chancecards_8 + m_statistics.m_cost_enchantcards + m_statistics.m_cost_speedcards +
+		(m_statistics.m_used_speedcards + m_statistics.m_used_enchantcards) * COST_ENCHANT_SINGLE;
+																													   
+	m_cost_enchprots_e1_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e5_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
+	m_cost_chancecards_8_string = Utility::to_string_with_precision<float>(m_statistics.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
+	m_cost_enchantcards_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_speedcards_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_speedcards / 1000000.0f, 1) + "kk";
+	m_cost_total_string			= Utility::to_string_with_precision<float>(m_statistics.m_cost_total / 1000000.0f, 1) + "kk";
 }
 
 bool EnchantBot::TrySimulateButtonClick(LabButtonCode button)
