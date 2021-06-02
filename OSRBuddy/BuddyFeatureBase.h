@@ -17,7 +17,8 @@ enum class FeatureType : int
 	EnchantBot,
 	AntiRandomness,
 	WatermelonBot,
-	Visuals
+	Visuals,
+	Miscellaneous
 };
 			 
 class BuddyFeatureBase

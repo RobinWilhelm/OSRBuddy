@@ -8,6 +8,8 @@
 #include "GambleBot.h"
 #include "EnchantBot.h"
 #include "WatermelonBot.h"
+#include "Visuals.h"
+#include "Miscellaneous.h"
                                 
 #include "AntiAntiCheat.h"
 #include "PatternManager.h"
@@ -112,6 +114,9 @@ OSRBuddyMain::OSRBuddyMain()
     m_orig_OnSetCursorPos = nullptr;
     m_orig_OnSetCursorPos = nullptr;
     m_orig_tick = nullptr;
+
+    m_allow_notify_popups = false;
+    m_allow_notify_sounds = true;
 }
 
 OSRBuddyMain::~OSRBuddyMain()
@@ -156,6 +161,7 @@ bool OSRBuddyMain::Start()
         RegisterFeature(new WatermelonBot(this));          
         RegisterFeature(new GambleBot(this));
         RegisterFeature(new EnchantBot(this));
+        RegisterFeature(new Miscellaneous(this));
         //RegisterFeature(new AntiMTRandBot(this));
         //RegisterFeature(new TestItemUse(this));
 
@@ -245,34 +251,32 @@ void OSRBuddyMain::ShutdownTickHook()
     }
 }
 
-/*
-bool OSRBuddyMain::InitOnRecvdPacketHook()
+void OSRBuddyMain::MessageBoxThreadFunction(std::function<void(int)> callback, std::string message, std::string header, int type)
 {
-    if (m_fieldsockethooks) {
-        return false;
-    }
-
-    m_fieldsockethooks = std::make_unique<VMTHook<CFieldWinSocket*>>();
-    if (!m_fieldsockethooks->setupvmt((CFieldWinSocket**)m_osr->GetFieldWinSocket())) {
-        return false;
-    }
-
-    m_orig_onrecvdpacket = g_osrbuddy->m_fieldsockethooks->get_original<WinSocketOnRecvdPacketType>(2);
-    m_fieldsockethooks->hook_index(2, (BYTE*)OSRBuddyMain::OnRecvdPacket_Hooked);
-    return true;
+    int returnval = MessageBox(NULL, message.c_str(), header.c_str(), type);
+    callback(returnval);
 }
 
-
-void OSRBuddyMain::ShutdownOnRecvdPacketHook()
-{
-    if (m_fieldsockethooks)
+void OSRBuddyMain::OpenMessageBoxAsync(std::function<void(int)> callback, std::string message, std::string header, MessageBoxType type)
+{      
+    int uType = MB_SYSTEMMODAL;
+    switch (type)
     {
-        m_fieldsockethooks->unhook_all();
-        Sleep(100);
-        m_fieldsockethooks.reset();
+    case MessageBoxType::Information:
+        uType |= MB_ICONINFORMATION; 
+        break;
+    case MessageBoxType::Warning:
+        uType |= MB_ICONWARNING;
+        break;
+    case MessageBoxType::Error:
+        uType |= MB_ICONERROR;
+        break;    
     }
+
+    std::thread msgboxthread(OSRBuddyMain::MessageBoxThreadFunction, callback, message, header, uType);
+    msgboxthread.detach();
 }
-  */
+
 bool OSRBuddyMain::InitOnReadPacketHook()
 {    
     if (m_OnRecvFieldSocketMessagehook) {

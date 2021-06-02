@@ -25,10 +25,19 @@ using CWinSocketWriteType = int(__thiscall*)(CWinSocket * ecx, LPCSTR pPacket, i
 // mouse move emulation
 using GetCursorPosType = BOOL(__stdcall*)(LPPOINT lpPoint);
 using SetCursorPosType = BOOL(__stdcall*)(int x, int y);
-
+ 
 
 using FeatureKeyValue	= std::pair<FeatureType, BuddyFeatureBase*>;
 using FeatureContainer	= std::vector<BuddyFeatureBase*>;
+
+enum class MessageBoxType
+{
+	Information = 0,
+	Warning,
+	Error
+};
+
+
 
 class OSRBuddyMain : public D3DInternalBase
 {
@@ -56,8 +65,10 @@ public:
 
 	bool NotificationSoundAllowed() { return m_allow_notify_sounds; };
 	bool NotificationPopupAllowed() { return m_allow_notify_popups; };
+	void OpenMessageBoxAsync(std::function<void(int)> callback, std::string message, std::string header = std::string("OSRBuddy"), MessageBoxType type = MessageBoxType::Warning);
 	
 private:
+	void static MessageBoxThreadFunction(std::function<void(int)> callback, std::string message, std::string header = std::string("OSRBuddy"), int type = MB_SYSTEMMODAL);
 	// Geerbt über D3DInternalBase
 	virtual void Render(IDirect3DDevice9* device) override;
 	 
@@ -65,8 +76,7 @@ private:
 	
 	bool InitTickHook(); 
 	void ShutdownTickHook();	 
-	
-	
+		
 	//bool InitOnRecvdPacketHook();		//not currently used
 	//void ShutdownOnRecvdPacketHook();	//not currently used
 	

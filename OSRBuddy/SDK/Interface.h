@@ -12,7 +12,8 @@
 #include "AtumNode.h"
 #include "INFInvenExtend.h"
 #include "INFGameMain.h"
-
+#include "INFImage.h"
+#include "INFImageBtn.h"
 
 
 // 2008-02-27 by bhsohn 아레나 이동시 채팅정보 뺵업

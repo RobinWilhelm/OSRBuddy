@@ -79,6 +79,11 @@ CSceneData* OldSchoolRivalsAPI::GetSceneData()
 	return m_atumapplication->m_pScene;
 }
 
+CINFGameMainChat* OldSchoolRivalsAPI::GetINFGameMainChat()
+{
+	return m_atumapplication->m_pInterface->m_pGameMain->m_pChat;
+}
+
 HWND OldSchoolRivalsAPI::GetMainWindow()
 {
 	return m_atumapplication->m_hWnd;

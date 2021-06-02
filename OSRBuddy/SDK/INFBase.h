@@ -29,6 +29,7 @@ enum {
 	ARENA_WAR_MODE_ROUND,					// 라운드.
 	ARENA_WAR_MODE_END
 };
+/*
 struct ST_WARINFO_OUTPOST : public SCITY_WARINFO_OUTPOST
 {
 
@@ -41,7 +42,7 @@ struct ST_WARINFO_OUTPOST : public SCITY_WARINFO_OUTPOST
 	//	ATUM_DATE_TIME	OutpostDate;
 
 };
-
+  */
 
 
 // 2010-06-15 by shcho&hslee 펫시스템 - 좌표 처리 관련 클래스 추가.

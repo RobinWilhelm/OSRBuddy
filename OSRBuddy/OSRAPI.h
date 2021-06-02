@@ -34,6 +34,7 @@ public:
 	CAtumDatabase* GetDatabase();
 	CFieldWinSocket* GetFieldWinSocket(UINT nSocketNotifyType = 0);	  
 	CSceneData* GetSceneData();	  
+	CINFGameMainChat* GetINFGameMainChat();
 
 	HWND GetMainWindow();
 	IDirect3DDevice9* GetD3D9Device();

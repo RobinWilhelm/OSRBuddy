@@ -153,6 +153,8 @@
     <ClInclude Include="AtumProtocol.h" />
     <ClInclude Include="AtumTypedef.h" />
     <ClInclude Include="BuddyAPI.h" />
+    <ClInclude Include="INFBase.h" />
+    <ClInclude Include="Miscellaneous.h" />
     <ClInclude Include="OsrItemInfo.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="D3DHanFont.h" />
@@ -187,12 +189,15 @@
     <ClInclude Include="SDK\AtumDatabase.h" />
     <ClInclude Include="SDK\AtumDateTime.h" />
     <ClInclude Include="SDK\AtumDefine.h" />
+    <ClInclude Include="SDK\AtumError.h" />
     <ClInclude Include="SDK\AtumNode.h" />
     <ClInclude Include="SDK\AtumParam.h" />
+    <ClInclude Include="SDK\AtumProtocol.h" />
     <ClInclude Include="SDK\AtumTypedef.h" />
     <ClInclude Include="SDK\Background.h" />
     <ClInclude Include="SDK\Camera.h" />
     <ClInclude Include="SDK\CharacterInfo.h" />
+    <ClInclude Include="SDK\ChatTab_t.h" />
     <ClInclude Include="SDK\ClientParty.h" />
     <ClInclude Include="SDK\D3dapp.h" />
     <ClInclude Include="SDK\D3DHanFont.h" />
@@ -217,6 +222,10 @@
     <ClInclude Include="SDK\INFCityBase.h" />
     <ClInclude Include="SDK\INFCityLab.h" />
     <ClInclude Include="SDK\INFGameMain.h" />
+    <ClInclude Include="SDK\INFGameMainChat.h" />
+    <ClInclude Include="SDK\INFGameMainWisperChat.h" />
+    <ClInclude Include="SDK\INFImage.h" />
+    <ClInclude Include="SDK\INFImageBtn.h" />
     <ClInclude Include="SDK\INFInvenExtend.h" />
     <ClInclude Include="SDK\Interface.h" />
     <ClInclude Include="SDK\ItemInfo.h" />
@@ -248,6 +257,7 @@
   <ItemGroup>
     <ClCompile Include="AntiAntiCheat.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
+    <ClCompile Include="Miscellaneous.cpp" />
     <ClCompile Include="OsrItemInfo.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="D3DInternalBase.cpp" />

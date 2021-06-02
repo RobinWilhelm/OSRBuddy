@@ -204,13 +204,13 @@ void EnchantBot::RenderSuccessPercentage(int enchstep, int total_tries, int fail
 	} 
 
 	float probabiliy = g_Enchant_probabilities[enchstep] / 10000.0f;
-	float delta = probabiliy - success_ratio - 0.03f;
+	float delta = probabiliy - success_ratio;
 	std::string success_percentage_string = Utility::to_string_with_precision<float>(success_ratio * 100, 1) + "%%";
 
 	ImColor color = ImColor(255,255,0,255);
 	float color_ratio = std::min(1.0f, fabs(delta) / probabiliy * 10.0f);
 
-	if (delta > 0) // bad -> gradually remove green
+	if (delta > -0.03f) // bad -> gradually remove green
 	{
 		color.Value.y = 1.0f - color_ratio;
 	}

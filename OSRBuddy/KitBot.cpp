@@ -1117,7 +1117,7 @@ void KitBuffBot::RenderImGui()
 
 const char* KitBuffBot::GetName() const
 {
-    return "KitBot";
+    return "KitBuffBot";
 }
 
 bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)

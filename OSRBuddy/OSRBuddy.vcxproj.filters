@@ -301,6 +301,33 @@
     <ClInclude Include="PatternManager.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="INFBase.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumError.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AtumProtocol.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ChatTab_t.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFGameMainChat.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFGameMainWisperChat.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Miscellaneous.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFImage.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFImageBtn.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -377,6 +404,9 @@
     </ClCompile>
     <ClCompile Include="OsrItemInfo.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Miscellaneous.cpp">
+      <Filter>Features</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

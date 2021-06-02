@@ -13,21 +13,21 @@
 //#include "AtumApplication.h"
 //#include "INFMission.h"
 // 2007-07-04 by bhsohn 오퍼레이터 추가
-//#include "INFImageBtn.h"
+#include "INFImageBtn.h"
 
 // 2007-08-07 by bhsohn 스피커 아이템 추가
 //#include "INFSpeakeMsg.h"
 
 // 2008-02-27 by bhsohn 아레나 이동시 채팅정보 뺵업
-//#include "ChatTab_t.h"
+#include "ChatTab_t.h"
 
 
 
 // 2008. 12. 23 by ckPark 스킬 사용 지연 사용 지연
-//#include "SkillInfo.h"
+#include "SkillInfo.h"
 // end 2008. 12. 23 by ckPark 스킬 사용 지연 사용 지연
 
-
+#include "INFGameMainChat.h"
 
 
 
@@ -209,7 +209,8 @@ class CINFOptionSystem;
 //class CINFCharacterInfo;
 class CINFCharacterInfoExtend;
 
-class CINFGameMainChat;
+
+//class CINFGameMainChat;
 class CINFIcon;
 class CINFShop;
 class CINFItemInfo;
