@@ -5,7 +5,7 @@ class Visuals :	public BuddyFeatureBase
 {
 	// Geerbt über BuddyFeatureBase
 	virtual FeatureType GetType() const override;
-	virtual const char* GetName() const override;
+	virtual std::string GetName() const override;
 	virtual void Tick() override;
 	virtual void RenderImGui() override;
 };

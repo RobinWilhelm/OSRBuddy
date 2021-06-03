@@ -14,7 +14,7 @@ public:
 	// Geerbt über BuddyFeatureBase
 	virtual void Tick() override;
 	virtual void RenderImGui() override;
-	virtual const char* GetName() const;		 
+	virtual std::string GetName() const;
 	virtual FeatureType GetType() const override;
 
 	void SaveMysterInfoToFile(FILE* fd);

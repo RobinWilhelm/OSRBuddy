@@ -75,37 +75,27 @@ void EnchantBot::Tick()
 			CItemInfo* targetitem = OSR_API->FindItemFromTarget(m_currentEnchantItemUID);
 			if (targetitem && TryTargetItemToInventory())
 			{
+				m_waiting_for_answer = false;
 				UpdateEnchantItemAmount();
 				// item should be in inventory now, set the current enchant item again					
 				SetEnchantItem(m_currentEnchantItemUID);				
 				m_next_action = EnchantAction::Add_EnchantItem;
+
 				if (!m_auto_enchant) {
 					SetEnchantBotState(EnchantBotState::STANDBY);
-				}
+				} 
 
 				if (EnchantFinished())
-				{
+				{ 
 					m_buddy->NotifySound(NotifyType::Information);
 					if (m_buddy->NotificationPopupAllowed())
 					{
 						std::string msg = "Successfully enchanted to E" + std::to_string(m_wantedEnchants.size());
 						m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
-					}	  
+					} 					
 					SetEnchantBotState(EnchantBotState::STANDBY);
 				}
-				int postEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
-				if (m_previous_enchantnum >= 5) {
-					if (postEnch <= m_previous_enchantnum)
-					{
-						m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
-						m_statistics.m_enchantStats[m_previous_enchantnum - 5][1] += 1;
-					}
-					else
-					{
-						m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
-					}
-				}
-				m_waiting_for_answer = false;
+				UpdateEnchantStats();
 			}
 		}
 		else
@@ -196,7 +186,7 @@ void EnchantBot::RenderImGui()
 	ImGui::EndDisabledMode();
 }
 
-const char* EnchantBot::GetName() const
+std::string EnchantBot::GetName() const
 {
 	return "EnchantBot";
 }
@@ -256,6 +246,22 @@ void EnchantBot::ResetLab()
 	m_using_enchprot_e1 = false;
 	m_using_enchprot_e5 = false;
 	m_using_speedcard = false; 
+}
+
+void EnchantBot::UpdateEnchantStats()
+{
+	int postEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
+	if (m_previous_enchantnum >= 5) 
+	{
+		if (postEnch <= m_previous_enchantnum)
+		{
+			m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
+			m_statistics.m_enchantStats[m_previous_enchantnum - 5][1] += 1;
+		}
+		else {
+			m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
+		}
+	}
 }
 
 void EnchantBot::UpdateCheckTime(float elapsedTime)
@@ -831,7 +837,7 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 	}
 	else
 	{			
-		//enchant item not found
+		//enchant item not found	 		
 		m_buddy->NotifySound(NotifyType::Information);
 		if (m_buddy->NotificationPopupAllowed())
 		{											
@@ -853,8 +859,10 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 			}  
 			m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
 		}
+		
 		SetEnchantBotState(EnchantBotState::STANDBY);
 		ResetLab();
+		
 		return false;
 	}  	
 }

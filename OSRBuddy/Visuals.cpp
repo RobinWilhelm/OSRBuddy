@@ -5,7 +5,7 @@ FeatureType Visuals::GetType() const
 	return FeatureType::Visuals;
 }
 
-const char* Visuals::GetName() const
+std::string Visuals::GetName() const
 {
 	return "Visuals";
 }

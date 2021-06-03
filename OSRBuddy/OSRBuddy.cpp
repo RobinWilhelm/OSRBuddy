@@ -87,9 +87,23 @@ BOOL __stdcall OSRBuddyMain::OnSetCursorPos_Hooked(int x, int y)
     return g_osrbuddy->SetCursorPosition(x, y);
 }  
 
-void OSRBuddyMain::MessageBoxThreadFunction(std::string message, std::string header, int type, std::function<void(int)> callback)
+void OSRBuddyMain::MessageBoxThreadFunction(std::string message, std::string header, NotifyType type, std::function<void(int)> callback)
 {     
-    int returnval = MessageBox(NULL, message.c_str(), header.c_str(), type);
+    int uType = MB_SYSTEMMODAL;
+    switch (type)
+    {
+    case NotifyType::Information:
+        uType |= MB_ICONINFORMATION;
+        break;
+    case NotifyType::Warning:
+        uType |= MB_ICONWARNING;
+        break;
+    case NotifyType::Error:
+        uType |= MB_ICONERROR;
+        break;
+    }  
+
+    int returnval = MessageBox(NULL, message.c_str(), header.c_str(), uType);
     if (callback) {
         callback(returnval);
     }
@@ -282,23 +296,17 @@ void OSRBuddyMain::NotifySound(NotifyType type)
     }
 }
 
-void OSRBuddyMain::OpenMessageBoxAsync(std::string message, std::string header, NotifyType type, std::function<void(int)> callback)
-{  
-    int uType = MB_SYSTEMMODAL;
-    switch (type)
-    {
-    case NotifyType::Information:
-        uType |= MB_ICONINFORMATION;
-        break;
-    case NotifyType::Warning:
-        uType |= MB_ICONWARNING;
-        break;
-    case NotifyType::Error:
-        uType |= MB_ICONERROR;
-        break;
-    }
 
-    std::thread msgboxthread(OSRBuddyMain::MessageBoxThreadFunction, message, header, uType, callback);
+void OSRBuddyMain::OpenMessageBoxAsync(std::string message, std::string header, NotifyType type, std::function<void(int)> callback)
+{ 
+    std::thread msgboxthread(OSRBuddyMain::MessageBoxThreadFunction, message, header, type, callback);
+    msgboxthread.detach();
+}
+
+
+void OSRBuddyMain::OpenMessageBoxAsync(std::string message, std::string header, NotifyType type)
+{
+    std::thread msgboxthread(OSRBuddyMain::MessageBoxThreadFunction, message, header, type, nullptr);
     msgboxthread.detach();
 }
 

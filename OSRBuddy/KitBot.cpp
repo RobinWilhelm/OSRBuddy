@@ -1115,7 +1115,7 @@ void KitBuffBot::RenderImGui()
     ImGui::EndColumns();
 }
 
-const char* KitBuffBot::GetName() const
+std::string KitBuffBot::GetName() const
 {
     return "KitBuffBot";
 }

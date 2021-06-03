@@ -206,7 +206,7 @@ void WatermelonBot::RenderImGui()
     ImGui::EndDisabledMode();
 }
 
-const char* WatermelonBot::GetName() const
+std::string WatermelonBot::GetName() const
 {
 	return "Watermelon Bot";
 }

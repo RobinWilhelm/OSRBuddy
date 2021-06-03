@@ -238,7 +238,7 @@ void GambleBot::RenderImGui()
 	ImGui::EndDisabledMode();
 }
 
-const char* GambleBot::GetName()  const
+std::string GambleBot::GetName() const
 {
 	return  "GambleBot";
 }

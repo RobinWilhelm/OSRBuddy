@@ -4,6 +4,7 @@
 #include "imgui/imgui_impl_win32.h"
 
 #include <Windows.h>
+#include <string>
    	 
 class OSRBuddyMain;
 class OldSchoolRivalsAPI;
@@ -41,7 +42,7 @@ public:
 	}
 			   				 
 	virtual FeatureType GetType() const = 0;
-	virtual const char* GetName() const = 0;  
+	virtual std::string GetName() const = 0;  
 	virtual void OnEnable() { return;  };
 	virtual void OnDisable() { return; };
 

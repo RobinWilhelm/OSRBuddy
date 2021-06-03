@@ -19,7 +19,7 @@ FeatureType Miscellaneous::GetType() const
 	return FeatureType::Miscellaneous;
 }
 
-const char* Miscellaneous::GetName() const
+std::string Miscellaneous::GetName() const
 {
 	return "Misc";
 }

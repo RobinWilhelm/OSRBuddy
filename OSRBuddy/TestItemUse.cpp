@@ -198,7 +198,7 @@ void TestItemUse::RenderImGui()
 
 }
 
-const char* TestItemUse::GetName() const
+std::string TestItemUse::GetName() const
 {
 	return "Test";
 }

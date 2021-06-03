@@ -21,7 +21,7 @@ public:
 	// Geerbt über BuddyFeatureBase
 	virtual void Tick() override;
 	virtual void RenderImGui() override;
-	virtual const char* GetName() const override;
+	virtual std::string GetName() const override;
 	virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
 	virtual int WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;	
 	virtual FeatureType GetType() const override;

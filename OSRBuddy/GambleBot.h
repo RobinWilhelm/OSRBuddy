@@ -66,7 +66,7 @@ public:
 	// Geerbt über BuddyFeatureBase
 	virtual void Tick() override;
 	virtual void RenderImGui() override;
-	virtual const char* GetName() const override;				  
+	virtual std::string GetName() const override;
 	virtual FeatureType GetType() const override;
 	virtual void OnEnable() override;
 

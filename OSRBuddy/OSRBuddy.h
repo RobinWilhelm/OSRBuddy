@@ -67,10 +67,12 @@ public:
 	bool NotificationPopupAllowed() { return m_allow_notify_popups; };
 
 	void NotifySound(NotifyType type);
-	void OpenMessageBoxAsync(std::string message, std::string header = std::string("OSRBuddy"), NotifyType type = NotifyType::Warning, std::function<void(int)> callback = nullptr);
-	
+	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type, std::function<void(int)> callback);
+	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type);
+
+
 private:
-	void static MessageBoxThreadFunction(std::string message, std::string header = std::string("OSRBuddy"), int type = MB_SYSTEMMODAL, std::function<void(int)> callback = nullptr);
+	void static MessageBoxThreadFunction(std::string message, std::string header, NotifyType type, std::function<void(int)> callback = nullptr);
 	// Geerbt über D3DInternalBase
 	virtual void Render(IDirect3DDevice9* device) override;
 	 
