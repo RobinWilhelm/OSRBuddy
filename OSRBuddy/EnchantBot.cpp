@@ -85,7 +85,12 @@ void EnchantBot::Tick()
 
 				if (EnchantFinished())
 				{
-					Notify(NotifyType::ENCHANTING_FINISHED);
+					m_buddy->NotifySound(NotifyType::Information);
+					if (m_buddy->NotificationPopupAllowed())
+					{
+						std::string msg = "Successfully enchanted to E" + std::to_string(m_wantedEnchants.size());
+						m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
+					}	  
 					SetEnchantBotState(EnchantBotState::STANDBY);
 				}
 				int postEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
@@ -242,6 +247,15 @@ void EnchantBot::ResetCurrentEnchantItem()
 {
 	m_currentEnchantItemUID = 0; 
 	ResetEnchantList(m_currentEnchants);
+}
+
+void EnchantBot::ResetLab()
+{
+	OSR_API->OnButtonClick(TO_INT(LabButtonCode::Cancel));
+	m_using_chancecard_8 = false;
+	m_using_enchprot_e1 = false;
+	m_using_enchprot_e5 = false;
+	m_using_speedcard = false; 
 }
 
 void EnchantBot::UpdateCheckTime(float elapsedTime)
@@ -536,7 +550,7 @@ void EnchantBot::RenderEnchantButtons()
 		}
 	}  	
 
-	ImGui::Dummy(ImVec2(0, 5));
+	ImGui::NewLine();
 	if (ImGui::Button("Reset",ImVec2(100, 20))) {
 		ResetEnchantList(m_wantedEnchants);
 	}
@@ -729,11 +743,6 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		ResetEnchantCheckTime();
 		// first item will be the item to be enchanted
 		enchantitem = m_enchant_item.GetItemInfo();
-
-		m_using_chancecard_8 = false;
-		m_using_enchprot_e1 = false;
-		m_using_enchprot_e5 = false;
-		m_using_speedcard = false;
 		break;
 
 	case EnchantAction::Add_EnchantCard:
@@ -752,7 +761,9 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 			if (m_enchant_item.GetItemInfo()->m_nEnchantNumber == 5 || m_enchant_item.GetItemInfo()->m_nEnchantNumber == 6)
 			{
 				enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantProtectE1, m_enchantTargetKind, OSR_API->GetPlayerGearType());
-				m_using_enchprot_e1 = true;
+				if (enchantitem) {
+					m_using_enchprot_e1 = true;
+				}
 			}
 			else
 			{
@@ -800,8 +811,12 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 			m_statistics.m_used_enchantcards++;
 		}
 
-		UpdateTotalCost();
+		m_using_chancecard_8 = false;
+		m_using_enchprot_e1 = false;
+		m_using_enchprot_e5 = false;
+		m_using_speedcard = false;
 
+		UpdateTotalCost();	
 		return true;
 	}
 
@@ -817,8 +832,29 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 	else
 	{			
 		//enchant item not found
-		Notify(NotifyType::MISSING_ITEM);
-		SetEnchantBotState(EnchantBotState::STANDBY); 	
+		m_buddy->NotifySound(NotifyType::Information);
+		if (m_buddy->NotificationPopupAllowed())
+		{											
+			std::string msg;
+			switch (action)
+			{
+			case EnchantAction::Add_EnchantItem:
+				msg = "Missing Enchantitem!";
+				break;
+			case EnchantAction::Add_EnchantCard:
+				msg = "Missing Enchantcard!";
+				break;
+			case EnchantAction::Add_ProtectCard:
+				msg = "Missing Protectcard!";
+				break;
+			case EnchantAction::Add_PercentageCard:
+				msg = "Missing Chancecard!";
+				break;		
+			}  
+			m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
+		}
+		SetEnchantBotState(EnchantBotState::STANDBY);
+		ResetLab();
 		return false;
 	}  	
 }
@@ -1017,32 +1053,7 @@ EnchantAction EnchantBot::GetNextAction()
 			return EnchantAction::Add_EnchantItem;		
 		}
 	}			
-}
-
-void EnchantBot::Notify(NotifyType type)
-{
-	switch (type)
-	{
-	case NotifyType::MISSING_ITEM:
-		if (m_buddy->NotificationSoundAllowed()) {
-			MessageBeep(MB_ICONWARNING);
-		}
-		if (m_buddy->NotificationPopupAllowed()) {
-			MessageBox(0, "Missing items for enchant!", "EnchantBot", MB_SYSTEMMODAL);
-		} 		
-		break;
-	case NotifyType::ENCHANTING_FINISHED:
-		if (m_buddy->NotificationSoundAllowed()) {
-			MessageBeep(MB_OK);
-		}
-		if (m_buddy->NotificationPopupAllowed()) {
-			MessageBox(0, "Enchanting successfully finished", "EnchantBot", MB_SYSTEMMODAL);
-		}
-		break;
-	default:
-		break;
-	}
-}
+} 
 
 FeatureType EnchantBot::GetType() const
 {

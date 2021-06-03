@@ -96,7 +96,6 @@ private:
 	bool CheckRarePrefix(CItemInfo* weapon);
 	bool CheckRareSuffix(CItemInfo* weapon);
 	const char* GetGambleActionString(GambleAction);
-	void Notify();
 	bool FixIsInList(int codenum, const int* fixlist, size_t arraysize);
 	void UpdateTotalGambleItemAmount();
 	int GetTotalInventoryAmount(GambleItem gambleItem);

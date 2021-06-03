@@ -747,6 +747,8 @@ bool GambleBot::TryTargetItemToInventory()
 	// m_nextGambleAction is the action that was just done
 	GambleAction current_action = m_next_gamble_action;
 		 		
+	bool found_prefix = false, found_suffix = false;
+
 	switch (current_action)
 	{
 	case GambleAction::ADD_PREFIX:
@@ -754,7 +756,7 @@ bool GambleBot::TryTargetItemToInventory()
 		{
 			m_do_prefix_gamble = false;
 			m_do_prefix_gamble_temp = false;
-			Notify();
+			found_prefix = true;
 		}
 		break;
 	case GambleAction::ADD_SUFFIX:
@@ -762,7 +764,7 @@ bool GambleBot::TryTargetItemToInventory()
 		{ 
 			m_do_suffix_gamble = false;
 			m_do_suffix_gamble_temp = false;
-			Notify();
+			found_suffix = true;
 		}
 		break;
 	case GambleAction::ADD_PREFIX_AND_SUFFIX:
@@ -770,17 +772,44 @@ bool GambleBot::TryTargetItemToInventory()
 		{
 			m_do_prefix_gamble = false;
 			m_do_prefix_gamble_temp = false;
-			Notify();
+			found_prefix = true;
 		}
 		if (CheckRareSuffix(m_gamble_item.GetItemInfo()))
 		{
 			m_do_suffix_gamble = false;
 			m_do_suffix_gamble_temp = false;
-			Notify();
+			found_suffix = true;   	 
 		}
 		break;	
 	}
-	
+
+	if (found_prefix && found_suffix)
+	{
+		m_buddy->NotifySound(NotifyType::Information);
+		if (m_buddy->NotificationPopupAllowed())
+		{
+			std::string msg = "Found rare fixes: " + m_gamble_item.GetCleanPrefixName() + " of " + m_gamble_item.GetCleanSuffixName();
+			m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
+		}
+	}
+	else if (found_prefix)
+	{
+		m_buddy->NotifySound(NotifyType::Information);
+		if (m_buddy->NotificationPopupAllowed())
+		{
+			std::string msg = "Found rare prefix  " + m_gamble_item.GetCleanPrefixName();
+			m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
+		}
+	}
+	else if (found_suffix)
+	{
+		m_buddy->NotifySound(NotifyType::Information);
+		if (m_buddy->NotificationPopupAllowed())
+		{
+			std::string msg = "Found rare suffix  " + m_gamble_item.GetCleanPrefixName();
+			m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
+		}
+	}  	
 	return true;
  }
 
@@ -876,18 +905,7 @@ CItemInfo* GambleBot::FindGambleItemFromInventory(GambleItem gambleitemkind)
 
 	return gambleitem;
 }
-
-void GambleBot::Notify()
-{
-	if (m_buddy->NotificationSoundAllowed()) {
-		MessageBeep(MB_OK);
-	}
-	
-	if (m_buddy->NotificationPopupAllowed()) {
-		MessageBox(0, "Fix has been found!", "GambleBot", MB_SYSTEMMODAL);
-	}	
-}
-
+   	 
 bool GambleBot::FixIsInList(int codenum, const int* fixlist, size_t arraysize)
 {
 	for (int i = 0; i < arraysize; i++)

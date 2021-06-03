@@ -36,17 +36,15 @@ void Miscellaneous::Tick()
 			{
 				if (whisperchat->m_bNewMassage) 
 				{
-					if (m_buddy->NotificationSoundAllowed()) {
-						MessageBeep(MB_ICONWARNING);
-					}
-
+					m_buddy->NotifySound(NotifyType::Warning);
 					if (!m_popup_open && m_buddy->NotificationPopupAllowed())
 					{							
 						std::string msg = std::string(whisperchat->m_szWisperCharacterName) + " has whispered you!";
-						m_buddy->OpenMessageBoxAsync(std::bind(&Miscellaneous::OnMessageBoxClose, this, std::placeholders::_1), msg, "Whisper Warning!", MessageBoxType::Warning);
+						m_buddy->OpenMessageBoxAsync(msg, "Whisper Warning!", NotifyType::Warning, std::bind(&Miscellaneous::OnMessageBoxClose, this, std::placeholders::_1));
 						m_popup_open = true;
 					}					
 					m_last_whisperwarn = currenttime;
+					break;
 				}
 			}
 		}

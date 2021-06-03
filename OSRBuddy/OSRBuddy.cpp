@@ -87,6 +87,14 @@ BOOL __stdcall OSRBuddyMain::OnSetCursorPos_Hooked(int x, int y)
     return g_osrbuddy->SetCursorPosition(x, y);
 }  
 
+void OSRBuddyMain::MessageBoxThreadFunction(std::string message, std::string header, int type, std::function<void(int)> callback)
+{     
+    int returnval = MessageBox(NULL, message.c_str(), header.c_str(), type);
+    if (callback) {
+        callback(returnval);
+    }
+}
+
 void OSRBuddyMain::Render(IDirect3DDevice9* device)
 {
     for (auto& feature : m_features) 
@@ -251,29 +259,46 @@ void OSRBuddyMain::ShutdownTickHook()
     }
 }
 
-void OSRBuddyMain::MessageBoxThreadFunction(std::function<void(int)> callback, std::string message, std::string header, int type)
-{
-    int returnval = MessageBox(NULL, message.c_str(), header.c_str(), type);
-    callback(returnval);
+void OSRBuddyMain::NotifySound(NotifyType type)
+{   
+    if (!NotificationSoundAllowed()) {
+        return;
+    }
+
+    switch (type)
+    {
+    case NotifyType::Information:
+        MessageBeep(MB_ICONINFORMATION);
+        break;
+    case NotifyType::Warning:
+        MessageBeep(MB_ICONWARNING);
+        break;
+    case NotifyType::Error:
+        MessageBeep(MB_ICONERROR);
+        break;
+    default:
+        MessageBeep(MB_ICONWARNING);
+        break;
+    }
 }
 
-void OSRBuddyMain::OpenMessageBoxAsync(std::function<void(int)> callback, std::string message, std::string header, MessageBoxType type)
-{      
+void OSRBuddyMain::OpenMessageBoxAsync(std::string message, std::string header, NotifyType type, std::function<void(int)> callback)
+{  
     int uType = MB_SYSTEMMODAL;
     switch (type)
     {
-    case MessageBoxType::Information:
-        uType |= MB_ICONINFORMATION; 
+    case NotifyType::Information:
+        uType |= MB_ICONINFORMATION;
         break;
-    case MessageBoxType::Warning:
+    case NotifyType::Warning:
         uType |= MB_ICONWARNING;
         break;
-    case MessageBoxType::Error:
+    case NotifyType::Error:
         uType |= MB_ICONERROR;
-        break;    
+        break;
     }
 
-    std::thread msgboxthread(OSRBuddyMain::MessageBoxThreadFunction, callback, message, header, uType);
+    std::thread msgboxthread(OSRBuddyMain::MessageBoxThreadFunction, message, header, uType, callback);
     msgboxthread.detach();
 }
 

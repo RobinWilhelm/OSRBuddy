@@ -40,13 +40,7 @@ enum class EnchantAction
 	Add_PercentageCard,
 	Use_OkButton,
 };
-
-enum class NotifyType
-{
-	MISSING_ITEM = 0,
-	ENCHANTING_FINISHED,
-};
-
+ 
 struct EnchantStatistics
 {
 	int m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
@@ -83,6 +77,7 @@ private:
 	EnchantBotState GetEnchantBotState();
 	void SetEnchantBotState(EnchantBotState);
 	void ResetCurrentEnchantItem();
+	void ResetLab();
 
 	void UpdateCheckTime(float elapsedTime);
 	bool InternalActionCheckTimeReady();
@@ -113,8 +108,6 @@ private:
 
 	bool EnchantFinished();	   
 	EnchantAction GetNextAction();
-
-	void Notify(NotifyType type);
 
 private:
 	EnchantBotState			m_state;

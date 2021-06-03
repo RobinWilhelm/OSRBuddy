@@ -30,7 +30,7 @@ using SetCursorPosType = BOOL(__stdcall*)(int x, int y);
 using FeatureKeyValue	= std::pair<FeatureType, BuddyFeatureBase*>;
 using FeatureContainer	= std::vector<BuddyFeatureBase*>;
 
-enum class MessageBoxType
+enum class NotifyType
 {
 	Information = 0,
 	Warning,
@@ -65,10 +65,12 @@ public:
 
 	bool NotificationSoundAllowed() { return m_allow_notify_sounds; };
 	bool NotificationPopupAllowed() { return m_allow_notify_popups; };
-	void OpenMessageBoxAsync(std::function<void(int)> callback, std::string message, std::string header = std::string("OSRBuddy"), MessageBoxType type = MessageBoxType::Warning);
+
+	void NotifySound(NotifyType type);
+	void OpenMessageBoxAsync(std::string message, std::string header = std::string("OSRBuddy"), NotifyType type = NotifyType::Warning, std::function<void(int)> callback = nullptr);
 	
 private:
-	void static MessageBoxThreadFunction(std::function<void(int)> callback, std::string message, std::string header = std::string("OSRBuddy"), int type = MB_SYSTEMMODAL);
+	void static MessageBoxThreadFunction(std::string message, std::string header = std::string("OSRBuddy"), int type = MB_SYSTEMMODAL, std::function<void(int)> callback = nullptr);
 	// Geerbt über D3DInternalBase
 	virtual void Render(IDirect3DDevice9* device) override;
 	 
