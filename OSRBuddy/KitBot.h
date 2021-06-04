@@ -70,8 +70,8 @@ public:
 			use_energy_type_c = other.use_energy_type_c;
 			use_ammobox = other.use_ammobox;
 			use_fuel = other.use_fuel;
-			use_stealthcard = other.use_stealthcard;
-			use_rabbitnecklace = other.use_rabbitnecklace;
+			//use_stealthcard = other.use_stealthcard;
+			//use_rabbitnecklace = other.use_rabbitnecklace;
 
 			field_healings_active = other.field_healings_active; 
 			field_repair_active = other.field_repair_active; 

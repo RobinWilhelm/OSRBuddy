@@ -964,14 +964,12 @@ void KitBuffBot::RenderImGui()
             ImGui::Text("Others");
             ImGui::Separator();
             ImGui::BeginColumns("OthersColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
-            {
-                ImGui::Checkbox("Ammunition Box", &m_settings.use_ammobox);
+            {                 
                 ImGui::Checkbox("Fuel Kit", &m_settings.use_fuel);
             }
             ImGui::NextColumn();
             {
-                ImGui::Checkbox("Stealthcard", &m_settings.use_stealthcard);
-                ImGui::Checkbox("Rabbit Necklace", &m_settings.use_rabbitnecklace);
+                ImGui::Checkbox("Ammunition Box", &m_settings.use_ammobox);
             }
         }
         ImGui::EndChild();

@@ -268,6 +268,14 @@ enum class ItemNumber : int
     D_Type_CondensedFuel = 7008080,
     E_Type_CondensedFuel =  7000790,
               
+    // Grinding items
+    Rabbit_Necklace = 7030910,
+    Item_Seeker_Unit = 7001610,
+    Stealth_Card_2h = 7001070,
+    Stealth_Card_30m = 7021270,
+    Mini_Stealth_Card = 7010690,
+    Starter_Mini_Stealth_Card = 7021071,
+
     // Watermelon Bot
     Square_Watermelon_Gift = 7023970,
 

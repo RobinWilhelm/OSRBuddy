@@ -53,6 +53,7 @@ public:
 	FeatureContainer GetAllFeatures() const;
 	void RegisterFeature(BuddyFeatureBase* feature);
 	void ReleaseFeatures();
+	void DisableAllFeatures();				 // disable all features and close the imgui menu
 	std::chrono::microseconds GetTickTime(); // should be much more accurate than the games GetElapsedTime() function
 
 	void EnableMouseEmulation(bool on);

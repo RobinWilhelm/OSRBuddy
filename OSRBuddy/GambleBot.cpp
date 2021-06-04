@@ -806,7 +806,7 @@ bool GambleBot::TryTargetItemToInventory()
 		m_buddy->NotifySound(NotifyType::Information);
 		if (m_buddy->NotificationPopupAllowed())
 		{
-			std::string msg = "Found rare suffix  " + m_gamble_item.GetCleanPrefixName();
+			std::string msg = "Found rare suffix  " + m_gamble_item.GetCleanSuffixName();
 			m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
 		}
 	}  	

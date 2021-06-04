@@ -30,6 +30,15 @@ LRESULT OSRBuddyMain::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
     
     switch (msg)
     {
+        case WM_KEYUP:
+            switch (wParam)
+            {
+            case VK_END:                                     
+                DisableAllFeatures();
+            case VK_DELETE:
+                InitiateAppShutdown();
+            }
+        break;
         case WM_QUIT:
         case WM_CLOSE:
         case WM_DESTROY:
@@ -448,11 +457,19 @@ FeatureContainer OSRBuddyMain::GetAllFeatures() const
 
 void OSRBuddyMain::ReleaseFeatures()
 {
-    for (auto& elem : m_features) 
+    for (auto& feature : m_features)
     {
-        delete elem;
+        delete feature;
     } 
     m_features.clear();
+}
+
+void OSRBuddyMain::DisableAllFeatures()
+{
+    for (auto& feature : m_features) {
+        feature->Enable(false);
+    }                                
+    m_imguimenu->ShowMenu(false);
 }
 
 std::chrono::microseconds OSRBuddyMain::GetTickTime()
