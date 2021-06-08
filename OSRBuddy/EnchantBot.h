@@ -6,7 +6,7 @@
 
 #include "OsrItemInfo.h"
 
-#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (2000)
+#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (1500)
 #define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (400)	// button clicks and item movement
 
 #define COLOR_ENCHANTITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green
@@ -83,8 +83,8 @@ private:
 	void UpdateCheckTime(float elapsedTime);
 	bool InternalActionCheckTimeReady();
 	bool EnchantCheckTimeReady();
-	void ResetInternalActionCheckTime(bool random = true);
-	void ResetEnchantCheckTime(bool random = true);		   	
+	void ResetInternalActionCheckTime(bool random = false);
+	void ResetEnchantCheckTime(bool random = false);
 
 	bool IsValidEnchantItem(ITEM_BASE* enchantItem);
 	void SetEnchantItem(UID64_t uid);

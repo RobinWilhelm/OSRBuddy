@@ -112,6 +112,7 @@ LRESULT ImGuiBase::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
             Toggle();
             return 1;
         }
+
     case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:
     case WM_RBUTTONDOWN: case WM_RBUTTONDBLCLK:
     case WM_MBUTTONDOWN: case WM_MBUTTONDBLCLK:                                                                                                                             

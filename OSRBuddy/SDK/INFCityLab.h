@@ -35,7 +35,9 @@ public:
 	virtual int WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 public:
-	char m_pad01[16];
+	
+	std::vector<int> m_saved_times;
+	DWORD m_lasttime;	// 52
 
 	CItemInfo* m_pSelectItem;
 	BOOL				m_bIsEnchantCheck; 
@@ -58,10 +60,9 @@ public:
 	vector<CItemInfo*>  m_vecSource;
 	vector<CItemInfo*>  m_vecTarget;
 	BOOL				m_bShowTarget;
-	BUILDINGNPC* m_pBuildingInfo;
+	BUILDINGNPC* m_pBuildingInfo;		  // offset 240 / 0xF0	
 
-	BOOL				m_bSelectDown;
-
+	BOOL				m_bSelectDown;	  // offset 244	
 };
 
 #endif // !defined(AFX_INFCITYSTORE_H__AD058082_959A_4B02_BEDD_AAE54DE7B3E0__INCLUDED_)

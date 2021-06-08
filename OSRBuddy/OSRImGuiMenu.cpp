@@ -21,8 +21,19 @@ void OSRImGuiMenu::Render()
         {
             if (ImGui::BeginTabItem("Settings"))
             {
-                ImGui::BeginColumns("SettingsColumns", 2, ImGuiColumnsFlags_NoResize);
+                ImGui::Separator();
+                ImGui::Text("HotKeys");
+                ImGui::Separator();
+
+                ImGui::Text("Insert (Einfg):    Open / Close this menu");
+                ImGui::Text("End (Ende):        Disable all features and close menu");
+                ImGui::Text("Delete (Entf):     Unload osrbuddy");
+
+                ImGui::NewLine();
+
+                ImGui::BeginColumns("SettingsColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
                 {
+                    //ImGui::SetColumnWidth(0, 500);
                     ImGui::BeginChild("SettingsTabCol1", ImVec2(), false);
                     {
                         ImGui::Separator();

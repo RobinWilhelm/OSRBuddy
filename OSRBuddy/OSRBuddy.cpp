@@ -30,14 +30,16 @@ LRESULT OSRBuddyMain::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
     
     switch (msg)
     {
-        case WM_KEYUP:
-            switch (wParam)
-            {
-            case VK_END:                                     
-                DisableAllFeatures();
-            case VK_DELETE:
-                InitiateAppShutdown();
-            }
+    case WM_KEYUP:
+        switch (wParam)
+        {
+        case VK_END:
+            DisableAllFeatures();
+            break;
+        case VK_DELETE:
+            InitiateAppShutdown();
+            break;
+        }
         break;
         case WM_QUIT:
         case WM_CLOSE:
@@ -194,7 +196,7 @@ bool OSRBuddyMain::Start()
         RegisterFeature(new EnchantBot(this));
         RegisterFeature(new Miscellaneous(this));
         //RegisterFeature(new AntiMTRandBot(this));
-        //RegisterFeature(new TestItemUse(this));
+        RegisterFeature(new TestItemUse(this));
 
         if (!InitTickHook()) {
             throw exception("TickHook failed to initialise");

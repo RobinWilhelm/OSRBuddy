@@ -296,7 +296,7 @@ bool EnchantBot::EnchantCheckTimeReady()
 void EnchantBot::ResetInternalActionCheckTime(bool random)
 {
 	if (random) {
-		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 300));
+		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 400));
 	}
 	else {
 		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION);
@@ -306,7 +306,7 @@ void EnchantBot::ResetInternalActionCheckTime(bool random)
 void EnchantBot::ResetEnchantCheckTime(bool random)
 {
 	if (random) {
-		m_enchantCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS + m_buddy->GetRandInt32(0, 700));
+		m_enchantCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS + m_buddy->GetRandInt32(0, 1200));
 	}
 	else {
 		m_enchantCheckTime = static_cast<float>ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS;
@@ -725,7 +725,7 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		return false;
 	}
 	else {
-		ResetInternalActionCheckTime(true);
+		ResetInternalActionCheckTime();
 	}
 
 	if (m_currentEnchantItemUID == 0) {
@@ -1008,7 +1008,7 @@ bool EnchantBot::TrySimulateButtonClick(LabButtonCode button)
 	if (InternalActionCheckTimeReady())
 	{
 		OSR_API->OnButtonClick(TO_INT(button));
-		ResetInternalActionCheckTime(true);
+		ResetInternalActionCheckTime();
 		return true;
 	}
 	else {

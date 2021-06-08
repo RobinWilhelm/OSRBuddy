@@ -80,7 +80,7 @@ public:
 	virtual int WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);	
 public:
 	CGameData* m_pGameData;
-	float			m_fTexRate;			// 상점에서만 사용
+	float			m_fTexRate;	// 40		// 상점에서만 사용
 
 };
 

@@ -59,14 +59,14 @@ bool D3DInternalBase::GetD3D9DeviceVtable(void** pTable, size_t Size)
 }
 
 LRESULT D3DInternalBase::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{   
+{ 
+    if (g_D3DInternalBase->WindowProcedure(hwnd, msg, wParam, lParam)) {
+        return 1;
+    } 
     if (g_D3DInternalBase->m_imguimenu && g_D3DInternalBase->m_imguimenu->WindowProcedure(hwnd, msg, wParam, lParam)) {
         return 1;
     }
 
-    if (g_D3DInternalBase->WindowProcedure(hwnd, msg, wParam, lParam)) {
-        return 1;
-    } 
     return CallWindowProc(g_D3DInternalBase->m_OriginalWndproc, hwnd, msg, wParam, lParam);
 }
 

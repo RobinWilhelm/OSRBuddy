@@ -47,7 +47,25 @@ void TestItemUse::Tick()
 
 void TestItemUse::RenderImGui()
 {
-	static OldSchoolRivalsAPI* osr = OSR_API;	   	   	  
+	static OldSchoolRivalsAPI* osr = OSR_API;	  
+
+	ImGui::NewLine();
+
+	CINFCityLab* lab = static_cast<CINFCityLab*>(OSR_API->FindBuildingShop(BUILDINGKIND_LABORATORY));
+	if (lab)
+	{
+		ImGui::InputInt("LastTime: ", (int*)&lab->m_lasttime);
+		ImGui::NewLine();
+		int counter = 0;
+		for (auto item : lab->m_saved_times)
+		{
+			std::string elem_str = std::to_string(item);
+			ImGui::Text(elem_str.c_str());
+		}
+		ImGui::NewLine();
+		
+	}
+
 
 	// test 
 	if (ImGui::Button("Use Healing target")) 

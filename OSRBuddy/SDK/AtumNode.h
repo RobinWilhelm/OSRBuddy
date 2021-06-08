@@ -31,7 +31,7 @@ public:
 	CAtumNode* m_pParent;		// 부모의 노드
 	DWORD			m_dwStateBlock;	// 렌더링상태블럭
 	BOOL			m_bUsing;
-	DWORD			m_dwPartType;
+	DWORD			m_dwPartType; //32
 };
 
 #endif // !defined(AFX_ATUMNODE_H__C4F6F8E5_CA48_46AF_8E84_DD50489CBCF1__INCLUDED_)
