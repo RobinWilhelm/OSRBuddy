@@ -48,7 +48,7 @@ enum class EnchantAction
  
 struct EnchantStatistics
 {
-	int m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
+	int m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };	 // total_tries, fails
 
 	int	m_used_enchprots_e1;
 	int	m_used_enchprots_e5;
