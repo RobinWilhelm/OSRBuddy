@@ -4,6 +4,7 @@
 #include <vector>
 #include "Console.h"
 #include <chrono>
+#include "PersistingTools.h"
 
 class CInterface;
 class CWinSocket;
@@ -70,7 +71,7 @@ public:
 	void NotifySound(NotifyType type);
 	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type, std::function<void(int)> callback);
 	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type);
-
+	PersistingTools m_persistingTools;
 
 private:
 	void static MessageBoxThreadFunction(std::string message, std::string header, NotifyType type, std::function<void(int)> callback = nullptr);

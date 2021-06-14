@@ -328,6 +328,9 @@
     <ClInclude Include="SDK\INFImageBtn.h">
       <Filter>SDK</Filter>
     </ClInclude>
+    <ClInclude Include="PersistingTools.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -407,6 +410,9 @@
     </ClCompile>
     <ClCompile Include="Miscellaneous.cpp">
       <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="PersistingTools.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

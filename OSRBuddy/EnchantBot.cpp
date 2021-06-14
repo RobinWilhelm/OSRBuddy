@@ -2,7 +2,6 @@
 #include "OSRBuddy.h"
 #include "OSRImGuiMenu.h" 
 #include "Utility.h"
-
 #include "OsrItemInfo.h"
 #include "OSRAPI.h"
 
@@ -27,7 +26,7 @@ EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_using_enchprot_e5 = false;
 	m_using_speedcard = false;
 
-	ZeroMemory(&m_statistics, sizeof(EnchantStatistics));
+	ZeroMemory(&m_statisticsSession, sizeof(EnchantStatistics));
 }
 
 EnchantBot::~EnchantBot()
@@ -251,15 +250,18 @@ void EnchantBot::ResetLab()
 void EnchantBot::UpdateEnchantStats()
 {
 	int postEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
+	if (m_previous_enchantnum == 10) {
+		m_statisticsWeapon.m_enchantStats[5][0] += 1;
+	}
 	if (m_previous_enchantnum >= 5) 
 	{
 		if (postEnch <= m_previous_enchantnum)
 		{
-			m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
-			m_statistics.m_enchantStats[m_previous_enchantnum - 5][1] += 1;
+			m_statisticsSession.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
+			m_statisticsSession.m_enchantStats[m_previous_enchantnum - 5][1] += 1;
 		}
 		else {
-			m_statistics.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
+			m_statisticsSession.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
 		}
 	}
 }
@@ -326,6 +328,10 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 
 	m_next_action = EnchantAction::Add_EnchantItem;
 	m_enchant_item = OsrItemInfo(uid);
+	m_buddy->m_persistingTools.CloseStream();
+	m_buddy->m_persistingTools.SetItem(uid);
+	m_statisticsWeapon = m_buddy->m_persistingTools.GetStats();
+
 	if (!m_enchant_item.IsArmor() && !m_enchant_item.IsWeapon()) 
 	{
 		m_currentEnchantItemUID = 0;
@@ -602,13 +608,13 @@ void EnchantBot::RenderStatisticsPopup()
 					std::string enchstep = "E" + std::to_string(i + 5) + " -> " + "E" + std::to_string(i + 6) + ":";
 					ImGui::Text(enchstep.c_str());
 					ImGui::NextColumn();
-					std::string triesfails = std::to_string(m_statistics.m_enchantStats[i][0]) + " - " + std::to_string(m_statistics.m_enchantStats[i][1]);
+					std::string triesfails = std::to_string(m_statisticsSession.m_enchantStats[i][0]) + " - " + std::to_string(m_statisticsSession.m_enchantStats[i][1]);
 					ImGui::DrawTextCentered(triesfails, ImGui::GetColumnWidth());
 					if (ImGui::IsItemHovered()) {
 						ImGui::SetTooltip("total tries - total fails");
 					}
 					ImGui::NextColumn();
-					RenderSuccessPercentage(i + 5, m_statistics.m_enchantStats[i][0], m_statistics.m_enchantStats[i][1]);
+					RenderSuccessPercentage(i + 5, m_statisticsSession.m_enchantStats[i][0], m_statisticsSession.m_enchantStats[i][1]);
 					ImGui::NextColumn();
 				}
 			}
@@ -631,11 +637,11 @@ void EnchantBot::RenderStatisticsPopup()
 			}
 			ImGui::NextColumn();
 			{
-				ImGui::Text(std::to_string(m_statistics.m_used_enchprots_e1).c_str());
-				ImGui::Text(std::to_string(m_statistics.m_used_enchprots_e5).c_str());
-				ImGui::Text(std::to_string(m_statistics.m_used_chancecards_8).c_str());
-				ImGui::Text(std::to_string(m_statistics.m_used_enchantcards).c_str());
-				ImGui::Text(std::to_string(m_statistics.m_used_speedcards).c_str());
+				ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e1).c_str());
+				ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e5).c_str());
+				ImGui::Text(std::to_string(m_statisticsSession.m_used_chancecards_8).c_str());
+				ImGui::Text(std::to_string(m_statisticsSession.m_used_enchantcards).c_str());
+				ImGui::Text(std::to_string(m_statisticsSession.m_used_speedcards).c_str());
 			}	
 			ImGui::NextColumn();
 			{
@@ -651,6 +657,45 @@ void EnchantBot::RenderStatisticsPopup()
 			ImGui::Text("Total spi cost:");
 			ImGui::SameLine(); 		
 			ImGui::Text(m_cost_total_string.c_str());
+			ImGui::Separator();
+		}
+		ImGui::EndGroup();
+		ImGui::BeginGroup();
+		{
+			ImGui::Text("Overall Weapon Statistics");
+			ImGui::Separator();
+			ImGui::Text("E11 Fails: ");
+			ImGui::Text(std::to_string(m_statisticsWeapon.m_enchantStats[5][0]).c_str());
+			ImGui::BeginColumns("WeaponStatColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+			{
+				ImGui::Text("E1 Protects");
+				ImGui::Text("E5 Protects");
+				ImGui::Text("8%% Chance Cards");
+				ImGui::Text("Enchantcards");
+				ImGui::Text("Speedcards");
+			}
+			ImGui::NextColumn();
+			{
+				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e1).c_str());
+				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e5).c_str());
+				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_chancecards_8).c_str());
+				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchantcards).c_str());
+				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_speedcards).c_str());
+			}
+			ImGui::NextColumn();
+			{
+				ImGui::Text(m_cost_enchprots_e1_string_W.c_str());
+				ImGui::Text(m_cost_enchprots_e5_string_W.c_str());
+				ImGui::Text(m_cost_chancecards_8_string_W.c_str());
+				ImGui::Text(m_cost_enchantcards_string_W.c_str());
+				ImGui::Text(m_cost_speedcards_string_W.c_str());
+			}
+			ImGui::EndColumns();
+			ImGui::NewLine();
+			ImGui::Separator();
+			ImGui::Text("Total spi cost:");
+			ImGui::SameLine();
+			ImGui::Text(m_cost_total_string_W.c_str());
 			ImGui::Separator();
 		}
 		ImGui::EndGroup();
@@ -799,24 +844,29 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		m_waiting_for_answer = true;
 
 		if (m_using_chancecard_8) {
-			m_statistics.m_used_chancecards_8++;
+			m_statisticsSession.m_used_chancecards_8++;
+			m_statisticsWeapon.m_used_chancecards_8++;
 		}
 
 		if (m_using_enchprot_e1) {
-			m_statistics.m_used_enchprots_e1++;
+			m_statisticsSession.m_used_enchprots_e1++;
+			m_statisticsWeapon.m_used_enchprots_e1++;
 		}
 
 		if (m_using_enchprot_e5){
-			m_statistics.m_used_enchprots_e5++;
+			m_statisticsSession.m_used_enchprots_e5++;
+			m_statisticsWeapon.m_used_enchprots_e5++;
 		}
 
 		if (m_using_speedcard) {
-			m_statistics.m_used_speedcards++;
+			m_statisticsSession.m_used_speedcards++;
+			m_statisticsWeapon.m_used_speedcards++;
 		}
 		else {
-			m_statistics.m_used_enchantcards++;
+			m_statisticsSession.m_used_enchantcards++;
+			m_statisticsWeapon.m_used_enchantcards++;
 		}
-
+		m_buddy->m_persistingTools.PersistEnchantments(m_statisticsWeapon);
 		m_using_chancecard_8 = false;
 		m_using_enchprot_e1 = false;
 		m_using_enchprot_e5 = false;
@@ -985,22 +1035,39 @@ void EnchantBot::UpdateEnchantItemAmount()
 
 void EnchantBot::UpdateTotalCost()
 {
-	m_statistics.m_cost_enchprots_e1	= m_statistics.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
-	m_statistics.m_cost_enchprots_e5	= m_statistics.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
-	m_statistics.m_cost_chancecards_8	= m_statistics.m_used_chancecards_8 * COST_ENCHANT_CHANCE_8;
-	m_statistics.m_cost_enchantcards	= m_statistics.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
-	m_statistics.m_cost_speedcards		= m_statistics.m_used_speedcards * COST_ENCHANTCARD_SPEED;
+	m_statisticsSession.m_cost_enchprots_e1	= m_statisticsSession.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
+	m_statisticsSession.m_cost_enchprots_e5	= m_statisticsSession.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
+	m_statisticsSession.m_cost_chancecards_8	= m_statisticsSession.m_used_chancecards_8 * COST_ENCHANT_CHANCE_8;
+	m_statisticsSession.m_cost_enchantcards	= m_statisticsSession.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
+	m_statisticsSession.m_cost_speedcards		= m_statisticsSession.m_used_speedcards * COST_ENCHANTCARD_SPEED;
 
-	m_statistics.m_cost_total = m_statistics.m_cost_enchprots_e1 + m_statistics.m_cost_enchprots_e5 +
-		m_statistics.m_cost_chancecards_8 + m_statistics.m_cost_enchantcards + m_statistics.m_cost_speedcards +
-		(m_statistics.m_used_speedcards + m_statistics.m_used_enchantcards) * COST_ENCHANT_SINGLE;
+	m_statisticsSession.m_cost_total = m_statisticsSession.m_cost_enchprots_e1 + m_statisticsSession.m_cost_enchprots_e5 +
+		m_statisticsSession.m_cost_chancecards_8 + m_statisticsSession.m_cost_enchantcards + m_statisticsSession.m_cost_speedcards +
+		(m_statisticsSession.m_used_speedcards + m_statisticsSession.m_used_enchantcards) * COST_ENCHANT_SINGLE;
 																													   
-	m_cost_enchprots_e1_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
-	m_cost_enchprots_e5_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_8_string = Utility::to_string_with_precision<float>(m_statistics.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
-	m_cost_enchantcards_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_enchantcards / 1000000.0f, 1) + "kk";
-	m_cost_speedcards_string	= Utility::to_string_with_precision<float>(m_statistics.m_cost_speedcards / 1000000.0f, 1) + "kk";
-	m_cost_total_string			= Utility::to_string_with_precision<float>(m_statistics.m_cost_total / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e1_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e5_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
+	m_cost_chancecards_8_string = Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
+	m_cost_enchantcards_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_speedcards_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_speedcards / 1000000.0f, 1) + "kk";
+	m_cost_total_string			= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_total / 1000000.0f, 1) + "kk";
+
+	m_statisticsWeapon.m_cost_enchprots_e1 = m_statisticsWeapon.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
+	m_statisticsWeapon.m_cost_enchprots_e5 = m_statisticsWeapon.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
+	m_statisticsWeapon.m_cost_chancecards_8 = m_statisticsWeapon.m_used_chancecards_8 * COST_ENCHANT_CHANCE_8;
+	m_statisticsWeapon.m_cost_enchantcards = m_statisticsWeapon.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
+	m_statisticsWeapon.m_cost_speedcards = m_statisticsWeapon.m_used_speedcards * COST_ENCHANTCARD_SPEED;
+
+	m_statisticsWeapon.m_cost_total = m_statisticsWeapon.m_cost_enchprots_e1 + m_statisticsWeapon.m_cost_enchprots_e5 +
+		m_statisticsWeapon.m_cost_chancecards_8 + m_statisticsWeapon.m_cost_enchantcards + m_statisticsWeapon.m_cost_speedcards +
+		(m_statisticsWeapon.m_used_speedcards + m_statisticsWeapon.m_used_enchantcards) * COST_ENCHANT_SINGLE;
+
+	m_cost_enchprots_e1_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e5_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
+	m_cost_chancecards_8_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
+	m_cost_enchantcards_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_speedcards_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_total_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_total / 1000000.0f, 1) + "kk";
 }
 
 bool EnchantBot::TrySimulateButtonClick(LabButtonCode button)
