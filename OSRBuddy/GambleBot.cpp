@@ -457,7 +457,7 @@ bool GambleBot::InternalActionCheckTimeReady()
 	return m_internal_action_check_time == 0.0f;
 }
 
-void GambleBot::ResetGambleCheckTime(bool random = true)
+void GambleBot::ResetGambleCheckTime(bool random)
 {	
 	if (random) {
 		m_gamble_check_time = static_cast<float>(GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES + m_buddy->GetRandInt32(0, 700));
@@ -467,7 +467,7 @@ void GambleBot::ResetGambleCheckTime(bool random = true)
 	}	
 }
 
-void GambleBot::ResetInternalActionCheckTime(bool random = true)
+void GambleBot::ResetInternalActionCheckTime(bool random)
 {
 	if (random) {
 		m_internal_action_check_time = static_cast<float>(GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 300));

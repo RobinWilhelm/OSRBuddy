@@ -194,9 +194,12 @@ bool OSRBuddyMain::Start()
         RegisterFeature(new WatermelonBot(this));          
         RegisterFeature(new GambleBot(this));
         RegisterFeature(new EnchantBot(this));
-        RegisterFeature(new Miscellaneous(this));
-        //RegisterFeature(new AntiMTRandBot(this));
+        RegisterFeature(new Miscellaneous(this));          
+
+#ifndef RELEASE_SETHIA
         RegisterFeature(new TestItemUse(this));
+        //RegisterFeature(new AntiMTRandBot(this));
+#endif // !RELEASE_SETHIA          
 
         if (!InitTickHook()) {
             throw exception("TickHook failed to initialise");

@@ -7,8 +7,13 @@
 
 #include "OsrItemInfo.h"
 
+#ifdef RELEASE_SETHIA
+#define GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES (1500)           // minimum time between to complete gamble actions (add/remove fix) 
+#define GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (600)	// button clicks and item movement
+#else
 #define GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES (1500)           // minimum time between to complete gamble actions (add/remove fix) 
 #define GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (400)	// button clicks and item movement
+#endif // RELEASE_SETHIA
 
 #define COLOR_GAMBLEITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green
 #define COLOR_GAMBLEITEM_LT_100 (ImColor(0xFF, 0xBB, 0x33).Value) // orange
@@ -91,8 +96,8 @@ private:
 	void UpdateCheckTime(float elapsedTime);
 	bool GambleCheckTimeReady();
 	bool InternalActionCheckTimeReady();
-	void ResetGambleCheckTime(bool random);
-	void ResetInternalActionCheckTime(bool random);
+	void ResetGambleCheckTime(bool random = true);
+	void ResetInternalActionCheckTime(bool random = true);
 	bool CheckRarePrefix(CItemInfo* weapon);
 	bool CheckRareSuffix(CItemInfo* weapon);
 	const char* GetGambleActionString(GambleAction);
