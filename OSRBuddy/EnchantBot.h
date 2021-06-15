@@ -64,7 +64,6 @@ struct EnchantStatistics
 	int	m_cost_total;
 };
 
-
 class EnchantBot : public BuddyFeatureBase
 {
 public:
@@ -148,7 +147,8 @@ private:
 	bool					m_using_chancecard_8;
 	bool					m_using_speedcard;
 
-	EnchantStatistics       m_statistics;
+	EnchantStatistics       m_statisticsSession;
+	EnchantStatistics		m_statisticsWeapon;
 
 	// for buffering
 	std::string				m_cost_total_string;
@@ -157,4 +157,12 @@ private:
 	std::string				m_cost_chancecards_8_string;
 	std::string				m_cost_enchantcards_string;
 	std::string				m_cost_speedcards_string;
+
+	//for buffering of overall stats:
+	std::string				m_cost_total_string_W;
+	std::string				m_cost_enchprots_e1_string_W;
+	std::string				m_cost_enchprots_e5_string_W;
+	std::string				m_cost_chancecards_8_string_W;
+	std::string				m_cost_enchantcards_string_W;
+	std::string				m_cost_speedcards_string_W;
 };

@@ -230,6 +230,7 @@
     <ClInclude Include="OSRAPI.h" />
     <ClInclude Include="OSRBuddy.h" />
     <ClInclude Include="OSRImGuiMenu.h" />
+    <ClInclude Include="PersistingTools.h" />
     <ClInclude Include="SDK\AppEffectData.h" />
     <ClInclude Include="SDK\AtumApplication.h" />
     <ClInclude Include="SDK\AtumData.h" />
@@ -331,6 +332,7 @@
     <ClCompile Include="OSRBuddy.cpp" />
     <ClCompile Include="OSRImGuiMenu.cpp" />
     <ClCompile Include="PatternManager.cpp" />
+    <ClCompile Include="PersistingTools.cpp" />
     <ClCompile Include="TestItemUse.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Visuals.cpp" />
