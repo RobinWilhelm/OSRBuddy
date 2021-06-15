@@ -328,7 +328,7 @@ bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
         return false;
     }
 
-    if (m_shoot_all_goldies)
+    if (m_shoot_all_goldies && monster->m_pMonsterInfo)
     {
         if (monster->m_pMonsterInfo->MonsterName[0] == '\\' && monster->m_pMonsterInfo->MonsterName[1] == 'e') {
             return true;
