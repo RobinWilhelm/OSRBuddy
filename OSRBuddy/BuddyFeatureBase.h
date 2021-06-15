@@ -17,7 +17,7 @@ enum class FeatureType : int
 	GambleBot,
 	EnchantBot,
 	AntiRandomness,
-	WatermelonBot,
+	GrindBot,
 	Visuals,
 	Miscellaneous
 };

@@ -19,6 +19,7 @@
 [Rr]elease/
 [Rr]elease_Debug/
 [Rr]eleases/
+Rr]elease_Sethia/
 x64/
 x86/
 [Aa][Rr][Mm]/
@@ -27,7 +28,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-[Rr]elease_Debug/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

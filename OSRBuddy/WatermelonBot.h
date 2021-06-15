@@ -5,9 +5,22 @@
 #include "OSRAPI.h"
 #include <chrono>
    
+#define CAPSULE_OPEN_REATTACK 500ms
+
 class KitBuffBot; 
 
-class WatermelonBot : public BuddyFeatureBase
+
+
+struct GrindMonsterInfo
+{
+	INT monsterunitkind;
+	std::string clean_name;
+	bool shoot;
+	uint32_t killed;
+};
+
+
+class GrindBot : public BuddyFeatureBase
 {
 public:
 	enum class State
@@ -17,7 +30,7 @@ public:
 		OVERHEATED,	
 	};
 
-	WatermelonBot(OSRBuddyMain* buddy);
+	GrindBot(OSRBuddyMain* buddy);
 	// Geerbt über BuddyFeatureBase
 	virtual void Tick() override;
 	virtual void RenderImGui() override;
@@ -28,7 +41,7 @@ public:
 	virtual void OnEnable() override;
 	virtual void OnDisable() override;
 
-	void ChangeState(WatermelonBot::State newState);
+	void ChangeState(GrindBot::State newState);
 								
 private:
 	float GetTargetDistance(CAtumData* m_target);
@@ -44,9 +57,12 @@ private:
 	void UpdateCheckTime();
 	void UpdateGrindingTime();
 
+	void TickInventoryCleaning();
+	bool TryOpenCapsule(ItemNumber capsule);
+
 private:
 	CMonsterData* m_target;
-	WatermelonBot::State m_current_state;
+	GrindBot::State m_current_state;
 	KitBuffBot* m_kitbot;
 
 	std::chrono::milliseconds m_grinding_time;
@@ -56,13 +72,17 @@ private:
 	bool m_awaiting_siege_toggle_ok;
 	bool m_on_target;	 
 	bool m_get_new_target;
-	bool m_auto_clean_inventory;
 
+	std::vector<int, uint32_t> m_killed_mobs;	  	  
 	std::chrono::milliseconds m_inv_action_check_time;
 
-	bool m_shoot_watermelon_tanks;
-	bool m_shoot_watermelon_z;
+	bool m_clean_inventory;
+	bool m_only_clean_while_stopped;
+	bool m_only_clean_while_overheat;
 
-	uint32_t m_killed_watermelon_tanks;
-	uint32_t m_killed_watermelon_z;
+	bool m_open_watermelongift;
+	bool m_open_spicapsule;
+	bool m_open_fantasyglobemineralcapsule;
+	bool m_open_mineralcapsule;
+	bool m_open_wpcapsule;
 };

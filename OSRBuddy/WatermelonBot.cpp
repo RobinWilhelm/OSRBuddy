@@ -9,20 +9,17 @@
 #define TARGETING_SPEED 1.0f
 #define INVENTORY_CLEAN_ACTION_MIN_TIME 2000
   
-WatermelonBot::WatermelonBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
+GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
-    m_current_state = WatermelonBot::State::WAITING;
+    m_current_state = GrindBot::State::WAITING;
     m_on_target = false;
-    m_killed_watermelon_tanks = 0;
-    m_killed_watermelon_z = 0;
     m_target = nullptr;
     m_kitbot = nullptr;
-    m_auto_clean_inventory = false;
     m_get_new_target = true;   
     m_inv_action_check_time = 0ms;
 }   
 
-void WatermelonBot::Tick()
+void GrindBot::Tick()
 {
     if (!IsEnabled() || OSR_API->GetPlayerGearType() != GearType::AGear) {
         return;
@@ -33,6 +30,7 @@ void WatermelonBot::Tick()
     }
 
     UpdateCheckTime();
+    TickInventoryCleaning();
 
     if (OSR_API->IsShuttleDead()) {
         return;
@@ -62,17 +60,17 @@ void WatermelonBot::Tick()
  
     switch (m_current_state)
     {
-    case WatermelonBot::State::WAITING:   
+    case GrindBot::State::WAITING:   
         // show the user what the next targets would be
         m_get_new_target = true;                             
         break;
 
-    case WatermelonBot::State::SIEGEING:
+    case GrindBot::State::SIEGEING:
         UpdateGrindingTime();
         // check for overheat and valid target first
         if (OSR_API->GetPrimaryWeapon()->m_bOverHeat) 
         {
-            ChangeState(WatermelonBot::State::OVERHEATED);
+            ChangeState(GrindBot::State::OVERHEATED);
             return;
         }
         
@@ -100,7 +98,7 @@ void WatermelonBot::Tick()
         }
         break;
 
-    case WatermelonBot::State::OVERHEATED: 
+    case GrindBot::State::OVERHEATED: 
         UpdateGrindingTime();
         if (!OSR_API->GetPrimaryWeapon()->m_bOverHeat) 
         {
@@ -112,80 +110,47 @@ void WatermelonBot::Tick()
                 OSR_API->SetTarget(m_target);
             }
             
-            ChangeState(WatermelonBot::State::SIEGEING);
-        }
-        else
-        {      
-            if (m_auto_clean_inventory && InventoryActionCheckTimeReady())
-            {
-                // Clean inventory of unneeded items         
-
-                // first try to open all watermelon boxes
-                CItemInfo* item = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Square_Watermelon_Gift);
-                if (item)
-                {
-                    OSR_API->SendUseItem(item);
-                    ResetInventoryActionCheckTime();
-                    return;
-                }
-
-                // delete marks 
-            }
-        }
+            ChangeState(GrindBot::State::SIEGEING);
+        }       
         break;
     }
 }
    	 
-void WatermelonBot::RenderImGui()
+void GrindBot::RenderImGui()
 {
     if (!DrawEnableCheckBox()) {
         //return;
     } 
-
     ImGui::NewLine();
-    ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear || OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland);
-    {     
-        switch (m_current_state)
-        {
-        case WatermelonBot::State::WAITING:
-            ImGui::Text("Status: Standby");
-            break;
-        case WatermelonBot::State::SIEGEING:
-            ImGui::Text("Status: Grinding");
-            break;
-        case WatermelonBot::State::OVERHEATED:
-            ImGui::Text("Status: Overheated");
-            break;
-        default:
-            break;
-        }
+    ImGui::BeginColumns("GrindBotColumns", 2, ImGuiColumnsFlags_NoResize);
+    {
+        ImGui::BeginChild("GrindBotColumn1", ImVec2(), false);
+        {              
+            ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear || OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland);
+            {   
+                ImGui::Text("Start / Stop hotkey: \"U\"");
+                ImGui::NewLine();
 
-        ImGui::NewLine();
-        ImGui::Text("Start / Stop hotkey: \"U\"");
-        ImGui::NewLine();
-       
-        ImGui::BeginColumns("WatermelonBotColumns", 2, ImGuiColumnsFlags_NoResize);
-        {   
-            ImGui::BeginChild("WatermelonBotCol1", ImVec2(0,0), false);
-            {
+                switch (m_current_state)
+                {
+                case GrindBot::State::WAITING:
+                    ImGui::Text("Status: Standby");
+                    break;
+                case GrindBot::State::SIEGEING:
+                    ImGui::Text("Status: Grinding");
+                    break;
+                case GrindBot::State::OVERHEATED:
+                    ImGui::Text("Status: Overheated");
+                    break;
+                }
+          
                 ImGui::Separator();
                 ImGui::Text("Settings");
                 ImGui::Separator();
+                
+                // TODO - profile selection
 
-                ImGui::Checkbox("Shoot Watermelon Tanks", &m_shoot_watermelon_tanks);
-                ImGui::Checkbox("Shoot Watermelon Z", &m_shoot_watermelon_z);
-                ImGui::NewLine();
-                ImGui::Checkbox("Automatic Inventory Cleaning", &m_auto_clean_inventory);
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Will automatically open watermelon gifts.");
-                }
-            }
-            ImGui::EndChild();
-        }
-        ImGui::NextColumn();
-        {
-            ImGui::BeginChild("WatermelonBotCol2", ImVec2(0, 0), false);
-            {
+       
                 ImGui::Separator();
                 ImGui::Text("Statistics");
                 ImGui::Separator();
@@ -197,21 +162,46 @@ void WatermelonBot::RenderImGui()
                 ImGui::Text(std::to_string(m_killed_watermelon_tanks).c_str());
                 ImGui::Text("Watermelon Z killed:");
                 ImGui::SameLine();
-                ImGui::Text(std::to_string(m_killed_watermelon_z).c_str());
+                ImGui::Text(std::to_string(m_killed_watermelon_z).c_str()); 
             }
-            ImGui::EndChild();
+            ImGui::EndDisabledMode();
         }
-        ImGui::EndColumns();
+        ImGui::EndChild();
     }
-    ImGui::EndDisabledMode();
+    ImGui::NextColumn();
+    {
+        ImGui::BeginChild("GrindBotColumn2", ImVec2(), false);
+        {
+            ImGui::Separator();
+            ImGui::Text("Inventory Cleaning");
+            ImGui::Separator();
+
+            ImGui::NewLine();
+            ImGui::Checkbox("Active", &m_clean_inventory);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Will automatically open the below specified items.");
+            }
+            ImGui::Checkbox("Only while stopped", &m_only_clean_while_stopped);
+            ImGui::Checkbox("Only while overheated", &m_only_clean_while_overheat);
+
+            ImGui::NewLine();
+            ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
+            ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
+            ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
+            ImGui::Checkbox("Fantasy Globe Mineral Capsules", &m_open_fantasyglobemineralcapsule);
+            ImGui::Checkbox("WP Capsules", &m_open_wpcapsule);
+        }
+        ImGui::EndChild();
+    }
+    ImGui::EndColumns();
 }
 
-std::string WatermelonBot::GetName() const
+std::string GrindBot::GetName() const
 {
 	return "Watermelon Bot";
 }
 
-bool WatermelonBot::OnReadPacket(unsigned short msgtype, byte* packet)
+bool GrindBot::OnReadPacket(unsigned short msgtype, byte* packet)
 {
     if (!IsEnabled())
         return false;
@@ -243,7 +233,7 @@ bool WatermelonBot::OnReadPacket(unsigned short msgtype, byte* packet)
     return false;
 }
 
-int WatermelonBot::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+int GrindBot::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 { 
     switch (msg)
     {
@@ -258,7 +248,7 @@ int WatermelonBot::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-float WatermelonBot::GetTargetDistance(CAtumData* m_target)
+float GrindBot::GetTargetDistance(CAtumData* m_target)
 {
     if (!m_target) {
         return 0.0f;
@@ -268,7 +258,7 @@ float WatermelonBot::GetTargetDistance(CAtumData* m_target)
     return D3DXVec3Length(&delta);  
 }
 
-bool WatermelonBot::CanShootAtTarget(CUnitData* target)
+bool GrindBot::CanShootAtTarget(CUnitData* target)
 {
     if (!target || target->m_bIsUnderWater) {
         return false;
@@ -281,7 +271,7 @@ bool WatermelonBot::CanShootAtTarget(CUnitData* target)
     return OSR_API->IsHitablePrimary(target);
 }
 
-bool WatermelonBot::IsValidTargetMonster(CMonsterData* monster)
+bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
 {
     if (!monster) {
         return false;
@@ -310,7 +300,7 @@ bool WatermelonBot::IsValidTargetMonster(CMonsterData* monster)
     return true;
 }
 
-CMonsterData* WatermelonBot::FindNewTarget(float max_distance, bool front_only)
+CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
 {  
     float min_cursor_distance = 999999;
     CMonsterData* newtarget = nullptr;
@@ -379,7 +369,7 @@ CMonsterData* WatermelonBot::FindNewTarget(float max_distance, bool front_only)
     return newtarget;
 }
 
-void WatermelonBot::AimAtTarget(CMonsterData* m_target)
+void GrindBot::AimAtTarget(CMonsterData* m_target)
 {
     if (m_target)
     {
@@ -412,19 +402,19 @@ void WatermelonBot::AimAtTarget(CMonsterData* m_target)
     }
 }
 
-void WatermelonBot::ToggleGrinding()
+void GrindBot::ToggleGrinding()
 {
     switch (m_current_state)
     {
-    case WatermelonBot::State::WAITING:
+    case GrindBot::State::WAITING:
         m_buddy->EnableMouseEmulation(true);
-        ChangeState(WatermelonBot::State::SIEGEING);   
+        ChangeState(GrindBot::State::SIEGEING);   
         m_grinding_start = std::chrono::system_clock::now();
         break;
-    case WatermelonBot::State::SIEGEING:
-    case WatermelonBot::State::OVERHEATED:
+    case GrindBot::State::SIEGEING:
+    case GrindBot::State::OVERHEATED:
         m_buddy->EnableMouseEmulation(false);
-        ChangeState(WatermelonBot::State::WAITING);
+        ChangeState(GrindBot::State::WAITING);
         m_grinding_time_total = m_grinding_time;
         break;
     default:
@@ -432,17 +422,17 @@ void WatermelonBot::ToggleGrinding()
     }  
 }
 
-bool WatermelonBot::InventoryActionCheckTimeReady()
+bool GrindBot::InventoryActionCheckTimeReady()
 {
     return m_inv_action_check_time <= 0ms;
 }
 
-void WatermelonBot::ResetInventoryActionCheckTime()
+void GrindBot::ResetInventoryActionCheckTime()
 {
-    m_inv_action_check_time = std::chrono::milliseconds(INVENTORY_CLEAN_ACTION_MIN_TIME + m_buddy->GetRandInt32(0, 300));
+    m_inv_action_check_time = CAPSULE_OPEN_REATTACK + std::chrono::milliseconds(m_buddy->GetRandInt32(0, 300));
 }
 
-void WatermelonBot::UpdateCheckTime()
+void GrindBot::UpdateCheckTime()
 {   
     if (m_inv_action_check_time > 0ms) {
         m_inv_action_check_time -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
@@ -452,18 +442,73 @@ void WatermelonBot::UpdateCheckTime()
     }
 }
 
-void WatermelonBot::UpdateGrindingTime()
+void GrindBot::UpdateGrindingTime()
 {
     auto current = std::chrono::system_clock::now();
     m_grinding_time = m_grinding_time_total + std::chrono::duration_cast<std::chrono::milliseconds>(current - m_grinding_start);
 }
-       
-FeatureType WatermelonBot::GetType() const
-{
-	return FeatureType::WatermelonBot;
+
+void GrindBot::TickInventoryCleaning()
+{   
+    if (m_clean_inventory && (!m_only_clean_while_stopped || OSR_API->GetAtumApplication()->m_pShuttleChild->m_bUnitStop)
+        && (!m_only_clean_while_overheat || m_current_state == GrindBot::State::OVERHEATED))
+    {
+
+
+        if (InventoryActionCheckTimeReady())
+        {
+            if (m_open_mineralcapsule && TryOpenCapsule(ItemNumber::Mineral_Capsule)) {
+                return;
+            }
+
+            if (m_open_fantasyglobemineralcapsule && TryOpenCapsule(ItemNumber::Fantasy_Globe_Mineral_Capsule)) {
+                return;
+            }
+
+            if (m_open_watermelongift && TryOpenCapsule(ItemNumber::Square_Watermelon_Gift)) {
+                return;
+            }
+
+            if (m_open_spicapsule && TryOpenCapsule(ItemNumber::SPI_capsule)) {
+                return;
+            }
+
+            if (m_open_wpcapsule)
+            {
+                if (TryOpenCapsule(ItemNumber::WP_Capsule_100)) {
+                    return;
+                }
+
+                if (TryOpenCapsule(ItemNumber::WP_Capsule_500)) {
+                    return;
+                }
+
+                if (TryOpenCapsule(ItemNumber::WP_Capsule_1000)) {
+                    return;
+                }
+            }
+        }
+    }
 }
 
-void WatermelonBot::OnEnable()
+bool GrindBot::TryOpenCapsule(ItemNumber capsule)
+{
+    CItemInfo* item = OSR_API->FindItemInInventoryByItemNum(capsule);
+    if (item)
+    {
+        OSR_API->SendUseItem(item);
+        ResetInventoryActionCheckTime();
+        return true;
+    }
+    return false;
+}
+       
+FeatureType GrindBot::GetType() const
+{
+	return FeatureType::GrindBot;
+}
+
+void GrindBot::OnEnable()
 {
     if (OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland) 
     {
@@ -474,8 +519,6 @@ void WatermelonBot::OnEnable()
     // reset grinding timer
     m_grinding_time = 0ms;
     m_grinding_time_total = 0ms;
-    m_killed_watermelon_tanks = 0;
-    m_killed_watermelon_z = 0;
 
     m_kitbot = static_cast<KitBuffBot*>(m_buddy->GetFeatureByType(FeatureType::KitBuffBot));
     if (m_kitbot)
@@ -506,14 +549,14 @@ void WatermelonBot::OnEnable()
     }
 }
 
-void WatermelonBot::OnDisable()
+void GrindBot::OnDisable()
 {
     if (m_kitbot) {
         m_kitbot->Enable(false);
     }
 }
 
-void WatermelonBot::ChangeState(WatermelonBot::State newState)
+void GrindBot::ChangeState(GrindBot::State newState)
 {
     if (newState == m_current_state) {
         return;
@@ -521,14 +564,14 @@ void WatermelonBot::ChangeState(WatermelonBot::State newState)
 
     switch (newState)
     {
-    case WatermelonBot::State::WAITING:
+    case GrindBot::State::WAITING:
         OSR_API->UsePrimaryWeapon(false);
         OSR_API->UseSecondaryWeapon(false);
         m_kitbot->ToggleSKill(SkillType::Siege_Mode, false);
         break;
-    case WatermelonBot::State::SIEGEING:
+    case GrindBot::State::SIEGEING:
         break;
-    case WatermelonBot::State::OVERHEATED:
+    case GrindBot::State::OVERHEATED:
         OSR_API->UsePrimaryWeapon(false);
         OSR_API->UseSecondaryWeapon(false);
         m_kitbot->ToggleSKill(SkillType::Siege_Mode, false);

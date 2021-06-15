@@ -278,6 +278,12 @@ enum class ItemNumber : int
 
     // Watermelon Bot
     Square_Watermelon_Gift = 7023970,
+    Fantasy_Globe_Mineral_Capsule = 7023480,
+    WP_Capsule_100 = 7030445,
+    WP_Capsule_500 = 7030444,
+    WP_Capsule_1000 = 7030443,
+    SPI_capsule = 7004740,
+    Mineral_Capsule = 7015000,
 
     // Skills
     IG_Turnaround_2 = 7832022,
@@ -675,9 +681,20 @@ enum class ItemNumber : int
 
 enum class MonsterUnitKind : unsigned int
 {
+    // watermelon map
     Watermelon_Z = 2090600,
     Watermelon_Tank = 2090700,
+
+    // easter even
     Easter_Egg = 2082300,
+
+    // summer event
+    Summer_Messenger = 2099900,
+    Summer_Sprite = 2100000,
+    Icecream_Jet = 2105900,
+    Icecream_Tank = 2106000,
+    Flying_Ball = 2098000,
+    Dropped_Ball = 2098100,
 };
 
 // gamble items

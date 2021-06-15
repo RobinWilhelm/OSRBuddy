@@ -2,6 +2,10 @@
 #include "BuddyFeatureBase.h"
 #include <chrono>
 #include <atomic>
+#include "OSRBuddyDefine.h"
+
+#define CAPSULE_OPEN_REATTACK 400ms
+
 
 class CItemInfo;
 
@@ -19,16 +23,29 @@ public:
 
 	void OnMessageBoxClose(int result);
 
-	CItemInfo* FindStealthCardInInventory();
+	CItemInfo* FindStealthCardInInventory();  
+	void TickCleanInventory();
+
+private:
+	bool TryOpenCapsule(ItemNumber capsule);
+
 
 private:
 	bool m_whisperwarner_active;
 	bool m_whisperwarner_closeall;
-	
-	bool use_stealthcard;
-	bool use_rabbitnecklace;
-	bool use_ammobox;
+
+	bool m_use_ammobox; //todo
+
+	bool m_clean_inventory;
+	bool m_only_clean_while_stopped;
+
+	bool m_open_watermelongift;
+	bool m_open_spicapsule;
+	bool m_open_fantasyglobemineralcapsule;
+	bool m_open_mineralcapsule;
+	bool m_open_wpcapsule;
 
 	std::chrono::milliseconds m_last_whisperwarn;
 	std::atomic<bool> m_popup_open;
+	std::chrono::milliseconds m_last_capsule_opened;
 };
