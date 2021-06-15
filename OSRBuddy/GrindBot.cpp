@@ -638,7 +638,7 @@ bool GrindBot::TryOpenCapsule(ItemNumber capsule)
 
 bool GrindBot::IsMonsterDead(CMonsterData* monster)
 {
-    if (monster->m_dwState == _FALLING || monster->m_dwState == _FALLEN || monster->m_dwState == _EXPLODING || monster->m_dwState == _EXPLODED) {
+    if (monster->m_dwState == _FALLING || monster->m_dwState == _FALLEN || monster->m_dwState == _EXPLODING || monster->m_dwState == _EXPLODED || monster->m_dwState == _AUTODESTROYED) {
         return true;
     }
 
