@@ -143,7 +143,8 @@ void GrindBot::RenderImGui()
                 ImGui::Text("Settings");
                 ImGui::Separator();
                 ImGui::Text("Start / Stop hotkey: \"U\"");
-                ImGui::Checkbox("Shoot Front only", &m_front_only);
+                ImGui::Checkbox("Prioritise mobs closer to the Gear", &m_prioritise_closer_mobs);
+                ImGui::Checkbox("Shoot only Monster in the Screen", &m_front_only);
                 ImGui::Checkbox("Shoot all goldies", &m_shoot_all_goldies);
 
                 ImGui::NewLine();
@@ -154,7 +155,7 @@ void GrindBot::RenderImGui()
                 {
                     ImGui::Text("Shoot at");
                     ImGui::NextColumn();
-                    ImGui::Text("Prioritse");
+                    ImGui::Text("Prioritise");
                     ImGui::NextColumn();
                     ImGui::Separator();
                     for (auto& monsterinfo : m_mobs)
@@ -250,7 +251,7 @@ void GrindBot::RenderImGui()
 
 std::string GrindBot::GetName() const
 {
-	return "Watermelon Bot";
+	return "GrindBot";
 }
 
 bool GrindBot::OnReadPacket(unsigned short msgtype, byte* packet)
@@ -265,7 +266,7 @@ bool GrindBot::OnReadPacket(unsigned short msgtype, byte* packet)
         {             
             if (((MSG_FC_MONSTER_CHANGE_HP*)packet)->CurrentHP <= 0)
             {
-                m_target->m_info.CurrentHP = 0; 
+                //um_target->m_info.CurrentHP = 0; 
                 auto monsterinfo = FindGrindMonsterInfo(m_target->m_info.MonsterUnitKind);
                 if (monsterinfo != m_mobs.end()) {
                     monsterinfo->second.killed++;
@@ -324,9 +325,11 @@ bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
         return false;
     }  
 
-    if (monster->m_info.CurrentHP <= 0) {
+    if ( IsMonsterDead(monster)) {
         return false;
     }
+
+   // if(monster->)
 
     if (m_shoot_all_goldies && monster->m_pMonsterInfo)
     {
@@ -344,10 +347,10 @@ bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
 
 CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
 {  
-    float min_cursor_distance = 999999;
+    float min_distance = 999999;
     CMonsterData* newtarget = nullptr;
 
-    float min_cursor_distance_prio = 999999;
+    float min_distance_prio = 999999;
     CMonsterData* newtarget_prio = nullptr;
 
     POINT curPos;
@@ -372,18 +375,27 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                 delta.x = curPos.x - monster->m_nObjScreenX;
                 delta.y = curPos.y - monster->m_nObjScreenY;
 
-                float cursor_dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
-
-                if (cursor_dist < min_cursor_distance)
+                float dist;
+                if (m_prioritise_closer_mobs)
                 {
-                    min_cursor_distance = cursor_dist;
+                    dist = GetTargetDistance(monster);
+                }
+                else
+                {
+                    dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
+                }
+                
+
+                if (dist < min_distance)
+                {
+                    min_distance = dist;
                     newtarget = monster;
                 }
 
                 auto monsterinfo = FindGrindMonsterInfo(monster->m_pMonsterInfo->MonsterUnitKind);
-                if (monsterinfo->second.priority && cursor_dist < min_cursor_distance_prio)
+                if (monsterinfo->second.priority && dist < min_distance_prio)
                 {
-                    min_cursor_distance_prio = cursor_dist;
+                    min_distance_prio = dist;
                     newtarget_prio = monster;
                 }
             }
@@ -408,18 +420,26 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                 delta.x = curPos.x - monster.second->m_nObjScreenX;
                 delta.y = curPos.y - monster.second->m_nObjScreenY;
 
-                float cursor_dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
-
-                if (cursor_dist < min_cursor_distance)
+                float dist;
+                if (m_prioritise_closer_mobs)
                 {
-                    min_cursor_distance = cursor_dist;
+                    dist = GetTargetDistance(monster.second);
+                }
+                else
+                {
+                    dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
+                }
+
+                if (dist < min_distance)
+                {
+                    min_distance = dist;
                     newtarget = monster.second;
                 }
 
                 auto monsterinfo = FindGrindMonsterInfo(monster.second->m_pMonsterInfo->MonsterUnitKind);
-                if (monsterinfo->second.priority && cursor_dist < min_cursor_distance_prio)
+                if (monsterinfo->second.priority && dist < min_distance_prio)
                 {
-                    min_cursor_distance_prio = cursor_dist;
+                    min_distance_prio = dist;
                     newtarget_prio = monster.second;
                 }                  
             }
@@ -615,6 +635,15 @@ bool GrindBot::TryOpenCapsule(ItemNumber capsule)
     }
     return false;
 }
+
+bool GrindBot::IsMonsterDead(CMonsterData* monster)
+{
+    if (monster->m_dwState == _FALLING || monster->m_dwState == _FALLEN || monster->m_dwState == _EXPLODING || monster->m_dwState == _EXPLODED) {
+        return true;
+    }
+
+    return false;
+}
        
 FeatureType GrindBot::GetType() const
 {
@@ -637,6 +666,8 @@ void GrindBot::OnEnable()
     m_mobs.insert({ 2098000 , gmi });  
 
     m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;    
+
+    m_clean_inventory = true;
 
     // reset grinding timer
     m_grinding_time = 0ms;

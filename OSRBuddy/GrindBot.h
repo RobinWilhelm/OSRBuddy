@@ -69,6 +69,8 @@ private:
 	void TickInventoryCleaning();
 	bool TryOpenCapsule(ItemNumber capsule);
 
+	bool IsMonsterDead(CMonsterData* monster);
+
 private:
 	CMonsterData* m_target;
 	GrindBot::State m_current_state;
@@ -84,6 +86,7 @@ private:
 	bool m_get_new_target;
 	bool m_front_only;
 	bool m_shoot_all_goldies;
+	bool m_prioritise_closer_mobs;
 			  	  
 	std::chrono::milliseconds m_inv_action_check_time;
 	std::chrono::milliseconds m_update_mob_list_check_time;

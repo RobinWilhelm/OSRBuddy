@@ -593,9 +593,9 @@ void EnchantBot::RenderColoredEnchantItemAmount(int amount)
 
 void EnchantBot::RenderStatisticsPopup()
 {
-	ImGui::SetNextWindowSize(ImVec2(300.0f, 320.0f));
+	ImGui::SetNextWindowSize(ImVec2(600.0f, 320.0f));
 	if (ImGui::BeginPopup("StatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
-	{
+	{ 	
 		ImGui::BeginGroup(); // run view
 		{
 			ImGui::Text("Run View");
@@ -622,87 +622,102 @@ void EnchantBot::RenderStatisticsPopup()
 		}
 		ImGui::EndGroup();
 		ImGui::NewLine();
-		ImGui::BeginGroup();
-		{
-			ImGui::Text("Used Items and Cost:");
-			ImGui::Separator();
-			ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-			{
-				ImGui::Text("E1 Protects");
-				ImGui::Text("E5 Protects");
-				ImGui::Text("8%% Chance Cards");
-				ImGui::Text("Enchantcards");
-				ImGui::Text("Speedcards");
 
-			}
-			ImGui::NextColumn();
-			{
-				ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e1).c_str());
-				ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e5).c_str());
-				ImGui::Text(std::to_string(m_statisticsSession.m_used_chancecards_8).c_str());
-				ImGui::Text(std::to_string(m_statisticsSession.m_used_enchantcards).c_str());
-				ImGui::Text(std::to_string(m_statisticsSession.m_used_speedcards).c_str());
-			}	
-			ImGui::NextColumn();
-			{
-				ImGui::Text(m_cost_enchprots_e1_string.c_str());
-				ImGui::Text(m_cost_enchprots_e5_string.c_str());
-				ImGui::Text(m_cost_chancecards_8_string.c_str());
-				ImGui::Text(m_cost_enchantcards_string.c_str());
-				ImGui::Text(m_cost_speedcards_string.c_str());
-			} 
-			ImGui::EndColumns();
-			ImGui::NewLine();
-			ImGui::Separator();
-			ImGui::Text("Total spi cost:");
-			ImGui::SameLine(); 		
-			ImGui::Text(m_cost_total_string.c_str());
-			ImGui::Separator();
-		}
-		ImGui::EndGroup();
-		ImGui::BeginGroup();
+		ImGui::BeginColumns("StatisticsColums", 2, ImGuiColumnsFlags_NoResize);
 		{
-			ImGui::Text("Overall Weapon Statistics");
-			ImGui::Separator();
-			ImGui::Text("E11 Tries: ");
-			ImGui::Text(std::to_string(m_statisticsWeapon.m_enchantStats[5][0]).c_str());
-			ImGui::BeginColumns("WeaponStatColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+			ImGui::BeginChild("StatisticSessionChild");
 			{
-				ImGui::Text("E1 Protects");
-				ImGui::Text("E5 Protects");
-				ImGui::Text("8%% Chance Cards");
-				ImGui::Text("Enchantcards");
-				ImGui::Text("Speedcards");
+				ImGui::BeginGroup();
+				{
+					ImGui::Text("Used Items and Cost (Session):");
+					ImGui::Separator();
+					ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					{
+						ImGui::Text("E1 Protects");
+						ImGui::Text("E5 Protects");
+						ImGui::Text("8%% Chance Cards");
+						ImGui::Text("Enchantcards");
+						ImGui::Text("Speedcards");
+					}
+					ImGui::NextColumn();
+					{
+						ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e1).c_str());
+						ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e5).c_str());
+						ImGui::Text(std::to_string(m_statisticsSession.m_used_chancecards_8).c_str());
+						ImGui::Text(std::to_string(m_statisticsSession.m_used_enchantcards).c_str());
+						ImGui::Text(std::to_string(m_statisticsSession.m_used_speedcards).c_str());
+					}
+					ImGui::NextColumn();
+					{
+						ImGui::Text(m_cost_enchprots_e1_string.c_str());
+						ImGui::Text(m_cost_enchprots_e5_string.c_str());
+						ImGui::Text(m_cost_chancecards_8_string.c_str());
+						ImGui::Text(m_cost_enchantcards_string.c_str());
+						ImGui::Text(m_cost_speedcards_string.c_str());
+					}
+					ImGui::EndColumns();
+					ImGui::NewLine();
+					ImGui::Separator();
+					ImGui::Text("Total spi cost:");
+					ImGui::SameLine();
+					ImGui::Text(m_cost_total_string.c_str());
+					ImGui::Separator();
+				}
+				ImGui::EndGroup();
 			}
-			ImGui::NextColumn();
-			{
-				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e1).c_str());
-				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e5).c_str());
-				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_chancecards_8).c_str());
-				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchantcards).c_str());
-				ImGui::Text(std::to_string(m_statisticsWeapon.m_used_speedcards).c_str());
-			}
-			ImGui::NextColumn();
-			{
-				ImGui::Text(m_cost_enchprots_e1_string_W.c_str());
-				ImGui::Text(m_cost_enchprots_e5_string_W.c_str());
-				ImGui::Text(m_cost_chancecards_8_string_W.c_str());
-				ImGui::Text(m_cost_enchantcards_string_W.c_str());
-				ImGui::Text(m_cost_speedcards_string_W.c_str());
-			}
-			ImGui::EndColumns();
-			ImGui::NewLine();
-			ImGui::Separator();
-			ImGui::Text("Total spi cost:");
-			ImGui::SameLine();
-			ImGui::Text(m_cost_total_string_W.c_str());
-			ImGui::Separator();
+			ImGui::EndChild();
 		}
-		ImGui::EndGroup();
+		ImGui::NextColumn();
+		{ 
+			ImGui::BeginChild("WeaponStatisticsChild");
+			{
+				ImGui::BeginGroup();
+				{
+					ImGui::Text("Used Items and Cost (Weapon):");
+					ImGui::Separator();
+					//ImGui::Text("E11 Tries: ");
+					//ImGui::Text(std::to_string(m_statisticsWeapon.m_enchantStats[5][0]).c_str());
+					ImGui::BeginColumns("WeaponStatColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					{
+						ImGui::Text("E1 Protects");
+						ImGui::Text("E5 Protects");
+						ImGui::Text("8%% Chance Cards");
+						ImGui::Text("Enchantcards");
+						ImGui::Text("Speedcards");
+					}
+					ImGui::NextColumn();
+					{
+						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e1).c_str());
+						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e5).c_str());
+						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_chancecards_8).c_str());
+						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchantcards).c_str());
+						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_speedcards).c_str());
+					}
+					ImGui::NextColumn();
+					{
+						ImGui::Text(m_cost_enchprots_e1_string_W.c_str());
+						ImGui::Text(m_cost_enchprots_e5_string_W.c_str());
+						ImGui::Text(m_cost_chancecards_8_string_W.c_str());
+						ImGui::Text(m_cost_enchantcards_string_W.c_str());
+						ImGui::Text(m_cost_speedcards_string_W.c_str());
+					}
+					ImGui::EndColumns();
+					ImGui::NewLine();
+					ImGui::Separator();
+					ImGui::Text("Total spi cost:");
+					ImGui::SameLine();
+					ImGui::Text(m_cost_total_string_W.c_str());
+					ImGui::Separator();
+				}
+				ImGui::EndGroup();
+			}
+			ImGui::EndChild();
+		}
+		ImGui::EndColumns();
 		ImGui::EndPopup();
 	}
-
 }
+
 
 void EnchantBot::ResetEnchantList(EnchantListType& enchantlist)
 {
