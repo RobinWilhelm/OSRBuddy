@@ -664,7 +664,7 @@ void EnchantBot::RenderStatisticsPopup()
 		{
 			ImGui::Text("Overall Weapon Statistics");
 			ImGui::Separator();
-			ImGui::Text("E11 Fails: ");
+			ImGui::Text("E11 Tries: ");
 			ImGui::Text(std::to_string(m_statisticsWeapon.m_enchantStats[5][0]).c_str());
 			ImGui::BeginColumns("WeaponStatColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 			{
@@ -1066,7 +1066,7 @@ void EnchantBot::UpdateTotalCost()
 	m_cost_enchprots_e5_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
 	m_cost_chancecards_8_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
 	m_cost_enchantcards_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
-	m_cost_speedcards_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_speedcards_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_speedcards / 1000000.0f, 1) + "kk";
 	m_cost_total_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_total / 1000000.0f, 1) + "kk";
 }
 

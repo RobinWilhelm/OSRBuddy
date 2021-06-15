@@ -34,6 +34,7 @@ void PersistingTools::SetItem(UID64_t uid) {
         m_statistics.m_used_enchantcards = (int) m_j["cards"];
         m_statistics.m_used_speedcards = (int) m_j["specialcards"];
         m_statistics.m_used_chancecards_8 = (int) m_j["usedluckycards"];
+        m_statistics.m_enchantStats[5][0] = (int)m_j["failstoeleven"];
         m_file.close();
     }
     else {
@@ -68,9 +69,9 @@ void PersistingTools::PersistEnchantments(EnchantStatistics enchstats) {
     m_j["protect1"] = enchstats.m_used_enchprots_e1;
     m_j["protect5"] = enchstats.m_used_enchprots_e5;
     m_j["cards"] = enchstats.m_used_enchantcards;
-    m_j["specialcards"] = enchstats.m_used_chancecards_8;
+    m_j["specialcards"] = enchstats.m_used_speedcards;
     m_j["usedluckycards"] = enchstats.m_used_chancecards_8;
-    m_j["failstoeleven"] = enchstats.m_enchantStats[5][1];
+    m_j["failstoeleven"] = enchstats.m_enchantStats[5][0];
     m_file << std::setw(4) << m_j << std::endl;
     m_file.close();
 }
