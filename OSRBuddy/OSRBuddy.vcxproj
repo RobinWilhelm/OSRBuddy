@@ -299,8 +299,11 @@
     <ClInclude Include="Utility.h" />
     <ClInclude Include="Visuals.h" />
     <ClInclude Include="VMTHook.h" />
-    <ClInclude Include="WatermelonBot.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Sethia|Win32'">true</ExcludedFromBuild>
+    <ClInclude Include="GrindBot.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Sethia|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="WinPacket.h" />
   </ItemGroup>
@@ -336,8 +339,11 @@
     <ClCompile Include="TestItemUse.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Visuals.cpp" />
-    <ClCompile Include="WatermelonBot.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Sethia|Win32'">true</ExcludedFromBuild>
+    <ClCompile Include="GrindBot.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Sethia|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

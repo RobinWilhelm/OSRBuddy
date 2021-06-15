@@ -4,8 +4,10 @@
 #include <string>		  
 #include "OSRAPI.h"
 #include <chrono>
+#include <map>
    
 #define CAPSULE_OPEN_REATTACK 500ms
+#define UPDATE_GRINDMOBS_TIME 500ms
 
 class KitBuffBot; 
 
@@ -13,10 +15,11 @@ class KitBuffBot;
 
 struct GrindMonsterInfo
 {
-	INT monsterunitkind;
 	std::string clean_name;
 	bool shoot;
+	bool priority;
 	uint32_t killed;
+	bool goldy;				
 };
 
 
@@ -54,8 +57,14 @@ private:
 	
 	bool InventoryActionCheckTimeReady();
 	void ResetInventoryActionCheckTime();
+	bool ShouldCheck_GrindMobs();
+	void Reset_GrindMobsCheckTime();
+
 	void UpdateCheckTime();
 	void UpdateGrindingTime();
+	void UpdateGrindMobInfo();
+
+	std::map<INT, GrindMonsterInfo>::iterator FindGrindMonsterInfo(int monsterunitkind);
 
 	void TickInventoryCleaning();
 	bool TryOpenCapsule(ItemNumber capsule);
@@ -69,12 +78,17 @@ private:
 	std::chrono::milliseconds m_grinding_time_total;
 	std::chrono::time_point<std::chrono::system_clock> m_grinding_start;
 
+	MapIndex_t m_grinding_map;
 	bool m_awaiting_siege_toggle_ok;
 	bool m_on_target;	 
 	bool m_get_new_target;
-
-	std::vector<int, uint32_t> m_killed_mobs;	  	  
+	bool m_front_only;
+	bool m_shoot_all_goldies;
+			  	  
 	std::chrono::milliseconds m_inv_action_check_time;
+	std::chrono::milliseconds m_update_mob_list_check_time;
+
+	std::map<INT, GrindMonsterInfo> m_mobs;
 
 	bool m_clean_inventory;
 	bool m_only_clean_while_stopped;

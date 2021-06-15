@@ -695,6 +695,9 @@ enum class MonsterUnitKind : unsigned int
     Icecream_Tank = 2106000,
     Flying_Ball = 2098000,
     Dropped_Ball = 2098100,
+
+    Scout_Guard_Ani = 2030100,
+
 };
 
 // gamble items

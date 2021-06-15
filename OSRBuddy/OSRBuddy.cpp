@@ -7,7 +7,7 @@
 #include "TestItemUse.h"
 #include "GambleBot.h"
 #include "EnchantBot.h"
-//#include "WatermelonBot.h"
+#include "GrindBot.h"
 #include "Visuals.h"
 #include "Miscellaneous.h"
                                 
@@ -191,7 +191,7 @@ bool OSRBuddyMain::Start()
         }
                  
         RegisterFeature(new KitBuffBot(this)); 
-        //RegisterFeature(new GrindBot(this));          
+        RegisterFeature(new GrindBot(this));          
         RegisterFeature(new GambleBot(this));
         RegisterFeature(new EnchantBot(this));
         RegisterFeature(new Miscellaneous(this));          

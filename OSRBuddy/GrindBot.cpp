@@ -1,4 +1,4 @@
-#include "WatermelonBot.h"
+﻿#include "GrindBot.h"
 #include "OSRAPI.h"
 #include "SDK/AtumApplication.h"
 #include "OSRBuddy.h"
@@ -17,20 +17,30 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_kitbot = nullptr;
     m_get_new_target = true;   
     m_inv_action_check_time = 0ms;
+    m_update_mob_list_check_time = 0ms;
+    m_mobs.clear(); 
+    m_clean_inventory = false;
+    m_only_clean_while_overheat = false;
+    m_only_clean_while_stopped = false;
+    m_open_watermelongift = true;
+    m_open_spicapsule = true;
+    m_open_fantasyglobemineralcapsule = true;
+    m_open_mineralcapsule = true;
+    m_open_wpcapsule = true;
+    m_shoot_all_goldies = true;
 }   
 
 void GrindBot::Tick()
-{
-    if (!IsEnabled() || OSR_API->GetPlayerGearType() != GearType::AGear) {
-        return;
-    }
-
-    if (OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland) {
-        return;
-    }
-
+{                           
     UpdateCheckTime();
     TickInventoryCleaning();
+
+    if (!IsEnabled() || OSR_API->GetPlayerGearType() != GearType::AGear) {
+        return;
+    }  
+
+    UpdateGrindMobInfo();
+
 
     if (OSR_API->IsShuttleDead()) {
         return;
@@ -39,10 +49,10 @@ void GrindBot::Tick()
     if (m_get_new_target) 
     {
         // try to find a close target first, to prevent getting rammed
-        m_target = FindNewTarget(250, false);
+        m_target = FindNewTarget(250, m_front_only);
         if (!m_target)
         {
-            m_target = FindNewTarget(OSR_API->GetRadarRangePrimary() - 50, false);
+            m_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f - 50, m_front_only);
         }
         
         if (m_target)
@@ -103,7 +113,7 @@ void GrindBot::Tick()
         if (!OSR_API->GetPrimaryWeapon()->m_bOverHeat) 
         {
             // check if a monster has come close to the player  
-            CMonsterData* closetarget = FindNewTarget(250);
+            CMonsterData* closetarget = FindNewTarget(250, m_front_only);
             if (closetarget) 
             {
                 m_target = closetarget;
@@ -124,45 +134,38 @@ void GrindBot::RenderImGui()
     ImGui::NewLine();
     ImGui::BeginColumns("GrindBotColumns", 2, ImGuiColumnsFlags_NoResize);
     {
+       // ImGui::SetColumnWidth(0, 400);
         ImGui::BeginChild("GrindBotColumn1", ImVec2(), false);
         {              
-            ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear || OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland);
+            ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear);
             {   
-                ImGui::Text("Start / Stop hotkey: \"U\"");
-                ImGui::NewLine();
-
-                switch (m_current_state)
-                {
-                case GrindBot::State::WAITING:
-                    ImGui::Text("Status: Standby");
-                    break;
-                case GrindBot::State::SIEGEING:
-                    ImGui::Text("Status: Grinding");
-                    break;
-                case GrindBot::State::OVERHEATED:
-                    ImGui::Text("Status: Overheated");
-                    break;
-                }
-          
                 ImGui::Separator();
                 ImGui::Text("Settings");
                 ImGui::Separator();
-                
-                // TODO - profile selection
+                ImGui::Text("Start / Stop hotkey: \"U\"");
+                ImGui::Checkbox("Shoot Front only", &m_front_only);
+                ImGui::Checkbox("Shoot all goldies", &m_shoot_all_goldies);
 
+                ImGui::NewLine();
+                ImGui::Text("Monster Selection");
+                ImGui::Separator();
        
-                ImGui::Separator();
-                ImGui::Text("Statistics");
-                ImGui::Separator();
-
-                std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
-                ImGui::Text(grindtime.c_str());
-                ImGui::Text("Watermelon Tanks killed:");
-                ImGui::SameLine();
-                ImGui::Text(std::to_string(m_killed_watermelon_tanks).c_str());
-                ImGui::Text("Watermelon Z killed:");
-                ImGui::SameLine();
-                ImGui::Text(std::to_string(m_killed_watermelon_z).c_str()); 
+                ImGui::BeginColumns("MonsterSelectColumns", 2, ImGuiColumnsFlags_NoResize );
+                {
+                    ImGui::Text("Shoot at");
+                    ImGui::NextColumn();
+                    ImGui::Text("Prioritse");
+                    ImGui::NextColumn();
+                    ImGui::Separator();
+                    for (auto& monsterinfo : m_mobs)
+                    {
+                        ImGui::Checkbox(monsterinfo.second.clean_name.c_str(), &monsterinfo.second.shoot);
+                        ImGui::NextColumn();
+                        ImGui::Checkbox(("###" + monsterinfo.second.clean_name).c_str(), &monsterinfo.second.priority);
+                        ImGui::NextColumn();
+                    }
+                }
+                ImGui::EndColumns();             
             }
             ImGui::EndDisabledMode();
         }
@@ -171,25 +174,74 @@ void GrindBot::RenderImGui()
     ImGui::NextColumn();
     {
         ImGui::BeginChild("GrindBotColumn2", ImVec2(), false);
-        {
+        {   
             ImGui::Separator();
             ImGui::Text("Inventory Cleaning");
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("This works for all gears. Grindbot does not have to be enabled for this to work.");
+            }
             ImGui::Separator();
 
-            ImGui::NewLine();
             ImGui::Checkbox("Active", &m_clean_inventory);
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("Will automatically open the below specified items.");
             }
-            ImGui::Checkbox("Only while stopped", &m_only_clean_while_stopped);
-            ImGui::Checkbox("Only while overheated", &m_only_clean_while_overheat);
+            ImGui::SameLine();
+            ImGui::Checkbox("Stopped only", &m_only_clean_while_stopped);
+            ImGui::SameLine();
+            ImGui::Checkbox("Overheated only", &m_only_clean_while_overheat);
 
             ImGui::NewLine();
-            ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
-            ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
-            ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
-            ImGui::Checkbox("Fantasy Globe Mineral Capsules", &m_open_fantasyglobemineralcapsule);
-            ImGui::Checkbox("WP Capsules", &m_open_wpcapsule);
+            ImGui::BeginColumns("InventoryCleaningColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+            {
+                ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
+                ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
+                ImGui::Checkbox("Fantasy Globe MC", &m_open_fantasyglobemineralcapsule);
+            }
+            ImGui::NextColumn();
+            {
+                ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
+                ImGui::Checkbox("WP Capsules", &m_open_wpcapsule);
+            }
+            ImGui::EndColumns();
+
+            ImGui::NewLine();
+            ImGui::Separator();
+            ImGui::Text("Statistics");
+            ImGui::Separator();
+
+            switch (m_current_state)
+            {
+            case GrindBot::State::WAITING:
+                ImGui::Text("Status: Standby");
+                break;
+            case GrindBot::State::SIEGEING:
+                ImGui::Text("Status: Grinding");
+                break;
+            case GrindBot::State::OVERHEATED:
+                ImGui::Text("Status: Overheated");
+                break;
+            }
+            std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
+            ImGui::Text(grindtime.c_str());
+
+            ImGui::NewLine();
+            ImGui::Text("Mobs killed");
+            ImGui::Separator();
+            ImGui::BeginColumns("MonsterStatisticColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+            {
+                for (auto& monsterinfo : m_mobs)
+                {
+                    if (monsterinfo.second.killed > 0)
+                    {
+                        ImGui::Text(monsterinfo.second.clean_name.c_str());
+                        ImGui::NextColumn();
+                        ImGui::Text(std::to_string(monsterinfo.second.killed).c_str());
+                        ImGui::NextColumn();
+                    }
+                }
+            }
+            ImGui::EndColumns();
         }
         ImGui::EndChild();
     }
@@ -213,17 +265,12 @@ bool GrindBot::OnReadPacket(unsigned short msgtype, byte* packet)
         {             
             if (((MSG_FC_MONSTER_CHANGE_HP*)packet)->CurrentHP <= 0)
             {
-                m_target->m_info.CurrentHP = 0;
+                m_target->m_info.CurrentHP = 0; 
+                auto monsterinfo = FindGrindMonsterInfo(m_target->m_info.MonsterUnitKind);
+                if (monsterinfo != m_mobs.end()) {
+                    monsterinfo->second.killed++;
+                }
 
-                switch (m_target->m_info.MonsterUnitKind)
-                {
-                case static_cast<UINT>(MonsterUnitKind::Watermelon_Tank) :
-                    m_killed_watermelon_tanks++;
-                    break;
-                case static_cast<UINT>(MonsterUnitKind::Watermelon_Z) :
-                    m_killed_watermelon_z++;
-                    break;
-                }         
                 m_target = nullptr;
             }              
         }
@@ -264,7 +311,7 @@ bool GrindBot::CanShootAtTarget(CUnitData* target)
         return false;
     }
 
-    if (GetTargetDistance(target) > OSR_API->GetRadarRangePrimary()) {
+    if (GetTargetDistance(target) > OSR_API->GetRadarRangePrimary() * 1.30f) {
         return false;
     }
  
@@ -281,29 +328,27 @@ bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
         return false;
     }
 
-    switch (monster->m_info.MonsterUnitKind)
+    if (m_shoot_all_goldies)
     {
-    case static_cast<UINT>(MonsterUnitKind::Watermelon_Tank):
-        if (!m_shoot_watermelon_tanks) { 
-            return false; 
+        if (monster->m_pMonsterInfo->MonsterName[0] == '\\' && monster->m_pMonsterInfo->MonsterName[1] == 'e') {
+            return true;
         }
-        break;
-    case static_cast<UINT>(MonsterUnitKind::Watermelon_Z):
-        if (!m_shoot_watermelon_z) {
-            return false;
-        }
-        break;
-    default:
-        return false;
-    } 
+    }
 
-    return true;
+    auto monsterinfo = FindGrindMonsterInfo(monster->m_info.MonsterUnitKind);
+    if(monsterinfo != m_mobs.end() && monsterinfo->second.shoot) {
+            return true;
+    }
+    return false;
 }
 
 CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
 {  
     float min_cursor_distance = 999999;
     CMonsterData* newtarget = nullptr;
+
+    float min_cursor_distance_prio = 999999;
+    CMonsterData* newtarget_prio = nullptr;
 
     POINT curPos;
     m_buddy->GetCursorPosition(&curPos);
@@ -334,6 +379,13 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                     min_cursor_distance = cursor_dist;
                     newtarget = monster;
                 }
+
+                auto monsterinfo = FindGrindMonsterInfo(monster->m_pMonsterInfo->MonsterUnitKind);
+                if (monsterinfo->second.priority && cursor_dist < min_cursor_distance_prio)
+                {
+                    min_cursor_distance_prio = cursor_dist;
+                    newtarget_prio = monster;
+                }
             }
         }
     }
@@ -363,10 +415,17 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                     min_cursor_distance = cursor_dist;
                     newtarget = monster.second;
                 }
+
+                auto monsterinfo = FindGrindMonsterInfo(monster.second->m_pMonsterInfo->MonsterUnitKind);
+                if (monsterinfo->second.priority && cursor_dist < min_cursor_distance_prio)
+                {
+                    min_cursor_distance_prio = cursor_dist;
+                    newtarget_prio = monster.second;
+                }                  
             }
         }        
     } 
-    return newtarget;
+    return (newtarget_prio) ? newtarget_prio : newtarget;
 }
 
 void GrindBot::AimAtTarget(CMonsterData* m_target)
@@ -432,6 +491,16 @@ void GrindBot::ResetInventoryActionCheckTime()
     m_inv_action_check_time = CAPSULE_OPEN_REATTACK + std::chrono::milliseconds(m_buddy->GetRandInt32(0, 300));
 }
 
+bool GrindBot::ShouldCheck_GrindMobs()
+{
+    return m_update_mob_list_check_time <= 0ms;
+}
+
+void GrindBot::Reset_GrindMobsCheckTime()
+{
+    m_inv_action_check_time = UPDATE_GRINDMOBS_TIME;
+}
+
 void GrindBot::UpdateCheckTime()
 {   
     if (m_inv_action_check_time > 0ms) {
@@ -439,6 +508,13 @@ void GrindBot::UpdateCheckTime()
     }
     if (m_inv_action_check_time < 0ms) {
         m_inv_action_check_time = 0ms;
+    }
+
+    if (m_update_mob_list_check_time > 0ms) {
+        m_update_mob_list_check_time -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
+    }
+    if (m_update_mob_list_check_time < 0ms) {
+        m_update_mob_list_check_time = 0ms;
     }
 }
 
@@ -448,13 +524,50 @@ void GrindBot::UpdateGrindingTime()
     m_grinding_time = m_grinding_time_total + std::chrono::duration_cast<std::chrono::milliseconds>(current - m_grinding_start);
 }
 
+void GrindBot::UpdateGrindMobInfo()
+{   
+    if (ShouldCheck_GrindMobs())
+    {
+        if (m_grinding_map != 0 && m_grinding_map == OSR_API->GetCurrentMapChannelIndex().MapIndex)
+        {
+            for (auto& monster : OSR_API->GetSceneData()->m_mapMonsterList)
+            {
+                // check if mob is already in the map, if not -> insert it
+                auto monsterinfo = m_mobs.find(monster.second->m_info.MonsterUnitKind);
+                if (monsterinfo == m_mobs.end())
+                {
+                    GrindMonsterInfo gmi;
+                    gmi.clean_name = std::string(monster.second->m_pMonsterInfo->MonsterName);
+                    if (gmi.clean_name.find("Scout Guard") != string::npos) {
+                        continue;
+                    }
+
+                    if (gmi.clean_name[0] == '\\')
+                    {
+                        gmi.clean_name.erase(gmi.clean_name.begin(), gmi.clean_name.begin() + 2);
+                        gmi.clean_name.erase(gmi.clean_name.end() - 2, gmi.clean_name.end());
+                        gmi.goldy = true;
+                    }
+                    gmi.killed = 0;
+                    gmi.shoot = false;
+                    gmi.priority = false;
+                    m_mobs.insert({ monster.second->m_info.MonsterUnitKind, gmi });
+                }
+            }
+        }
+    }
+}
+
+std::map<INT, GrindMonsterInfo>::iterator GrindBot::FindGrindMonsterInfo(int monsterunitkind)
+{
+    return m_mobs.find(monsterunitkind);
+}
+
 void GrindBot::TickInventoryCleaning()
 {   
     if (m_clean_inventory && (!m_only_clean_while_stopped || OSR_API->GetAtumApplication()->m_pShuttleChild->m_bUnitStop)
         && (!m_only_clean_while_overheat || m_current_state == GrindBot::State::OVERHEATED))
-    {
-
-
+    {  
         if (InventoryActionCheckTimeReady())
         {
             if (m_open_mineralcapsule && TryOpenCapsule(ItemNumber::Mineral_Capsule)) {
@@ -510,11 +623,20 @@ FeatureType GrindBot::GetType() const
 
 void GrindBot::OnEnable()
 {
-    if (OSR_API->GetCurrentMap() != MapIndex::WatermelonIsland) 
-    {
-        Enable(false);
-        return;
-    }
+    m_mobs.clear();
+
+    // sommer event special, always add these monster to the list
+    GrindMonsterInfo gmi;
+    gmi.clean_name = "Dropped Ball";
+    gmi.goldy = true;
+    gmi.killed = 0;
+    gmi.priority = false;
+    gmi.shoot = false;              
+    m_mobs.insert({ 2098100 , gmi});
+    gmi.clean_name = "Flying Ball";  
+    m_mobs.insert({ 2098000 , gmi });  
+
+    m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;    
 
     // reset grinding timer
     m_grinding_time = 0ms;
@@ -551,6 +673,7 @@ void GrindBot::OnEnable()
 
 void GrindBot::OnDisable()
 {
+    m_grinding_map = 0;
     if (m_kitbot) {
         m_kitbot->Enable(false);
     }

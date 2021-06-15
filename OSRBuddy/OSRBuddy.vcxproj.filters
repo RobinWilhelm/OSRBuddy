@@ -283,9 +283,6 @@
     <ClInclude Include="SDK\ClientParty.h">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="WatermelonBot.h">
-      <Filter>Features</Filter>
-    </ClInclude>
     <ClInclude Include="Visuals.h">
       <Filter>Features</Filter>
     </ClInclude>
@@ -330,6 +327,9 @@
     </ClInclude>
     <ClInclude Include="PersistingTools.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GrindBot.h">
+      <Filter>Features</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -393,9 +393,6 @@
     <ClCompile Include="EnchantBot.cpp">
       <Filter>Features</Filter>
     </ClCompile>
-    <ClCompile Include="WatermelonBot.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
     <ClCompile Include="BuddyFeatureBase.cpp">
       <Filter>Features</Filter>
     </ClCompile>
@@ -413,6 +410,9 @@
     </ClCompile>
     <ClCompile Include="PersistingTools.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="GrindBot.cpp">
+      <Filter>Features</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
