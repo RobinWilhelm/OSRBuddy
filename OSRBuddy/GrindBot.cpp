@@ -105,6 +105,7 @@ void GrindBot::Tick()
             if (m_target)
             {
                 Reset_NewTargetDelayTime();
+                m_target = nullptr;
             }
             m_get_new_target = true;
             return;
