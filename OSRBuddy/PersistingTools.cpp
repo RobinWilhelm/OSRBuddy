@@ -82,8 +82,8 @@ void PersistingTools::CloseStream() {
 void PersistingTools::PersistEnchantments(EnchantStatistics enchstats) {
     for (int i = 0; i < 6; i++) {
         std::string groupname = "E" + std::to_string(i + 5) + "-E" + std::to_string(i + 6);
-        m_j[groupname]["tries"] = m_statistics.m_enchantStats[i][0];
-        m_j[groupname]["fails"] = m_statistics.m_enchantStats[i][1];
+        m_j[groupname]["tries"] = enchstats.m_enchantStats[i][0];
+        m_j[groupname]["fails"] = enchstats.m_enchantStats[i][1];
     }
     m_j["protect1"] = enchstats.m_used_enchprots_e1;
     m_j["protect5"] = enchstats.m_used_enchprots_e5;
