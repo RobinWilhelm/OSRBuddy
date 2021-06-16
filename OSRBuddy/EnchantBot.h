@@ -56,6 +56,11 @@ struct EnchantStatistics
 	int	m_used_enchantcards;
 	int	m_used_speedcards;
 
+	int m_used_prefixwhipes;
+	int m_used_prefixcards;
+	int m_used_suffixwhipes;
+	int m_used_suffixcards;
+
 	int	m_cost_enchprots_e1;
 	int	m_cost_enchprots_e5;
 	int	m_cost_chancecards_8;

@@ -250,18 +250,18 @@ void EnchantBot::ResetLab()
 void EnchantBot::UpdateEnchantStats()
 {
 	int postEnch = m_enchant_item.GetItemInfo()->m_nEnchantNumber;
-	if (m_previous_enchantnum == 10) {
-		m_statisticsWeapon.m_enchantStats[5][0] += 1;
-	}
 	if (m_previous_enchantnum >= 5) 
 	{
 		if (postEnch <= m_previous_enchantnum)
 		{
 			m_statisticsSession.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
+			m_statisticsWeapon.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
 			m_statisticsSession.m_enchantStats[m_previous_enchantnum - 5][1] += 1;
+			m_statisticsWeapon.m_enchantStats[m_previous_enchantnum - 5][1] += 1;
 		}
 		else {
 			m_statisticsSession.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
+			m_statisticsWeapon.m_enchantStats[m_previous_enchantnum - 5][0] += 1;
 		}
 	}
 }
@@ -596,37 +596,36 @@ void EnchantBot::RenderStatisticsPopup()
 	ImGui::SetNextWindowSize(ImVec2(600.0f, 320.0f));
 	if (ImGui::BeginPopup("StatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
 	{ 	
-		ImGui::BeginGroup(); // run view
-		{
-			ImGui::Text("Run View");
-			ImGui::Separator();
-
-			ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-			{
-				for (int i = 0; i < 6; i++)
-				{
-					std::string enchstep = "E" + std::to_string(i + 5) + " -> " + "E" + std::to_string(i + 6) + ":";
-					ImGui::Text(enchstep.c_str());
-					ImGui::NextColumn();
-					std::string triesfails = std::to_string(m_statisticsSession.m_enchantStats[i][0]) + " - " + std::to_string(m_statisticsSession.m_enchantStats[i][1]);
-					ImGui::DrawTextCentered(triesfails, ImGui::GetColumnWidth());
-					if (ImGui::IsItemHovered()) {
-						ImGui::SetTooltip("total tries - total fails");
-					}
-					ImGui::NextColumn();
-					RenderSuccessPercentage(i + 5, m_statisticsSession.m_enchantStats[i][0], m_statisticsSession.m_enchantStats[i][1]);
-					ImGui::NextColumn();
-				}
-			}
-			ImGui::EndColumns();
-		}
-		ImGui::EndGroup();
-		ImGui::NewLine();
-
 		ImGui::BeginColumns("StatisticsColums", 2, ImGuiColumnsFlags_NoResize);
 		{
 			ImGui::BeginChild("StatisticSessionChild");
 			{
+				ImGui::BeginGroup(); // run view
+				{
+					ImGui::Text("Run View");
+					ImGui::Separator();
+
+					ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					{
+						for (int i = 0; i < 6; i++)
+						{
+							std::string enchstep = "E" + std::to_string(i + 5) + " -> " + "E" + std::to_string(i + 6) + ":";
+							ImGui::Text(enchstep.c_str());
+							ImGui::NextColumn();
+							std::string triesfails = std::to_string(m_statisticsSession.m_enchantStats[i][0]) + " - " + std::to_string(m_statisticsSession.m_enchantStats[i][1]);
+							ImGui::DrawTextCentered(triesfails, ImGui::GetColumnWidth());
+							if (ImGui::IsItemHovered()) {
+								ImGui::SetTooltip("total tries - total fails");
+							}
+							ImGui::NextColumn();
+							RenderSuccessPercentage(i + 5, m_statisticsSession.m_enchantStats[i][0], m_statisticsSession.m_enchantStats[i][1]);
+							ImGui::NextColumn();
+						}
+					}
+					ImGui::EndColumns();
+				}
+				ImGui::EndGroup();
+				ImGui::NewLine();
 				ImGui::BeginGroup();
 				{
 					ImGui::Text("Used Items and Cost (Session):");
@@ -671,6 +670,32 @@ void EnchantBot::RenderStatisticsPopup()
 		{ 
 			ImGui::BeginChild("WeaponStatisticsChild");
 			{
+				ImGui::BeginGroup(); // run view
+				{
+					ImGui::Text("Overall Weapons statistics");
+					ImGui::Separator();
+
+					ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					{
+						for (int i = 0; i < 6; i++)
+						{
+							std::string enchstep = "E" + std::to_string(i + 5) + " -> " + "E" + std::to_string(i + 6) + ":";
+							ImGui::Text(enchstep.c_str());
+							ImGui::NextColumn();
+							std::string triesfails = std::to_string(m_statisticsWeapon.m_enchantStats[i][0]) + " - " + std::to_string(m_statisticsWeapon.m_enchantStats[i][1]);
+							ImGui::DrawTextCentered(triesfails, ImGui::GetColumnWidth());
+							if (ImGui::IsItemHovered()) {
+								ImGui::SetTooltip("total tries - total fails");
+							}
+							ImGui::NextColumn();
+							RenderSuccessPercentage(i + 5, m_statisticsWeapon.m_enchantStats[i][0], m_statisticsWeapon.m_enchantStats[i][1]);
+							ImGui::NextColumn();
+						}
+					}
+					ImGui::EndColumns();
+				}
+				ImGui::EndGroup();
+				ImGui::NewLine();
 				ImGui::BeginGroup();
 				{
 					ImGui::Text("Used Items and Cost (Weapon):");

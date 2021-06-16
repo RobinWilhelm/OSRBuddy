@@ -12,6 +12,7 @@ public:
 	void CloseStream();
 	void PersistEnchantments(EnchantStatistics enchstats);
 	EnchantStatistics PersistingTools::GetStats();
+	void PersistingTools::PersistCards(EnchantStatistics enchstats);
 	
 
 private:

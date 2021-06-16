@@ -29,22 +29,37 @@ void PersistingTools::SetItem(UID64_t uid) {
         m_file.open(m_fullpath, ios::in);
         m_file >> m_j;
         //todo: preparation for gamblecount
+      //  m_statistics.m_used_prefixwhipes = (int)m_j["prefixwhipes"];
+     //   m_statistics.m_used_prefixcards = (int)m_j["prefixcards"];
+       // m_statistics.m_used_suffixwhipes = (int)m_j["suffixwhipes"];
+      //  m_statistics.m_used_suffixcards = (int)m_j["suffixcards"];
+        for (int i = 0; i < 6; i++) {
+            std::string groupname = "E" + std::to_string(i +5) + "-E" + std::to_string(i + 6);
+            m_statistics.m_enchantStats[i][0] = (int)m_j[groupname]["tries"];
+            m_statistics.m_enchantStats[i][1] = (int)m_j[groupname]["fails"];
+        }
         m_statistics.m_used_enchprots_e1 = (int) m_j["protect1"];
         m_statistics.m_used_enchprots_e5 = (int) m_j["protect5"];
         m_statistics.m_used_enchantcards = (int) m_j["cards"];
         m_statistics.m_used_speedcards = (int) m_j["specialcards"];
-        m_statistics.m_used_chancecards_8 = (int) m_j["usedluckycards"];
-        m_statistics.m_enchantStats[5][0] = (int)m_j["failstoeleven"];
+        m_statistics.m_used_chancecards_8 = m_j["usedluckycards"];
         m_file.close();
     }
     else {
+        m_j["prefixwhipes"] = 0;
+        m_j["prefixcards"] = 0;
+        m_j["suffixwhipes"] = 0;
+        m_j["suffixcards"] = 0;
+        for (int i = 0; i < 6; i++) {
+            std::string groupname = "E" + std::to_string(i + 5) + "-E" + std::to_string(i + 6);
+            m_j[groupname]["tries"] = 0;
+            m_j[groupname]["fails"] = 0;
+        }
         m_j["protect1"] = 0;
         m_j["protect5"] = 0;
         m_j["cards"] = 0;
         m_j["specialcards"] = 0;
         m_j["usedluckycards"] = 0;
-        m_j["failstoeleven"] = 0;
-        m_j["failstotwelve"] = 0;
         ZeroMemory(&m_statistics, sizeof(EnchantStatistics));
         m_file.open(m_fullpath, ios::out);
         m_file << std::setw(4) << m_j << std::endl;
@@ -65,14 +80,27 @@ void PersistingTools::CloseStream() {
 
 
 void PersistingTools::PersistEnchantments(EnchantStatistics enchstats) {
-    m_file.open(m_fullpath, ios::out);
+    for (int i = 0; i < 6; i++) {
+        std::string groupname = "E" + std::to_string(i + 5) + "-E" + std::to_string(i + 6);
+        m_j[groupname]["tries"] = m_statistics.m_enchantStats[i][0];
+        m_j[groupname]["fails"] = m_statistics.m_enchantStats[i][1];
+    }
     m_j["protect1"] = enchstats.m_used_enchprots_e1;
     m_j["protect5"] = enchstats.m_used_enchprots_e5;
     m_j["cards"] = enchstats.m_used_enchantcards;
     m_j["specialcards"] = enchstats.m_used_speedcards;
     m_j["usedluckycards"] = enchstats.m_used_chancecards_8;
-    m_j["failstoeleven"] = enchstats.m_enchantStats[5][0];
+    m_file.open(m_fullpath, ios::out);
     m_file << std::setw(4) << m_j << std::endl;
     m_file.close();
 }
 
+void PersistingTools::PersistCards(EnchantStatistics enchstats) {
+    m_j["prefixwhipes"] = enchstats.m_used_prefixwhipes;
+    m_j["prefixcards"] = enchstats.m_used_prefixcards;
+    m_j["suffixwhipes"] = enchstats.m_used_suffixwhipes;
+    m_j["suffixcards"] = enchstats.m_used_suffixcards;
+    m_file.open(m_fullpath, ios::out);
+    m_file << std::setw(4) << m_j << std::endl;
+    m_file.close();
+}

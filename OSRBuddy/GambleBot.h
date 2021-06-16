@@ -4,6 +4,7 @@
 #include <string>		  
 #include "SDK/ObjectDefine.h"	// INVEN_DISPLAY_INFO
 #include "OSRAPI.h"
+#include "EnchantBot.h"
 
 #include "OsrItemInfo.h"
 
@@ -137,5 +138,7 @@ private:
 											
 	FixSelection			m_suffix_selection;
 	FixSelection			m_prefix_selection;		
+
+	EnchantStatistics		m_statisticsWeapon;
 };
 
