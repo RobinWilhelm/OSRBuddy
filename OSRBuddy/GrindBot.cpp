@@ -271,7 +271,7 @@ void GrindBot::RenderImGui()
             std::string mobskilled = "Mobs killed: " + std::to_string(m_total_mobs_killed);
             ImGui::Text(mobskilled.c_str());
 
-            ImGui::SetNextWindowSize(ImVec2(200.0f, 320.0f));
+            ImGui::SetNextWindowSize(ImVec2(300.0f, 200.0f));
             if (ImGui::BeginPopup("GrindBotStatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
             {  
                 ImGui::BeginColumns("MonsterStatisticColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
