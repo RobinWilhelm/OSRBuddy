@@ -215,6 +215,11 @@ void OldSchoolRivalsAPI::SetTarget(CUnitData* target)
 	m_atumapplication->m_pShuttleChild->m_pOrderTarget = target;
 }
 
+CUnitData* OldSchoolRivalsAPI::GetTarget()
+{
+	return (CUnitData*)m_atumapplication->m_pShuttleChild->m_pOrderTarget;
+}
+
 bool OldSchoolRivalsAPI::IsHitablePrimary(CUnitData* target)
 {
 	D3DXVECTOR3 vTargetPos = target->m_vPos;

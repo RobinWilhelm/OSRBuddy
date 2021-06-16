@@ -235,6 +235,10 @@ void D3DInternalBase::OnAfterReset(IDirect3DDevice9* device, D3DPRESENT_PARAMETE
 
 int D3DInternalBase::GetRandInt32(int min, int max)
 {
+    if (min = max) {
+        return min;
+    }
+
     std::uniform_int_distribution<int> distribution(min, max);
     return distribution(*m_random_generator.get());
 }

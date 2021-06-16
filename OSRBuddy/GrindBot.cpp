@@ -6,8 +6,8 @@
 #include "KitBot.h"
 
 #define TARGET_LOCK_THRESHOLD    45.0f
-#define TARGETING_SPEED 1.0f
-#define INVENTORY_CLEAN_ACTION_MIN_TIME 2000
+#define TARGETING_SPEED 0.1f
+
   
 GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
@@ -27,7 +27,13 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_open_fantasyglobemineralcapsule = true;
     m_open_mineralcapsule = true;
     m_open_wpcapsule = true;
+
     m_shoot_all_goldies = true;
+    m_front_only = true;
+    m_humanized_overshoot = true;
+    m_humanized_target_delay_min = MIN_NEW_TARGET_DELAY_TIME.count();
+    m_humanized_target_delay_max = MAX_NEW_TARGET_DELAY_TIME.count();
+    m_target_mode = TargetMode::CrosshairDistance;
 }   
 
 void GrindBot::Tick()
@@ -46,25 +52,21 @@ void GrindBot::Tick()
         return;
     }
 
-    if (m_get_new_target) 
-    {
+    if (m_get_new_target && m_shoot_new_target_delay <= 0ms)
+    { 
         // try to find a close target first, to prevent getting rammed
         m_target = FindNewTarget(250, m_front_only);
         if (!m_target)
         {
             m_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f - 50, m_front_only);
-        }
-        
+        }      
+
         if (m_target)
         {
             OSR_API->SetTarget(m_target);
             m_on_target = false;
             m_get_new_target = false;
-        }  
-        else
-        {
-            OSR_API->UsePrimaryWeapon(false);
-            OSR_API->UseSecondaryWeapon(false);
+            m_no_target_time = 0ms;
         }
     }  
  
@@ -83,9 +85,27 @@ void GrindBot::Tick()
             ChangeState(GrindBot::State::OVERHEATED);
             return;
         }
-        
+
+        if (!m_target)
+        {
+            m_no_target_time += std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
+            if ((m_no_target_time - m_shoot_new_target_delay) >= NO_TARGET_STOP_SHOOTING_TIME)
+            {
+                OSR_API->UsePrimaryWeapon(false);
+                OSR_API->UseSecondaryWeapon(false);
+            }  
+
+            if (m_no_target_time >= NO_TARGET_SIEGE_DISABLE_TIME) {
+                m_kitbot->ToggleSKill(SkillType::Siege_Mode, false);
+            }
+        } 
+
         if (!IsValidTargetMonster(m_target) || !CanShootAtTarget(m_target))
         {
+            if (m_target)
+            {
+                Reset_NewTargetDelayTime();
+            }
             m_get_new_target = true;
             return;
         }                 
@@ -101,10 +121,13 @@ void GrindBot::Tick()
             // only use secondary if in radar range          
             OSR_API->UseSecondaryWeapon(GetTargetDistance(m_target) < OSR_API->GetRadarRangeSecondary());        
         } 
-        else 
+        else
         {
-            OSR_API->UsePrimaryWeapon(false);
-            OSR_API->UseSecondaryWeapon(false);
+            if (!m_humanized_overshoot) 
+            {
+                OSR_API->UsePrimaryWeapon(false);
+                OSR_API->UseSecondaryWeapon(false);
+            }
         }
         break;
 
@@ -134,48 +157,67 @@ void GrindBot::RenderImGui()
     ImGui::NewLine();
     ImGui::BeginColumns("GrindBotColumns", 2, ImGuiColumnsFlags_NoResize);
     {
-       // ImGui::SetColumnWidth(0, 400);
+        ImGui::SetColumnWidth(0, 400);
         ImGui::BeginChild("GrindBotColumn1", ImVec2(), false);
         {              
-            ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear);
+            ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear || !IsEnabled());
             {   
                 ImGui::Separator();
                 ImGui::Text("Settings");
                 ImGui::Separator();
-                ImGui::Text("Start / Stop hotkey: \"U\"");
-                ImGui::Checkbox("Prioritise mobs closer to the Gear", &m_prioritise_closer_mobs);
-                ImGui::Checkbox("Shoot only Monster in the Screen", &m_front_only);
-                ImGui::Checkbox("Shoot all goldies", &m_shoot_all_goldies);
+                ImGui::Text("Start / Stop hotkey: \"U\"");        
+                //ImGui::BeginColumns("SettingsColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+                //{
+                    //ImGui::SetColumnWidth(0, 250);
+                    const char* items[] = { "Gear distance", "Crosshair distance" };
+                    ImGui::ComboEx("Target Mode:", reinterpret_cast<int*>(&m_target_mode), items, 2, -1, true, 150);
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Gear distance: Will shoot the nearest mob first.\nCrosshair distance: Will shoot the mob closest to the crosshair first.");
+                    }
+                    ImGui::Checkbox("Shoot and prio all goldies", &m_shoot_all_goldies);
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Will shoot an prioritise all gold mobs, even if they are not in the monster selection list yet.");
+                    }  
+                //}
+                //ImGui::NextColumn();
+                //{
+                    ImGui::Checkbox("Visible only", &m_front_only);
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
+                    }
+                    ImGui::Checkbox("Overshoot", &m_humanized_overshoot);
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Will continue to shoot for some time after a mob died.");
+                    }
+                //}
+                //ImGui::EndColumns();     
 
                 ImGui::NewLine();
-                ImGui::Text("Monster Selection");
-                ImGui::Separator();
-       
-                ImGui::BeginColumns("MonsterSelectColumns", 2, ImGuiColumnsFlags_NoResize );
-                {
-                    ImGui::Text("Shoot at");
-                    ImGui::NextColumn();
-                    ImGui::Text("Prioritise");
-                    ImGui::NextColumn();
-                    ImGui::Separator();
-                    for (auto& monsterinfo : m_mobs)
+                ImGui::Text("Targeting delay in milliseconds:");
+                ImGui::PushItemWidth(125);
+                ImGui::BeginColumns("TargetDelayColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+                {        
+                    if(ImGui::SliderInt("Min", &m_humanized_target_delay_min, 0, 500))
                     {
-                        ImGui::Checkbox(monsterinfo.second.clean_name.c_str(), &monsterinfo.second.shoot);
-                        ImGui::NextColumn();
-                        ImGui::Checkbox(("###" + monsterinfo.second.clean_name).c_str(), &monsterinfo.second.priority);
-                        ImGui::NextColumn();
+                        if (m_humanized_target_delay_min > m_humanized_target_delay_max) {
+                            m_humanized_target_delay_min = m_humanized_target_delay_max;
+                        }
                     }
                 }
-                ImGui::EndColumns();             
+                ImGui::NextColumn();
+                {
+                    if (ImGui::SliderInt("Max", &m_humanized_target_delay_max, 0, 500)) 
+                    { 
+                        if (m_humanized_target_delay_min > m_humanized_target_delay_max) {
+                            m_humanized_target_delay_max = m_humanized_target_delay_min;
+                        }
+                    }
+                }
+                ImGui::EndColumns();
             }
             ImGui::EndDisabledMode();
-        }
-        ImGui::EndChild();
-    }
-    ImGui::NextColumn();
-    {
-        ImGui::BeginChild("GrindBotColumn2", ImVec2(), false);
-        {   
+
+            ImGui::NewLine();
             ImGui::Separator();
             ImGui::Text("Inventory Cleaning");
             if (ImGui::IsItemHovered()) {
@@ -188,9 +230,15 @@ void GrindBot::RenderImGui()
                 ImGui::SetTooltip("Will automatically open the below specified items.");
             }
             ImGui::SameLine();
-            ImGui::Checkbox("Stopped only", &m_only_clean_while_stopped);
+            ImGui::Checkbox("Stopped", &m_only_clean_while_stopped);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Only clean inventory while gear is stopped.");
+            }
             ImGui::SameLine();
-            ImGui::Checkbox("Overheated only", &m_only_clean_while_overheat);
+            ImGui::Checkbox("Overheated", &m_only_clean_while_overheat);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Only clean inventory standard weapon is overheated.");
+            }
 
             ImGui::NewLine();
             ImGui::BeginColumns("InventoryCleaningColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
@@ -204,45 +252,72 @@ void GrindBot::RenderImGui()
                 ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
                 ImGui::Checkbox("WP Capsules", &m_open_wpcapsule);
             }
-            ImGui::EndColumns();
-
-            ImGui::NewLine();
+            ImGui::EndColumns(); 
+        }
+        ImGui::EndChild();
+    }
+    ImGui::NextColumn();
+    {
+        ImGui::BeginChild("GrindBotColumn2", ImVec2(), false);
+        {   
             ImGui::Separator();
             ImGui::Text("Statistics");
             ImGui::Separator();
 
-            switch (m_current_state)
-            {
-            case GrindBot::State::WAITING:
-                ImGui::Text("Status: Standby");
-                break;
-            case GrindBot::State::SIEGEING:
-                ImGui::Text("Status: Grinding");
-                break;
-            case GrindBot::State::OVERHEATED:
-                ImGui::Text("Status: Overheated");
-                break;
-            }
             std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
             ImGui::Text(grindtime.c_str());
 
-            ImGui::NewLine();
-            ImGui::Text("Mobs killed");
-            ImGui::Separator();
-            ImGui::BeginColumns("MonsterStatisticColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
-            {
-                for (auto& monsterinfo : m_mobs)
+            std::string mobskilled = "Mobs killed: " + std::to_string(m_total_mobs_killed);
+            ImGui::Text(mobskilled.c_str());
+
+            ImGui::SetNextWindowSize(ImVec2(200.0f, 320.0f));
+            if (ImGui::BeginPopup("GrindBotStatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
+            {  
+                ImGui::BeginColumns("MonsterStatisticColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
                 {
-                    if (monsterinfo.second.killed > 0)
+                    for (auto& monsterinfo : m_mobs)
                     {
-                        ImGui::Text(monsterinfo.second.clean_name.c_str());
+                        if (monsterinfo.second.killed > 0)
+                        {
+                            ImGui::Text(monsterinfo.second.clean_name.c_str());
+                            ImGui::NextColumn();
+                            ImGui::Text(std::to_string(monsterinfo.second.killed).c_str());
+                            ImGui::NextColumn();
+                        }
+                    }
+                }
+                ImGui::EndColumns();
+                ImGui::EndPopup();
+            }
+            ImGui::NewLine();
+            if (ImGui::Button("Details")) {
+                ImGui::OpenPopup("GrindBotStatisticsPopup");
+            }
+
+            ImGui::NewLine();
+            ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear || !IsEnabled());
+            {
+                ImGui::Separator();
+                ImGui::Text("Monster Selection");
+                ImGui::Separator();
+
+                ImGui::BeginColumns("MonsterSelectColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+                {
+                    ImGui::Text("Shoot at");
+                    ImGui::NextColumn();
+                    ImGui::Text("Prioritise");
+                    ImGui::NextColumn();
+                    for (auto& monsterinfo : m_mobs)
+                    {
+                        ImGui::Checkbox(monsterinfo.second.clean_name.c_str(), &monsterinfo.second.shoot);
                         ImGui::NextColumn();
-                        ImGui::Text(std::to_string(monsterinfo.second.killed).c_str());
+                        ImGui::Checkbox(("###" + monsterinfo.second.clean_name).c_str(), &monsterinfo.second.priority);
                         ImGui::NextColumn();
                     }
                 }
+                ImGui::EndColumns();
             }
-            ImGui::EndColumns();
+            ImGui::EndDisabledMode();
         }
         ImGui::EndChild();
     }
@@ -268,10 +343,12 @@ bool GrindBot::OnReadPacket(unsigned short msgtype, byte* packet)
             {
                 //um_target->m_info.CurrentHP = 0; 
                 auto monsterinfo = FindGrindMonsterInfo(m_target->m_info.MonsterUnitKind);
-                if (monsterinfo != m_mobs.end()) {
+                if (monsterinfo != m_mobs.end())                 {
                     monsterinfo->second.killed++;
+                    m_total_mobs_killed++;
                 }
 
+                Reset_NewTargetDelayTime();
                 m_target = nullptr;
             }              
         }
@@ -329,15 +406,6 @@ bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
         return false;
     }
 
-   // if(monster->)
-
-    if (m_shoot_all_goldies && monster->m_pMonsterInfo)
-    {
-        if (monster->m_pMonsterInfo->MonsterName[0] == '\\' && monster->m_pMonsterInfo->MonsterName[1] == 'e') {
-            return true;
-        }
-    }
-
     auto monsterinfo = FindGrindMonsterInfo(monster->m_info.MonsterUnitKind);
     if(monsterinfo != m_mobs.end() && monsterinfo->second.shoot) {
             return true;
@@ -346,7 +414,7 @@ bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
 }
 
 CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
-{  
+{ 
     float min_distance = 999999;
     CMonsterData* newtarget = nullptr;
 
@@ -371,20 +439,19 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
 
             if (CanShootAtTarget(monster))
             {
-                POINT delta;
-                delta.x = curPos.x - monster->m_nObjScreenX;
-                delta.y = curPos.y - monster->m_nObjScreenY;
-
-                float dist;
-                if (m_prioritise_closer_mobs)
+                float dist = 9999999.0f;
+                switch (m_target_mode)
                 {
+                case TargetMode::GearDistance:
                     dist = GetTargetDistance(monster);
-                }
-                else
-                {
+                    break;
+                case TargetMode::CrosshairDistance:
+                    POINT delta;
+                    delta.x = curPos.x - monster->m_nObjScreenX;
+                    delta.y = curPos.y - monster->m_nObjScreenY;
                     dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
+                    break;
                 }
-                
 
                 if (dist < min_distance)
                 {
@@ -416,18 +483,18 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
 
             if (CanShootAtTarget(monster.second))
             {
-                POINT delta;
-                delta.x = curPos.x - monster.second->m_nObjScreenX;
-                delta.y = curPos.y - monster.second->m_nObjScreenY;
-
-                float dist;
-                if (m_prioritise_closer_mobs)
+                float dist = 9999999.0f;
+                switch (m_target_mode)
                 {
+                case TargetMode::GearDistance:
                     dist = GetTargetDistance(monster.second);
-                }
-                else
-                {
+                    break;
+                case TargetMode::CrosshairDistance:
+                    POINT delta;
+                    delta.x = curPos.x - monster.second->m_nObjScreenX;
+                    delta.y = curPos.y - monster.second->m_nObjScreenY;
                     dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
+                    break;
                 }
 
                 if (dist < min_distance)
@@ -468,14 +535,14 @@ void GrindBot::AimAtTarget(CMonsterData* m_target)
             targetPos.x - TARGET_LOCK_THRESHOLD > curPos.x || 
             targetPos.y + TARGET_LOCK_THRESHOLD < curPos.y ||
             targetPos.y - TARGET_LOCK_THRESHOLD > curPos.y)
-        {
-            //SetCursorPos(targetPos.x, targetPos.y);
-            //SendMouseMove(delta_x, delta_y);
-            //m_buddy->SetCursorPosition(targetPos.x, targetPos.y);
+        {   
+            // aim to target slowly
             m_buddy->SetCursorPosition(curPos.x + delta_x, curPos.y + delta_y);
         }
         else
         {
+            // lock target
+            m_buddy->SetCursorPosition(targetPos.x, targetPos.y);
             m_on_target = true;
         }
     }
@@ -521,6 +588,11 @@ void GrindBot::Reset_GrindMobsCheckTime()
     m_inv_action_check_time = UPDATE_GRINDMOBS_TIME;
 }
 
+void GrindBot::Reset_NewTargetDelayTime()
+{
+    m_shoot_new_target_delay = std::chrono::milliseconds(m_buddy->GetRandInt32(m_humanized_target_delay_min, m_humanized_target_delay_max));
+}
+
 void GrindBot::UpdateCheckTime()
 {   
     if (m_inv_action_check_time > 0ms) {
@@ -536,6 +608,13 @@ void GrindBot::UpdateCheckTime()
     if (m_update_mob_list_check_time < 0ms) {
         m_update_mob_list_check_time = 0ms;
     }
+    
+    if (m_shoot_new_target_delay > 0ms) {
+        m_shoot_new_target_delay -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
+    }
+    if (m_shoot_new_target_delay < 0ms) {
+        m_shoot_new_target_delay = 0ms;
+    }  
 }
 
 void GrindBot::UpdateGrindingTime()
@@ -562,15 +641,24 @@ void GrindBot::UpdateGrindMobInfo()
                         continue;
                     }
 
+                    gmi.shoot = false;
+                    gmi.priority = false;
+                    gmi.goldy = false;
+                    gmi.killed = 0;
+
                     if (gmi.clean_name[0] == '\\')
                     {
                         gmi.clean_name.erase(gmi.clean_name.begin(), gmi.clean_name.begin() + 2);
                         gmi.clean_name.erase(gmi.clean_name.end() - 2, gmi.clean_name.end());
                         gmi.goldy = true;
+
+                        if (m_shoot_all_goldies) 
+                        {
+                            gmi.shoot = true;
+                            gmi.priority = true;
+                        }
                     }
-                    gmi.killed = 0;
-                    gmi.shoot = false;
-                    gmi.priority = false;
+              
                     m_mobs.insert({ monster.second->m_info.MonsterUnitKind, gmi });
                 }
             }
@@ -642,6 +730,10 @@ bool GrindBot::IsMonsterDead(CMonsterData* monster)
         return true;
     }
 
+    if (monster->m_info.CurrentHP == 0) {
+        return true;
+    }
+
     return false;
 }
        
@@ -652,6 +744,12 @@ FeatureType GrindBot::GetType() const
 
 void GrindBot::OnEnable()
 {
+    if (OSR_API->GetPlayerGearType() != GearType::AGear) 
+    {
+        Enable(false); 
+        return;
+    }
+
     m_mobs.clear();
 
     // sommer event special, always add these monster to the list
@@ -700,6 +798,9 @@ void GrindBot::OnEnable()
 
         m_kitbot->Enable(true);
     }
+
+    OSR_API->UsePrimaryWeapon(false);
+    OSR_API->UseSecondaryWeapon(false);
 }
 
 void GrindBot::OnDisable()

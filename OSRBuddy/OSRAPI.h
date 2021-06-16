@@ -64,6 +64,7 @@ public:
 	CWeaponItemInfo* GetSecondaryWeapon();
 
 	void SetTarget(CUnitData* target);
+	CUnitData* GetTarget();
 
 	bool IsHitablePrimary(CUnitData* target);
 

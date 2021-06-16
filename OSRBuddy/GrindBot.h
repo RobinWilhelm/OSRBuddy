@@ -8,6 +8,11 @@
    
 #define CAPSULE_OPEN_REATTACK 500ms
 #define UPDATE_GRINDMOBS_TIME 500ms
+#define NO_TARGET_SIEGE_DISABLE_TIME 1500ms
+#define NO_TARGET_STOP_SHOOTING_TIME 600ms
+
+#define MIN_NEW_TARGET_DELAY_TIME 100ms
+#define MAX_NEW_TARGET_DELAY_TIME 300ms
 
 class KitBuffBot; 
 
@@ -22,6 +27,12 @@ struct GrindMonsterInfo
 	bool goldy;				
 };
 
+
+enum class TargetMode
+{
+	GearDistance = 0,
+	CrosshairDistance = 1,
+};
 
 class GrindBot : public BuddyFeatureBase
 {
@@ -59,6 +70,7 @@ private:
 	void ResetInventoryActionCheckTime();
 	bool ShouldCheck_GrindMobs();
 	void Reset_GrindMobsCheckTime();
+	void Reset_NewTargetDelayTime();
 
 	void UpdateCheckTime();
 	void UpdateGrindingTime();
@@ -87,11 +99,19 @@ private:
 	bool m_front_only;
 	bool m_shoot_all_goldies;
 	bool m_prioritise_closer_mobs;
-			  	  
+	TargetMode m_target_mode;
+
+	bool m_humanized_overshoot;
+	int m_humanized_target_delay_min;
+	int m_humanized_target_delay_max;
+
 	std::chrono::milliseconds m_inv_action_check_time;
 	std::chrono::milliseconds m_update_mob_list_check_time;
+	std::chrono::milliseconds m_no_target_time;
+	std::chrono::milliseconds m_shoot_new_target_delay;
 
 	std::map<INT, GrindMonsterInfo> m_mobs;
+	int m_total_mobs_killed;
 
 	bool m_clean_inventory;
 	bool m_only_clean_while_stopped;
