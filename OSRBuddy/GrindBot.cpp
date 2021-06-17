@@ -6,7 +6,7 @@
 #include "KitBot.h"
 
 #define TARGET_LOCK_THRESHOLD    45.0f
-#define TARGETING_SPEED 0.1f
+#define TARGETING_SPEED 1.0f
 
   
 GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
