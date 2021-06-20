@@ -6,7 +6,6 @@
 #include "KitBot.h"
 
 #define TARGET_LOCK_THRESHOLD    45.0f
-#define TARGETING_SPEED 1.0f
 
   
 GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
@@ -27,6 +26,7 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_open_fantasyglobemineralcapsule = true;
     m_open_mineralcapsule = true;
     m_open_wpcapsule = true;
+    m_open_soccer_ball_capsule = true;
 
     m_shoot_all_goldies = true;
     m_front_only = true;
@@ -34,6 +34,13 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_humanized_target_delay_min = MIN_NEW_TARGET_DELAY_TIME.count();
     m_humanized_target_delay_max = MAX_NEW_TARGET_DELAY_TIME.count();
     m_target_mode = TargetMode::CrosshairDistance;
+
+
+    m_smoothtype = SmoothType::Distance;
+    m_dist_smooth_x = 1;
+    m_dist_smooth_y = 1;
+    m_time_smooth_x = 1;
+    m_time_smooth_y = 1;
 }   
 
 void GrindBot::Tick()
@@ -167,37 +174,31 @@ void GrindBot::RenderImGui()
                 ImGui::Text("Settings");
                 ImGui::Separator();
                 ImGui::Text("Start / Stop hotkey: \"U\"");        
-                //ImGui::BeginColumns("SettingsColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-                //{
-                    //ImGui::SetColumnWidth(0, 250);
-                    const char* items[] = { "Gear distance", "Crosshair distance" };
-                    ImGui::ComboEx("Target Mode:", reinterpret_cast<int*>(&m_target_mode), items, 2, -1, true, 150);
-                    if (ImGui::IsItemHovered()) {
-                        ImGui::SetTooltip("Gear distance: Will shoot the nearest mob first.\nCrosshair distance: Will shoot the mob closest to the crosshair first.");
-                    }
-                    ImGui::Checkbox("Shoot and prio all goldies", &m_shoot_all_goldies);
-                    if (ImGui::IsItemHovered()) {
-                        ImGui::SetTooltip("Will shoot an prioritise all gold mobs, even if they are not in the monster selection list yet.");
-                    }  
-                //}
-                //ImGui::NextColumn();
-                //{
-                    ImGui::Checkbox("Visible only", &m_front_only);
-                    if (ImGui::IsItemHovered()) {
-                        ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
-                    }
-                    ImGui::Checkbox("Overshoot", &m_humanized_overshoot);
-                    if (ImGui::IsItemHovered()) {
-                        ImGui::SetTooltip("Will continue to shoot for some time after a mob died.");
-                    }
-                //}
-                //ImGui::EndColumns();     
-
+  
+                const char* items[] = { "Gear distance", "Crosshair distance" };
+                ImGui::ComboEx("Target Mode:", reinterpret_cast<int*>(&m_target_mode), items, 2, -1, true, 150);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Gear distance: Will shoot the nearest mob first.\nCrosshair distance: Will shoot the mob closest to the crosshair first.");
+                }
+                ImGui::Checkbox("Shoot and prio all goldies", &m_shoot_all_goldies);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Will shoot an prioritise all gold mobs, even if they are not in the monster selection list yet.");
+                }  
+         
+                ImGui::Checkbox("Visible only", &m_front_only);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
+                }
+                ImGui::Checkbox("Overshoot", &m_humanized_overshoot);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Will continue to shoot for some time after a mob died.");
+                }                  
+                  
                 ImGui::NewLine();
-                ImGui::Text("Targeting delay in milliseconds:");
-                ImGui::PushItemWidth(125);
+                ImGui::Text("Targeting delay");
+                ImGui::Separator();
                 ImGui::BeginColumns("TargetDelayColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-                {        
+                { 
                     if(ImGui::SliderInt("Min", &m_humanized_target_delay_min, 0, 500))
                     {
                         if (m_humanized_target_delay_min > m_humanized_target_delay_max) {
@@ -212,6 +213,31 @@ void GrindBot::RenderImGui()
                         if (m_humanized_target_delay_min > m_humanized_target_delay_max) {
                             m_humanized_target_delay_max = m_humanized_target_delay_min;
                         }
+                    }
+                }
+                ImGui::EndColumns();
+
+                ImGui::NewLine();
+                ImGui::Text("Aim smoothing");
+                ImGui::Separator();
+                const char* smoothitems[] = { "Distance", "Time" };
+                ImGui::ComboEx("Smooth Type:", reinterpret_cast<int*>(&m_smoothtype), smoothitems, 1, -1, true, 100);
+                ImGui::BeginColumns("AimSmoothingColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+                {
+                    if (m_smoothtype == SmoothType::Time) {
+                        ImGui::SliderFloat("X", &m_time_smooth_x, 0, 10);
+                    }
+                    else {
+                        ImGui::SliderFloat("X", &m_dist_smooth_x, 0, 10);
+                    }
+                }
+                ImGui::NextColumn();
+                {
+                    if (m_smoothtype == SmoothType::Time) {
+                        ImGui::SliderFloat("Y", &m_time_smooth_y, 0, 10);
+                    }
+                    else {
+                        ImGui::SliderFloat("Y", &m_dist_smooth_y, 0, 10);
                     }
                 }
                 ImGui::EndColumns();
@@ -252,6 +278,7 @@ void GrindBot::RenderImGui()
             {
                 ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
                 ImGui::Checkbox("WP Capsules", &m_open_wpcapsule);
+                ImGui::Checkbox("Soccer Ball Capsule", &m_open_soccer_ball_capsule);
             }
             ImGui::EndColumns(); 
         }
@@ -422,10 +449,16 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
     float min_distance_prio = 999999;
     CMonsterData* newtarget_prio = nullptr;
 
+    D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
+    D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
+    QAngle targetAng;
+    QAngle localAng = CalcAngle(mousepos, mousepos + mousedir);
+    QAngle deltaAng;
+
     POINT curPos;
     m_buddy->GetCursorPosition(&curPos);
     ScreenToClient(OSR_API->GetAtumApplication()->m_hWnd, &curPos);  
-
+           
     if (front_only)
     {
         for (auto& monster : OSR_API->GetSceneData()->m_vecMonsterRenderList)
@@ -447,10 +480,15 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                     dist = GetTargetDistance(monster);
                     break;
                 case TargetMode::CrosshairDistance:
+                    targetAng = CalcAngle(mousepos, monster->m_vPos);
+                    deltaAng = targetAng - localAng;
+                    dist = deltaAng.Length();
+                    /*
                     POINT delta;
                     delta.x = curPos.x - monster->m_nObjScreenX;
                     delta.y = curPos.y - monster->m_nObjScreenY;
                     dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
+                    */
                     break;
                 }
 
@@ -491,10 +529,16 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                     dist = GetTargetDistance(monster.second);
                     break;
                 case TargetMode::CrosshairDistance:
+                    targetAng = CalcAngle(mousepos, monster.second->m_vPos);
+                    deltaAng = targetAng - localAng;
+                    dist = deltaAng.Length();
+
+                    /*
                     POINT delta;
                     delta.x = curPos.x - monster.second->m_nObjScreenX;
                     delta.y = curPos.y - monster.second->m_nObjScreenY;
                     dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
+                    */
                     break;
                 }
 
@@ -513,6 +557,7 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
             }
         }        
     } 
+   
     return (newtarget_prio) ? newtarget_prio : newtarget;
 }
 
@@ -528,25 +573,114 @@ void GrindBot::AimAtTarget(CMonsterData* m_target)
         targetPos.y = m_target->m_nObjScreenY;
 
         ClientToScreen(OSR_API->GetAtumApplication()->m_hWnd, &targetPos);
-
-        int delta_x = (targetPos.x - curPos.x) * TARGETING_SPEED;
-        int delta_y = (targetPos.y - curPos.y) * TARGETING_SPEED; 
-
+           
         if (targetPos.x + TARGET_LOCK_THRESHOLD < curPos.x ||
             targetPos.x - TARGET_LOCK_THRESHOLD > curPos.x || 
             targetPos.y + TARGET_LOCK_THRESHOLD < curPos.y ||
             targetPos.y - TARGET_LOCK_THRESHOLD > curPos.y)
-        {   
+        { 
+            
+            D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
+            D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
+
+            QAngle targetAng = CalcAngle(mousepos, m_target->m_vPos);
+            QAngle localAng = CalcAngle(mousepos, mousepos + mousedir);
+            QAngle deltaAng = targetAng - localAng;
+
+            SmoothDeltaAngle(deltaAng);
+
+            localAng += deltaAng;
+
+            D3DXVECTOR3 endpoint;
+            MathHelper::AngleVectors(localAng, &endpoint, NULL, NULL);
+            /*
+            OSR_API->WorldToScreen(mousepos + endpoint, screen_x, screen_y);
+            POINT screen;
+            screen.x = screen_x;
+            screen.y = screen_y;
+            ClientToScreen(OSR_API->GetAtumApplication()->m_hWnd, &screen);
+             */
+
+            D3DXVec3Normalize(&OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponVel, &endpoint);
+
+
+            // center the mouse
+            POINT pt;	                           
+            auto atumapp = OSR_API->GetAtumApplication();
+            // ±× Â÷¸¸Å­ Å¬¶óÀÌ¾ðÆ®ÀÇ Áß½ÉÁÂÇ¥¸¦ nX,nY¿¡ ³Ö¾îÁØ´Ù.
+            pt.x = atumapp->m_d3dsdBackBuffer.Width / 2;
+            pt.y = atumapp->m_d3dsdBackBuffer.Height / 2;    
+            ClientToScreen(OSR_API->GetAtumApplication()->m_hWnd, &pt);
+            m_buddy->SetCursorPosition(pt.x, pt.y);
+
+            //m_buddy->SetCursorPosition(screen.x, screen.y);
+            return;
+            
+                /*
             // aim to target slowly
-            m_buddy->SetCursorPosition(curPos.x + delta_x, curPos.y + delta_y);
+            POINT delta;
+            delta.x = (targetPos.x - curPos.x);
+            delta.y = (targetPos.y - curPos.y);
+
+            D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
+            D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
+            QAngle targetAng = CalcAngle(mousepos, m_target->m_vPos);
+            QAngle localAng = CalcAngle(mousepos, mousepos + mousedir);
+            QAngle deltaAng = targetAng - localAng;
+
+           
+
+            //SmoothAimDelta(delta, deltaAng.Length());
+
+            //m_buddy->SetCursorPosition(curPos.x + delta.x, curPos.y + delta.y);
+            */   
         }
         else
         {
-            // lock target
-            m_buddy->SetCursorPosition(targetPos.x, targetPos.y);
             m_on_target = true;
         }
     }
+}
+
+void GrindBot::SmoothAimDelta(POINT& delta, float deltaAngleLength)
+{
+    switch (m_smoothtype)
+    {
+    case SmoothType::Distance:
+        delta.x /= std::max(1.0f, m_dist_smooth_x * std::min(deltaAngleLength, 90.0f) / 50.0f);
+        delta.y /= std::max(1.0f, m_dist_smooth_y * std::min(deltaAngleLength, 90.0f) / 50.0f);
+        break;
+    case SmoothType::Time:
+        //float dist = std::sqrtf(delta.x * delta.x + delta.y * delta.y);
+
+        //float finalTime_x = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_x;
+        //float finalTime_y = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_y;
+        float finalTime_x = deltaAngleLength * m_time_smooth_x;
+        float finalTime_y = deltaAngleLength * m_time_smooth_y;
+
+
+        static float curAimTime_x = 0.0f;
+        static float curAimTime_y = 0.0f;
+        
+        auto deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime()).count() / 1000.0f;
+
+        curAimTime_x += deltaTime;
+        curAimTime_y += deltaTime;
+
+        if (curAimTime_x > finalTime_x)
+            curAimTime_x = finalTime_x;
+
+        if (curAimTime_y > finalTime_y)
+            curAimTime_y = finalTime_y;   
+
+        float percent_x = curAimTime_x / finalTime_x;
+        float percent_y = curAimTime_y / finalTime_y;      
+
+        delta.x *= percent_x;
+        delta.y *= percent_y;
+        break;
+    }
+
 }
 
 void GrindBot::ToggleGrinding()
@@ -691,7 +825,8 @@ void GrindBot::TickInventoryCleaning()
                 return;
             }
 
-            if (m_open_spicapsule && TryOpenCapsule(ItemNumber::SPI_capsule)) {
+    
+            if (m_open_soccer_ball_capsule && TryOpenCapsule(ItemNumber::Soccer_Ball_Capsule)) {
                 return;
             }
 
@@ -709,6 +844,10 @@ void GrindBot::TickInventoryCleaning()
                     return;
                 }
             }
+
+            if (m_open_spicapsule && TryOpenCapsule(ItemNumber::SPI_capsule)) {
+                return;
+            }  
         }
     }
 }
@@ -737,6 +876,61 @@ bool GrindBot::IsMonsterDead(CMonsterData* monster)
 
     return false;
 }
+
+QAngle GrindBot::CalcAngle(const D3DXVECTOR3& source, const D3DXVECTOR3& target)
+{
+    QAngle angles;
+    D3DXVECTOR3 delta = target - source;
+    MathHelper::VectorToAngles(delta, angles);
+    return angles;
+}
+
+void GrindBot::SmoothDeltaAngle(QAngle& deltaAng)
+{
+    switch (m_smoothtype)
+    {
+    case SmoothType::Distance:
+        deltaAng.pitch /= 1 + m_dist_smooth_x;
+        deltaAng.yaw /= 1+ m_dist_smooth_y;
+        break;
+    case SmoothType::Time:
+        float dist = deltaAng.Length();  
+        //float finalTime_x = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_x;
+        //float finalTime_y = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_y;
+        float finalTime_x = dist * (m_time_smooth_x * 1.5);
+        float finalTime_y = dist * (m_time_smooth_y * 1.5);
+
+
+        static float curAimTime_x = 0.0f;
+        static float curAimTime_y = 0.0f;
+
+        auto deltaTime = OSR_API->GetElapsedTime();
+
+        curAimTime_x += deltaTime;
+        curAimTime_y += deltaTime;
+
+        if (curAimTime_x > finalTime_x)
+            curAimTime_x = finalTime_x;
+
+        if (curAimTime_y > finalTime_y)
+            curAimTime_y = finalTime_y;
+
+        float percent_x = curAimTime_x / finalTime_x;
+        float percent_y = curAimTime_y / finalTime_y;
+
+        if (finalTime_x <= 0.001f)
+            percent_x = 1;
+
+        if (finalTime_y <= 0.001f)
+            percent_y = 1;
+
+
+        deltaAng.pitch  *= percent_x;
+        deltaAng.yaw    *= percent_y;
+        break;
+    }
+}
+
        
 FeatureType GrindBot::GetType() const
 {

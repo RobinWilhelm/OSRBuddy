@@ -214,6 +214,28 @@ void TestItemUse::RenderImGui()
 		}
 	}
 
+
+	ImGui::NewLine();
+	ImGui::Text("mousedir");
+	CShuttleChild* shuttlechild = OSR_API->GetAtumApplication()->m_pShuttleChild;
+
+	ImGui::InputFloat("mousedir_x", &shuttlechild->m_vMouseDir.x);
+	ImGui::InputFloat("mousedir_y", &shuttlechild->m_vMouseDir.y);
+	ImGui::InputFloat("mousedir_z", &shuttlechild->m_vMouseDir.z);
+
+	/*
+	ImGui::Text(mousedir_x.c_str());
+	ImGui::Text(mousedir_y.c_str());
+	ImGui::Text(mousedir_z.c_str());
+	*/
+	ImGui::Text("mousepos");
+	std::string mousepos_x = std::to_string(shuttlechild->m_vMousePos.x);
+	std::string mousepos_y = std::to_string(shuttlechild->m_vMousePos.y);
+	std::string mousepos_z = std::to_string(shuttlechild->m_vMousePos.z);
+
+	ImGui::Text(mousepos_x.c_str());
+	ImGui::Text(mousepos_y.c_str());
+	ImGui::Text(mousepos_z.c_str());
 }
 
 std::string TestItemUse::GetName() const

@@ -47,6 +47,11 @@ LRESULT OSRBuddyMain::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
             InitiateAppShutdown();
             break;   
         case WM_MOUSEMOVE:
+            if (m_block_mouse)
+            {
+                return 1;
+            }
+
             if (m_emulate_mouse)
             {
                 m_cur_mousepos.x = GET_X_LPARAM(lParam);
@@ -324,6 +329,11 @@ void OSRBuddyMain::OpenMessageBoxAsync(std::string message, std::string header, 
     msgboxthread.detach();
 }
 
+void OSRBuddyMain::BlockMouseInput(bool on)
+{
+    m_block_mouse = on;
+}
+
 bool OSRBuddyMain::InitOnReadPacketHook()
 {    
     if (m_OnRecvFieldSocketMessagehook) {
@@ -488,12 +498,14 @@ void OSRBuddyMain::EnableMouseEmulation(bool on)
         return;
     }
 
-    if (on) {
+    if (on)
+    {
         m_orig_OnGetCursorPos(&m_cur_mousepos);
     }       
     m_emulate_mouse = on;
 
-    if (!on) {
+    if (!on) 
+    {
         m_orig_OnSetCursorPos(m_cur_mousepos.x, m_cur_mousepos.y);
     }
 }

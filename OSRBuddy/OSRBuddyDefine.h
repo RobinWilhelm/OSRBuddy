@@ -265,7 +265,7 @@ enum class ItemNumber : int
     AmmunitionRechargeBox = 7022120,
     B_Type_CondensedFuel = 7008100,
     C_Type_CondensedFuel = 7008090,
-    D_Type_CondensedFuel = 7008080,
+    D_Type_CondensedFuel = 7008080, 
     E_Type_CondensedFuel =  7000790,
               
     // Grinding items
@@ -276,7 +276,7 @@ enum class ItemNumber : int
     Mini_Stealth_Card = 7010690,
     Starter_Mini_Stealth_Card = 7021071,
 
-    // Watermelon Bot
+    // Inventory Cleaning
     Square_Watermelon_Gift = 7023970,
     Fantasy_Globe_Mineral_Capsule = 7023480,
     WP_Capsule_100 = 7030445,
@@ -284,6 +284,7 @@ enum class ItemNumber : int
     WP_Capsule_1000 = 7030443,
     SPI_capsule = 7004740,
     Mineral_Capsule = 7015000,
+    Soccer_Ball_Capsule = 7029520,
 
     // Skills
     IG_Turnaround_2 = 7832022,

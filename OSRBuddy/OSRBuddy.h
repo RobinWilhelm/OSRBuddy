@@ -71,7 +71,8 @@ public:
 	void NotifySound(NotifyType type);
 	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type, std::function<void(int)> callback);
 	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type);
-	PersistingTools m_persistingTools;
+	
+	void BlockMouseInput(bool on);
 
 private:
 	void static MessageBoxThreadFunction(std::string message, std::string header, NotifyType type, std::function<void(int)> callback = nullptr);
@@ -146,4 +147,6 @@ private:
 
 	bool m_allow_notify_sounds;
 	bool m_allow_notify_popups;
+	PersistingTools m_persistingTools;
+	bool m_block_mouse;
 };

@@ -5,7 +5,8 @@
 #include "OSRAPI.h"
 #include <chrono>
 #include <map>
-   
+#include "MathHelper.h" 
+
 #define CAPSULE_OPEN_REATTACK 500ms
 #define UPDATE_GRINDMOBS_TIME 500ms
 #define NO_TARGET_SIEGE_DISABLE_TIME 1500ms
@@ -27,6 +28,11 @@ struct GrindMonsterInfo
 	bool goldy;				
 };
 
+enum class SmoothType
+{
+	Distance,
+	Time
+};
 
 enum class TargetMode
 {
@@ -63,7 +69,7 @@ private:
 	bool IsValidTargetMonster(CMonsterData* m_target);
 	CMonsterData* FindNewTarget(float max_distance, bool front_only = false);
 	void AimAtTarget(CMonsterData* m_target);
-
+	void SmoothAimDelta(POINT& delta, float deltaAngleLength);
 	void ToggleGrinding();
 	
 	bool InventoryActionCheckTimeReady();
@@ -82,6 +88,8 @@ private:
 	bool TryOpenCapsule(ItemNumber capsule);
 
 	bool IsMonsterDead(CMonsterData* monster);
+	QAngle CalcAngle(const D3DXVECTOR3& source, const D3DXVECTOR3& target);
+	void SmoothDeltaAngle(QAngle& deltaAng);
 
 private:
 	CMonsterData* m_target;
@@ -105,6 +113,12 @@ private:
 	int m_humanized_target_delay_min;
 	int m_humanized_target_delay_max;
 
+	SmoothType m_smoothtype;  
+	float m_dist_smooth_x;
+	float m_dist_smooth_y;
+	float m_time_smooth_x;
+	float m_time_smooth_y;				
+
 	std::chrono::milliseconds m_inv_action_check_time;
 	std::chrono::milliseconds m_update_mob_list_check_time;
 	std::chrono::milliseconds m_no_target_time;
@@ -122,4 +136,5 @@ private:
 	bool m_open_fantasyglobemineralcapsule;
 	bool m_open_mineralcapsule;
 	bool m_open_wpcapsule;
+	bool m_open_soccer_ball_capsule;
 };
