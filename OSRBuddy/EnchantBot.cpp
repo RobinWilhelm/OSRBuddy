@@ -328,9 +328,9 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 
 	m_next_action = EnchantAction::Add_EnchantItem;
 	m_enchant_item = OsrItemInfo(uid);
-	m_buddy->m_persistingTools.CloseStream();
-	m_buddy->m_persistingTools.SetItem(uid);
-	m_statisticsWeapon = m_buddy->m_persistingTools.GetStats();
+	m_buddy->GetPersistingTools()->CloseStream();
+	m_buddy->GetPersistingTools()->SetItem(uid);
+	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();
 
 	if (!m_enchant_item.IsArmor() && !m_enchant_item.IsWeapon()) 
 	{
@@ -906,7 +906,7 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 			m_statisticsSession.m_used_enchantcards++;
 			m_statisticsWeapon.m_used_enchantcards++;
 		}
-		m_buddy->m_persistingTools.PersistEnchantments(m_statisticsWeapon);
+		m_buddy->GetPersistingTools()->PersistEnchantments(m_statisticsWeapon);
 		m_using_chancecard_8 = false;
 		m_using_enchprot_e1 = false;
 		m_using_enchprot_e5 = false;

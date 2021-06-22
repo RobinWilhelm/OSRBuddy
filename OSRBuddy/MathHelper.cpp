@@ -24,7 +24,7 @@ void MathHelper::AngleVectors(const QAngle& angles, D3DXVECTOR3* forward, D3DXVE
 	{
 		forward->x = cp * cy;
 		forward->y = cp * sy;
-		forward->z = -sp;
+		forward->z = sp;
 	}
 
 	if (right)
@@ -45,9 +45,11 @@ void MathHelper::AngleVectors(const QAngle& angles, D3DXVECTOR3* forward, D3DXVE
 bool MathHelper::VectorToAngles(const D3DXVECTOR3& forward, QAngle& angles)
 {
 	//angles.pitch = RAD2DEG(atan2(sqrt(forward.x * forward.x + forward.y * forward.y), forward.z));
-	angles.pitch = RAD2DEG(atan2(-forward.z, sqrt(forward.x * forward.x + forward.y * forward.y)));
-	angles.yaw = RAD2DEG(atan2(forward.y, forward.x));
-	angles.roll = 0.0f;
+	angles.pitch = atan2(forward.z, sqrt(forward.x * forward.x + forward.y * forward.y));
+	angles.yaw = atan2(forward.y, forward.x);
+	  
+	angles.pitch = RAD2DEG(angles.pitch);
+	angles.yaw = RAD2DEG(angles.yaw);
 
 	if (!std::isnan(angles.yaw) && !std::isnan(angles.pitch))
 		return true;

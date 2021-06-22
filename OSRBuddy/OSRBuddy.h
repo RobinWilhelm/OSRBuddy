@@ -72,7 +72,9 @@ public:
 	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type, std::function<void(int)> callback);
 	void OpenMessageBoxAsync(std::string message, std::string header, NotifyType type);
 	
-	void BlockMouseInput(bool on);
+	void BlockMouseInput(bool on);		   
+
+	PersistingTools* GetPersistingTools() { return &m_persistingTools; }
 
 private:
 	void static MessageBoxThreadFunction(std::string message, std::string header, NotifyType type, std::function<void(int)> callback = nullptr);

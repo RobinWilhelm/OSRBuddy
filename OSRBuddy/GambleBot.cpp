@@ -404,9 +404,9 @@ void GambleBot::SetGambleItem(UID64_t uid)
 	}
 
 	m_gamble_item = OsrItemInfo(uid);
-	m_buddy->m_persistingTools.CloseStream();
-	m_buddy->m_persistingTools.SetItem(uid);
-	m_statisticsWeapon = m_buddy->m_persistingTools.GetStats();
+	m_buddy->GetPersistingTools()->CloseStream();
+	m_buddy->GetPersistingTools()->SetItem(uid);
+	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();
 
 	if (!m_gamble_item.GetItemInfo() || !m_gamble_item.IsWeapon())
 	{

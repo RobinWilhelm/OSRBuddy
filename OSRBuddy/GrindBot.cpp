@@ -4,6 +4,9 @@
 #include "OSRBuddy.h"
 #include <string> 
 #include "KitBot.h"
+#include "Miscellaneous.h"
+#include "D3D9Renderer.h"
+#include <cmath>
 
 #define TARGET_LOCK_THRESHOLD    45.0f
 
@@ -15,18 +18,9 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_target = nullptr;
     m_kitbot = nullptr;
     m_get_new_target = true;   
-    m_inv_action_check_time = 0ms;
+
     m_update_mob_list_check_time = 0ms;
     m_mobs.clear(); 
-    m_clean_inventory = false;
-    m_only_clean_while_overheat = false;
-    m_only_clean_while_stopped = false;
-    m_open_watermelongift = true;
-    m_open_spicapsule = true;
-    m_open_fantasyglobemineralcapsule = true;
-    m_open_mineralcapsule = true;
-    m_open_wpcapsule = true;
-    m_open_soccer_ball_capsule = true;
 
     m_shoot_all_goldies = true;
     m_front_only = true;
@@ -37,16 +31,17 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 
 
     m_smoothtype = SmoothType::Distance;
-    m_dist_smooth_x = 1;
-    m_dist_smooth_y = 1;
-    m_time_smooth_x = 1;
-    m_time_smooth_y = 1;
+    m_smooth_factor_distance = 0.5f;
+    m_smooth_factor_time = 0.5f;
+
+    m_aimtime_current = 0ms;
+    m_aimtime_final = 0ms;
+    m_anti_ram = true;
 }   
 
 void GrindBot::Tick()
 {                           
     UpdateCheckTime();
-    TickInventoryCleaning();
 
     if (!IsEnabled() || OSR_API->GetPlayerGearType() != GearType::AGear) {
         return;
@@ -59,23 +54,7 @@ void GrindBot::Tick()
         return;
     }
 
-    if (m_get_new_target && m_shoot_new_target_delay <= 0ms)
-    { 
-        // try to find a close target first, to prevent getting rammed
-        m_target = FindNewTarget(250, m_front_only);
-        if (!m_target)
-        {
-            m_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f - 50, m_front_only);
-        }      
-
-        if (m_target)
-        {
-            OSR_API->SetTarget(m_target);
-            m_on_target = false;
-            m_get_new_target = false;
-            m_no_target_time = 0ms;
-        }
-    }  
+    GetNewTarget();
  
     switch (m_current_state)
     {
@@ -144,13 +123,13 @@ void GrindBot::Tick()
         if (!OSR_API->GetPrimaryWeapon()->m_bOverHeat) 
         {
             // check if a monster has come close to the player  
-            CMonsterData* closetarget = FindNewTarget(250, m_front_only);
-            if (closetarget) 
+            if (m_anti_ram)
             {
-                m_target = closetarget;
-                OSR_API->SetTarget(m_target);
-            }
-            
+                CMonsterData* closetarget = FindNewTarget(250, m_front_only);
+                if (closetarget) {
+                    ChangeTarget(closetarget);
+                }
+            }            
             ChangeState(GrindBot::State::SIEGEING);
         }       
         break;
@@ -183,8 +162,7 @@ void GrindBot::RenderImGui()
                 ImGui::Checkbox("Shoot and prio all goldies", &m_shoot_all_goldies);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot an prioritise all gold mobs, even if they are not in the monster selection list yet.");
-                }  
-         
+                }                         
                 ImGui::Checkbox("Visible only", &m_front_only);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
@@ -192,7 +170,11 @@ void GrindBot::RenderImGui()
                 ImGui::Checkbox("Overshoot", &m_humanized_overshoot);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will continue to shoot for some time after a mob died.");
-                }                  
+                }                
+                ImGui::Checkbox("Anti ram", &m_anti_ram);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Will prioritise close targets that could ram the gear and turn it upside down.");
+                }
                   
                 ImGui::NewLine();
                 ImGui::Text("Targeting delay");
@@ -221,66 +203,41 @@ void GrindBot::RenderImGui()
                 ImGui::Text("Aim smoothing");
                 ImGui::Separator();
                 const char* smoothitems[] = { "Distance", "Time" };
-                ImGui::ComboEx("Smooth Type:", reinterpret_cast<int*>(&m_smoothtype), smoothitems, 1, -1, true, 100);
+                ImGui::ComboEx("Type:", reinterpret_cast<int*>(&m_smoothtype), smoothitems, 2, -1, true, 100);
+
+                ImGui::Text("Factor:");
+                ImGui::SameLine();
+                ImGui::PushItemWidth(150);
+                if (m_smoothtype == SmoothType::Time) {
+                    ImGui::SliderFloat("###timeSmoothfactor", &m_smooth_factor_time, 0, 1);
+                }
+                else {
+                    ImGui::SliderFloat("###distanceSmoothfactor", &m_smooth_factor_distance, 0, 1);
+                }
+                ImGui::PopItemWidth();
+                /*
                 ImGui::BeginColumns("AimSmoothingColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
                 {
                     if (m_smoothtype == SmoothType::Time) {
-                        ImGui::SliderFloat("X", &m_time_smooth_x, 0, 10);
+                        ImGui::SliderFloat("X", &m_time_smooth_x, 0, 1);
                     }
                     else {
-                        ImGui::SliderFloat("X", &m_dist_smooth_x, 0, 10);
+                        ImGui::SliderFloat("X", &m_dist_smooth_x, 0, 1);
                     }
                 }
                 ImGui::NextColumn();
                 {
                     if (m_smoothtype == SmoothType::Time) {
-                        ImGui::SliderFloat("Y", &m_time_smooth_y, 0, 10);
+                        ImGui::SliderFloat("Y", &m_time_smooth_y, 0, 1);
                     }
                     else {
-                        ImGui::SliderFloat("Y", &m_dist_smooth_y, 0, 10);
+                        ImGui::SliderFloat("Y", &m_dist_smooth_y, 0, 1);
                     }
                 }
                 ImGui::EndColumns();
+                */
             }
             ImGui::EndDisabledMode();
-
-            ImGui::NewLine();
-            ImGui::Separator();
-            ImGui::Text("Inventory Cleaning");
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("This works for all gears. Grindbot does not have to be enabled for this to work.");
-            }
-            ImGui::Separator();
-
-            ImGui::Checkbox("Active", &m_clean_inventory);
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("Will automatically open the below specified items.");
-            }
-            ImGui::SameLine();
-            ImGui::Checkbox("Stopped", &m_only_clean_while_stopped);
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("Only clean inventory while gear is stopped.");
-            }
-            ImGui::SameLine();
-            ImGui::Checkbox("Overheated", &m_only_clean_while_overheat);
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("Only clean inventory standard weapon is overheated.");
-            }
-
-            ImGui::NewLine();
-            ImGui::BeginColumns("InventoryCleaningColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
-            {
-                ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
-                ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
-                ImGui::Checkbox("Fantasy Globe MC", &m_open_fantasyglobemineralcapsule);
-            }
-            ImGui::NextColumn();
-            {
-                ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
-                ImGui::Checkbox("WP Capsules", &m_open_wpcapsule);
-                ImGui::Checkbox("Soccer Ball Capsule", &m_open_soccer_ball_capsule);
-            }
-            ImGui::EndColumns(); 
         }
         ImGui::EndChild();
     }
@@ -447,13 +404,7 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
     CMonsterData* newtarget = nullptr;
 
     float min_distance_prio = 999999;
-    CMonsterData* newtarget_prio = nullptr;
-
-    D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
-    D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
-    QAngle targetAng;
-    QAngle localAng = CalcAngle(mousepos, mousepos + mousedir);
-    QAngle deltaAng;
+    CMonsterData* newtarget_prio = nullptr;   
 
     POINT curPos;
     m_buddy->GetCursorPosition(&curPos);
@@ -480,15 +431,10 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                     dist = GetTargetDistance(monster);
                     break;
                 case TargetMode::CrosshairDistance:
-                    targetAng = CalcAngle(mousepos, monster->m_vPos);
-                    deltaAng = targetAng - localAng;
-                    dist = deltaAng.Length();
-                    /*
                     POINT delta;
                     delta.x = curPos.x - monster->m_nObjScreenX;
                     delta.y = curPos.y - monster->m_nObjScreenY;
-                    dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
-                    */
+                    dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));          
                     break;
                 }
 
@@ -528,17 +474,11 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                 case TargetMode::GearDistance:
                     dist = GetTargetDistance(monster.second);
                     break;
-                case TargetMode::CrosshairDistance:
-                    targetAng = CalcAngle(mousepos, monster.second->m_vPos);
-                    deltaAng = targetAng - localAng;
-                    dist = deltaAng.Length();
-
-                    /*
+                case TargetMode::CrosshairDistance:          
                     POINT delta;
                     delta.x = curPos.x - monster.second->m_nObjScreenX;
                     delta.y = curPos.y - monster.second->m_nObjScreenY;
                     dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
-                    */
                     break;
                 }
 
@@ -582,106 +522,55 @@ void GrindBot::AimAtTarget(CMonsterData* m_target)
             
             D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
             D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
+            //D3DXVECTOR3 mouseUp = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp;
 
-            QAngle targetAng = CalcAngle(mousepos, m_target->m_vPos);
-            QAngle localAng = CalcAngle(mousepos, mousepos + mousedir);
-            QAngle deltaAng = targetAng - localAng;
+            /*
+            D3DXVECTOR3 weaponDir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponVel;
+            D3DXVECTOR3 weaponPos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponPos;
+            D3DXVECTOR3 weaponUp = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponUp;
+            */
 
-            SmoothDeltaAngle(deltaAng);
+            D3DXVECTOR3 target = m_target->m_vPos - mousepos;
+            //D3DXVECTOR3 target_normalized;
+            D3DXVec3Normalize(&target, &target);
 
-            localAng += deltaAng;
+            D3DXVECTOR3 source = mousedir;
+            D3DXVec3Normalize(&source, &source);
+            float angle = acos(D3DXVec3Dot(&source, &target));
+
+            D3DXVECTOR3 rotAxis;
+            D3DXVec3Cross(&rotAxis, &source, &target);
+            D3DXVec3Normalize(&rotAxis, &rotAxis);
+            static D3DXMATRIX rotationMatrix;
+            D3DXMatrixIdentity(&rotationMatrix);
+
+            SmoothDeltaAngle(angle);
+            D3DXMatrixRotationAxis(&rotationMatrix, &rotAxis, angle);
 
             D3DXVECTOR3 endpoint;
-            MathHelper::AngleVectors(localAng, &endpoint, NULL, NULL);
-            /*
-            OSR_API->WorldToScreen(mousepos + endpoint, screen_x, screen_y);
-            POINT screen;
-            screen.x = screen_x;
-            screen.y = screen_y;
-            ClientToScreen(OSR_API->GetAtumApplication()->m_hWnd, &screen);
-             */
+            D3DXVec3TransformCoord(&endpoint, &mousedir, &rotationMatrix);
+            //int screen_x, screen_y;
+            //OSR_API->WorldToScreen(mousepos + endpoint, screen_x, screen_y);
 
-            D3DXVec3Normalize(&OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponVel, &endpoint);
 
+            // directly set the weapon direction
+            D3DXVec3Normalize(&OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponVel, &endpoint);  
 
             // center the mouse
             POINT pt;	                           
             auto atumapp = OSR_API->GetAtumApplication();
-            // ±× Â÷¸¸Å­ Å¬¶óÀÌ¾ðÆ®ÀÇ Áß½ÉÁÂÇ¥¸¦ nX,nY¿¡ ³Ö¾îÁØ´Ù.
             pt.x = atumapp->m_d3dsdBackBuffer.Width / 2;
             pt.y = atumapp->m_d3dsdBackBuffer.Height / 2;    
             ClientToScreen(OSR_API->GetAtumApplication()->m_hWnd, &pt);
             m_buddy->SetCursorPosition(pt.x, pt.y);
-
-            //m_buddy->SetCursorPosition(screen.x, screen.y);
             return;
-            
-                /*
-            // aim to target slowly
-            POINT delta;
-            delta.x = (targetPos.x - curPos.x);
-            delta.y = (targetPos.y - curPos.y);
-
-            D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
-            D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
-            QAngle targetAng = CalcAngle(mousepos, m_target->m_vPos);
-            QAngle localAng = CalcAngle(mousepos, mousepos + mousedir);
-            QAngle deltaAng = targetAng - localAng;
-
-           
-
-            //SmoothAimDelta(delta, deltaAng.Length());
-
-            //m_buddy->SetCursorPosition(curPos.x + delta.x, curPos.y + delta.y);
-            */   
         }
         else
         {
             m_on_target = true;
         }
     }
-}
-
-void GrindBot::SmoothAimDelta(POINT& delta, float deltaAngleLength)
-{
-    switch (m_smoothtype)
-    {
-    case SmoothType::Distance:
-        delta.x /= std::max(1.0f, m_dist_smooth_x * std::min(deltaAngleLength, 90.0f) / 50.0f);
-        delta.y /= std::max(1.0f, m_dist_smooth_y * std::min(deltaAngleLength, 90.0f) / 50.0f);
-        break;
-    case SmoothType::Time:
-        //float dist = std::sqrtf(delta.x * delta.x + delta.y * delta.y);
-
-        //float finalTime_x = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_x;
-        //float finalTime_y = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_y;
-        float finalTime_x = deltaAngleLength * m_time_smooth_x;
-        float finalTime_y = deltaAngleLength * m_time_smooth_y;
-
-
-        static float curAimTime_x = 0.0f;
-        static float curAimTime_y = 0.0f;
-        
-        auto deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime()).count() / 1000.0f;
-
-        curAimTime_x += deltaTime;
-        curAimTime_y += deltaTime;
-
-        if (curAimTime_x > finalTime_x)
-            curAimTime_x = finalTime_x;
-
-        if (curAimTime_y > finalTime_y)
-            curAimTime_y = finalTime_y;   
-
-        float percent_x = curAimTime_x / finalTime_x;
-        float percent_y = curAimTime_y / finalTime_y;      
-
-        delta.x *= percent_x;
-        delta.y *= percent_y;
-        break;
-    }
-
-}
+}     
 
 void GrindBot::ToggleGrinding()
 {
@@ -703,15 +592,6 @@ void GrindBot::ToggleGrinding()
     }  
 }
 
-bool GrindBot::InventoryActionCheckTimeReady()
-{
-    return m_inv_action_check_time <= 0ms;
-}
-
-void GrindBot::ResetInventoryActionCheckTime()
-{
-    m_inv_action_check_time = CAPSULE_OPEN_REATTACK + std::chrono::milliseconds(m_buddy->GetRandInt32(0, 300));
-}
 
 bool GrindBot::ShouldCheck_GrindMobs()
 {
@@ -720,7 +600,7 @@ bool GrindBot::ShouldCheck_GrindMobs()
 
 void GrindBot::Reset_GrindMobsCheckTime()
 {
-    m_inv_action_check_time = UPDATE_GRINDMOBS_TIME;
+    m_update_mob_list_check_time = UPDATE_GRINDMOBS_TIME;
 }
 
 void GrindBot::Reset_NewTargetDelayTime()
@@ -730,13 +610,6 @@ void GrindBot::Reset_NewTargetDelayTime()
 
 void GrindBot::UpdateCheckTime()
 {   
-    if (m_inv_action_check_time > 0ms) {
-        m_inv_action_check_time -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
-    }
-    if (m_inv_action_check_time < 0ms) {
-        m_inv_action_check_time = 0ms;
-    }
-
     if (m_update_mob_list_check_time > 0ms) {
         m_update_mob_list_check_time -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
     }
@@ -805,65 +678,7 @@ std::map<INT, GrindMonsterInfo>::iterator GrindBot::FindGrindMonsterInfo(int mon
 {
     return m_mobs.find(monsterunitkind);
 }
-
-void GrindBot::TickInventoryCleaning()
-{   
-    if (m_clean_inventory && (!m_only_clean_while_stopped || OSR_API->GetAtumApplication()->m_pShuttleChild->m_bUnitStop)
-        && (!m_only_clean_while_overheat || m_current_state == GrindBot::State::OVERHEATED))
-    {  
-        if (InventoryActionCheckTimeReady())
-        {
-            if (m_open_mineralcapsule && TryOpenCapsule(ItemNumber::Mineral_Capsule)) {
-                return;
-            }
-
-            if (m_open_fantasyglobemineralcapsule && TryOpenCapsule(ItemNumber::Fantasy_Globe_Mineral_Capsule)) {
-                return;
-            }
-
-            if (m_open_watermelongift && TryOpenCapsule(ItemNumber::Square_Watermelon_Gift)) {
-                return;
-            }
-
-    
-            if (m_open_soccer_ball_capsule && TryOpenCapsule(ItemNumber::Soccer_Ball_Capsule)) {
-                return;
-            }
-
-            if (m_open_wpcapsule)
-            {
-                if (TryOpenCapsule(ItemNumber::WP_Capsule_100)) {
-                    return;
-                }
-
-                if (TryOpenCapsule(ItemNumber::WP_Capsule_500)) {
-                    return;
-                }
-
-                if (TryOpenCapsule(ItemNumber::WP_Capsule_1000)) {
-                    return;
-                }
-            }
-
-            if (m_open_spicapsule && TryOpenCapsule(ItemNumber::SPI_capsule)) {
-                return;
-            }  
-        }
-    }
-}
-
-bool GrindBot::TryOpenCapsule(ItemNumber capsule)
-{
-    CItemInfo* item = OSR_API->FindItemInInventoryByItemNum(capsule);
-    if (item)
-    {
-        OSR_API->SendUseItem(item);
-        ResetInventoryActionCheckTime();
-        return true;
-    }
-    return false;
-}
-
+     
 bool GrindBot::IsMonsterDead(CMonsterData* monster)
 {
     if (monster->m_dwState == _FALLING || monster->m_dwState == _FALLEN || monster->m_dwState == _EXPLODING || monster->m_dwState == _EXPLODED || monster->m_dwState == _AUTODESTROYED) {
@@ -885,48 +700,27 @@ QAngle GrindBot::CalcAngle(const D3DXVECTOR3& source, const D3DXVECTOR3& target)
     return angles;
 }
 
-void GrindBot::SmoothDeltaAngle(QAngle& deltaAng)
+void GrindBot::SmoothDeltaAngle(float& deltaAng)
 {
     switch (m_smoothtype)
     {
     case SmoothType::Distance:
-        deltaAng.pitch /= 1 + m_dist_smooth_x;
-        deltaAng.yaw /= 1+ m_dist_smooth_y;
+        deltaAng /= std::max(0.1f,(m_smooth_factor_distance * 50));
         break;
     case SmoothType::Time:
-        float dist = deltaAng.Length();  
-        //float finalTime_x = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_x;
-        //float finalTime_y = std::max(1500.0f, std::min(dist, 500.0f)) / 100 * m_time_smooth_y;
-        float finalTime_x = dist * (m_time_smooth_x * 1.5);
-        float finalTime_y = dist * (m_time_smooth_y * 1.5);
+        float degree = RAD2DEG(deltaAng);  
 
+        // new target
+        if (m_aimtime_current == 0ms) {
+            m_aimtime_final = std::chrono::milliseconds(static_cast<long>(std::max(degree, 20.0f)* std::max(0.1f, m_smooth_factor_time * 100)));
+        }     
+        m_aimtime_current += std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
 
-        static float curAimTime_x = 0.0f;
-        static float curAimTime_y = 0.0f;
+        if (m_aimtime_current > m_aimtime_final)
+            m_aimtime_current = m_aimtime_final; 
 
-        auto deltaTime = OSR_API->GetElapsedTime();
-
-        curAimTime_x += deltaTime;
-        curAimTime_y += deltaTime;
-
-        if (curAimTime_x > finalTime_x)
-            curAimTime_x = finalTime_x;
-
-        if (curAimTime_y > finalTime_y)
-            curAimTime_y = finalTime_y;
-
-        float percent_x = curAimTime_x / finalTime_x;
-        float percent_y = curAimTime_y / finalTime_y;
-
-        if (finalTime_x <= 0.001f)
-            percent_x = 1;
-
-        if (finalTime_y <= 0.001f)
-            percent_y = 1;
-
-
-        deltaAng.pitch  *= percent_x;
-        deltaAng.yaw    *= percent_y;
+        float percent = static_cast<float>(m_aimtime_current.count()) / static_cast<float>(m_aimtime_final.count());
+        deltaAng *= percent;
         break;
     }
 }
@@ -959,9 +753,7 @@ void GrindBot::OnEnable()
     m_mobs.insert({ 2098000 , gmi });  
 
     m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;    
-
-    m_clean_inventory = true;
-
+                                   
     // reset grinding timer
     m_grinding_time = 0ms;
     m_grinding_time_total = 0ms;
@@ -994,16 +786,84 @@ void GrindBot::OnEnable()
         m_kitbot->Enable(true);
     }
 
+    m_miscfeatures = static_cast<Miscellaneous*>(m_buddy->GetFeatureByType(FeatureType::Miscellaneous));
+    if (m_miscfeatures) {
+        m_miscfeatures->ActivateInventoryCleaning(true);
+    }
+
     OSR_API->UsePrimaryWeapon(false);
     OSR_API->UseSecondaryWeapon(false);
 }
 
 void GrindBot::OnDisable()
 {
+    OSR_API->UsePrimaryWeapon(false);
+    OSR_API->UseSecondaryWeapon(false);
+
     m_grinding_map = 0;
     if (m_kitbot) {
         m_kitbot->Enable(false);
     }
+
+    if (m_miscfeatures) {
+        m_miscfeatures->ActivateInventoryCleaning(false);
+    }
+}
+
+void GrindBot::Render(IDirect3DDevice9* device)
+{
+    /*
+    if (IsEnabled() && m_target)
+    {
+        D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
+        D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
+        D3DXVECTOR3 mouseUp = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp;
+        D3DXVECTOR3 shuttlePos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vPos;
+
+        D3DXVECTOR3 weaponDir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponVel;
+        D3DXVECTOR3 weaponPos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponPos;
+        D3DXVECTOR3 weaponUp = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponUp;
+                                                                                             
+        D3DXVECTOR3 mousetarget = mousepos + mousedir;
+
+        //QAngle targetAng = CalcAngle(mousepos, m_target->m_vPos);
+        //QAngle localAng = CalcAngle(mousepos, mousetarget);
+        //QAngle deltaAng = targetAng - localAng;
+
+        D3DXVECTOR3 target = m_target->m_vPos - mousepos;
+        D3DXVECTOR3 target_normalized;
+        D3DXVec3Normalize(&target_normalized, &target);
+
+        D3DXVECTOR3 source = mousedir;
+        D3DXVec3Normalize(&source, &source);
+        float angle = acos(D3DXVec3Dot(&source, &target_normalized));
+
+        D3DXVECTOR3 rotAxis;
+        D3DXVec3Cross(&rotAxis, &source, &target_normalized);
+        D3DXVec3Normalize(&rotAxis, &rotAxis);
+        
+        D3DXMATRIX rot;
+
+        for (int i = 1; i <= 100; i++)
+        {
+           
+            QAngle new_localAng = localAng + (deltaAng / 100) * i;
+
+            
+            MathHelper::AngleVectors(new_localAng, &endpoint, NULL, NULL);
+            
+            
+            float step = angle / 100 * i;
+            D3DXMatrixRotationAxis(&rot, &rotAxis, step); 
+            D3DXVECTOR3 endpoint;
+            D3DXVec3TransformCoord(&endpoint, &mousedir, &rot);
+            int screen_x, screen_y;
+            OSR_API->WorldToScreen(mousepos + endpoint, screen_x, screen_y);
+
+            D3D9Helper::SetRect(device, screen_x - 2, screen_y - 2, 5, 5, D3DCOLOR_ARGB(255, 0, 0, 255));
+        }
+    }
+    */
 }
 
 void GrindBot::ChangeState(GrindBot::State newState)
@@ -1020,6 +880,7 @@ void GrindBot::ChangeState(GrindBot::State newState)
         m_kitbot->ToggleSKill(SkillType::Siege_Mode, false);
         break;
     case GrindBot::State::SIEGEING:
+        m_aimtime_current = 0ms;
         break;
     case GrindBot::State::OVERHEATED:
         OSR_API->UsePrimaryWeapon(false);
@@ -1031,4 +892,35 @@ void GrindBot::ChangeState(GrindBot::State newState)
     }
 
     m_current_state = newState;
+}
+
+void GrindBot::ChangeTarget(CMonsterData* newTarget)
+{
+    m_target = newTarget;
+    m_aimtime_current = 0ms;
+    m_no_target_time = 0ms;
+    m_on_target = false;
+    OSR_API->SetTarget(m_target);
+}
+
+void GrindBot::GetNewTarget()
+{
+    if (m_get_new_target && m_shoot_new_target_delay <= 0ms)
+    {
+        CMonsterData* new_target = nullptr;
+        // try to find a close target first, to prevent getting rammed
+        if (m_anti_ram) {
+            new_target = FindNewTarget(250, m_front_only);
+        }
+
+        if (!new_target) {
+            new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f - 50, m_front_only);
+        }
+
+        if (new_target)
+        {
+            ChangeTarget(new_target);
+            m_get_new_target = false;
+        }
+    }
 }

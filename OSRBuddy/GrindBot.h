@@ -7,7 +7,6 @@
 #include <map>
 #include "MathHelper.h" 
 
-#define CAPSULE_OPEN_REATTACK 500ms
 #define UPDATE_GRINDMOBS_TIME 500ms
 #define NO_TARGET_SIEGE_DISABLE_TIME 1500ms
 #define NO_TARGET_STOP_SHOOTING_TIME 600ms
@@ -16,7 +15,7 @@
 #define MAX_NEW_TARGET_DELAY_TIME 300ms
 
 class KitBuffBot; 
-
+class Miscellaneous;
 
 
 struct GrindMonsterInfo
@@ -60,8 +59,11 @@ public:
 	virtual FeatureType GetType() const override;
 	virtual void OnEnable() override;
 	virtual void OnDisable() override;
+	virtual void Render(IDirect3DDevice9* device) override;
 
 	void ChangeState(GrindBot::State newState);
+	void ChangeTarget(CMonsterData* newTarget);
+	void GetNewTarget();
 								
 private:
 	float GetTargetDistance(CAtumData* m_target);
@@ -69,11 +71,8 @@ private:
 	bool IsValidTargetMonster(CMonsterData* m_target);
 	CMonsterData* FindNewTarget(float max_distance, bool front_only = false);
 	void AimAtTarget(CMonsterData* m_target);
-	void SmoothAimDelta(POINT& delta, float deltaAngleLength);
 	void ToggleGrinding();
 	
-	bool InventoryActionCheckTimeReady();
-	void ResetInventoryActionCheckTime();
 	bool ShouldCheck_GrindMobs();
 	void Reset_GrindMobsCheckTime();
 	void Reset_NewTargetDelayTime();
@@ -84,21 +83,23 @@ private:
 
 	std::map<INT, GrindMonsterInfo>::iterator FindGrindMonsterInfo(int monsterunitkind);
 
-	void TickInventoryCleaning();
-	bool TryOpenCapsule(ItemNumber capsule);
-
 	bool IsMonsterDead(CMonsterData* monster);
 	QAngle CalcAngle(const D3DXVECTOR3& source, const D3DXVECTOR3& target);
-	void SmoothDeltaAngle(QAngle& deltaAng);
+	void SmoothDeltaAngle(float& deltaAng);
 
 private:
 	CMonsterData* m_target;
 	GrindBot::State m_current_state;
 	KitBuffBot* m_kitbot;
+	Miscellaneous* m_miscfeatures;
 
 	std::chrono::milliseconds m_grinding_time;
 	std::chrono::milliseconds m_grinding_time_total;
 	std::chrono::time_point<std::chrono::system_clock> m_grinding_start;
+
+	std::chrono::milliseconds m_aimtime_current;
+	std::chrono::milliseconds m_aimtime_final;
+
 
 	MapIndex_t m_grinding_map;
 	bool m_awaiting_siege_toggle_ok;
@@ -107,6 +108,7 @@ private:
 	bool m_front_only;
 	bool m_shoot_all_goldies;
 	bool m_prioritise_closer_mobs;
+	bool m_anti_ram;
 	TargetMode m_target_mode;
 
 	bool m_humanized_overshoot;
@@ -114,12 +116,9 @@ private:
 	int m_humanized_target_delay_max;
 
 	SmoothType m_smoothtype;  
-	float m_dist_smooth_x;
-	float m_dist_smooth_y;
-	float m_time_smooth_x;
-	float m_time_smooth_y;				
+	float m_smooth_factor_distance;
+	float m_smooth_factor_time;		
 
-	std::chrono::milliseconds m_inv_action_check_time;
 	std::chrono::milliseconds m_update_mob_list_check_time;
 	std::chrono::milliseconds m_no_target_time;
 	std::chrono::milliseconds m_shoot_new_target_delay;
@@ -127,14 +126,4 @@ private:
 	std::map<INT, GrindMonsterInfo> m_mobs;
 	int m_total_mobs_killed;
 
-	bool m_clean_inventory;
-	bool m_only_clean_while_stopped;
-	bool m_only_clean_while_overheat;
-
-	bool m_open_watermelongift;
-	bool m_open_spicapsule;
-	bool m_open_fantasyglobemineralcapsule;
-	bool m_open_mineralcapsule;
-	bool m_open_wpcapsule;
-	bool m_open_soccer_ball_capsule;
 };
