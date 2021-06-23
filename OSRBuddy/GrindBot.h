@@ -59,7 +59,7 @@ public:
 	virtual FeatureType GetType() const override;
 	virtual void OnEnable() override;
 	virtual void OnDisable() override;
-	virtual void Render(IDirect3DDevice9* device) override;
+	virtual void Render(D3D9Renderer* renderer) override;
 
 	void ChangeState(GrindBot::State newState);
 	void ChangeTarget(CMonsterData* newTarget);

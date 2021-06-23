@@ -13,7 +13,7 @@
 //#include "GameDataLast.h"
 
 // 2009. 11. 23 by jskim 리소스 로딩 구조 변경
-#include "AtumApplication.h"
+#include "AtumApplication.h"  
 //end 2009. 11. 23 by jskim 리소스 로딩 구조 변경
 
 #define GXRELEASE(_p) do { if ((_p) != NULL) {(_p)->Release(); (_p) = NULL;} } while (0)

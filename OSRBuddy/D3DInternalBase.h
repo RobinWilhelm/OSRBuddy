@@ -4,10 +4,12 @@
 #include <memory>
 #include "Trampoline.h"
 #include "ImGuiBase.h"
-#include <random>
+#include <random>	   
+#include "D3D9Renderer.h"
 
 #include <d3d9.h>
 #pragma comment(lib,"d3d9.lib")
+
 
 																				 
 using EndSceneType	= HRESULT(__stdcall*)(IDirect3DDevice9*);	  
@@ -93,5 +95,6 @@ protected:
 
 	std::unique_ptr<ImGuiBase> m_imguimenu;		  
 
-	std::unique_ptr<std::mt19937> m_random_generator;
+	std::unique_ptr<std::mt19937> m_random_generator;	  	  
+	std::unique_ptr<D3D9Renderer> m_renderer;
 };

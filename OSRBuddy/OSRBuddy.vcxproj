@@ -199,6 +199,7 @@
     <ClInclude Include="AtumProtocol.h" />
     <ClInclude Include="AtumTypedef.h" />
     <ClInclude Include="BuddyAPI.h" />
+    <ClInclude Include="BuddyFont.h" />
     <ClInclude Include="D3D9Renderer.h" />
     <ClInclude Include="INFBase.h" />
     <ClInclude Include="MathHelper.h" />
@@ -313,6 +314,7 @@
   <ItemGroup>
     <ClCompile Include="AntiAntiCheat.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
+    <ClCompile Include="BuddyFont.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Miscellaneous.cpp" />

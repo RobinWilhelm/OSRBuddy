@@ -127,9 +127,8 @@ void OSRBuddyMain::MessageBoxThreadFunction(std::string message, std::string hea
 
 void OSRBuddyMain::Render(IDirect3DDevice9* device)
 {
-    for (auto& feature : m_features) 
-    {
-        feature->Render(device);
+    for (auto& feature : m_features) {
+        feature->Render(m_renderer.get());
     }
 } 
 
@@ -194,7 +193,9 @@ bool OSRBuddyMain::Start()
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
             throw exception("D3D9 Hooks failed to initialise");
         }
-                 
+             
+        m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
+
         RegisterFeature(new KitBuffBot(this)); 
         RegisterFeature(new GrindBot(this));          
         RegisterFeature(new GambleBot(this));

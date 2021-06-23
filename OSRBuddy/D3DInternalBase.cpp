@@ -216,7 +216,7 @@ void D3DInternalBase::OnEndScene(IDirect3DDevice9* device)
 
 void D3DInternalBase::OnPresent(IDirect3DDevice9* device, const RECT*, const RECT*, HWND, const RGNDATA*)
 {
-    g_D3DInternalBase->Render(device);
+    Render(device);
 
     if (m_imguimenu && m_imguimenu->IsOpen()) {
         m_imguimenu->Render(device);
@@ -225,11 +225,13 @@ void D3DInternalBase::OnPresent(IDirect3DDevice9* device, const RECT*, const REC
 
 void D3DInternalBase::OnBeforeReset(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 {
+    m_renderer->OnLostDevice();
     m_imguimenu->BeforeReset();
 }
 
 void D3DInternalBase::OnAfterReset(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 {
+    m_renderer->OnResetDevice();
     m_imguimenu->AfterReset();
 }
 

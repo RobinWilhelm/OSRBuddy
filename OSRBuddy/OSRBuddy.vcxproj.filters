@@ -340,6 +340,9 @@
     <ClInclude Include="D3D9Renderer.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="BuddyFont.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -427,6 +430,9 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="D3D9Renderer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="BuddyFont.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>

@@ -221,8 +221,9 @@ void Miscellaneous::ResetInventoryActionCheckTime()
 
 void Miscellaneous::TickInventoryCleaning()
 {
-	if (m_clean_inventory && (!m_only_clean_while_stopped || OSR_API->GetAtumApplication()->m_pShuttleChild->m_bUnitStop)
-		&& (!m_only_clean_while_overheat || OSR_API->GetPrimaryWeapon()->m_bOverHeat))
+	if (m_clean_inventory && 
+		(!m_only_clean_while_stopped || OSR_API->GetAtumApplication()->m_pShuttleChild->m_bUnitStop) && 
+		(!m_only_clean_while_overheat || OSR_API->GetPrimaryWeapon()->m_bOverHeat))
 	{
 		if (InventoryActionCheckTimeReady())
 		{

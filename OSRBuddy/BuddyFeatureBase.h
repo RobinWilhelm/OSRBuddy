@@ -9,6 +9,7 @@
 class OSRBuddyMain;
 class OldSchoolRivalsAPI;
 class IDirect3DDevice9;
+class D3D9Renderer;
 
 enum class FeatureType : int
 {
@@ -49,7 +50,7 @@ public:
 	virtual void Tick() = 0;
 	virtual void RenderImGui() = 0;		   
 
-	virtual void Render(IDirect3DDevice9* device) { return; };
+	virtual void Render(D3D9Renderer* renderer) { return; };
 	virtual bool OnReadPacket(unsigned short msgtype, byte* packet) { return false; };
 	virtual bool OnWritePacket(unsigned short msgtype, byte* packet) { return false; };
 	virtual int WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) { return 0; };

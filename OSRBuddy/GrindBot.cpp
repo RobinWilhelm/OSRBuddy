@@ -430,10 +430,10 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
             case TargetMode::GearDistance:
                 dist = GetTargetDistance(monster);
                 break;
-            case TargetMode::CrosshairDistance:
-                // gets the angle between two vectors
+            case TargetMode::CrosshairDistance:                   
                 D3DXVECTOR3 targetDir = monster->m_vPos - mousepos;
                 D3DXVec3Normalize(&targetDir, &targetDir);
+                // gets the angle between two vectors
                 dist = acos(D3DXVec3Dot(&sourceDir, &targetDir));  
                 break;
             }
@@ -665,14 +665,14 @@ void GrindBot::SmoothDeltaAngle(float& deltaAng)
     switch (m_smoothtype)
     {
     case SmoothType::Distance:
-        deltaAng /= std::max(0.1f,(m_smooth_factor_distance * 50));
+        deltaAng /= std::max(1.0f,(m_smooth_factor_distance * 75));
         break;
     case SmoothType::Time:
         float degree = RAD2DEG(deltaAng);  
 
         // new target
         if (m_aimtime_current == 0ms) {
-            m_aimtime_final = std::chrono::milliseconds(static_cast<long>(std::max(degree, 20.0f)* std::max(0.1f, m_smooth_factor_time * 100)));
+            m_aimtime_final = std::chrono::milliseconds(static_cast<long>(std::max(degree, 30.0f)* std::max(0.1f, m_smooth_factor_time * 150)));
         }     
         m_aimtime_current += std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
 
@@ -706,8 +706,8 @@ void GrindBot::OnEnable()
     gmi.clean_name = "Dropped Ball";
     gmi.goldy = true;
     gmi.killed = 0;
-    gmi.priority = false;
-    gmi.shoot = false;              
+    gmi.priority = true;
+    gmi.shoot = true;
     m_mobs.insert({ 2098100 , gmi});
     gmi.clean_name = "Flying Ball";  
     m_mobs.insert({ 2098000 , gmi });  
@@ -770,7 +770,7 @@ void GrindBot::OnDisable()
     }
 }
 
-void GrindBot::Render(IDirect3DDevice9* device)
+void GrindBot::Render(D3D9Renderer* renderer)
 {
     /*
     if (IsEnabled() && m_target)
