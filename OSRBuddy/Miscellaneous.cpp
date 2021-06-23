@@ -6,11 +6,12 @@
 
 #define WHISPER_WARNING_TIME 10s
 #define CAPSULE_OPEN_REATTACK 200ms
-#define WHIPSER_SILENCE_TIME 1min
+#define WHIPSER_SNOOZE_TIME 1min
 
 Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
 	m_whisperwarner_active = false;	
+	m_whisperwarner_snooze_enabled = true;
 
 	m_inv_action_check_time = 0ms;
 	m_clean_inventory = false;
@@ -57,14 +58,15 @@ void Miscellaneous::RenderImGui()
 	{
 		ImGui::BeginChild("MiscColumn1", ImVec2(), false);
 		{
-			ImGui::NewLine();
-			ImGui::Checkbox("Whisperwarner", &m_whisperwarner_active);
+			ImGui::Separator();
+			ImGui::Text("Whisperwarner");
+			ImGui::Separator();
+			ImGui::Checkbox("Active", &m_whisperwarner_active);
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Will notify the user whenever there is a new / unread whisper message.");
 			}
-			ImGui::BeginDisabledMode(!m_whisperwarner_active);
-			ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);
-			ImGui::EndDisabledMode();
+			ImGui::Checkbox("Snooze enabled", &m_whisperwarner_snooze_enabled);
+			ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);  			
 		}
 		ImGui::EndChild();
 	}
@@ -132,9 +134,13 @@ void Miscellaneous::OnMessageBoxClose(int result)
 				whisperchat->m_bNewMassage = false;
 			}
 		}
-	}
-	auto currenttime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-	m_ignore_whisperwarn_time = currenttime + WHIPSER_SILENCE_TIME;
+
+		if (m_whisperwarner_snooze_enabled)
+		{
+			auto currenttime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+			m_ignore_whisperwarn_time = currenttime + WHIPSER_SNOOZE_TIME;
+		}
+	}	  
 	m_popup_open = false;
 }
 

@@ -40,9 +40,11 @@ private:
 
 	bool m_use_ammobox; //todo
 
+	bool m_whisperwarner_snooze_enabled;
 	std::chrono::milliseconds m_ignore_whisperwarn_time;
 	std::chrono::milliseconds m_last_whisperwarn;
 	std::atomic<bool> m_popup_open;
+	
 
 
 	std::chrono::milliseconds m_inv_action_check_time;

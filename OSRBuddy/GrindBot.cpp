@@ -406,51 +406,58 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
     float min_distance_prio = 999999;
     CMonsterData* newtarget_prio = nullptr;   
 
-    POINT curPos;
-    m_buddy->GetCursorPosition(&curPos);
-    ScreenToClient(OSR_API->GetAtumApplication()->m_hWnd, &curPos);  
+    D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
+    D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
+
+    D3DXVECTOR3 sourceDir = mousedir;
+    D3DXVec3Normalize(&sourceDir, &sourceDir);
+
+    auto checkTarget = [&](CMonsterData* monster) -> bool
+    {
+        if (!IsValidTargetMonster(monster)) {
+            return false;
+        }
+
+        if (GetTargetDistance(monster) > max_distance) {
+            return false;
+        }
+
+        if (CanShootAtTarget(monster))
+        {
+            float dist = 9999999.0f;
+            switch (m_target_mode)
+            {
+            case TargetMode::GearDistance:
+                dist = GetTargetDistance(monster);
+                break;
+            case TargetMode::CrosshairDistance:
+                // gets the angle between two vectors
+                D3DXVECTOR3 targetDir = monster->m_vPos - mousepos;
+                D3DXVec3Normalize(&targetDir, &targetDir);
+                dist = acos(D3DXVec3Dot(&sourceDir, &targetDir));  
+                break;
+            }
+
+            if (dist < min_distance)
+            {
+                min_distance = dist;
+                newtarget = monster;
+            }
+
+            auto monsterinfo = FindGrindMonsterInfo(monster->m_pMonsterInfo->MonsterUnitKind);
+            if (monsterinfo->second.priority && dist < min_distance_prio)
+            {
+                min_distance_prio = dist;
+                newtarget_prio = monster;
+            }
+        }
+    };    
            
     if (front_only)
     {
         for (auto& monster : OSR_API->GetSceneData()->m_vecMonsterRenderList)
-        {
-            if (!IsValidTargetMonster(monster)) {
-                continue;
-            }
-
-            if (GetTargetDistance(monster) > max_distance) {
-                continue;
-            }
-
-            if (CanShootAtTarget(monster))
-            {
-                float dist = 9999999.0f;
-                switch (m_target_mode)
-                {
-                case TargetMode::GearDistance:
-                    dist = GetTargetDistance(monster);
-                    break;
-                case TargetMode::CrosshairDistance:
-                    POINT delta;
-                    delta.x = curPos.x - monster->m_nObjScreenX;
-                    delta.y = curPos.y - monster->m_nObjScreenY;
-                    dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));          
-                    break;
-                }
-
-                if (dist < min_distance)
-                {
-                    min_distance = dist;
-                    newtarget = monster;
-                }
-
-                auto monsterinfo = FindGrindMonsterInfo(monster->m_pMonsterInfo->MonsterUnitKind);
-                if (monsterinfo->second.priority && dist < min_distance_prio)
-                {
-                    min_distance_prio = dist;
-                    newtarget_prio = monster;
-                }
-            }
+        {   
+            checkTarget(monster);
         }
     }
     else
@@ -458,43 +465,7 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
     // search all mobs
         for (auto& monster : OSR_API->GetSceneData()->m_mapMonsterList)
         {
-            if (!IsValidTargetMonster(monster.second)) {
-                continue;
-            } 
-
-            if (GetTargetDistance(monster.second) > max_distance) {
-                continue;
-            }
-
-            if (CanShootAtTarget(monster.second))
-            {
-                float dist = 9999999.0f;
-                switch (m_target_mode)
-                {
-                case TargetMode::GearDistance:
-                    dist = GetTargetDistance(monster.second);
-                    break;
-                case TargetMode::CrosshairDistance:          
-                    POINT delta;
-                    delta.x = curPos.x - monster.second->m_nObjScreenX;
-                    delta.y = curPos.y - monster.second->m_nObjScreenY;
-                    dist = static_cast<float>(sqrt(delta.x * delta.x + delta.y * delta.y));
-                    break;
-                }
-
-                if (dist < min_distance)
-                {
-                    min_distance = dist;
-                    newtarget = monster.second;
-                }
-
-                auto monsterinfo = FindGrindMonsterInfo(monster.second->m_pMonsterInfo->MonsterUnitKind);
-                if (monsterinfo->second.priority && dist < min_distance_prio)
-                {
-                    min_distance_prio = dist;
-                    newtarget_prio = monster.second;
-                }                  
-            }
+            checkTarget(monster.second);
         }        
     } 
    
@@ -522,16 +493,8 @@ void GrindBot::AimAtTarget(CMonsterData* m_target)
             
             D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
             D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
-            //D3DXVECTOR3 mouseUp = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp;
-
-            /*
-            D3DXVECTOR3 weaponDir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponVel;
-            D3DXVECTOR3 weaponPos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponPos;
-            D3DXVECTOR3 weaponUp = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponUp;
-            */
-
+ 
             D3DXVECTOR3 target = m_target->m_vPos - mousepos;
-            //D3DXVECTOR3 target_normalized;
             D3DXVec3Normalize(&target, &target);
 
             D3DXVECTOR3 source = mousedir;
@@ -549,11 +512,8 @@ void GrindBot::AimAtTarget(CMonsterData* m_target)
 
             D3DXVECTOR3 endpoint;
             D3DXVec3TransformCoord(&endpoint, &mousedir, &rotationMatrix);
-            //int screen_x, screen_y;
-            //OSR_API->WorldToScreen(mousepos + endpoint, screen_x, screen_y);
 
-
-            // directly set the weapon direction
+            // set weapon direction
             D3DXVec3Normalize(&OSR_API->GetAtumApplication()->m_pShuttleChild->m_vWeaponVel, &endpoint);  
 
             // center the mouse
