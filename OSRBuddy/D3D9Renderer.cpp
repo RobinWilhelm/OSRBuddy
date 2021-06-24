@@ -5,12 +5,22 @@
 D3D9Renderer::D3D9Renderer(IDirect3DDevice9* device)
 {
 	m_d3d9device = device;
-	m_standardfont = std::make_unique<BuddyFont>(device, "Tahoma", 14, 6, FW_BOLD);
+	m_standardfont = std::make_unique<D3D9Font>(device, "Tahoma", 14, 6, FW_BOLD);
 }
 
 D3D9Renderer::~D3D9Renderer()
 {
 	m_d3d9device = nullptr;
+}
+
+void D3D9Renderer::Begin()
+{
+	m_d3d9device->CreateStateBlock(D3DSBT_ALL, &m_stateBlock);
+}
+
+void D3D9Renderer::End()
+{
+	m_stateBlock->Apply();
 }
 
 IDirect3DDevice9* D3D9Renderer::GetDevice()
@@ -24,7 +34,7 @@ void D3D9Renderer::RenderRect(int x, int y, int width, int height, D3DCOLOR colo
 	m_d3d9device->Clear(1, &rect, D3DCLEAR_TARGET, color, 1.0f, NULL);
 }
 
-void D3D9Renderer::RenderText(std::string text, int x, int y, int width, int height, D3DCOLOR color, BuddyFont* font)
+void D3D9Renderer::RenderText(std::string text, int x, int y, int width, int height, D3DCOLOR color, D3D9Font* font)
 {
 	if (!font) {
 		m_standardfont->RenderText(text, x, y, width, height, color);

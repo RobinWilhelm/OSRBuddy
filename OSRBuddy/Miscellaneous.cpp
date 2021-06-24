@@ -18,10 +18,10 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_only_clean_while_overheat = false;
 	m_only_clean_while_stopped = false;
 	m_open_watermelongift = true;
-	m_open_spicapsule = true;
+	m_open_spicapsule = false;
 	m_open_fantasyglobemineralcapsule = true;
 	m_open_mineralcapsule = true;
-	m_open_wpcapsule = true;
+	m_open_wpcapsule = false;
 	m_open_soccer_ball_capsule = true;
 }
 

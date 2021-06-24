@@ -47,7 +47,9 @@ void TestItemUse::Tick()
 
 void TestItemUse::RenderImGui()
 {
-	static OldSchoolRivalsAPI* osr = OSR_API;	  
+	static OldSchoolRivalsAPI* osr = OSR_API;
+	auto shuttle = osr->GetAtumApplication()->m_pShuttleChild;
+	auto scene = osr->GetAtumApplication()->m_pScene;
 
 	ImGui::NewLine();
 

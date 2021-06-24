@@ -6,12 +6,12 @@
 class ID3DXFont;
 
 
-class BuddyFont
+class D3D9Font
 {
 friend class D3D9Renderer;
 public:
-	BuddyFont(IDirect3DDevice9* device, std::string name, int height, int width, int weight);
-	~BuddyFont();
+	D3D9Font(IDirect3DDevice9* device, std::string name, int size, bool bold, bool italic);
+	~D3D9Font();
 
 	SIZE GetSize(std::string text);   
 	void RenderText(std::string text, int x, int y, int height, int width, D3DCOLOR color);
@@ -20,5 +20,6 @@ public:
 	HRESULT OnResetDevice();
 
 private:
+	bool m_initialised;
 	ID3DXFont* m_d3dfont;
 };

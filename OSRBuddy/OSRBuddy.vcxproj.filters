@@ -340,7 +340,7 @@
     <ClInclude Include="D3D9Renderer.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="BuddyFont.h">
+    <ClInclude Include="D3D9Font.h">
       <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
@@ -432,7 +432,7 @@
     <ClCompile Include="D3D9Renderer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="BuddyFont.cpp">
+    <ClCompile Include="D3D9Font.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>

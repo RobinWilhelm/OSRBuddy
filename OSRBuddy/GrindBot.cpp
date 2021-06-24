@@ -645,10 +645,11 @@ bool GrindBot::IsMonsterDead(CMonsterData* monster)
         return true;
     }
 
+    /*
     if (monster->m_info.CurrentHP == 0) {
         return true;
     }
-
+    */
     return false;
 }
 

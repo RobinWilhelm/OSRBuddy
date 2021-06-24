@@ -127,9 +127,11 @@ void OSRBuddyMain::MessageBoxThreadFunction(std::string message, std::string hea
 
 void OSRBuddyMain::Render(IDirect3DDevice9* device)
 {
+    m_renderer->Begin();
     for (auto& feature : m_features) {
         feature->Render(m_renderer.get());
     }
+    m_renderer->End();
 } 
 
 OSRBuddyMain::OSRBuddyMain()
@@ -189,13 +191,7 @@ bool OSRBuddyMain::Start()
         if (!m_imguimenu->Init(OSR_API->GetD3D9Device()))  {
             throw exception("ImGui failed to initialise");
         }    
-
-        if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
-            throw exception("D3D9 Hooks failed to initialise");
-        }
-             
-        m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
-
+                 
         RegisterFeature(new KitBuffBot(this)); 
         RegisterFeature(new GrindBot(this));          
         RegisterFeature(new GambleBot(this));
@@ -204,8 +200,14 @@ bool OSRBuddyMain::Start()
 
 #ifndef RELEASE_SETHIA
         RegisterFeature(new TestItemUse(this));
-        //RegisterFeature(new AntiMTRandBot(this));
 #endif // !RELEASE_SETHIA          
+
+        if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
+            throw exception("D3D9 Hooks failed to initialise");
+        }
+
+        m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
+
 
         if (!InitTickHook()) {
             throw exception("TickHook failed to initialise");
