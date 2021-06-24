@@ -191,6 +191,8 @@ bool OSRBuddyMain::Start()
         if (!m_imguimenu->Init(OSR_API->GetD3D9Device()))  {
             throw exception("ImGui failed to initialise");
         }    
+
+        m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
                  
         RegisterFeature(new KitBuffBot(this)); 
         RegisterFeature(new GrindBot(this));          
@@ -206,7 +208,7 @@ bool OSRBuddyMain::Start()
             throw exception("D3D9 Hooks failed to initialise");
         }
 
-        m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
+       
 
 
         if (!InitTickHook()) {

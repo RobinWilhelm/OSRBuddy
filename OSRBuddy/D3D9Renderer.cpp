@@ -15,12 +15,12 @@ D3D9Renderer::~D3D9Renderer()
 
 void D3D9Renderer::Begin()
 {
-	m_d3d9device->CreateStateBlock(D3DSBT_ALL, &m_stateBlock);
+	//m_d3d9device->CreateStateBlock(D3DSBT_ALL, &m_stateBlock);
 }
 
 void D3D9Renderer::End()
 {
-	m_stateBlock->Apply();
+	//m_stateBlock->Apply();
 }
 
 IDirect3DDevice9* D3D9Renderer::GetDevice()
