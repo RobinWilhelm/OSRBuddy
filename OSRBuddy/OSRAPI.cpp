@@ -11,6 +11,12 @@
 #include <d3dx9.h>
 #pragma comment(lib,"d3dx9.lib")
 
+#include <minwindef.h>
+
+
+#define SIZE_MAX_ADDABLE_INVENTORY_COUNT 100
+#define SIZE_MAX_ITEM_GENERAL 60
+#define COUNT_IN_MEMBERSHIP_ADDED_INVENTORY	40
 
 using SendUseItemType = void(__thiscall*)(CINFInvenExtend * ecx, ITEM_BASE * item);
 using SendUseSkillType = void(__thiscall*)(CINFCharacterInfoExtend * ecx, ITEM_BASE * skill);
@@ -47,16 +53,6 @@ bool OldSchoolRivalsAPI::CreateAndCheckConsistence()
 	// Create game API and return  
 	OldSchoolRivalsAPI::instance = new OldSchoolRivalsAPI();
 	OldSchoolRivalsAPI::instance->m_atumapplication					= atumapplication;
-	//OldSchoolRivalsAPI::instance->m_SendUseItem						= reinterpret_cast<SendUseItemType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__SendUseItem).address);
-	//OldSchoolRivalsAPI::instance->m_OnButtonClick					= reinterpret_cast<OnButtonClickType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__OnButtonClicked).address);
-	//OldSchoolRivalsAPI::instance->m_InvenToSourceItem				= reinterpret_cast<InvenToSourceItemType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__InvenToSourceItem).address);
-	//OldSchoolRivalsAPI::instance->m_GetServerRareItemInfo			= reinterpret_cast<GetServerRareItemInfoType>(PatternManager::Get(OffsetIdentifier::CAtumDatabase__GetServerRareItemInfo).address);
-	//OldSchoolRivalsAPI::instance->m_SendUseSkill					= reinterpret_cast<SendUseSkillType>(PatternManager::Get(OffsetIdentifier::CINFCharacterInfoExtend__SendUseSkill).address);
-	//OldSchoolRivalsAPI::instance->m_CalcObjectSourceScreenCoords	= reinterpret_cast<CalcObjectSourceScreenCoordsType>(PatternManager::Get(OffsetIdentifier::CAtumApplication__CalcObjectSourceScreenCoords).address);
-	//OldSchoolRivalsAPI::instance->m_DeleteSelectItem				= reinterpret_cast<DeleteSelectItemType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__DeleteSelectItem).address);
-	//OldSchoolRivalsAPI::instance->m_WritePacket						= reinterpret_cast<DeleteSelectItemType>(PatternManager::Get(OffsetIdentifier::CWinSocket__Write).address);
-
-
 	return true;
 }
 
@@ -783,6 +779,35 @@ int OldSchoolRivalsAPI::WritePacket(byte* packet, int length)
 		return writePacketFn(winsocket, reinterpret_cast<LPCSTR>(packet), length);
 	}
 	return 0;
+}
+
+bool OldSchoolRivalsAPI::HasPremium()
+{
+	return m_atumapplication->m_PremiumCardInfo.nCardItemNum1 > 0;
+}
+
+int OldSchoolRivalsAPI::GetMaxInventorySize()
+{
+	int invspace = SIZE_MAX_ITEM_GENERAL + min(m_atumapplication->m_pShuttleChild->m_myShuttleInfo.RacingPoint & 0xFF, SIZE_MAX_ADDABLE_INVENTORY_COUNT);
+	if (HasPremium()) {
+		invspace += COUNT_IN_MEMBERSHIP_ADDED_INVENTORY;
+	}
+	return invspace;
+}
+
+int OldSchoolRivalsAPI::GetCurrentInventorySize()
+{
+	return m_atumapplication->m_pShuttleChild->m_pStoreData->m_mapItemUniqueNumber.size();
+}
+
+bool OldSchoolRivalsAPI::IsInventoryFull()
+{
+	return GetCurrentInventorySize() >= GetMaxInventorySize();
+}
+
+bool OldSchoolRivalsAPI::IsLanded()
+{
+	return !OSR_API->GetAtumApplication()->m_pShuttleChild->m_bIsAir;
 }
 
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)

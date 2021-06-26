@@ -102,6 +102,12 @@ public:
 
 	// CWinSocket
 	int WritePacket(byte* packet, int length);
+
+	bool HasPremium();
+	int GetMaxInventorySize();
+	int GetCurrentInventorySize();
+	bool IsInventoryFull();	 
+	bool IsLanded();
 	   	
 
 private:
@@ -120,16 +126,6 @@ private:
 private:
 	static OldSchoolRivalsAPI* instance;
 	CAtumApplication*			m_atumapplication;
-
-	// game methods
-	//SendUseItemType				m_SendUseItem;
-	//OnButtonClickType			m_OnButtonClick;
-	//InvenToSourceItemType		m_InvenToSourceItem;
-	//GetServerRareItemInfoType	m_GetServerRareItemInfo;
-	//SendUseSkillType			m_SendUseSkill;
-	//CalcObjectSourceScreenCoordsType m_CalcObjectSourceScreenCoords;
-	//DeleteSelectItemType		m_DeleteSelectItem;
-	//CWinSocketWriteType			m_WritePacket;
 };
 
 #ifndef OSR_API

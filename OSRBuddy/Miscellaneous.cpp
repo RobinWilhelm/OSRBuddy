@@ -60,8 +60,9 @@ void Miscellaneous::Tick()
 	if (m_inv_action_check_time < 0ms) {
 		m_inv_action_check_time = 0ms;
 	}
-		 	
-	if (m_autoflip && OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y < 0) {
+	
+	// autoflip feature
+	if (m_autoflip && OSR_API->IsLanded() && OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y < 0) {
 		OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y *= -1;
 	}
 
@@ -90,6 +91,7 @@ void Miscellaneous::Tick()
 
 void Miscellaneous::RenderImGui()
 {
+	ImGui::NewLine();
 	ImGui::BeginColumns("MiscColumns", 2, ImGuiColumnsFlags_NoResize);
 	{
 		ImGui::BeginChild("MiscColumn1", ImVec2(), false);
@@ -107,7 +109,11 @@ void Miscellaneous::RenderImGui()
 			ImGui::NewLine();
 			ImGui::Text("Other");
 			ImGui::Separator();
-			ImGui::Checkbox("Autoflip", &m_autoflip);
+			ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear);
+			{
+				ImGui::Checkbox("Autoflip", &m_autoflip);
+			}
+			ImGui::EndDisabledMode();
 		}
 		ImGui::EndChild();
 	}
@@ -242,7 +248,7 @@ bool Miscellaneous::OnWritePacket(unsigned short msgtype, byte* packet)
 	case T_FC_ITEM_THROW_AWAY_ITEM:
 		{	  			
 			MSG_FC_ITEM_THROW_AWAY_ITEM* msg = (MSG_FC_ITEM_THROW_AWAY_ITEM*)packet;
-			m_sold_item = msg->ItemUniqueNumber;
+			m_deleted_item = msg->ItemUniqueNumber;
 			m_awaiting_delete_ok = true;
 		}
 		break;
@@ -265,20 +271,7 @@ void Miscellaneous::ActivateInventoryCleaning(bool active)
 bool Miscellaneous::TrySendSellItem(CItemInfo* item, int count)
 {
 	if (item && count <= item->CurrentCount && !m_awaiting_sell_ok && m_in_sell_building)
-	{
-		if (!OSR_API->IsInBuilding()) 
-		{
-			m_selling_items = false; 
-			return false;
-		}
-
-		auto building = OSR_API->GetCurrentBuilding();
-		if (!IS_ITEM_SHOP_TYPE(building.BuildingKind) && !IS_WARPOINT_SHOP_TYPE(building.BuildingKind)) 
-		{
-			m_selling_items = false;
-			return false;
-		} 
-
+	{	 		
 		MSG_FC_SHOP_SELL_ITEM sMsg;
 		memset(&sMsg, 0x00, sizeof(sMsg));
 		char buffer[SIZE_MAX_PACKET];
@@ -291,7 +284,7 @@ bool Miscellaneous::TrySendSellItem(CItemInfo* item, int count)
 		}
 		sMsg.ItemKind = item->Kind;
 		sMsg.ItemUniqueNumber = item->UniqueNumber;
-		sMsg.BuildingIndex = building.BuildingIndex;
+		sMsg.BuildingIndex = OSR_API->GetCurrentBuilding().BuildingIndex;
 		int nType = T_FC_SHOP_SELL_ITEM;
 		memcpy(buffer, &nType, SIZE_FIELD_TYPE_HEADER);
 		memcpy(buffer + SIZE_FIELD_TYPE_HEADER, &sMsg, sizeof(sMsg));
@@ -323,49 +316,6 @@ void Miscellaneous::OnMessageBoxClose(int result)
 	m_popup_open = false;
 }
 
-void Miscellaneous::SelectItemsForSell()
-{
-	if (!OSR_API->IsInBuilding()) {
-		return;
-	}
-
-	auto building  = OSR_API->GetCurrentBuilding();
-	if (!IS_ITEM_SHOP_TYPE(building.BuildingKind) && !IS_WARPOINT_SHOP_TYPE(building.BuildingKind)) {
-		return;
-	}
-	deque<stMultiSelectItem>* multiSelectItem = &OSR_API->GetAtumApplication()->m_vecSellMultiSelectItem;
-	stMultiSelectItem selectItem;
-	CItemInfo* iteminfo = GetNextItemForDelete();
-	while (iteminfo != nullptr)
-	{
-		ZeroMemory(&selectItem, sizeof(stMultiSelectItem));
-
-		selectItem.uSellingPrice = iteminfo->ItemInfo->Price * 0.2f;
-		selectItem.byItemKind = iteminfo->Kind;
-		selectItem.nUniqueNumber = iteminfo->UniqueNumber;
-		selectItem.SourceIndex = iteminfo->ItemInfo->SourceIndex;
-		selectItem.bySelectType = ITEM_INVEN_POS;
-		//selectItem.ptIcon = ptIcon;
-		selectItem.ItemNum = iteminfo->ItemNum;
-
-		if (IS_COUNTABLE_ITEM(iteminfo->Kind)) {
-			selectItem.nAmount = iteminfo->CurrentCount;
-		}
-		else {
-			selectItem.nAmount = 1;
-		}
-		
-		selectItem.nBuildingIndex = building.BuildingIndex;
-		strncpy_s(selectItem.szName, iteminfo->ItemInfo->ItemName, 50);
-
-		char strIconName[64];
-		wsprintf(strIconName, "%08d", iteminfo->ItemInfo->SourceIndex);
-		strncpy_s(selectItem.szIconName, strIconName, 20);
-		multiSelectItem->push_back(selectItem);
-
-		iteminfo = GetNextItemForDelete();
-	}
-}
 
 CItemInfo* Miscellaneous::GetNextItemForDelete()
 {
@@ -495,6 +445,10 @@ void Miscellaneous::TickInventoryCleaning()
 		{
 			// first try to delete items to make space
 			if (TickItemDelete()) {
+				return;
+			}
+
+			if (OSR_API->IsInventoryFull()) {
 				return;
 			}
 			

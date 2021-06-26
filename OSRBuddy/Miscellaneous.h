@@ -26,7 +26,6 @@ public:
 
 private:
 	void OnMessageBoxClose(int result);
-	void SelectItemsForSell();
 	CItemInfo* GetNextItemForDelete();	
 	CItemInfo* FindStealthCardInInventory();  	  
 
