@@ -700,6 +700,7 @@ void GrindBot::OnEnable()
         return;
     }
 
+    m_total_mobs_killed = 0;
     m_mobs.clear();
 
     // sommer event special, always add these monster to the list

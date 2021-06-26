@@ -36,6 +36,7 @@ private:
 	bool TickItemDelete();
 	bool TryOpenCapsule(ItemNumber capsule);
 	void TickItemSell();
+	void TickAutoFlip();
 
 private:
 	bool m_whisperwarner_active;

@@ -6,6 +6,49 @@
 #include "OSRBuddyDefine.h"
 #include "OSRImGuiMenu.h" 
 
+#include <algorithm> // std::find
+
+// pierce
+std::vector<AdvancedPrefix> GoodAdvanced_Pierce_PrefixList = { AdvancedPrefix::Archrival, AdvancedPrefix::Bandit, AdvancedPrefix::Adversary, AdvancedPrefix::Bane, AdvancedPrefix::Challenger, AdvancedPrefix::Traitor, AdvancedPrefix::Stronghold };
+std::vector<AdvancedPrefix> BestAdvanced_Pierce_PrefixList = { AdvancedPrefix::Bandit, AdvancedPrefix::Traitor};
+std::vector<StandardPrefix> GoodStandard_Pierce_PrefixList = { StandardPrefix::Archrival, StandardPrefix::Bandit, StandardPrefix::Adversary, StandardPrefix::Bane, StandardPrefix::Challenger_1, StandardPrefix::Challenger_2, StandardPrefix::Traitor, StandardPrefix::Stronghold };
+std::vector<StandardPrefix> BestStandard_Pierce_PrefixList = { StandardPrefix::Bandit, StandardPrefix::Traitor };
+
+// reattack prob
+std::vector<AdvancedPrefix> GoodAdvanced_ProbReattack_PrefixList = { AdvancedPrefix::Meteo, AdvancedPrefix::Silence, AdvancedPrefix::Bio, AdvancedPrefix::Attack, AdvancedPrefix::Legend };
+std::vector<AdvancedPrefix> BestAdvanced_ProbReattack_PrefixList = { AdvancedPrefix::Legend, AdvancedPrefix::Bio };
+std::vector<StandardPrefix> GoodStandard_ProbReattack_PrefixList = { StandardPrefix::Meteo, StandardPrefix::Silence, StandardPrefix::Bio, StandardPrefix::Attack, StandardPrefix::Legend };
+std::vector<StandardPrefix> BestStandard_ProbReattack_PrefixList = { StandardPrefix::Legend, StandardPrefix::Bio };
+
+std::vector<AdvancedSuffix> GoodAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Meteo, AdvancedSuffix::Silence, AdvancedSuffix::Bio, AdvancedSuffix::Attack, AdvancedSuffix::Legend };
+std::vector<AdvancedSuffix> BestAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Legend, AdvancedSuffix::Bio };
+std::vector<StandardSuffix> GoodStandard_ProbReattack_SuffixList = { StandardSuffix::Meteo, StandardSuffix::Silence, StandardSuffix::Bio, StandardSuffix::Attack, StandardSuffix::Legend };
+std::vector<StandardSuffix> BestStandard_ProbReattack_SuffixList = { StandardSuffix::Legend, StandardSuffix::Bio };
+
+// minmax prob
+std::vector<AdvancedPrefix> GoodAdvanced_ProbDamage_PrefixList = { AdvancedPrefix::Navas, AdvancedPrefix::Agareth, AdvancedPrefix::Asmodi, AdvancedPrefix::Kobal, AdvancedPrefix::Warrior, AdvancedPrefix::Hound, AdvancedPrefix::Proson, AdvancedPrefix::Aloken, AdvancedPrefix::Tobit };
+std::vector<AdvancedPrefix> BestAdvanced_ProbDamage_PrefixList = { AdvancedPrefix::Navas, AdvancedPrefix::Agareth, AdvancedPrefix::Asmodi, AdvancedPrefix::Kobal, AdvancedPrefix::Warrior, };
+std::vector<StandardPrefix> GoodStandard_ProbDamage_PrefixList = { StandardPrefix::Navas, StandardPrefix::Agareth, StandardPrefix::Asmodi, StandardPrefix::Kobal, StandardPrefix::Warrior, StandardPrefix::Hound, StandardPrefix::Proson, StandardPrefix::Aloken, StandardPrefix::Tobit };
+std::vector<StandardPrefix> BestStandard_ProbDamage_PrefixList = { StandardPrefix::Navas, StandardPrefix::Agareth, StandardPrefix::Asmodi, StandardPrefix::Kobal, StandardPrefix::Warrior, };
+
+std::vector<AdvancedSuffix> GoodAdvanced_ProbDamage_SuffixList = { AdvancedSuffix::Navas, AdvancedSuffix::Agareth, AdvancedSuffix::Asmodi, AdvancedSuffix::Kobal, AdvancedSuffix::Warrior, AdvancedSuffix::Hound, AdvancedSuffix::Proson, AdvancedSuffix::Aloken, AdvancedSuffix::Tobit };
+std::vector<AdvancedSuffix> BestAdvanced_ProbDamage_SuffixList = { AdvancedSuffix::Navas, AdvancedSuffix::Agareth, AdvancedSuffix::Asmodi, AdvancedSuffix::Kobal, AdvancedSuffix::Warrior, };
+std::vector<StandardSuffix> GoodStandard_ProbDamage_SuffixList = { StandardSuffix::Navas, StandardSuffix::Agareth, StandardSuffix::Asmodi, StandardSuffix::Kobal, StandardSuffix::Warrior, StandardSuffix::Hound, StandardSuffix::Proson, StandardSuffix::Aloken, StandardSuffix::Tobit };
+std::vector<StandardSuffix> BestStandard_ProbDamage_SuffixList = { StandardSuffix::Navas, StandardSuffix::Agareth, StandardSuffix::Asmodi, StandardSuffix::Kobal, StandardSuffix::Warrior, };
+
+// reattack minmax
+std::vector<AdvancedPrefix> GoodAdvanced_ReattackDamage_PrefixList = { AdvancedPrefix::Squire, AdvancedPrefix::Max, AdvancedPrefix::Rukieper, AdvancedPrefix::Major };
+std::vector<AdvancedPrefix> BestAdvanced_ReattackDamage_PrefixList = { AdvancedPrefix::Squire, AdvancedPrefix::Max };
+std::vector<StandardPrefix> GoodStandard_ReattackDamage_PrefixList = { StandardPrefix::Squire, StandardPrefix::Max, StandardPrefix::Rukieper, StandardPrefix::Major };
+std::vector<StandardPrefix> BestStandard_ReattackDamage_PrefixList = { StandardPrefix::Squire, StandardPrefix::Max };
+
+std::vector<AdvancedSuffix> GoodAdvanced_ReattackDamage_SuffixList = { AdvancedSuffix::Squire, AdvancedSuffix::Max, AdvancedSuffix::Rukieper, AdvancedSuffix::Major };
+std::vector<AdvancedSuffix> BestAdvanced_ReattackDamage_SuffixList = { AdvancedSuffix::Squire, AdvancedSuffix::Max };
+std::vector<StandardSuffix> GoodStandard_ReattackDamage_SuffixList = { StandardSuffix::Squire, StandardSuffix::Max, StandardSuffix::Rukieper, StandardSuffix::Major };
+std::vector<StandardSuffix> BestStandard_ReattackDamage_SuffixList = { StandardSuffix::Squire, StandardSuffix::Max };
+
+#define FIXSELECTION_ONLY_GOOD 1
+#define FIXSELECTION_ONLY_BEST 2
 
 
 GambleBot::GambleBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
@@ -495,59 +538,136 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 	}
 
 	int prefixcode = weapon->m_pRefPrefixRareInfo->CodeNum;
+	bool is_standard = IS_PRIMARY_WEAPON(weapon->m_pItemInfo->Kind);
 	
+	// prob minmax
 	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.ProbDamage : m_prefix_selection.Any) 
 	{
-		case FIXSELECTION_ONLY_GOOD:
-			if (FixIsInList(prefixcode, g_GoodProbDamagePrefixList, IM_ARRAYSIZE(g_GoodProbDamagePrefixList))) {
+	case FIXSELECTION_ONLY_GOOD:
+		if (is_standard)
+		{
+			if (std::find(GoodStandard_ProbDamage_PrefixList.begin(), GoodStandard_ProbDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_ProbDamage_PrefixList.end()) {
 				return true;
 			}
-			break;
-		case FIXSELECTION_ONLY_BEST:
-			if (FixIsInList(prefixcode, g_BestProbDamagePrefixList, IM_ARRAYSIZE(g_BestProbDamagePrefixList))) {
+		}
+		else
+		{
+			if (std::find(GoodAdvanced_ProbDamage_PrefixList.begin(), GoodAdvanced_ProbDamage_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != GoodAdvanced_ProbDamage_PrefixList.end()) {
 				return true;
 			}
-			break;
+		}
+		break;
+	case FIXSELECTION_ONLY_BEST:
+		if (is_standard)
+		{
+			if (std::find(BestStandard_ProbDamage_PrefixList.begin(), BestStandard_ProbDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_ProbDamage_PrefixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(BestAdvanced_ProbDamage_PrefixList.begin(), BestAdvanced_ProbDamage_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != BestAdvanced_ProbDamage_PrefixList.end()) {
+				return true;
+			}
+		}
+		break;
 	}
 
+	// pierce
 	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.Pierce : m_prefix_selection.Any)
 	{
 	case FIXSELECTION_ONLY_GOOD:
-		if (FixIsInList(prefixcode, g_GoodPiercePrefixList, IM_ARRAYSIZE(g_GoodPiercePrefixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(GoodStandard_Pierce_PrefixList.begin(), GoodStandard_Pierce_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_Pierce_PrefixList.end()) {
+				return true;
+			}
 		}
-		break;
+		else
+		{
+			if (std::find(GoodAdvanced_Pierce_PrefixList.begin(), GoodAdvanced_Pierce_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != GoodAdvanced_Pierce_PrefixList.end()) {
+				return true;
+			}
+		}
+		break;		
 	case FIXSELECTION_ONLY_BEST:
-		if (FixIsInList(prefixcode, g_BestPiercePrefixList, IM_ARRAYSIZE(g_BestPiercePrefixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(BestStandard_Pierce_PrefixList.begin(), BestStandard_Pierce_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_Pierce_PrefixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(BestAdvanced_Pierce_PrefixList.begin(), BestAdvanced_Pierce_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != BestAdvanced_Pierce_PrefixList.end()) {
+				return true;
+			}
 		}
 		break;
 	}
 
+	// prob reattack
 	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.ProbReattack : m_prefix_selection.Any)
 	{
 	case FIXSELECTION_ONLY_GOOD:
-		if (FixIsInList(prefixcode, g_GoodProbReattackPrefixList, IM_ARRAYSIZE(g_GoodProbReattackPrefixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(GoodStandard_ProbReattack_PrefixList.begin(), GoodStandard_ProbReattack_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_ProbReattack_PrefixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(GoodAdvanced_ProbReattack_PrefixList.begin(), GoodAdvanced_ProbReattack_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != GoodAdvanced_ProbReattack_PrefixList.end()) {
+				return true;
+			}
 		}
 		break;
 	case FIXSELECTION_ONLY_BEST:
-		if (FixIsInList(prefixcode, g_BestProbReattackPrefixList, IM_ARRAYSIZE(g_BestProbReattackPrefixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(BestStandard_ProbReattack_PrefixList.begin(), BestStandard_ProbReattack_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_ProbReattack_PrefixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(BestAdvanced_ProbReattack_PrefixList.begin(), BestAdvanced_ProbReattack_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != BestAdvanced_ProbReattack_PrefixList.end()) {
+				return true;
+			}
 		}
 		break;
 	}
 
+	// reattack minmax
 	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.ReattackDamage : m_prefix_selection.Any)
 	{
 	case FIXSELECTION_ONLY_GOOD:
-		if (FixIsInList(prefixcode, g_GoodReattackDamagePrefixList, IM_ARRAYSIZE(g_GoodReattackDamagePrefixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(GoodStandard_ReattackDamage_PrefixList.begin(), GoodStandard_ReattackDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_ReattackDamage_PrefixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(GoodAdvanced_ReattackDamage_PrefixList.begin(), GoodAdvanced_ReattackDamage_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != GoodAdvanced_ReattackDamage_PrefixList.end()) {
+				return true;
+			}
 		}
 		break;
 	case FIXSELECTION_ONLY_BEST:
-		if (FixIsInList(prefixcode, g_BestReattackDamagePrefixList, IM_ARRAYSIZE(g_BestReattackDamagePrefixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(BestStandard_ReattackDamage_PrefixList.begin(), BestStandard_ReattackDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_ReattackDamage_PrefixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(BestAdvanced_ReattackDamage_PrefixList.begin(), BestAdvanced_ReattackDamage_PrefixList.end(), static_cast<AdvancedPrefix>(prefixcode)) != BestAdvanced_ReattackDamage_PrefixList.end()) {
+				return true;
+			}
 		}
 		break;
 	}
@@ -571,46 +691,104 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 	}
 
 	int suffixcode = weapon->m_pRefSuffixRareInfo->CodeNum;
+	bool is_standard = IS_PRIMARY_WEAPON(weapon->m_pItemInfo->Kind);
 
+	// prob minmax
 	switch ((m_suffix_selection.Any == 0) ? m_suffix_selection.ProbDamage : m_suffix_selection.Any)
 	{
 	case FIXSELECTION_ONLY_GOOD:
-		if (FixIsInList(suffixcode, g_GoodProbDamageSuffixList, IM_ARRAYSIZE(g_GoodProbDamageSuffixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(GoodStandard_ProbDamage_SuffixList.begin(), GoodStandard_ProbDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != GoodStandard_ProbDamage_SuffixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(GoodAdvanced_ProbDamage_SuffixList.begin(), GoodAdvanced_ProbDamage_SuffixList.end(), static_cast<AdvancedSuffix>(suffixcode)) != GoodAdvanced_ProbDamage_SuffixList.end()) {
+				return true;
+			}
 		}
 		break;
 	case FIXSELECTION_ONLY_BEST:
-		if (FixIsInList(suffixcode, g_BestProbDamageSuffixList, IM_ARRAYSIZE(g_BestProbDamageSuffixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(BestStandard_ProbDamage_SuffixList.begin(), BestStandard_ProbDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != BestStandard_ProbDamage_SuffixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(BestAdvanced_ProbDamage_SuffixList.begin(), BestAdvanced_ProbDamage_SuffixList.end(), static_cast<AdvancedSuffix>(suffixcode)) != BestAdvanced_ProbDamage_SuffixList.end()) {
+				return true;
+			}
 		}
 		break;
 	}
 
+	// prob reattack
 	switch ((m_suffix_selection.Any == 0) ? m_suffix_selection.ProbReattack : m_suffix_selection.Any)
 	{
-	case FIXSELECTION_ONLY_GOOD:
-		if (FixIsInList(suffixcode, g_GoodProbReattackSuffixList, IM_ARRAYSIZE(g_GoodProbReattackSuffixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(GoodStandard_ProbReattack_SuffixList.begin(), GoodStandard_ProbReattack_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != GoodStandard_ProbReattack_SuffixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(GoodAdvanced_ProbReattack_SuffixList.begin(), GoodAdvanced_ProbReattack_SuffixList.end(), static_cast<AdvancedSuffix>(suffixcode)) != GoodAdvanced_ProbReattack_SuffixList.end()) {
+				return true;
+			}
 		}
 		break;
 	case FIXSELECTION_ONLY_BEST:
-		if (FixIsInList(suffixcode, g_BestProbReattackSuffixList, IM_ARRAYSIZE(g_BestProbReattackSuffixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(BestStandard_ProbReattack_SuffixList.begin(), BestStandard_ProbReattack_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != BestStandard_ProbReattack_SuffixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(BestAdvanced_ProbReattack_SuffixList.begin(), BestAdvanced_ProbReattack_SuffixList.end(), static_cast<AdvancedSuffix>(suffixcode)) != BestAdvanced_ProbReattack_SuffixList.end()) {
+				return true;
+			}
 		}
 		break;
 	}
 
+	// reattack minmax
 	switch ((m_suffix_selection.Any == 0) ? m_suffix_selection.ReattackDamage : m_suffix_selection.Any)
 	{
 	case FIXSELECTION_ONLY_GOOD:
-		if (FixIsInList(suffixcode, g_GoodReattackDamageSuffixList, IM_ARRAYSIZE(g_GoodReattackDamageSuffixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(GoodStandard_ReattackDamage_SuffixList.begin(), GoodStandard_ReattackDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != GoodStandard_ReattackDamage_SuffixList.end()) {
+				return true;
+			}
+		}
+		else
+		{
+			if (std::find(GoodAdvanced_ReattackDamage_SuffixList.begin(), GoodAdvanced_ReattackDamage_SuffixList.end(), static_cast<AdvancedSuffix>(suffixcode)) != GoodAdvanced_ReattackDamage_SuffixList.end()) {
+				return true;
+			}
 		}
 		break;
 	case FIXSELECTION_ONLY_BEST:
-		if (FixIsInList(suffixcode, g_BestReattackDamageSuffixList, IM_ARRAYSIZE(g_BestReattackDamageSuffixList))) {
-			return true;
+		if (is_standard)
+		{
+			if (std::find(BestStandard_ReattackDamage_SuffixList.begin(), BestStandard_ReattackDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != BestStandard_ReattackDamage_SuffixList.end()) {
+				return true;
+			}
 		}
+		else
+		{
+			if (std::find(BestAdvanced_ReattackDamage_SuffixList.begin(), BestAdvanced_ReattackDamage_SuffixList.end(), static_cast<AdvancedSuffix>(suffixcode)) != BestAdvanced_ReattackDamage_SuffixList.end()) {
+				return true;
+			}
+		}
+
 		break;
 	}
 
@@ -660,68 +838,68 @@ int GambleBot::GetTotalInventoryAmount(GambleItem gambleItem)
 	switch (gambleItem)
 	{
 	case GambleItem::SG_ADV_PREFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_PREFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Adv_Weapon_SG_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_PREFIX_2);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Advance_Weapon_Super_Gamble_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		break;
 
 	case GambleItem::SG_ADV_SUFFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_SUFFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Adv_Weapon_SG_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_SUFFIX_2);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Advance_Weapon_Super_Gamble_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		break;
 
 	case GambleItem::SG_STD_PREFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_PREFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Std_Weapon_SG_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_PREFIX_2);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Std_Weapon_Super_Gamble_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		break;
 
 	case GambleItem::SG_STD_SUFFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_SUFFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Std_Weapon_SG_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_SUFFIX_2);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Std_Weapon_Super_Gamble_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		break;
 
 	case GambleItem::INIT_PREFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_PREFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Gamble_Initialization_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_PREFIX_2);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Gamble_Initialization_Card_2);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
 		break;
 	case GambleItem::INIT_SUFFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_SUFFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Gamble_Initialization_Card);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_SUFFIX_2);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Gamble_Initialization_Card_2);
 		if (gambleitem) {
 			amount += gambleitem->CurrentCount;
 		}
@@ -866,39 +1044,39 @@ CItemInfo* GambleBot::FindGambleItemFromInventory(GambleItem gambleitemkind)
 	switch (gambleitemkind)
 	{
 	case GambleItem::SG_ADV_PREFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_PREFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Adv_Weapon_SG_Card);
 		if (!gambleitem) {
-			gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_PREFIX_2);
+			gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Advance_Weapon_Super_Gamble_Card);
 		}
 		break;
 	case GambleItem::SG_ADV_SUFFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_SUFFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Adv_Weapon_SG_Card);
 		if (!gambleitem) {
-			gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_ADV_SUFFIX_2);
+			gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Advance_Weapon_Super_Gamble_Card);
 		}
 		break;
 	case GambleItem::SG_STD_PREFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_PREFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Std_Weapon_SG_Card);
 		if (!gambleitem) {
-			gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_PREFIX_2);
+			gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Std_Weapon_Super_Gamble_Card);
 		}
 		break;
 	case GambleItem::SG_STD_SUFFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_SUFFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Std_Weapon_SG_Card);
 		if (!gambleitem) {
-			gambleitem = OSR_API->FindItemInInventoryByItemNum(SUPERGAMBLE_STD_SUFFIX_2);
+			gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Std_Weapon_Super_Gamble_Card);
 		}
 		break;
 	case GambleItem::INIT_PREFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_PREFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Gamble_Initialization_Card);
 		if (!gambleitem) {
-			gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_PREFIX_2);
+			gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Prefix_Gamble_Initialization_Card_2);
 		}
 		break;
 	case GambleItem::INIT_SUFFIX:
-		gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_SUFFIX_1);
+		gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Gamble_Initialization_Card);
 		if (!gambleitem) {
-			gambleitem = OSR_API->FindItemInInventoryByItemNum(INITIALIZATION_SUFFIX_2);
+			gambleitem = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Suffix_Gamble_Initialization_Card_2);
 		}
 		break;
 	case GambleItem::SOURCE_ITEM:
@@ -908,17 +1086,7 @@ CItemInfo* GambleBot::FindGambleItemFromInventory(GambleItem gambleitemkind)
 
 	return gambleitem;
 }
-   	 
-bool GambleBot::FixIsInList(int codenum, const int* fixlist, size_t arraysize)
-{
-	for (int i = 0; i < arraysize; i++)
-	{
-		if (codenum == fixlist[i]) {
-			return true; 
-		} 
-	}
-	return false;
-}
+  	 
 
 GambleAction GambleBot::DetermineNextAction()
 {

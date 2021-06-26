@@ -783,6 +783,7 @@ int OldSchoolRivalsAPI::WritePacket(byte* packet, int length)
 
 bool OldSchoolRivalsAPI::HasPremium()
 {
+	return true; // fix this
 	return m_atumapplication->m_PremiumCardInfo.nCardItemNum1 > 0;
 }
 

@@ -201,6 +201,7 @@
     <ClInclude Include="BuddyAPI.h" />
     <ClInclude Include="D3D9Font.h" />
     <ClInclude Include="D3D9Renderer.h" />
+    <ClInclude Include="GambleFixes.h" />
     <ClInclude Include="INFBase.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Miscellaneous.h" />

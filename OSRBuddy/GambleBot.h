@@ -6,6 +6,7 @@
 #include "OSRAPI.h"
 #include "EnchantBot.h"
 
+
 #include "OsrItemInfo.h"
 
 #ifdef RELEASE_SETHIA
@@ -102,7 +103,6 @@ private:
 	bool CheckRarePrefix(CItemInfo* weapon);
 	bool CheckRareSuffix(CItemInfo* weapon);
 	const char* GetGambleActionString(GambleAction);
-	bool FixIsInList(int codenum, const int* fixlist, size_t arraysize);
 	void UpdateTotalGambleItemAmount();
 	int GetTotalInventoryAmount(GambleItem gambleItem);
 	bool TrySimulateButtonClick(LabButtonCode button); 

@@ -7,7 +7,7 @@
 #define WHISPER_WARNING_TIME 10s
 #define CAPSULE_OPEN_REATTACK 200ms
 #define ITEM_DELETE_REATTACK 400ms
-#define WHIPSER_SNOOZE_TIME 1min
+#define WHIPSER_SNOOZE_TIME 2min
 #define ITEM_SELL_REATTACK 210ms
 
 Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
@@ -28,7 +28,7 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_delete_items = false;
 	m_delete_items_maxlevel = 20;
 	m_delete_weapons = true;
-	m_delete_engines = true;
+	m_delete_engines = false;
 	m_delete_radars = true;
 	m_delete_marks = true;
 	m_delete_cpus = true;
@@ -60,30 +60,8 @@ void Miscellaneous::Tick()
 	if (m_inv_action_check_time < 0ms) {
 		m_inv_action_check_time = 0ms;
 	}
-	
-	// autoflip feature
-	if (m_autoflip && OSR_API->IsLanded() && OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y < 0) {
-		OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y *= -1;
-	}
-
-	if (OSR_API->IsInBuilding())
-	{
-		auto building = OSR_API->GetCurrentBuilding();
-		if (IS_ITEM_SHOP_TYPE(building.BuildingKind) || IS_WARPOINT_SHOP_TYPE(building.BuildingKind)) {
-			m_in_sell_building = true;
-		}
-		else {
-			m_in_sell_building = false;
-		}
-	}
-	else {
-		m_in_sell_building = false;
-	}
-
-	if (!m_in_sell_building) {
-		m_selling_items = false;
-	}
-
+		   
+	TickAutoFlip();
 	TickItemSell();
 	TickWhisperWarner();
 	TickInventoryCleaning();
@@ -106,6 +84,7 @@ void Miscellaneous::RenderImGui()
 			ImGui::Checkbox("Snooze enabled", &m_whisperwarner_snooze_enabled);
 			ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);  	
 
+			ImGui::Separator();
 			ImGui::NewLine();
 			ImGui::Text("Other");
 			ImGui::Separator();
@@ -520,6 +499,16 @@ bool Miscellaneous::TryOpenCapsule(ItemNumber capsule)
 
 void Miscellaneous::TickItemSell()
 {	
+	// check if player is in a building where it is possible to sell items
+	if (OSR_API->IsInBuilding() && (IS_ITEM_SHOP_TYPE(OSR_API->GetCurrentBuilding().BuildingKind) || IS_WARPOINT_SHOP_TYPE(OSR_API->GetCurrentBuilding().BuildingKind))) {  				
+		m_in_sell_building = true;
+	}
+	else 
+	{
+		m_in_sell_building = false;
+		m_selling_items = false;
+	}	
+
 	if (m_selling_items)
 	{
 		auto current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
@@ -536,5 +525,12 @@ void Miscellaneous::TickItemSell()
 				m_last_itemsell = current;
 			}
 		}
+	}
+}
+
+void Miscellaneous::TickAutoFlip()
+{
+	if (m_autoflip && OSR_API->IsLanded() && OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y < 0) {
+		OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y *= -1;
 	}
 }
