@@ -22,6 +22,7 @@ enum OffsetIdentifier
 	CWinSocket__Write,
 	CSkillInfo__ChangeSkillState,
 	CAtumApplication__CalcObjectSourceScreenCoords,
+	CINFInvenExtend__DeleteSelectItem,
 };
 		
 
@@ -49,6 +50,7 @@ public:
 		PatternManager::m_patterninfos.push_back({ CWinSocket__Write, "8B F9 83 7F 08 FF C7 45 F0 00 00 00 00 0F 84 ?? ?? ?? ?? 83 7F 14 00 0F 84 ?? ?? ?? ?? 68 E4 05 00 00 6A 40" , -0x28, nullptr, 5 });
 		PatternManager::m_patterninfos.push_back({ CSkillInfo__ChangeSkillState, "8B 45 08 56 48 8B F1 89 74 24 18 57 83 F8 05 0F 87 ?? ?? ?? ?? FF 24 85", -0x1A, nullptr, 6 });
 		PatternManager::m_patterninfos.push_back({ CAtumApplication__CalcObjectSourceScreenCoords, "0F 11 44 24 14 53 66 0F 6E C8 8B C1 F7 D8 C7 44 24 3C 00 00 80 3F", -0x2D, nullptr, 6 });
+		PatternManager::m_patterninfos.push_back({ CINFInvenExtend__DeleteSelectItem, "56 8B F1 57 8B 86 98 01 00 00 8B BE 9C 01 00 00 85 C0 75 08 85 FF 0F 84 63 01 00 00", -0x1A, nullptr, 6 });
 		 
 		uintptr_t ace_modulebase = (uintptr_t)GetModuleHandle("ACEonline.atm");
 		if (!ace_modulebase) {

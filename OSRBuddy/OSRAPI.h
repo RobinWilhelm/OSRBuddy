@@ -4,20 +4,6 @@
 #include "OSRBuddyDefine.h"
 #include <d3d9.h>
    
-using SendUseItemType = void(__thiscall*)(CINFInvenExtend * ecx, ITEM_BASE * item);
-using SendUseSkillType = void(__thiscall*)(CINFCharacterInfoExtend * ecx, ITEM_BASE * skill);
-using OnButtonClickType = void(__thiscall*)(CINFCityLab * ecx, int button);
-using InvenToSourceItemType = void(__thiscall*)(CINFCityLab * ecx, CItemInfo * pItemInfo, int nCount, bool useMacroSource);
-using GetServerRareItemInfoType = RARE_ITEM_INFO * (__thiscall*)(CAtumDatabase * ecx, int nCodeNum);
-using ChangeSkillState = void(__thiscall*)(CSkillInfo * ecx, int dwState, int nTempSkillItemNum);
-using CalcObjectSourceScreenCoordsType = void(__thiscall*)(CAtumApplication * ecx, D3DXVECTOR3 vObjPos, int iScreenWidth, int iScreenHeight, int& iCoordX, int& iCoordY, int& iCoordW);
-
-enum class LabButtonCode : int
-{
-	Send = 0,
-	Cancel,
-	Ok,
-};
 
 class OldSchoolRivalsAPI
 {			
@@ -76,7 +62,8 @@ public:
 
 	// CINFCityBase
 	bool IsInBuilding();
-	int GetCurrentyBuildingKind();
+	int GetCurrentBuildingKind();
+	BUILDINGNPC GetCurrentBuilding();
 	CINFBase* FindBuildingShop(int buildingkind);
 
 	// CINFCityLab
@@ -89,7 +76,9 @@ public:
 	INVEN_DISPLAY_INFO* GetSelectedItem();
 
 	// CINFInvExtend
-	void SendUseItem(ITEM_GENERAL* item);  
+	void SendUseItem(ITEM_GENERAL* item); 
+	void DeleteItem(ITEM_GENERAL* item, int count);
+
 
 	// CINFCharacterInfoExtend
 	void SendUseSkill(ITEM_BASE* skill);
@@ -111,6 +100,10 @@ public:
 	// CAtumapplication
 	void WorldToScreen(D3DXVECTOR3 world, int& screen_x, int& screen_y);
 
+	// CWinSocket
+	int WritePacket(byte* packet, int length);
+	   	
+
 private:
 	// collision stuff
 	COLLISION_RESULT CheckCollMeshRangeObject(CObjRender* objrender, D3DXMATRIX mat, D3DXVECTOR3 vPos, float fMovingDistance, CMonsterData* pTarget);
@@ -129,12 +122,14 @@ private:
 	CAtumApplication*			m_atumapplication;
 
 	// game methods
-	SendUseItemType				m_SendUseItem;
-	OnButtonClickType			m_OnButtonClick;
-	InvenToSourceItemType		m_InvenToSourceItem;
-	GetServerRareItemInfoType	m_GetServerRareItemInfo;
-	SendUseSkillType			m_SendUseSkill;
-	CalcObjectSourceScreenCoordsType m_CalcObjectSourceScreenCoords;
+	//SendUseItemType				m_SendUseItem;
+	//OnButtonClickType			m_OnButtonClick;
+	//InvenToSourceItemType		m_InvenToSourceItem;
+	//GetServerRareItemInfoType	m_GetServerRareItemInfo;
+	//SendUseSkillType			m_SendUseSkill;
+	//CalcObjectSourceScreenCoordsType m_CalcObjectSourceScreenCoords;
+	//DeleteSelectItemType		m_DeleteSelectItem;
+	//CWinSocketWriteType			m_WritePacket;
 };
 
 #ifndef OSR_API

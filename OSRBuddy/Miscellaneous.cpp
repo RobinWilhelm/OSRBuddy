@@ -6,7 +6,9 @@
 
 #define WHISPER_WARNING_TIME 10s
 #define CAPSULE_OPEN_REATTACK 200ms
+#define ITEM_DELETE_REATTACK 400ms
 #define WHIPSER_SNOOZE_TIME 1min
+#define ITEM_SELL_REATTACK 210ms
 
 Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
@@ -23,6 +25,17 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_open_mineralcapsule = true;
 	m_open_wpcapsule = false;
 	m_open_soccer_ball_capsule = true;
+	m_delete_items = false;
+	m_delete_items_maxlevel = 20;
+	m_delete_weapons = true;
+	m_delete_engines = true;
+	m_delete_radars = true;
+	m_delete_marks = true;
+	m_delete_cpus = true;
+	m_awaiting_delete_ok = false;
+	m_in_sell_building = false;
+	m_sold_item = 0;
+	m_deleted_item = 0;
 }
 
 Miscellaneous::~Miscellaneous()
@@ -48,6 +61,29 @@ void Miscellaneous::Tick()
 		m_inv_action_check_time = 0ms;
 	}
 		 	
+	if (m_autoflip && OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y < 0) {
+		OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y *= -1;
+	}
+
+	if (OSR_API->IsInBuilding())
+	{
+		auto building = OSR_API->GetCurrentBuilding();
+		if (IS_ITEM_SHOP_TYPE(building.BuildingKind) || IS_WARPOINT_SHOP_TYPE(building.BuildingKind)) {
+			m_in_sell_building = true;
+		}
+		else {
+			m_in_sell_building = false;
+		}
+	}
+	else {
+		m_in_sell_building = false;
+	}
+
+	if (!m_in_sell_building) {
+		m_selling_items = false;
+	}
+
+	TickItemSell();
 	TickWhisperWarner();
 	TickInventoryCleaning();
 }
@@ -66,7 +102,12 @@ void Miscellaneous::RenderImGui()
 				ImGui::SetTooltip("Will notify the user whenever there is a new / unread whisper message.");
 			}
 			ImGui::Checkbox("Snooze enabled", &m_whisperwarner_snooze_enabled);
-			ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);  			
+			ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);  	
+
+			ImGui::NewLine();
+			ImGui::Text("Other");
+			ImGui::Separator();
+			ImGui::Checkbox("Autoflip", &m_autoflip);
 		}
 		ImGui::EndChild();
 	}
@@ -110,15 +151,153 @@ void Miscellaneous::RenderImGui()
 				ImGui::Checkbox("Soccer Ball Capsule", &m_open_soccer_ball_capsule);
 			}
 			ImGui::EndColumns();
+			ImGui::NewLine();
+			ImGui::Text("Item Deletion");
+			ImGui::Separator();
+			ImGui::Checkbox("Active###deleteItemsActivation", &m_delete_items);
+			ImGui::SliderInt("Max Level", &m_delete_items_maxlevel, 1, 100);
+			ImGui::Checkbox("Weapons", &m_delete_weapons);
+			ImGui::Checkbox("Radars", &m_delete_radars);
+			ImGui::Checkbox("Engines", &m_delete_engines);
+			ImGui::Checkbox("CPUs", &m_delete_cpus);
+			ImGui::Checkbox("Marks", &m_delete_marks); 
+
+			ImGui::NewLine();
+			ImGui::BeginDisabledMode(!m_in_sell_building);
+			{
+				if (!m_selling_items) 
+				{
+					if (ImGui::Button("Start selling")) {
+						m_selling_items = true;
+					}
+				}
+				else
+				{
+					if (ImGui::Button("Stop selling")) {
+						m_selling_items = false;
+					}
+				}
+			}
+			ImGui::EndDisabledMode();
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Sell all items that match the above criteria.\nCharacter needs to be in a sellshop.");
+			}
 		}
 		ImGui::EndChild();
 	}
 	ImGui::EndColumns();
 }
 
+bool Miscellaneous::OnReadPacket(unsigned short msgtype, byte* packet)
+{
+	switch (msgtype)
+	{
+	case T_FC_STORE_UPDATE_ITEM_COUNT:
+	{
+		MSG_FC_STORE_UPDATE_ITEM_COUNT* msg = (MSG_FC_STORE_UPDATE_ITEM_COUNT*)packet;
+		if (msg->ItemUpdateType == IUT_GENERAL && msg->ItemUniqueNumber == m_deleted_item) 
+		{
+			m_deleted_item = 0;
+			m_awaiting_delete_ok = false;
+		}
+
+		if (msg->ItemUpdateType == IUT_SHOP && msg->ItemUniqueNumber == m_sold_item) 
+		{
+			m_sold_item = 0;
+			m_awaiting_sell_ok = false;
+		}
+	}
+	break;
+	case T_FC_STORE_DELETE_ITEM:
+	{
+		MSG_FC_STORE_DELETE_ITEM* msg = (MSG_FC_STORE_DELETE_ITEM*)packet;
+		if (msg->ItemDeletionType == IUT_GENERAL && msg->ItemUniqueNumber == m_deleted_item)
+		{
+			m_deleted_item = 0;
+			m_awaiting_delete_ok = false;
+		}
+
+		if (msg->ItemDeletionType == IUT_SHOP && msg->ItemUniqueNumber == m_sold_item)
+		{
+			m_sold_item = 0;
+			m_awaiting_sell_ok = false;
+		}
+	}  
+	break;
+	case T_ERROR:
+		MSG_ERROR* msg = (MSG_ERROR*)packet;
+		if (msg->MsgType == T_FC_SHOP_SELL_ITEM)
+		{
+
+		}
+		break;
+	}  
+	return false;
+}
+
+bool Miscellaneous::OnWritePacket(unsigned short msgtype, byte* packet)
+{
+	switch (msgtype)
+	{
+	case T_FC_ITEM_THROW_AWAY_ITEM:
+		{	  			
+			MSG_FC_ITEM_THROW_AWAY_ITEM* msg = (MSG_FC_ITEM_THROW_AWAY_ITEM*)packet;
+			m_sold_item = msg->ItemUniqueNumber;
+			m_awaiting_delete_ok = true;
+		}
+		break;
+	case T_FC_SHOP_SELL_ITEM:
+		{
+			MSG_FC_SHOP_SELL_ITEM* msg = (MSG_FC_SHOP_SELL_ITEM*)packet;
+			m_sold_item = msg->ItemUniqueNumber;
+			m_awaiting_sell_ok = true;
+		}
+		break;
+	}
+	return false;
+}
+
 void Miscellaneous::ActivateInventoryCleaning(bool active)
 {
 	m_clean_inventory = active;
+}
+
+bool Miscellaneous::TrySendSellItem(CItemInfo* item, int count)
+{
+	if (item && count <= item->CurrentCount && !m_awaiting_sell_ok && m_in_sell_building)
+	{
+		if (!OSR_API->IsInBuilding()) 
+		{
+			m_selling_items = false; 
+			return false;
+		}
+
+		auto building = OSR_API->GetCurrentBuilding();
+		if (!IS_ITEM_SHOP_TYPE(building.BuildingKind) && !IS_WARPOINT_SHOP_TYPE(building.BuildingKind)) 
+		{
+			m_selling_items = false;
+			return false;
+		} 
+
+		MSG_FC_SHOP_SELL_ITEM sMsg;
+		memset(&sMsg, 0x00, sizeof(sMsg));
+		char buffer[SIZE_MAX_PACKET];
+
+		if (IS_COUNTABLE_ITEM(item->Kind)) {
+			sMsg.Amount = count;
+		}
+		else {
+			sMsg.Amount = 1;
+		}
+		sMsg.ItemKind = item->Kind;
+		sMsg.ItemUniqueNumber = item->UniqueNumber;
+		sMsg.BuildingIndex = building.BuildingIndex;
+		int nType = T_FC_SHOP_SELL_ITEM;
+		memcpy(buffer, &nType, SIZE_FIELD_TYPE_HEADER);
+		memcpy(buffer + SIZE_FIELD_TYPE_HEADER, &sMsg, sizeof(sMsg));
+		return OSR_API->WritePacket(reinterpret_cast<byte*>(buffer), SIZE_FIELD_TYPE_HEADER + sizeof(sMsg));
+	} 
+	return false;
 }
 
 void Miscellaneous::OnMessageBoxClose(int result)
@@ -142,6 +321,93 @@ void Miscellaneous::OnMessageBoxClose(int result)
 		}
 	}	  
 	m_popup_open = false;
+}
+
+void Miscellaneous::SelectItemsForSell()
+{
+	if (!OSR_API->IsInBuilding()) {
+		return;
+	}
+
+	auto building  = OSR_API->GetCurrentBuilding();
+	if (!IS_ITEM_SHOP_TYPE(building.BuildingKind) && !IS_WARPOINT_SHOP_TYPE(building.BuildingKind)) {
+		return;
+	}
+	deque<stMultiSelectItem>* multiSelectItem = &OSR_API->GetAtumApplication()->m_vecSellMultiSelectItem;
+	stMultiSelectItem selectItem;
+	CItemInfo* iteminfo = GetNextItemForDelete();
+	while (iteminfo != nullptr)
+	{
+		ZeroMemory(&selectItem, sizeof(stMultiSelectItem));
+
+		selectItem.uSellingPrice = iteminfo->ItemInfo->Price * 0.2f;
+		selectItem.byItemKind = iteminfo->Kind;
+		selectItem.nUniqueNumber = iteminfo->UniqueNumber;
+		selectItem.SourceIndex = iteminfo->ItemInfo->SourceIndex;
+		selectItem.bySelectType = ITEM_INVEN_POS;
+		//selectItem.ptIcon = ptIcon;
+		selectItem.ItemNum = iteminfo->ItemNum;
+
+		if (IS_COUNTABLE_ITEM(iteminfo->Kind)) {
+			selectItem.nAmount = iteminfo->CurrentCount;
+		}
+		else {
+			selectItem.nAmount = 1;
+		}
+		
+		selectItem.nBuildingIndex = building.BuildingIndex;
+		strncpy_s(selectItem.szName, iteminfo->ItemInfo->ItemName, 50);
+
+		char strIconName[64];
+		wsprintf(strIconName, "%08d", iteminfo->ItemInfo->SourceIndex);
+		strncpy_s(selectItem.szIconName, strIconName, 20);
+		multiSelectItem->push_back(selectItem);
+
+		iteminfo = GetNextItemForDelete();
+	}
+}
+
+CItemInfo* Miscellaneous::GetNextItemForDelete()
+{
+	for (auto mapentry : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pStoreData->m_mapItemUniqueNumber)
+	{
+		CItemInfo* iteminfo = mapentry.second;
+
+		if ((m_delete_weapons && IS_WEAPON(iteminfo->Kind)) ||
+			(m_delete_marks && iteminfo->Kind == ITEMKIND_MARK) ||
+			(m_delete_cpus && iteminfo->Kind == ITEMKIND_COMPUTER) ||
+			(m_delete_radars && iteminfo->Kind == ITEMKIND_RADAR) ||
+			(m_delete_engines && iteminfo->Kind == ITEMKIND_SUPPORT))
+		{
+			// skip all enchanted items
+			if (iteminfo->m_nEnchantNumber > 0) {
+				continue;
+			}
+
+			// skip all equipped items
+			bool is_equipped_item = false;
+			auto invenextend = OSR_API->GetAtumApplication()->m_pInterface->m_pGameMain->m_pInven;
+			for (int i = 0; i < MAX_EQUIP_POS; i++)
+			{
+				if (invenextend->m_pWearDisplayInfo[i] && invenextend->m_pWearDisplayInfo[i]->pItem->UniqueNumber == iteminfo->UniqueNumber)
+				{
+					is_equipped_item = true;
+					break;
+				}
+			}
+			if (is_equipped_item) {
+				continue;
+			}
+
+			// skip all items under the specified level
+			if (iteminfo->ItemInfo->ReqMinLevel > m_delete_items_maxlevel) {
+				continue;
+			}
+	
+			return iteminfo;
+		}
+	}
+	return nullptr;
 }
 
 CItemInfo* Miscellaneous::FindStealthCardInInventory()
@@ -227,6 +493,11 @@ void Miscellaneous::TickInventoryCleaning()
 	{
 		if (InventoryActionCheckTimeReady())
 		{
+			// first try to delete items to make space
+			if (TickItemDelete()) {
+				return;
+			}
+			
 			if (m_open_mineralcapsule && TryOpenCapsule(ItemNumber::Mineral_Capsule)) {
 				return;
 			}
@@ -237,13 +508,12 @@ void Miscellaneous::TickInventoryCleaning()
 
 			if (m_open_watermelongift && TryOpenCapsule(ItemNumber::Square_Watermelon_Gift)) {
 				return;
-			}
-
+			}  
 
 			if (m_open_soccer_ball_capsule && TryOpenCapsule(ItemNumber::Soccer_Ball_Capsule)) {
 				return;
 			}
-
+			  
 			if (m_open_wpcapsule)
 			{
 				if (TryOpenCapsule(ItemNumber::WP_Capsule_100)) {
@@ -266,6 +536,22 @@ void Miscellaneous::TickInventoryCleaning()
 	}
 }
 
+bool Miscellaneous::TickItemDelete()
+{
+	if (m_delete_items && !m_awaiting_delete_ok)
+	{
+		CItemInfo* iteminfo = GetNextItemForDelete();
+		if (iteminfo)
+		{ 
+			// delete item
+			OSR_API->DeleteItem(iteminfo, iteminfo->CurrentCount);	 			
+			m_inv_action_check_time = ITEM_DELETE_REATTACK + std::chrono::milliseconds(m_buddy->GetRandInt32(0, 500));
+			return true;
+		}		
+	}			 
+	return false;
+}
+
 bool Miscellaneous::TryOpenCapsule(ItemNumber capsule)
 {
 	CItemInfo* item = OSR_API->FindItemInInventoryByItemNum(capsule);
@@ -276,4 +562,25 @@ bool Miscellaneous::TryOpenCapsule(ItemNumber capsule)
 		return true;
 	}
 	return false;
+}
+
+void Miscellaneous::TickItemSell()
+{	
+	if (m_selling_items)
+	{
+		auto current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+		if (current - m_last_itemsell > ITEM_SELL_REATTACK)
+		{
+			CItemInfo* item = GetNextItemForDelete();
+			if (!item) // no more items to sell
+			{
+				m_selling_items = false;
+				return;
+			}
+
+			if (TrySendSellItem(item, item->CurrentCount)) {
+				m_last_itemsell = current;
+			}
+		}
+	}
 }

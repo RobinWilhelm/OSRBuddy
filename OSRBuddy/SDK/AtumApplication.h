@@ -577,7 +577,7 @@ public:
 	structLoadingGameData* m_pLoadingGameData;
 	//end 2009. 11. 23 by jskim ¸®¼Ò½º ·Îµù ±¸Á¶ º¯°æ
 
-private:
+
 	//	BOOL						m_bCashShopFlag;		// Ä³½¬¼¥ ÇÃ·¹±×
 	BOOL						m_bTestServer;			// Å×½ºÆ® ¼­¹ö ÇÃ·¡±×
 	BOOL						m_bDeadByP2PPK;			// PK½Ã Àû À¯´Ö¿¡°Ô Á×¾ú³ª? TRUE : Àû À¯´Ö¿¡°Ô Á×¾ú´Ù.

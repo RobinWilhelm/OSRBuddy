@@ -1,4 +1,5 @@
 #pragma once
+#include "OSRBuddyDefine.h"
 #include "D3DInternalBase.h"
 #include "BuddyFeatureBase.h"
 #include <vector>
@@ -12,22 +13,22 @@ class CFieldWinSocket;
 class CAtumapplication;
 
 // CInterface::Tick()
-using InterfaceTickType = void(__thiscall*)(CInterface* ecx);
+using InterfaceTickType = void(__thiscall*)(CInterface * ecx);
 
 // CFieldWinSocket::OnRecvdPacket
-using WinSocketOnRecvdPacketType = BOOL(__thiscall*)(CFieldWinSocket* ecx, LPSTR pPacket, int nLength, BYTE nSeq);
+using WinSocketOnRecvdPacketType = BOOL(__thiscall*)(CFieldWinSocket * ecx, LPSTR pPacket, int nLength, BYTE nSeq);
 
 // CAtumApplication::OnRecvFieldSocketMessage
-using CAtumApplicationOnRecvFieldSocketMessageType = int(__thiscall*)(CAtumapplication* ecx, DWORD wParam, UINT nSocketNotifyType);
+using CAtumApplicationOnRecvFieldSocketMessageType = int(__thiscall*)(CAtumapplication * ecx, DWORD wParam, UINT nSocketNotifyType);
 
 // CWinSocket::Write  
 using CWinSocketWriteType = int(__thiscall*)(CWinSocket * ecx, LPCSTR pPacket, int nLength);
-				
+
 // mouse move emulation
 using GetCursorPosType = BOOL(__stdcall*)(LPPOINT lpPoint);
 using SetCursorPosType = BOOL(__stdcall*)(int x, int y);
- 
 
+   
 using FeatureKeyValue	= std::pair<FeatureType, BuddyFeatureBase*>;
 using FeatureContainer	= std::vector<BuddyFeatureBase*>;
 

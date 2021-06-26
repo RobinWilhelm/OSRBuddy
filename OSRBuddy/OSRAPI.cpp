@@ -6,8 +6,21 @@
 #include "SDK/AtumApplication.h"
 #include "SDK/SceneData.h"
 
+#include "OSRBuddy.h"
+
 #include <d3dx9.h>
 #pragma comment(lib,"d3dx9.lib")
+
+
+using SendUseItemType = void(__thiscall*)(CINFInvenExtend * ecx, ITEM_BASE * item);
+using SendUseSkillType = void(__thiscall*)(CINFCharacterInfoExtend * ecx, ITEM_BASE * skill);
+using OnButtonClickType = void(__thiscall*)(CINFCityLab * ecx, int button);
+using InvenToSourceItemType = void(__thiscall*)(CINFCityLab * ecx, CItemInfo * pItemInfo, int nCount, bool useMacroSource);
+using GetServerRareItemInfoType = RARE_ITEM_INFO * (__thiscall*)(CAtumDatabase * ecx, int nCodeNum);
+using ChangeSkillState = void(__thiscall*)(CSkillInfo * ecx, int dwState, int nTempSkillItemNum);
+using CalcObjectSourceScreenCoordsType = void(__thiscall*)(CAtumApplication * ecx, D3DXVECTOR3 vObjPos, int iScreenWidth, int iScreenHeight, int& iCoordX, int& iCoordY, int& iCoordW);
+using DeleteSelectItemType = void(__thiscall*)(CINFInvenExtend * ecx, int count);
+
 
 OldSchoolRivalsAPI* OldSchoolRivalsAPI::instance  = nullptr;
 
@@ -34,12 +47,15 @@ bool OldSchoolRivalsAPI::CreateAndCheckConsistence()
 	// Create game API and return  
 	OldSchoolRivalsAPI::instance = new OldSchoolRivalsAPI();
 	OldSchoolRivalsAPI::instance->m_atumapplication					= atumapplication;
-	OldSchoolRivalsAPI::instance->m_SendUseItem						= reinterpret_cast<SendUseItemType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__SendUseItem).address);
-	OldSchoolRivalsAPI::instance->m_OnButtonClick					= reinterpret_cast<OnButtonClickType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__OnButtonClicked).address);
-	OldSchoolRivalsAPI::instance->m_InvenToSourceItem				= reinterpret_cast<InvenToSourceItemType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__InvenToSourceItem).address);
-	OldSchoolRivalsAPI::instance->m_GetServerRareItemInfo			= reinterpret_cast<GetServerRareItemInfoType>(PatternManager::Get(OffsetIdentifier::CAtumDatabase__GetServerRareItemInfo).address);
-	OldSchoolRivalsAPI::instance->m_SendUseSkill					= reinterpret_cast<SendUseSkillType>(PatternManager::Get(OffsetIdentifier::CINFCharacterInfoExtend__SendUseSkill).address);
-	OldSchoolRivalsAPI::instance->m_CalcObjectSourceScreenCoords	= reinterpret_cast<CalcObjectSourceScreenCoordsType>(PatternManager::Get(OffsetIdentifier::CAtumApplication__CalcObjectSourceScreenCoords).address);
+	//OldSchoolRivalsAPI::instance->m_SendUseItem						= reinterpret_cast<SendUseItemType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__SendUseItem).address);
+	//OldSchoolRivalsAPI::instance->m_OnButtonClick					= reinterpret_cast<OnButtonClickType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__OnButtonClicked).address);
+	//OldSchoolRivalsAPI::instance->m_InvenToSourceItem				= reinterpret_cast<InvenToSourceItemType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__InvenToSourceItem).address);
+	//OldSchoolRivalsAPI::instance->m_GetServerRareItemInfo			= reinterpret_cast<GetServerRareItemInfoType>(PatternManager::Get(OffsetIdentifier::CAtumDatabase__GetServerRareItemInfo).address);
+	//OldSchoolRivalsAPI::instance->m_SendUseSkill					= reinterpret_cast<SendUseSkillType>(PatternManager::Get(OffsetIdentifier::CINFCharacterInfoExtend__SendUseSkill).address);
+	//OldSchoolRivalsAPI::instance->m_CalcObjectSourceScreenCoords	= reinterpret_cast<CalcObjectSourceScreenCoordsType>(PatternManager::Get(OffsetIdentifier::CAtumApplication__CalcObjectSourceScreenCoords).address);
+	//OldSchoolRivalsAPI::instance->m_DeleteSelectItem				= reinterpret_cast<DeleteSelectItemType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__DeleteSelectItem).address);
+	//OldSchoolRivalsAPI::instance->m_WritePacket						= reinterpret_cast<DeleteSelectItemType>(PatternManager::Get(OffsetIdentifier::CWinSocket__Write).address);
+
 
 	return true;
 }
@@ -525,9 +541,14 @@ bool OldSchoolRivalsAPI::IsInBuilding()
 	return m_atumapplication->m_pInterface->m_pCityBase->m_nCurrentEnterBuildingIndex != -1;
 }
 
-int OldSchoolRivalsAPI::GetCurrentyBuildingKind()
+int OldSchoolRivalsAPI::GetCurrentBuildingKind()
 {
 	return m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC ? m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC->buildingInfo.BuildingKind : -1;
+}
+
+BUILDINGNPC OldSchoolRivalsAPI::GetCurrentBuilding()
+{
+	return m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC ? m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC->buildingInfo : BUILDINGNPC();
 }
 
 CINFBase* OldSchoolRivalsAPI::FindBuildingShop(int buildingkind)
@@ -549,22 +570,20 @@ CINFBase* OldSchoolRivalsAPI::FindBuildingShop(int buildingkind)
 
 void OldSchoolRivalsAPI::OnButtonClick(int button)
 {
+	static OnButtonClickType onButtonClickFn = reinterpret_cast<OnButtonClickType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__OnButtonClicked).address);
 	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
-	if (!citylab) {
-		return;
+	if (onButtonClickFn && citylab) {
+		onButtonClickFn(citylab, button);
 	}
-	
-	m_OnButtonClick(citylab, button);
 }
 
 void OldSchoolRivalsAPI::InvenToSourceItem(CItemInfo* pItemInfo, int nCount, bool useMacroSource = false)
 {
+	static InvenToSourceItemType invenToSourceItemFn = reinterpret_cast<InvenToSourceItemType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__InvenToSourceItem).address);
 	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
-	if (!citylab) {
-		return;
+	if (invenToSourceItemFn && citylab) {
+		invenToSourceItemFn(citylab, pItemInfo, nCount, useMacroSource);
 	}
-
-	m_InvenToSourceItem(citylab, pItemInfo, nCount, useMacroSource);
 }
 
 CItemInfo* OldSchoolRivalsAPI::FindItemFromTarget(UID64_t UniqueNumber)
@@ -616,17 +635,38 @@ INVEN_DISPLAY_INFO* OldSchoolRivalsAPI::GetSelectedItem()
 
 void OldSchoolRivalsAPI::SendUseItem(ITEM_GENERAL* item)
 {
+	static SendUseItemType sendUseItemFn = reinterpret_cast<SendUseItemType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__SendUseItem).address);
 	CINFInvenExtend* inven = m_atumapplication->m_pInterface->m_pGameMain->m_pInven;
-	if (inven) {
-		m_SendUseItem(inven, static_cast<ITEM_BASE*>(item));
+	if (sendUseItemFn && inven)
+	{
+		sendUseItemFn(inven, static_cast<ITEM_BASE*>(item));
 	}  	
+}
+
+void OldSchoolRivalsAPI::DeleteItem(ITEM_GENERAL* item, int count)
+{
+	static DeleteSelectItemType deleteSelectItemFn = reinterpret_cast<DeleteSelectItemType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__DeleteSelectItem).address);
+	CINFInvenExtend* inven = m_atumapplication->m_pInterface->m_pGameMain->m_pInven;
+	if (deleteSelectItemFn && inven && item && count > 0)
+	{
+		structDelItemInfo buffer = inven->m_struDeleteItem;
+		ZeroMemory(&inven->m_struDeleteItem, sizeof(structDelItemInfo));
+
+		inven->m_struDeleteItem.UniqueNumber = item->UniqueNumber;
+		inven->m_struDeleteItem.CurrentCount = item->CurrentCount;
+
+		deleteSelectItemFn(inven, count);
+
+		inven->m_struDeleteItem = buffer;
+	}
 }
 
 void OldSchoolRivalsAPI::SendUseSkill(ITEM_BASE* skill)
 {
+	static SendUseSkillType sendUseSkillFn = reinterpret_cast<SendUseSkillType>(PatternManager::Get(OffsetIdentifier::CINFCharacterInfoExtend__SendUseSkill).address);
 	CINFCharacterInfoExtend* charinfo = m_atumapplication->m_pInterface->m_pGameMain->m_pCharacterInfo;
-	if (charinfo) {
-		m_SendUseSkill(charinfo, static_cast<ITEM_BASE*>(skill));
+	if (sendUseSkillFn && charinfo) {
+		sendUseSkillFn(charinfo, static_cast<ITEM_BASE*>(skill));
 	}
 }
 
@@ -675,10 +715,11 @@ CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByUniqueNumber(UID64_t hyUniqu
 
 RARE_ITEM_INFO* OldSchoolRivalsAPI::GetServerRareItemInfo(int nCodeNum)
 {
+	static GetServerRareItemInfoType getServerRareItemInfoFn = reinterpret_cast<GetServerRareItemInfoType>(PatternManager::Get(OffsetIdentifier::CAtumDatabase__GetServerRareItemInfo).address);
 	CAtumDatabase* database = m_atumapplication->m_pDatabase;
 	RARE_ITEM_INFO* rif = nullptr;
-	if (database) {
-		rif = m_GetServerRareItemInfo(database, nCodeNum);
+	if (getServerRareItemInfoFn && database) {
+		rif = getServerRareItemInfoFn(database, nCodeNum);
 	}
 	return rif;
 }
@@ -727,8 +768,21 @@ MAP_INFO* OldSchoolRivalsAPI::GetMapInfo(unsigned short mapindex)
 
 void OldSchoolRivalsAPI::WorldToScreen(D3DXVECTOR3 world, int& screen_x, int& screen_y)
 {
+	static CalcObjectSourceScreenCoordsType calcObjectSourceScreenCoordsFn = reinterpret_cast<CalcObjectSourceScreenCoordsType>(PatternManager::Get(OffsetIdentifier::CAtumApplication__CalcObjectSourceScreenCoords).address);
 	int screen_w;
-	m_CalcObjectSourceScreenCoords(m_atumapplication, world, m_atumapplication->m_d3dsdBackBuffer.Width, m_atumapplication->m_d3dsdBackBuffer.Height, screen_x, screen_y, screen_w);
+	if (calcObjectSourceScreenCoordsFn && m_atumapplication) {
+		calcObjectSourceScreenCoordsFn(m_atumapplication, world, m_atumapplication->m_d3dsdBackBuffer.Width, m_atumapplication->m_d3dsdBackBuffer.Height, screen_x, screen_y, screen_w);
+	}
+}
+
+int OldSchoolRivalsAPI::WritePacket(byte* packet, int length)
+{
+	static CWinSocketWriteType writePacketFn = reinterpret_cast<CWinSocketWriteType>(PatternManager::Get(OffsetIdentifier::CWinSocket__Write).address);
+	CWinSocket* winsocket = GetFieldWinSocket();
+	if (writePacketFn && winsocket) {
+		return writePacketFn(winsocket, reinterpret_cast<LPCSTR>(packet), length);
+	}
+	return 0;
 }
 
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)

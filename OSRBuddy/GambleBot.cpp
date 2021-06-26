@@ -45,7 +45,7 @@ void GambleBot::Tick()
 	}
 
 	INVEN_DISPLAY_INFO* selected = nullptr;	
-	bool character_in_laboratory = (OSR_API->GetCurrentyBuildingKind() == BUILDINGKIND_LABORATORY);
+	bool character_in_laboratory = (OSR_API->GetCurrentBuildingKind() == BUILDINGKIND_LABORATORY);
 	if (GetGambleBotState() != GambleBotState::NOT_IN_LABORATORY && !character_in_laboratory) 
 	{
 		SetGambleBotState(GambleBotState::NOT_IN_LABORATORY);

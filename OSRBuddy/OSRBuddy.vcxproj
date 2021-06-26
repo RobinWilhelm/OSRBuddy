@@ -298,6 +298,7 @@
     <ClInclude Include="SDK\WeaponItemInfo.h" />
     <ClInclude Include="SDK\WinPacket.h" />
     <ClInclude Include="SDK\WinSocket.h" />
+    <ClInclude Include="SocketHeader.h" />
     <ClInclude Include="TestItemUse.h" />
     <ClInclude Include="Trampoline.h" />
     <ClInclude Include="Utility.h" />
@@ -309,7 +310,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="WinPacket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AntiAntiCheat.cpp" />

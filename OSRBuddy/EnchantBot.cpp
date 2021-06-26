@@ -41,7 +41,7 @@ void EnchantBot::Tick()
 		return;
 	}
 
-	bool character_in_laboratory = (OSR_API->GetCurrentyBuildingKind() == BUILDINGKIND_LABORATORY);
+	bool character_in_laboratory = (OSR_API->GetCurrentBuildingKind() == BUILDINGKIND_LABORATORY);
 	if (m_state != EnchantBotState::NOT_IN_LABORATORY && !character_in_laboratory) 
 	{
 		SetEnchantBotState(EnchantBotState::NOT_IN_LABORATORY);
