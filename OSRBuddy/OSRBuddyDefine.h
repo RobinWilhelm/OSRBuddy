@@ -17,8 +17,7 @@
 #define COST_ENCHANTCARD_ENERGYSHIELD (2000 * COST_WARPOINT) 
 
 const std::vector<uint32_t> g_Enchant_probabilities{ 10000, 10000, 10000, 10000, 10000, 9000, 8000, 6000, 4000, 2000, 1000, 500, 100 };
-
-    
+      
 
 enum class LabButtonCode : int
 {

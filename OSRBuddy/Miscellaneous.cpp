@@ -8,7 +8,7 @@
 #define CAPSULE_OPEN_REATTACK 200ms
 #define ITEM_DELETE_REATTACK 400ms
 #define WHIPSER_SNOOZE_TIME 2min
-#define ITEM_SELL_REATTACK 210ms
+#define ITEM_SELL_REATTACK 250ms
 
 Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {

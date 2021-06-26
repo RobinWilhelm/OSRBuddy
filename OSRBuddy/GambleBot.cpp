@@ -728,7 +728,8 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 
 	// prob reattack
 	switch ((m_suffix_selection.Any == 0) ? m_suffix_selection.ProbReattack : m_suffix_selection.Any)
-	{
+	{  
+	case FIXSELECTION_ONLY_GOOD:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_ProbReattack_SuffixList.begin(), GoodStandard_ProbReattack_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != GoodStandard_ProbReattack_SuffixList.end()) {
@@ -1168,38 +1169,31 @@ GambleAction GambleBot::DetermineNextAction()
 		}
 	}
 	
-	if (add_prefix && add_suffix) 
-	{			
+	if (add_prefix && add_suffix) {			
 		return GambleAction::ADD_PREFIX_AND_SUFFIX;
 	}
 
-	if (remove_prefix && remove_suffix)	
-	{		
+	if (remove_prefix && remove_suffix)	{		
 		return GambleAction::REMOVE_PREFIX_AND_SUFFIX;
 	}												  
 
-	if (add_prefix && !add_suffix) 
-	{	 		
+	if (add_prefix && !add_suffix) {	 		
 		return GambleAction::ADD_PREFIX;
 	}
 
-	if (remove_prefix && !remove_suffix) 
-	{		
+	if (remove_prefix && !remove_suffix) {		
 		return GambleAction::REMOVE_PREFIX;
 	}
 
-	if (!add_prefix && add_suffix) 
-	{  		
+	if (!add_prefix && add_suffix) {  		
 		return GambleAction::ADD_SUFFIX;
 	}
 
-	if (!remove_prefix && remove_suffix) 
-	{  		
+	if (!remove_prefix && remove_suffix) {  		
 		return GambleAction::REMOVE_SUFFIX;
 	}  
 	
-	if (!remove_prefix && !remove_suffix && !add_prefix && !add_suffix) 
-	{	  		
+	if (!remove_prefix && !remove_suffix && !add_prefix && !add_suffix) {	  		
 		return GambleAction::NONE;
 	}
 
