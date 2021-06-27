@@ -129,6 +129,11 @@ private:
 	bool					m_do_prefix_gamble_temp;
 	bool					m_do_suffix_gamble_temp;
 
+	bool					m_persist_prefix_whipe;
+	bool					m_persist_suffix_whipe;
+	bool					m_persist_prefix_card;
+	bool					m_persist_suffix_card;
+
 	GambleAction			m_next_gamble_action;
 	std::queue<GambleItem>	m_needed_source_items;
 	bool					m_waiting_for_answer;
