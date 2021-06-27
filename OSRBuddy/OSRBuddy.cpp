@@ -198,19 +198,13 @@ bool OSRBuddyMain::Start()
         RegisterFeature(new GrindBot(this));          
         RegisterFeature(new GambleBot(this));
         RegisterFeature(new EnchantBot(this));
-        RegisterFeature(new Miscellaneous(this));          
-
-#ifndef RELEASE_SETHIA
-        RegisterFeature(new TestItemUse(this));
-#endif // !RELEASE_SETHIA          
+        RegisterFeature(new Miscellaneous(this));    
+        //RegisterFeature(new TestItemUse(this));
 
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
             throw exception("D3D9 Hooks failed to initialise");
         }
-
-       
-
-
+         
         if (!InitTickHook()) {
             throw exception("TickHook failed to initialise");
         } 
@@ -218,8 +212,7 @@ bool OSRBuddyMain::Start()
         // not used
         //if (!InitOnRecvdPacketHook()) {
         //    throw exception("OnRevdPacketHook failed to initialise");
-        //}
-        
+        //}            
         
         if (!InitOnReadPacketHook()) {
             throw exception("ReadPacketHook failed to initialise");
@@ -227,8 +220,7 @@ bool OSRBuddyMain::Start()
 
         if(!InitOnWriteHook()) {
             throw exception("WritePacketHook failed to initialise");
-        }
-        
+        }            
 
         if (!InitOnGetCursorPosHook() || !InitOnSetCursorPosHook()) {
             throw exception("Mouseemulation failed to initialise");

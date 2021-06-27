@@ -9,20 +9,20 @@
 #include <algorithm> // std::find
 
 // pierce
-std::vector<AdvancedPrefix> GoodAdvanced_Pierce_PrefixList = { AdvancedPrefix::Archrival, AdvancedPrefix::Bandit, AdvancedPrefix::Adversary, AdvancedPrefix::Bane, AdvancedPrefix::Challenger, AdvancedPrefix::Traitor, AdvancedPrefix::Stronghold };
-std::vector<AdvancedPrefix> BestAdvanced_Pierce_PrefixList = { AdvancedPrefix::Bandit, AdvancedPrefix::Traitor};
-std::vector<StandardPrefix> GoodStandard_Pierce_PrefixList = { StandardPrefix::Archrival, StandardPrefix::Bandit, StandardPrefix::Adversary, StandardPrefix::Bane, StandardPrefix::Challenger_1, StandardPrefix::Challenger_2, StandardPrefix::Traitor, StandardPrefix::Stronghold };
+std::vector<AdvancedPrefix> GoodAdvanced_Pierce_PrefixList = { AdvancedPrefix::Bandit, AdvancedPrefix::Traitor, AdvancedPrefix::Archrival, AdvancedPrefix::Adversary, AdvancedPrefix::Bane, AdvancedPrefix::Challenger, AdvancedPrefix::Stronghold };
+std::vector<AdvancedPrefix> BestAdvanced_Pierce_PrefixList = { AdvancedPrefix::Bandit, AdvancedPrefix::Traitor };
+std::vector<StandardPrefix> GoodStandard_Pierce_PrefixList = { StandardPrefix::Bandit, StandardPrefix::Traitor, StandardPrefix::Archrival, StandardPrefix::Adversary, StandardPrefix::Bane, StandardPrefix::Challenger_1, StandardPrefix::Challenger_2, StandardPrefix::Stronghold };
 std::vector<StandardPrefix> BestStandard_Pierce_PrefixList = { StandardPrefix::Bandit, StandardPrefix::Traitor };
 
 // reattack prob
-std::vector<AdvancedPrefix> GoodAdvanced_ProbReattack_PrefixList = { AdvancedPrefix::Meteo, AdvancedPrefix::Silence, AdvancedPrefix::Bio, AdvancedPrefix::Attack, AdvancedPrefix::Legend };
+std::vector<AdvancedPrefix> GoodAdvanced_ProbReattack_PrefixList = { AdvancedPrefix::Legend, AdvancedPrefix::Bio, AdvancedPrefix::Meteo, AdvancedPrefix::Silence, AdvancedPrefix::Attack };
 std::vector<AdvancedPrefix> BestAdvanced_ProbReattack_PrefixList = { AdvancedPrefix::Legend, AdvancedPrefix::Bio };
-std::vector<StandardPrefix> GoodStandard_ProbReattack_PrefixList = { StandardPrefix::Meteo, StandardPrefix::Silence, StandardPrefix::Bio, StandardPrefix::Attack, StandardPrefix::Legend };
+std::vector<StandardPrefix> GoodStandard_ProbReattack_PrefixList = { StandardPrefix::Legend, StandardPrefix::Bio, StandardPrefix::Meteo, StandardPrefix::Silence, StandardPrefix::Attack };
 std::vector<StandardPrefix> BestStandard_ProbReattack_PrefixList = { StandardPrefix::Legend, StandardPrefix::Bio };
 
-std::vector<AdvancedSuffix> GoodAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Meteo, AdvancedSuffix::Silence, AdvancedSuffix::Bio, AdvancedSuffix::Attack, AdvancedSuffix::Legend };
+std::vector<AdvancedSuffix> GoodAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Legend, AdvancedSuffix::Bio, AdvancedSuffix::Meteo, AdvancedSuffix::Silence, AdvancedSuffix::Attack };
 std::vector<AdvancedSuffix> BestAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Legend, AdvancedSuffix::Bio };
-std::vector<StandardSuffix> GoodStandard_ProbReattack_SuffixList = { StandardSuffix::Meteo, StandardSuffix::Silence, StandardSuffix::Bio, StandardSuffix::Attack, StandardSuffix::Legend };
+std::vector<StandardSuffix> GoodStandard_ProbReattack_SuffixList = { StandardSuffix::Legend, StandardSuffix::Bio, StandardSuffix::Meteo, StandardSuffix::Silence, StandardSuffix::Attack };
 std::vector<StandardSuffix> BestStandard_ProbReattack_SuffixList = { StandardSuffix::Legend, StandardSuffix::Bio };
 
 // minmax prob
@@ -37,18 +37,15 @@ std::vector<StandardSuffix> GoodStandard_ProbDamage_SuffixList = { StandardSuffi
 std::vector<StandardSuffix> BestStandard_ProbDamage_SuffixList = { StandardSuffix::Navas, StandardSuffix::Agareth, StandardSuffix::Asmodi, StandardSuffix::Kobal, StandardSuffix::Warrior, };
 
 // reattack minmax
-std::vector<AdvancedPrefix> GoodAdvanced_ReattackDamage_PrefixList = { AdvancedPrefix::Squire, AdvancedPrefix::Max, AdvancedPrefix::Rukieper, AdvancedPrefix::Major };
-std::vector<AdvancedPrefix> BestAdvanced_ReattackDamage_PrefixList = { AdvancedPrefix::Squire, AdvancedPrefix::Max };
-std::vector<StandardPrefix> GoodStandard_ReattackDamage_PrefixList = { StandardPrefix::Squire, StandardPrefix::Max, StandardPrefix::Rukieper, StandardPrefix::Major };
-std::vector<StandardPrefix> BestStandard_ReattackDamage_PrefixList = { StandardPrefix::Squire, StandardPrefix::Max };
+std::vector<AdvancedPrefix> GoodAdvanced_ReattackDamage_PrefixList = { AdvancedPrefix::Max, AdvancedPrefix::Squire, AdvancedPrefix::Rukieper, AdvancedPrefix::Major };
+std::vector<AdvancedPrefix> BestAdvanced_ReattackDamage_PrefixList = { AdvancedPrefix::Max, AdvancedPrefix::Squire };
+std::vector<StandardPrefix> GoodStandard_ReattackDamage_PrefixList = { StandardPrefix::Max, StandardPrefix::Squire, StandardPrefix::Rukieper, StandardPrefix::Major };
+std::vector<StandardPrefix> BestStandard_ReattackDamage_PrefixList = { StandardPrefix::Max, StandardPrefix::Squire };
 
-std::vector<AdvancedSuffix> GoodAdvanced_ReattackDamage_SuffixList = { AdvancedSuffix::Squire, AdvancedSuffix::Max, AdvancedSuffix::Rukieper, AdvancedSuffix::Major };
-std::vector<AdvancedSuffix> BestAdvanced_ReattackDamage_SuffixList = { AdvancedSuffix::Squire, AdvancedSuffix::Max };
-std::vector<StandardSuffix> GoodStandard_ReattackDamage_SuffixList = { StandardSuffix::Squire, StandardSuffix::Max, StandardSuffix::Rukieper, StandardSuffix::Major };
-std::vector<StandardSuffix> BestStandard_ReattackDamage_SuffixList = { StandardSuffix::Squire, StandardSuffix::Max };
-
-#define FIXSELECTION_ONLY_GOOD 1
-#define FIXSELECTION_ONLY_BEST 2
+std::vector<AdvancedSuffix> GoodAdvanced_ReattackDamage_SuffixList = { AdvancedSuffix::Max, AdvancedSuffix::Squire, AdvancedSuffix::Rukieper, AdvancedSuffix::Major };
+std::vector<AdvancedSuffix> BestAdvanced_ReattackDamage_SuffixList = { AdvancedSuffix::Max, AdvancedSuffix::Squire };
+std::vector<StandardSuffix> GoodStandard_ReattackDamage_SuffixList = { StandardSuffix::Max, StandardSuffix::Squire, StandardSuffix::Rukieper, StandardSuffix::Major };
+std::vector<StandardSuffix> BestStandard_ReattackDamage_SuffixList = { StandardSuffix::Max, StandardSuffix::Squire };
 
 
 GambleBot::GambleBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
@@ -541,9 +538,9 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 	bool is_standard = IS_PRIMARY_WEAPON(weapon->m_pItemInfo->Kind);
 	
 	// prob minmax
-	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.ProbDamage : m_prefix_selection.Any) 
+	switch ((m_prefix_selection.Any == FixCategory::None) ? m_prefix_selection.ProbDamage : m_prefix_selection.Any) 
 	{
-	case FIXSELECTION_ONLY_GOOD:
+	case FixCategory::Good:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_ProbDamage_PrefixList.begin(), GoodStandard_ProbDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_ProbDamage_PrefixList.end()) {
@@ -557,7 +554,7 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 			}
 		}
 		break;
-	case FIXSELECTION_ONLY_BEST:
+	case FixCategory::Best:
 		if (is_standard)
 		{
 			if (std::find(BestStandard_ProbDamage_PrefixList.begin(), BestStandard_ProbDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_ProbDamage_PrefixList.end()) {
@@ -574,9 +571,9 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 	}
 
 	// pierce
-	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.Pierce : m_prefix_selection.Any)
+	switch ((m_prefix_selection.Any == FixCategory::None) ? m_prefix_selection.Pierce : m_prefix_selection.Any)
 	{
-	case FIXSELECTION_ONLY_GOOD:
+	case FixCategory::Good:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_Pierce_PrefixList.begin(), GoodStandard_Pierce_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_Pierce_PrefixList.end()) {
@@ -590,7 +587,7 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 			}
 		}
 		break;		
-	case FIXSELECTION_ONLY_BEST:
+	case FixCategory::Best:
 		if (is_standard)
 		{
 			if (std::find(BestStandard_Pierce_PrefixList.begin(), BestStandard_Pierce_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_Pierce_PrefixList.end()) {
@@ -607,9 +604,9 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 	}
 
 	// prob reattack
-	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.ProbReattack : m_prefix_selection.Any)
+	switch ((m_prefix_selection.Any == FixCategory::None) ? m_prefix_selection.ProbReattack : m_prefix_selection.Any)
 	{
-	case FIXSELECTION_ONLY_GOOD:
+	case FixCategory::Good:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_ProbReattack_PrefixList.begin(), GoodStandard_ProbReattack_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_ProbReattack_PrefixList.end()) {
@@ -623,7 +620,7 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 			}
 		}
 		break;
-	case FIXSELECTION_ONLY_BEST:
+	case FixCategory::Best:
 		if (is_standard)
 		{
 			if (std::find(BestStandard_ProbReattack_PrefixList.begin(), BestStandard_ProbReattack_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_ProbReattack_PrefixList.end()) {
@@ -640,9 +637,9 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 	}
 
 	// reattack minmax
-	switch ((m_prefix_selection.Any == 0) ? m_prefix_selection.ReattackDamage : m_prefix_selection.Any)
+	switch ((m_prefix_selection.Any == FixCategory::None) ? m_prefix_selection.ReattackDamage : m_prefix_selection.Any)
 	{
-	case FIXSELECTION_ONLY_GOOD:
+	case FixCategory::Good:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_ReattackDamage_PrefixList.begin(), GoodStandard_ReattackDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != GoodStandard_ReattackDamage_PrefixList.end()) {
@@ -656,7 +653,7 @@ bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 			}
 		}
 		break;
-	case FIXSELECTION_ONLY_BEST:
+	case FixCategory::Best:
 		if (is_standard)
 		{
 			if (std::find(BestStandard_ReattackDamage_PrefixList.begin(), BestStandard_ReattackDamage_PrefixList.end(), static_cast<StandardPrefix>(prefixcode)) != BestStandard_ReattackDamage_PrefixList.end()) {
@@ -694,9 +691,9 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 	bool is_standard = IS_PRIMARY_WEAPON(weapon->m_pItemInfo->Kind);
 
 	// prob minmax
-	switch ((m_suffix_selection.Any == 0) ? m_suffix_selection.ProbDamage : m_suffix_selection.Any)
+	switch ((m_suffix_selection.Any == FixCategory::None) ? m_suffix_selection.ProbDamage : m_suffix_selection.Any)
 	{
-	case FIXSELECTION_ONLY_GOOD:
+	case FixCategory::Good:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_ProbDamage_SuffixList.begin(), GoodStandard_ProbDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != GoodStandard_ProbDamage_SuffixList.end()) {
@@ -710,7 +707,7 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 			}
 		}
 		break;
-	case FIXSELECTION_ONLY_BEST:
+	case FixCategory::Best:
 		if (is_standard)
 		{
 			if (std::find(BestStandard_ProbDamage_SuffixList.begin(), BestStandard_ProbDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != BestStandard_ProbDamage_SuffixList.end()) {
@@ -727,9 +724,9 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 	}
 
 	// prob reattack
-	switch ((m_suffix_selection.Any == 0) ? m_suffix_selection.ProbReattack : m_suffix_selection.Any)
+	switch ((m_suffix_selection.Any == FixCategory::None) ? m_suffix_selection.ProbReattack : m_suffix_selection.Any)
 	{  
-	case FIXSELECTION_ONLY_GOOD:
+	case FixCategory::Good:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_ProbReattack_SuffixList.begin(), GoodStandard_ProbReattack_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != GoodStandard_ProbReattack_SuffixList.end()) {
@@ -743,7 +740,7 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 			}
 		}
 		break;
-	case FIXSELECTION_ONLY_BEST:
+	case FixCategory::Best:
 		if (is_standard)
 		{
 			if (std::find(BestStandard_ProbReattack_SuffixList.begin(), BestStandard_ProbReattack_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != BestStandard_ProbReattack_SuffixList.end()) {
@@ -760,9 +757,9 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 	}
 
 	// reattack minmax
-	switch ((m_suffix_selection.Any == 0) ? m_suffix_selection.ReattackDamage : m_suffix_selection.Any)
+	switch ((m_suffix_selection.Any == FixCategory::None) ? m_suffix_selection.ReattackDamage : m_suffix_selection.Any)
 	{
-	case FIXSELECTION_ONLY_GOOD:
+	case FixCategory::Good:
 		if (is_standard)
 		{
 			if (std::find(GoodStandard_ReattackDamage_SuffixList.begin(), GoodStandard_ReattackDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != GoodStandard_ReattackDamage_SuffixList.end()) {
@@ -776,7 +773,7 @@ bool GambleBot::CheckRareSuffix(CItemInfo* weapon)
 			}
 		}
 		break;
-	case FIXSELECTION_ONLY_BEST:
+	case FixCategory::Best:
 		if (is_standard)
 		{
 			if (std::find(BestStandard_ReattackDamage_SuffixList.begin(), BestStandard_ReattackDamage_SuffixList.end(), static_cast<StandardSuffix>(suffixcode)) != BestStandard_ReattackDamage_SuffixList.end()) {

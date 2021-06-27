@@ -174,7 +174,7 @@ void EnchantBot::RenderImGui()
 
 				ImGui::NewLine();
 				ImGui::NewLine();
-				ImGui::PushItemWidth(130);
+				ImGui::PushItemWidth(135);
 				ImGui::EnchantList("##current_enchants", &current_idx, m_currentEnchants, 13);
 				ImGui::PopItemWidth();
 			}
@@ -402,9 +402,21 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 			switch (enchant.m_nDesParam)
 			{
 			case static_cast<BYTE>(Desparam::Shield) :
+				if (enchant.m_fDesValue == 100.0f)
+				{
+					// energyshield card
+					break;
+				}
 				AddEnchantToList(EnchantItemType::Shield, m_currentEnchants);
 				break;
 			case static_cast<BYTE>(Desparam::Energy) :
+				if (enchant.m_fDesValue == 100.0f)
+				{
+					// energyshield card
+					AddEnchantToList(EnchantItemType::EnergyShield, m_currentEnchants);
+					break;
+				}
+
 				AddEnchantToList(EnchantItemType::Energy, m_currentEnchants);
 				break;
 			default:
@@ -593,7 +605,7 @@ void EnchantBot::RenderColoredEnchantItemAmount(int amount)
 
 void EnchantBot::RenderStatisticsPopup()
 {
-	ImGui::SetNextWindowSize(ImVec2(600.0f, 320.0f));
+	ImGui::SetNextWindowSize(ImVec2(600.0f, 350.0f));
 	if (ImGui::BeginPopup("StatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
 	{ 	
 		ImGui::BeginColumns("StatisticsColums", 2, ImGuiColumnsFlags_NoResize);
@@ -645,6 +657,7 @@ void EnchantBot::RenderStatisticsPopup()
 						ImGui::Text(std::to_string(m_statisticsSession.m_used_chancecards_8).c_str());
 						ImGui::Text(std::to_string(m_statisticsSession.m_used_enchantcards).c_str());
 						ImGui::Text(std::to_string(m_statisticsSession.m_used_speedcards).c_str());
+						ImGui::Text(std::to_string(m_statisticsSession.m_used_energyshieldcard).c_str());
 					}
 					ImGui::NextColumn();
 					{
@@ -653,6 +666,7 @@ void EnchantBot::RenderStatisticsPopup()
 						ImGui::Text(m_cost_chancecards_8_string.c_str());
 						ImGui::Text(m_cost_enchantcards_string.c_str());
 						ImGui::Text(m_cost_speedcards_string.c_str());
+						ImGui::Text(m_cost_energyshieldcards_string.c_str());
 					}
 					ImGui::EndColumns();
 					ImGui::NewLine();
@@ -717,6 +731,7 @@ void EnchantBot::RenderStatisticsPopup()
 						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_chancecards_8).c_str());
 						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchantcards).c_str());
 						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_speedcards).c_str());
+						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_energyshieldcard).c_str());
 					}
 					ImGui::NextColumn();
 					{
@@ -725,6 +740,7 @@ void EnchantBot::RenderStatisticsPopup()
 						ImGui::Text(m_cost_chancecards_8_string_W.c_str());
 						ImGui::Text(m_cost_enchantcards_string_W.c_str());
 						ImGui::Text(m_cost_speedcards_string_W.c_str());
+						ImGui::Text(m_cost_energyshieldcards_string_W.c_str());
 					}
 					ImGui::EndColumns();
 					ImGui::NewLine();
@@ -822,6 +838,7 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 	}
 		   
 	CItemInfo* enchantitem = nullptr;
+	GearType geartype = OSR_API->UnitKindToGearType(m_enchant_item.GetItemInfo()->m_pItemInfo->ReqUnitKind);
 
 	// move items to source, step by step
 	switch (action)
@@ -840,7 +857,11 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		if (m_wantedEnchants.at(m_enchant_item.GetItemInfo()->m_nEnchantNumber).first == EnchantItemType::Speed) {
 			m_using_speedcard = true;
 		}
-		enchantitem = GetEnchantItemFromInventory(m_wantedEnchants.at(m_enchant_item.GetItemInfo()->m_nEnchantNumber).first, m_enchantTargetKind, OSR_API->GetPlayerGearType());
+		if (m_wantedEnchants.at(m_enchant_item.GetItemInfo()->m_nEnchantNumber).first == EnchantItemType::EnergyShield) {
+			m_using_energyshieldcard = true;
+		}
+
+		enchantitem = GetEnchantItemFromInventory(m_wantedEnchants.at(m_enchant_item.GetItemInfo()->m_nEnchantNumber).first, m_enchantTargetKind, geartype);
 		break;
 	case EnchantAction::Add_ProtectCard:
 		if (m_enchant_item.GetItemInfo()->m_nEnchantNumber < 5) { // no need to add an enchant protect card
@@ -851,27 +872,27 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		{
 			if (m_enchant_item.GetItemInfo()->m_nEnchantNumber == 5 || m_enchant_item.GetItemInfo()->m_nEnchantNumber == 6)
 			{
-				enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantProtectE1, m_enchantTargetKind, OSR_API->GetPlayerGearType());
+				enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantProtectE1, m_enchantTargetKind, geartype);
 				if (enchantitem) {
 					m_using_enchprot_e1 = true;
 				}
 			}
 			else
 			{
-				enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantProtectE5, m_enchantTargetKind, OSR_API->GetPlayerGearType());
+				enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantProtectE5, m_enchantTargetKind, geartype);
 				m_using_enchprot_e5 = true;
 			}
 		}
 		else
 		{
-			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantProtectE5, m_enchantTargetKind, OSR_API->GetPlayerGearType());
+			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantProtectE5, m_enchantTargetKind, geartype);
 			m_using_enchprot_e5 = true;
 		}
 		break;
 	case EnchantAction::Add_PercentageCard: // next and optional item is an enchant chance card
 		if (m_enchant_item.GetItemInfo()->m_nEnchantNumber == 10)
 		{
-			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantChance8P, m_enchantTargetKind, OSR_API->GetPlayerGearType());
+			enchantitem = GetEnchantItemFromInventory(EnchantItemType::EnchantChance8P, m_enchantTargetKind, geartype);
 			m_using_chancecard_8 = true;
 		}
 		else {
@@ -883,26 +904,36 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 		OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
 		m_waiting_for_answer = true;
 
-		if (m_using_chancecard_8) {
+		if (m_using_chancecard_8) 
+		{
 			m_statisticsSession.m_used_chancecards_8++;
 			m_statisticsWeapon.m_used_chancecards_8++;
 		}
 
-		if (m_using_enchprot_e1) {
+		if (m_using_enchprot_e1) 
+		{
 			m_statisticsSession.m_used_enchprots_e1++;
 			m_statisticsWeapon.m_used_enchprots_e1++;
 		}
 
-		if (m_using_enchprot_e5){
+		if (m_using_enchprot_e5)
+		{
 			m_statisticsSession.m_used_enchprots_e5++;
 			m_statisticsWeapon.m_used_enchprots_e5++;
 		}
 
-		if (m_using_speedcard) {
+		if (m_using_speedcard) 
+		{
 			m_statisticsSession.m_used_speedcards++;
 			m_statisticsWeapon.m_used_speedcards++;
 		}
-		else {
+		else if (m_using_energyshieldcard)
+		{
+			m_statisticsSession.m_used_energyshieldcard++;
+			m_statisticsWeapon.m_used_energyshieldcard++;
+		} 		
+		else
+		{
 			m_statisticsSession.m_used_enchantcards++;
 			m_statisticsWeapon.m_used_enchantcards++;
 		}
@@ -1075,39 +1106,47 @@ void EnchantBot::UpdateEnchantItemAmount()
 
 void EnchantBot::UpdateTotalCost()
 {
-	m_statisticsSession.m_cost_enchprots_e1	= m_statisticsSession.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
-	m_statisticsSession.m_cost_enchprots_e5	= m_statisticsSession.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
+	m_statisticsSession.m_cost_enchprots_e1		= m_statisticsSession.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
+	m_statisticsSession.m_cost_enchprots_e5		= m_statisticsSession.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
 	m_statisticsSession.m_cost_chancecards_8	= m_statisticsSession.m_used_chancecards_8 * COST_ENCHANT_CHANCE_8;
-	m_statisticsSession.m_cost_enchantcards	= m_statisticsSession.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
+	m_statisticsSession.m_cost_enchantcards		= m_statisticsSession.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
 	m_statisticsSession.m_cost_speedcards		= m_statisticsSession.m_used_speedcards * COST_ENCHANTCARD_SPEED;
+	m_statisticsSession.m_cost_energyshieldcard = m_statisticsSession.m_used_energyshieldcard * COST_ENCHANTCARD_ENERGYSHIELD;
 
-	m_statisticsSession.m_cost_total = m_statisticsSession.m_cost_enchprots_e1 + m_statisticsSession.m_cost_enchprots_e5 +
-		m_statisticsSession.m_cost_chancecards_8 + m_statisticsSession.m_cost_enchantcards + m_statisticsSession.m_cost_speedcards +
-		(m_statisticsSession.m_used_speedcards + m_statisticsSession.m_used_enchantcards) * COST_ENCHANT_SINGLE;
+	m_statisticsSession.m_cost_total = 
+		m_statisticsSession.m_cost_enchprots_e1 + m_statisticsSession.m_cost_enchprots_e5 +
+		m_statisticsSession.m_cost_chancecards_8 + m_statisticsSession.m_cost_enchantcards + 
+		m_statisticsSession.m_cost_speedcards + m_statisticsSession.m_cost_energyshieldcard +
+		(m_statisticsSession.m_used_speedcards + m_statisticsSession.m_used_enchantcards + m_statisticsSession.m_used_energyshieldcard) * COST_ENCHANT_SINGLE;
 																													   
-	m_cost_enchprots_e1_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
-	m_cost_enchprots_e5_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_8_string = Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
-	m_cost_enchantcards_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchantcards / 1000000.0f, 1) + "kk";
-	m_cost_speedcards_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_speedcards / 1000000.0f, 1) + "kk";
-	m_cost_total_string			= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_total / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e1_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e5_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
+	m_cost_chancecards_8_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
+	m_cost_enchantcards_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_speedcards_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_speedcards / 1000000.0f, 1) + "kk";
+	m_cost_energyshieldcards_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_energyshieldcard / 1000000.0f, 1) + "kk";
+	m_cost_total_string				= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_total / 1000000.0f, 1) + "kk";
 
-	m_statisticsWeapon.m_cost_enchprots_e1 = m_statisticsWeapon.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
-	m_statisticsWeapon.m_cost_enchprots_e5 = m_statisticsWeapon.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
-	m_statisticsWeapon.m_cost_chancecards_8 = m_statisticsWeapon.m_used_chancecards_8 * COST_ENCHANT_CHANCE_8;
-	m_statisticsWeapon.m_cost_enchantcards = m_statisticsWeapon.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
-	m_statisticsWeapon.m_cost_speedcards = m_statisticsWeapon.m_used_speedcards * COST_ENCHANTCARD_SPEED;
+	m_statisticsWeapon.m_cost_enchprots_e1		= m_statisticsWeapon.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
+	m_statisticsWeapon.m_cost_enchprots_e5		= m_statisticsWeapon.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
+	m_statisticsWeapon.m_cost_chancecards_8		= m_statisticsWeapon.m_used_chancecards_8 * COST_ENCHANT_CHANCE_8;
+	m_statisticsWeapon.m_cost_enchantcards		= m_statisticsWeapon.m_used_enchantcards * COST_ENCHANTCARD_COMMON;
+	m_statisticsWeapon.m_cost_speedcards		= m_statisticsWeapon.m_used_speedcards * COST_ENCHANTCARD_SPEED;
+	m_statisticsWeapon.m_cost_energyshieldcard	= m_statisticsWeapon.m_used_energyshieldcard * COST_ENCHANTCARD_ENERGYSHIELD;
 
-	m_statisticsWeapon.m_cost_total = m_statisticsWeapon.m_cost_enchprots_e1 + m_statisticsWeapon.m_cost_enchprots_e5 +
-		m_statisticsWeapon.m_cost_chancecards_8 + m_statisticsWeapon.m_cost_enchantcards + m_statisticsWeapon.m_cost_speedcards +
-		(m_statisticsWeapon.m_used_speedcards + m_statisticsWeapon.m_used_enchantcards) * COST_ENCHANT_SINGLE;
+	m_statisticsWeapon.m_cost_total = 
+		m_statisticsWeapon.m_cost_enchprots_e1 + m_statisticsWeapon.m_cost_enchprots_e5 +
+		m_statisticsWeapon.m_cost_chancecards_8 + m_statisticsWeapon.m_cost_enchantcards + 
+		m_statisticsWeapon.m_cost_speedcards + m_statisticsWeapon.m_cost_energyshieldcard +
+		(m_statisticsWeapon.m_used_speedcards + m_statisticsWeapon.m_used_enchantcards + m_statisticsWeapon.m_used_energyshieldcard) * COST_ENCHANT_SINGLE;
 
-	m_cost_enchprots_e1_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
-	m_cost_enchprots_e5_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_8_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
-	m_cost_enchantcards_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
-	m_cost_speedcards_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_speedcards / 1000000.0f, 1) + "kk";
-	m_cost_total_string_W = Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_total / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e1_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
+	m_cost_enchprots_e5_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
+	m_cost_chancecards_8_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
+	m_cost_enchantcards_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_speedcards_string_W			= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_speedcards / 1000000.0f, 1) + "kk";
+	m_cost_energyshieldcards_string_W	= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_energyshieldcard / 1000000.0f, 1) + "kk";
+	m_cost_total_string_W				= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_total / 1000000.0f, 1) + "kk";
 }
 
 bool EnchantBot::TrySimulateButtonClick(LabButtonCode button)

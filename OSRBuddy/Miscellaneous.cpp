@@ -35,7 +35,8 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_awaiting_delete_ok = false;
 	m_in_sell_building = false;
 	m_sold_item = 0;
-	m_deleted_item = 0;
+	m_deleted_item = 0;	
+	m_open_capsules = true;
 }
 
 Miscellaneous::~Miscellaneous()
@@ -72,32 +73,6 @@ void Miscellaneous::RenderImGui()
 	ImGui::NewLine();
 	ImGui::BeginColumns("MiscColumns", 2, ImGuiColumnsFlags_NoResize);
 	{
-		ImGui::BeginChild("MiscColumn1", ImVec2(), false);
-		{
-			ImGui::Separator();
-			ImGui::Text("Whisperwarner");
-			ImGui::Separator();
-			ImGui::Checkbox("Active", &m_whisperwarner_active);
-			if (ImGui::IsItemHovered()) {
-				ImGui::SetTooltip("Will notify the user whenever there is a new / unread whisper message.");
-			}
-			ImGui::Checkbox("Snooze enabled", &m_whisperwarner_snooze_enabled);
-			ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);  	
-
-			ImGui::Separator();
-			ImGui::NewLine();
-			ImGui::Text("Other");
-			ImGui::Separator();
-			ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear);
-			{
-				ImGui::Checkbox("Autoflip", &m_autoflip);
-			}
-			ImGui::EndDisabledMode();
-		}
-		ImGui::EndChild();
-	}
-	ImGui::NextColumn();
-	{
 		ImGui::BeginChild("MiscColumn2", ImVec2(), false);
 		{
 			ImGui::Separator();
@@ -123,7 +98,10 @@ void Miscellaneous::RenderImGui()
 			}
 
 			ImGui::NewLine();
-			ImGui::BeginColumns("InventoryCleaningColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+			ImGui::Text("Automatic Capsule Opening");
+			ImGui::Separator();
+			ImGui::Checkbox("Enable###enableCapsuleOpening", &m_delete_items);
+			ImGui::BeginColumns("AutomaticCapsuleOpeningColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
 			{
 				ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
 				ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
@@ -139,26 +117,34 @@ void Miscellaneous::RenderImGui()
 			ImGui::NewLine();
 			ImGui::Text("Item Deletion");
 			ImGui::Separator();
-			ImGui::Checkbox("Active###deleteItemsActivation", &m_delete_items);
+			ImGui::Checkbox("Enable###enableItemsDeletion", &m_delete_items);
 			ImGui::SliderInt("Max Level", &m_delete_items_maxlevel, 1, 100);
-			ImGui::Checkbox("Weapons", &m_delete_weapons);
-			ImGui::Checkbox("Radars", &m_delete_radars);
-			ImGui::Checkbox("Engines", &m_delete_engines);
-			ImGui::Checkbox("CPUs", &m_delete_cpus);
-			ImGui::Checkbox("Marks", &m_delete_marks); 
-
+			ImGui::BeginColumns("ItemsDeletionColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+			{
+				ImGui::Checkbox("Weapons", &m_delete_weapons);
+				ImGui::Checkbox("Radars", &m_delete_radars);
+				ImGui::Checkbox("Engines", &m_delete_engines);
+			}
+			ImGui::NextColumn();
+			{
+				ImGui::Checkbox("CPUs", &m_delete_cpus);
+				ImGui::Checkbox("Marks", &m_delete_marks);
+			}
+			ImGui::EndColumns();
 			ImGui::NewLine();
+			ImGui::Text("Automatic Selling");
+			ImGui::Separator();
 			ImGui::BeginDisabledMode(!m_in_sell_building);
 			{
-				if (!m_selling_items) 
+				if (!m_selling_items)
 				{
-					if (ImGui::Button("Start selling")) {
+					if (ImGui::Button("Start")) {
 						m_selling_items = true;
 					}
 				}
 				else
 				{
-					if (ImGui::Button("Stop selling")) {
+					if (ImGui::Button("Stop")) {
 						m_selling_items = false;
 					}
 				}
@@ -169,6 +155,33 @@ void Miscellaneous::RenderImGui()
 			}
 		}
 		ImGui::EndChild();
+	}
+	ImGui::NextColumn();
+	{
+		ImGui::BeginChild("MiscColumn1", ImVec2(), false);
+		{
+			ImGui::Separator();
+			ImGui::Text("Whisperwarner");
+			ImGui::Separator();
+			ImGui::Checkbox("Active", &m_whisperwarner_active);
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Will notify the user whenever there is a new / unread whisper message.");
+			}
+			ImGui::Checkbox("Snooze enabled", &m_whisperwarner_snooze_enabled);
+			ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);
+
+
+			ImGui::NewLine();
+			ImGui::Separator();
+			ImGui::Text("Other");
+			ImGui::Separator();
+			ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear);
+			{
+				ImGui::Checkbox("Autoflip", &m_autoflip);
+			}
+			ImGui::EndDisabledMode();
+		}
+		ImGui::EndChild();	
 	}
 	ImGui::EndColumns();
 }
@@ -427,7 +440,7 @@ void Miscellaneous::TickInventoryCleaning()
 				return;
 			}
 
-			if (OSR_API->IsInventoryFull()) {
+			if (!m_open_capsules || OSR_API->IsInventoryFull()) {
 				return;
 			}
 			

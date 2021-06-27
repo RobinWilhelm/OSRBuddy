@@ -52,14 +52,21 @@ enum class GambleAction
 	REMOVE_PREFIX_AND_SUFFIX,
 };
 
+enum class FixCategory
+{
+	None,
+	Good,
+	Best,
+};
+
 struct FixSelection
 {
 	bool		AllNonGreen;
-	int			Pierce;
-	int			ProbDamage;
-	int			ProbReattack;
-	int			ReattackDamage;
-	int			Any;
+	FixCategory			Pierce;
+	FixCategory			ProbDamage;
+	FixCategory			ProbReattack;
+	FixCategory			ReattackDamage;
+	FixCategory			Any;
 };
 
 

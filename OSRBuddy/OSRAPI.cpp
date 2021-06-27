@@ -811,6 +811,21 @@ bool OldSchoolRivalsAPI::IsLanded()
 	return !OSR_API->GetAtumApplication()->m_pShuttleChild->m_bIsAir;
 }
 
+GearType OldSchoolRivalsAPI::UnitKindToGearType(USHORT unitkind)
+{
+	if (IS_BGEAR(unitkind))
+		return GearType::BGear;
+
+	if (IS_IGEAR(unitkind))
+		return GearType::IGear;
+
+	if (IS_MGEAR(unitkind))
+		return GearType::MGear;
+
+	if (IS_AGEAR(unitkind))
+		return GearType::AGear;
+}
+
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)
 {
 	D3DXMatrixMultiply(&pframeCur->matCombined, &pframeCur->matRot, &matCur);

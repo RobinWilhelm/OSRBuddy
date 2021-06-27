@@ -108,6 +108,7 @@ public:
 	int GetCurrentInventorySize();
 	bool IsInventoryFull();	 
 	bool IsLanded();
+	GearType UnitKindToGearType(USHORT unitkind);
 	   	
 
 private:
