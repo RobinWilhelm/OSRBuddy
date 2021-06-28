@@ -164,7 +164,7 @@ int OldSchoolRivalsAPI::GetPrimaryWeaponAmmo()
 	if (!GetPrimaryWeapon())
 	{
 		// no weapon equipped
-		return 0;
+		return -1;
 	}
 	return m_atumapplication->m_pShuttleChild->m_pPrimaryWeapon->m_pItemInfo->CurrentCount;
 }
@@ -174,7 +174,7 @@ int OldSchoolRivalsAPI::GetSecondaryWeaponAmmo()
 	if (!GetSecondaryWeapon())
 	{
 		// no weapon equipped
-		return 0;
+		return -1;
 	}
 	return m_atumapplication->m_pShuttleChild->m_pSecondaryWeapon->m_pItemInfo->CurrentCount;
 }

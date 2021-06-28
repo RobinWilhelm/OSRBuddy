@@ -289,9 +289,18 @@ enum class ItemNumber : int
     // Inventory Cleaning
     Square_Watermelon_Gift = 7023970,
     Fantasy_Globe_Mineral_Capsule = 7023480,
+
+
+    WP_Capsule_3 = 7030448,
+    WP_Capsule_10 = 7030447,
+    WP_Capsule_50 = 7030446,
     WP_Capsule_100 = 7030445,
     WP_Capsule_500 = 7030444,
     WP_Capsule_1000 = 7030443,
+    WP_Capsule_2500 = 7030442,
+    WP_Capsule_5000 = 7030441,
+    WP_Capsule_10000 = 7030440,
+
     SPI_capsule = 7004740,
     Mineral_Capsule = 7015000,
     Soccer_Ball_Capsule = 7029520,

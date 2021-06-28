@@ -204,7 +204,7 @@ void EnchantBot::RenderSuccessPercentage(int enchstep, int total_tries, int fail
 	ImColor color = ImColor(255,255,0,255);
 	float color_ratio = std::min(1.0f, fabs(delta) / probabiliy * 10.0f);
 
-	if (delta > -0.03f) // bad -> gradually remove green
+	if (delta > -0.05f) // bad -> gradually remove green
 	{
 		color.Value.y = 1.0f - color_ratio;
 	}
@@ -245,6 +245,7 @@ void EnchantBot::ResetLab()
 	m_using_enchprot_e1 = false;
 	m_using_enchprot_e5 = false;
 	m_using_speedcard = false; 
+	m_waiting_for_answer = false;
 }
 
 void EnchantBot::UpdateEnchantStats()
@@ -298,7 +299,7 @@ bool EnchantBot::EnchantCheckTimeReady()
 void EnchantBot::ResetInternalActionCheckTime(bool random)
 {
 	if (random) {
-		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 400));
+		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 500));
 	}
 	else {
 		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION);
@@ -308,7 +309,7 @@ void EnchantBot::ResetInternalActionCheckTime(bool random)
 void EnchantBot::ResetEnchantCheckTime(bool random)
 {
 	if (random) {
-		m_enchantCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS + m_buddy->GetRandInt32(0, 1200));
+		m_enchantCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS + m_buddy->GetRandInt32(0, 1500));
 	}
 	else {
 		m_enchantCheckTime = static_cast<float>ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS;
@@ -325,6 +326,8 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 	if (uid == 0) {
 		return;
 	}
+
+	ResetLab();
 
 	m_next_action = EnchantAction::Add_EnchantItem;
 	m_enchant_item = OsrItemInfo(uid);
@@ -772,44 +775,48 @@ void EnchantBot::AddEnchantToList(EnchantItemType enchanttype, EnchantListType& 
 		enchantlist.clear();
 	}
 
-	int enchantnum = enchantlist.size() + 1;
+	int enchantnum = enchantlist.size() + 1;  
+	std::string enchantstr = "E:" + std::to_string(enchantnum);
+	if (enchantnum < 10) {
+		enchantstr += " ";
+	}
 	EnchantTextPair etp;
 	etp.first = enchanttype;
 
 	switch (enchanttype)
 	{
 	case EnchantItemType::Accuracy:
-		etp.second = "E:" + std::to_string(enchantnum) + " Accuracy";
+		etp.second = enchantstr + " Accuracy";
 		break;
 	case EnchantItemType::Reattack:
-		etp.second = "E:" + std::to_string(enchantnum) + " Reattack";
+		etp.second = enchantstr + " Reattack";
 		break;
 	case EnchantItemType::MinMax:
-		etp.second = "E:" + std::to_string(enchantnum) + " Min/Max";
+		etp.second = enchantstr + " Min/Max";
 		break;
 	case EnchantItemType::Speed:
-		etp.second = "E:" + std::to_string(enchantnum) + " Speed";
+		etp.second = enchantstr + " Speed";
 		break;
 	case EnchantItemType::Overheating:
-		etp.second = "E:" + std::to_string(enchantnum) + " OVerheat";
+		etp.second = enchantstr + " OVerheat";
 		break;
 	case EnchantItemType::Range:
-		etp.second = "E:" + std::to_string(enchantnum) + " Range";
+		etp.second = enchantstr + " Range";
 		break;
 	case EnchantItemType::Time:
-		etp.second = "E:" + std::to_string(enchantnum) + " Time";
+		etp.second = enchantstr + " Time";
 		break;
 	case EnchantItemType::Weight:
-		etp.second = "E:" + std::to_string(enchantnum) + " Weight";
+		etp.second = enchantstr + " Weight";
 		break;
 	case EnchantItemType::Shield:
-		etp.second = "E:" + std::to_string(enchantnum) + " Shield";
+		etp.second = enchantstr + " Shield";
 		break;
 	case EnchantItemType::Energy:
-		etp.second = "E:" + std::to_string(enchantnum) + " Energy";
+		etp.second = enchantstr + " Energy";
 		break;
 	case EnchantItemType::EnergyShield:
-		etp.second = "E:" + std::to_string(enchantnum) + " Energy/Shield";
+		etp.second = enchantstr + " Energy/Shield";
 		break;
 	case EnchantItemType::None:
 		etp.second = "None";

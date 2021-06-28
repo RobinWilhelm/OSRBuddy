@@ -100,7 +100,7 @@ void Miscellaneous::RenderImGui()
 			ImGui::NewLine();
 			ImGui::Text("Automatic Capsule Opening");
 			ImGui::Separator();
-			ImGui::Checkbox("Enable###enableCapsuleOpening", &m_delete_items);
+			ImGui::Checkbox("Enable###enableCapsuleOpening", &m_open_capsules);
 			ImGui::BeginColumns("AutomaticCapsuleOpeningColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
 			{
 				ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
@@ -440,44 +440,72 @@ void Miscellaneous::TickInventoryCleaning()
 				return;
 			}
 
-			if (!m_open_capsules || OSR_API->IsInventoryFull()) {
-				return;
-			}
-			
-			if (m_open_mineralcapsule && TryOpenCapsule(ItemNumber::Mineral_Capsule)) {
+			TickCapsuleOpening();
+		}
+	}
+}
+
+void Miscellaneous::TickCapsuleOpening()
+{
+	if (m_open_capsules && !OSR_API->IsInventoryFull()) 
+	{
+		if (m_open_mineralcapsule && TryOpenCapsule(ItemNumber::Mineral_Capsule)) {
+			return;
+		}
+
+		if (m_open_fantasyglobemineralcapsule && TryOpenCapsule(ItemNumber::Fantasy_Globe_Mineral_Capsule)) {
+			return;
+		}
+
+		if (m_open_watermelongift && TryOpenCapsule(ItemNumber::Square_Watermelon_Gift)) {
+			return;
+		}
+
+		if (m_open_soccer_ball_capsule && TryOpenCapsule(ItemNumber::Soccer_Ball_Capsule)) {
+			return;
+		}
+
+		if (m_open_wpcapsule)
+		{	
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_10000)) {
 				return;
 			}
 
-			if (m_open_fantasyglobemineralcapsule && TryOpenCapsule(ItemNumber::Fantasy_Globe_Mineral_Capsule)) {
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_5000)) {
 				return;
 			}
 
-			if (m_open_watermelongift && TryOpenCapsule(ItemNumber::Square_Watermelon_Gift)) {
-				return;
-			}  
-
-			if (m_open_soccer_ball_capsule && TryOpenCapsule(ItemNumber::Soccer_Ball_Capsule)) {
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_2500)) {
 				return;
 			}
-			  
-			if (m_open_wpcapsule)
-			{
-				if (TryOpenCapsule(ItemNumber::WP_Capsule_100)) {
-					return;
-				}
 
-				if (TryOpenCapsule(ItemNumber::WP_Capsule_500)) {
-					return;
-				}
-
-				if (TryOpenCapsule(ItemNumber::WP_Capsule_1000)) {
-					return;
-				}
-			}
-
-			if (m_open_spicapsule && TryOpenCapsule(ItemNumber::SPI_capsule)) {
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_1000)) {
 				return;
 			}
+
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_500)) {
+				return;
+			}
+
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_100)) {
+				return;
+			}
+
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_50)) {
+				return;
+			}
+
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_10)) {
+				return;
+			}
+
+			if (TryOpenCapsule(ItemNumber::WP_Capsule_3)) {
+				return;
+			} 
+		}
+
+		if (m_open_spicapsule && TryOpenCapsule(ItemNumber::SPI_capsule)) {
+			return;
 		}
 	}
 }

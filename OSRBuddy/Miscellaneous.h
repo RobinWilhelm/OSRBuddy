@@ -33,6 +33,7 @@ private:
 	bool InventoryActionCheckTimeReady();
 	void ResetInventoryActionCheckTime();
 	void TickInventoryCleaning();
+	void TickCapsuleOpening();
 	bool TickItemDelete();
 	bool TryOpenCapsule(ItemNumber capsule);
 	void TickItemSell();

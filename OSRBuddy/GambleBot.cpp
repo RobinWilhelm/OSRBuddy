@@ -444,15 +444,16 @@ void GambleBot::SetGambleItem(UID64_t uid)
 	}
 
 	m_gamble_item = OsrItemInfo(uid);
-	m_buddy->GetPersistingTools()->CloseStream();
-	m_buddy->GetPersistingTools()->SetItem(uid);
-	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();
-
 	if (!m_gamble_item.GetItemInfo() || !m_gamble_item.IsWeapon())
 	{
 		ResetGambleItem();
 		return;
 	}
+
+	// try to load previous statistics for this weapon
+	m_buddy->GetPersistingTools()->CloseStream();
+	m_buddy->GetPersistingTools()->SetItem(uid);
+	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();		
 
 	m_is_advanced_weapon = IS_SECONDARY_WEAPON_1(m_gamble_item.GetItemInfo()->Kind);
 	m_current_gambleitem_uid = uid;
@@ -910,6 +911,7 @@ int GambleBot::GetTotalInventoryAmount(GambleItem gambleItem)
 void GambleBot::ResetGambleItem()
 {  	
 	m_current_gambleitem_uid = 0;
+	m_needed_source_items = std::queue<GambleItem>();
 }
 
 // executed after gambling action finished
