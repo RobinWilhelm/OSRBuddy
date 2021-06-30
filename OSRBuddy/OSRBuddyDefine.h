@@ -249,6 +249,11 @@ enum class ItemNumber : int
     AdvancedWeightCard = 7002530,
     StandardWeightCard = 7000670,
 
+    Milk = 7036870,
+    Vanilla = 7036890,
+    Egg = 7036880,
+    Cream = 7036900,
+
     // kits
     S_Type_RepairKit_1 = 7010290,
     S_Type_RepairKit_2 = 7022940,

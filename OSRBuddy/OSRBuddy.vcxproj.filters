@@ -346,6 +346,9 @@
     <ClInclude Include="GambleFixes.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Recipies.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
