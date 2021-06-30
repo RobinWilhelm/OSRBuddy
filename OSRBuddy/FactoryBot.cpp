@@ -7,6 +7,9 @@
 FactoryBot::FactoryBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
 	m_state = FactoryBotState::STANDBY;
+	m_wanted_amount = 0;
+	m_stackable = false;
+	m_open_instant = false;
 }
 
 FactoryBot::~FactoryBot()
@@ -69,7 +72,7 @@ void FactoryBot::RenderImGui()
 					current_item = items[n];
 					if (m_selected_recipie) 
 					{
-						SetRecipie(std::to_string(current_item));
+						SetRecipe(current_item);
 						ImGui::SetItemDefaultFocus();
 					}
 				}
@@ -77,10 +80,10 @@ void FactoryBot::RenderImGui()
 			ImGui::EndCombo();
 		}
 		ImGui::EndGroup();
-		ImGui::BeginDisabledMode(m_selected_recipie) 
+		ImGui::BeginDisabledMode(m_selected_recipie);
 		{
 			ImGui::BeginGroup();
-			ImGi::SliderInt("Wanted Amount", &m_wanted_amount, 1, m_max_amount);
+			ImGui::SliderInt("Wanted Amount", &m_wanted_amount, 1, m_max_amount);
 			ImGui::EndGroup();
 		}
 
@@ -93,9 +96,9 @@ void FactoryBot::SetRecipe(std::string name) {
 	if (name == "Vanilla Ice Cream") {
 		VanillaIceCream vic;
 		m_stackable = vic.stackable;
-		for (int i = 0; i < vic.amounts.size(); i++) {
+		for (int i = 0; i < (sizeof(vic.amounts)/sizeof(vic.amounts[0])) ; i++) {
 			Ingredient ingredient = Ingredient();
-			ingredient.name = vic.ingreds(i);
+			ingredient.name = vic.ingreds[i];
 			ingredient.amount = vic.amounts[i];
 			m_transformedRecipie.push_back(ingredient);
 		}

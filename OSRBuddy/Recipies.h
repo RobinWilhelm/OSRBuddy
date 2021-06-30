@@ -2,7 +2,7 @@
 
 
 struct VanillaIceCream {
-	enum { Milk, Vanilla, Egg, Cream } ingreds;
+	const char* ingreds[4] = { "Milk", "Vanilla", "Egg", "Cream" };
 	int amounts[4] = { 30, 30, 30, 30 };
 	bool stackable = false;
 };
