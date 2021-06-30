@@ -33,6 +33,7 @@ private:
 	bool InventoryActionCheckTimeReady();
 	void ResetInventoryActionCheckTime();
 	void TickInventoryCleaning();
+	void TickCapsuleOpening();
 	bool TickItemDelete();
 	bool TryOpenCapsule(ItemNumber capsule);
 	void TickItemSell();
@@ -56,6 +57,7 @@ private:
 	bool m_only_clean_while_stopped;
 	bool m_only_clean_while_overheat;
 
+	bool m_open_capsules;
 	bool m_open_watermelongift;
 	bool m_open_spicapsule;
 	bool m_open_fantasyglobemineralcapsule;

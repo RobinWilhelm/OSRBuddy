@@ -10,7 +10,7 @@
 #define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (2000)
 #define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (600)	// button clicks and item movement
 #else
-#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (1500)
+#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (1600)
 #define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (400)	// button clicks and item movement
 #endif // RELEASE_SETHIA
 						 
@@ -55,6 +55,7 @@ struct EnchantStatistics
 	int	m_used_chancecards_8;
 	int	m_used_enchantcards;
 	int	m_used_speedcards;
+	int m_used_energyshieldcard;
 
 	int m_used_prefixwhipes;
 	int m_used_prefixcards;
@@ -66,6 +67,7 @@ struct EnchantStatistics
 	int	m_cost_chancecards_8;
 	int	m_cost_enchantcards;
 	int	m_cost_speedcards;
+	int m_cost_energyshieldcard;
 	int	m_cost_total;
 };
 
@@ -151,6 +153,7 @@ private:
 	bool					m_using_enchprot_e5;
 	bool					m_using_chancecard_8;
 	bool					m_using_speedcard;
+	bool					m_using_energyshieldcard;
 
 	EnchantStatistics       m_statisticsSession;
 	EnchantStatistics		m_statisticsWeapon;
@@ -162,6 +165,7 @@ private:
 	std::string				m_cost_chancecards_8_string;
 	std::string				m_cost_enchantcards_string;
 	std::string				m_cost_speedcards_string;
+	std::string				m_cost_energyshieldcards_string;
 
 	//for buffering of overall stats:
 	std::string				m_cost_total_string_W;
@@ -170,4 +174,5 @@ private:
 	std::string				m_cost_chancecards_8_string_W;
 	std::string				m_cost_enchantcards_string_W;
 	std::string				m_cost_speedcards_string_W;
+	std::string				m_cost_energyshieldcards_string_W;
 };

@@ -164,7 +164,7 @@ int OldSchoolRivalsAPI::GetPrimaryWeaponAmmo()
 	if (!GetPrimaryWeapon())
 	{
 		// no weapon equipped
-		return 0;
+		return -1;
 	}
 	return m_atumapplication->m_pShuttleChild->m_pPrimaryWeapon->m_pItemInfo->CurrentCount;
 }
@@ -174,7 +174,7 @@ int OldSchoolRivalsAPI::GetSecondaryWeaponAmmo()
 	if (!GetSecondaryWeapon())
 	{
 		// no weapon equipped
-		return 0;
+		return -1;
 	}
 	return m_atumapplication->m_pShuttleChild->m_pSecondaryWeapon->m_pItemInfo->CurrentCount;
 }
@@ -809,6 +809,21 @@ bool OldSchoolRivalsAPI::IsInventoryFull()
 bool OldSchoolRivalsAPI::IsLanded()
 {
 	return !OSR_API->GetAtumApplication()->m_pShuttleChild->m_bIsAir;
+}
+
+GearType OldSchoolRivalsAPI::UnitKindToGearType(USHORT unitkind)
+{
+	if (IS_BGEAR(unitkind))
+		return GearType::BGear;
+
+	if (IS_IGEAR(unitkind))
+		return GearType::IGear;
+
+	if (IS_MGEAR(unitkind))
+		return GearType::MGear;
+
+	if (IS_AGEAR(unitkind))
+		return GearType::AGear;
 }
 
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)
