@@ -30,14 +30,17 @@ private:
 	void SetFactoryBotState(FactoryBotState);
 	void SetRecipe(std::string name);
 	bool DoCrafting();
+	void DoStackedCrafting();
 
 private:
 
 	FactoryBotState m_state;
 	int m_wanted_amount;
+	int m_max_amount;
 	bool m_open_instant;
 
 	bool m_selected_recipie;
+	bool m_stackable;
 
 	vector<Ingredient> m_transformedRecipie;
 };

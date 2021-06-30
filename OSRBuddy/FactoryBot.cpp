@@ -80,7 +80,7 @@ void FactoryBot::RenderImGui()
 		ImGui::BeginDisabledMode(m_selected_recipie) 
 		{
 			ImGui::BeginGroup();
-			ImGui::SliderInt();
+			ImGi::SliderInt("Wanted Amount", &m_wanted_amount, 1, m_max_amount);
 			ImGui::EndGroup();
 		}
 
@@ -92,6 +92,7 @@ void FactoryBot::SetRecipe(std::string name) {
 	m_transformedRecipie.clear();
 	if (name == "Vanilla Ice Cream") {
 		VanillaIceCream vic;
+		m_stackable = vic.stackable;
 		for (int i = 0; i < vic.amounts.size(); i++) {
 			Ingredient ingredient = Ingredient();
 			ingredient.name = vic.ingreds(i);
@@ -103,6 +104,10 @@ void FactoryBot::SetRecipe(std::string name) {
 bool FactoryBot::DoCrafting()
 {
 	return false;
+}
+
+void FactoryBot::DoStackedCrafting()
+{
 }
 
 

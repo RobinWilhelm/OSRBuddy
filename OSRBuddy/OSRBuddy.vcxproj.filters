@@ -349,6 +349,9 @@
     <ClInclude Include="Recipies.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="FactoryBot.h">
+      <Filter>Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -440,6 +443,9 @@
     </ClCompile>
     <ClCompile Include="D3D9Font.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="FactoryBot.cpp">
+      <Filter>Features</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
