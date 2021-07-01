@@ -346,7 +346,7 @@
     <ClInclude Include="GambleFixes.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Recipies.h">
+    <ClInclude Include="CookBook.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="FactoryBot.h">
@@ -446,6 +446,9 @@
     </ClCompile>
     <ClCompile Include="FactoryBot.cpp">
       <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="CookBook.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

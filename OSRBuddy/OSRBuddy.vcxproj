@@ -237,7 +237,7 @@
     <ClInclude Include="OSRImGuiMenu.h" />
     <ClInclude Include="PersistingTools.h" />
     <ClInclude Include="QAngle.h" />
-    <ClInclude Include="Recipies.h" />
+    <ClInclude Include="CookBook.h" />
     <ClInclude Include="SDK\AppEffectData.h" />
     <ClInclude Include="SDK\AtumApplication.h" />
     <ClInclude Include="SDK\AtumData.h" />
@@ -317,6 +317,7 @@
   <ItemGroup>
     <ClCompile Include="AntiAntiCheat.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
+    <ClCompile Include="CookBook.cpp" />
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
     <ClCompile Include="FactoryBot.cpp" />

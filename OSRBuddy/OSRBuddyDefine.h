@@ -254,6 +254,7 @@ enum class ItemNumber : int
     Vanilla = 7036890,
     Egg = 7036880,
     Cream = 7036900,
+    Vanilla_Ice_Cream = 7036910,
 
     // kits
     S_Type_RepairKit_1 = 7010290,
