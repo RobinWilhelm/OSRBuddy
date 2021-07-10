@@ -328,6 +328,9 @@
     <ClInclude Include="GrindBot.h">
       <Filter>Features</Filter>
     </ClInclude>
+    <ClInclude Include="QAngle.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
     <ClInclude Include="MathHelper.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -343,8 +346,11 @@
     <ClInclude Include="GambleFixes.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="BuddyTimer.h">
+    <ClInclude Include="CookBook.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="FactoryBot.h">
+      <Filter>Features</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -429,13 +435,19 @@
     <ClCompile Include="GrindBot.cpp">
       <Filter>Features</Filter>
     </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
     <ClCompile Include="D3D9Renderer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="D3D9Font.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="BuddyTimer.cpp">
+    <ClCompile Include="FactoryBot.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="CookBook.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>

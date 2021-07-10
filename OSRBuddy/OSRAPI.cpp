@@ -564,19 +564,19 @@ CINFBase* OldSchoolRivalsAPI::FindBuildingShop(int buildingkind)
 	return nullptr;
 }
 
-void OldSchoolRivalsAPI::OnButtonClick(int button)
+void OldSchoolRivalsAPI::OnButtonClick(int button, bool factory)
 {
 	static OnButtonClickType onButtonClickFn = reinterpret_cast<OnButtonClickType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__OnButtonClicked).address);
-	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
+	CINFCityLab* citylab = static_cast<CINFCityLab*>((factory) ? FindBuildingShop(BUILDINGKIND_FACTORY) : FindBuildingShop(BUILDINGKIND_LABORATORY));;
 	if (onButtonClickFn && citylab) {
 		onButtonClickFn(citylab, button);
 	}
 }
 
-void OldSchoolRivalsAPI::InvenToSourceItem(CItemInfo* pItemInfo, int nCount, bool useMacroSource = false)
+void OldSchoolRivalsAPI::InvenToSourceItem(CItemInfo* pItemInfo, int nCount, bool factory, bool useMacroSource)
 {
 	static InvenToSourceItemType invenToSourceItemFn = reinterpret_cast<InvenToSourceItemType>(PatternManager::Get(OffsetIdentifier::CINFCityLab__InvenToSourceItem).address);
-	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
+	CINFCityLab* citylab = static_cast<CINFCityLab*>((factory) ? FindBuildingShop(BUILDINGKIND_FACTORY) : FindBuildingShop(BUILDINGKIND_LABORATORY));
 	if (invenToSourceItemFn && citylab) {
 		invenToSourceItemFn(citylab, pItemInfo, nCount, useMacroSource);
 	}

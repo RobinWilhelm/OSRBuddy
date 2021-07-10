@@ -8,6 +8,7 @@
 #include "GambleBot.h"
 #include "EnchantBot.h"
 #include "GrindBot.h"
+#include "FactoryBot.h"
 #include "Visuals.h"
 #include "Miscellaneous.h"
                                 
@@ -198,6 +199,7 @@ bool OSRBuddyMain::Start()
         RegisterFeature(new GrindBot(this));          
         RegisterFeature(new GambleBot(this));
         RegisterFeature(new EnchantBot(this));
+        RegisterFeature(new FactoryBot(this));
         RegisterFeature(new Miscellaneous(this));    
         //RegisterFeature(new TestItemUse(this));
 

@@ -202,6 +202,7 @@
     <ClInclude Include="BuddyTimer.h" />
     <ClInclude Include="D3D9Font.h" />
     <ClInclude Include="D3D9Renderer.h" />
+    <ClInclude Include="FactoryBot.h" />
     <ClInclude Include="GambleFixes.h" />
     <ClInclude Include="INFBase.h" />
     <ClInclude Include="MathHelper.h" />
@@ -315,9 +316,9 @@
   <ItemGroup>
     <ClCompile Include="AntiAntiCheat.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
-    <ClCompile Include="BuddyTimer.cpp" />
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
+    <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Miscellaneous.cpp" />
     <ClCompile Include="OsrItemInfo.cpp" />
     <ClCompile Include="Console.cpp" />

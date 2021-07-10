@@ -67,8 +67,8 @@ public:
 	CINFBase* FindBuildingShop(int buildingkind);
 
 	// CINFCityLab
-	void OnButtonClick(int button);	
-	void InvenToSourceItem(CItemInfo* pItemInfo, int nCount, bool useMacroSource /*true if you want to move the item to Inetpubs macrogamblebot*/);
+	void OnButtonClick(int button, bool factory = false);
+	void InvenToSourceItem(CItemInfo* pItemInfo, int nCount, bool factory = false, bool useMacroSource = false /*true if you want to move the item to Inetpubs macrogamblebot*/);
 	CItemInfo* FindItemFromTarget(UID64_t UniqueNumber);
 	CItemInfo* FindItemFromSource(UID64_t UniqueNumber);
 

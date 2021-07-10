@@ -17,6 +17,7 @@ enum class FeatureType : int
 	TestItemUse,
 	GambleBot,
 	EnchantBot,
+	FactoryBot,
 	AntiRandomness,
 	GrindBot,
 	Visuals,
