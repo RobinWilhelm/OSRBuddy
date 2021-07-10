@@ -5,17 +5,24 @@
 #include "SDK/AtumApplication.h"
 
 #define WHISPER_WARNING_TIME 10s
-#define CAPSULE_OPEN_REATTACK 200ms
+#define WHISPER_SNOOZE_TIME 2min		  
+
+#define CAPSULE_OPEN_REATTACK 100ms
+#define CAPSULE_OPEN_REATTACK_VARIANCE 300ms
+   
 #define ITEM_DELETE_REATTACK 400ms
-#define WHIPSER_SNOOZE_TIME 2min
+#define ITEM_DELETE_REATTACK_VARIANCE 500ms
+
 #define ITEM_SELL_REATTACK 250ms
+#define ITEM_SELL_REATTACK_VARIANCE 100ms
+
+
 
 Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
 	m_whisperwarner_active = false;	
 	m_whisperwarner_snooze_enabled = true;
-
-	m_inv_action_check_time = 0ms;
+ 
 	m_clean_inventory = false;
 	m_only_clean_while_overheat = false;
 	m_only_clean_while_stopped = false;
@@ -54,14 +61,7 @@ std::string Miscellaneous::GetName() const
 }
 
 void Miscellaneous::Tick()
-{
-	if (m_inv_action_check_time > 0ms) {
-		m_inv_action_check_time -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
-	}
-	if (m_inv_action_check_time < 0ms) {
-		m_inv_action_check_time = 0ms;
-	}
-		   
+{  			   
 	TickAutoFlip();
 	TickItemSell();
 	TickWhisperWarner();
@@ -302,7 +302,7 @@ void Miscellaneous::OnMessageBoxClose(int result)
 		if (m_whisperwarner_snooze_enabled)
 		{
 			auto currenttime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-			m_ignore_whisperwarn_time = currenttime + WHIPSER_SNOOZE_TIME;
+			m_whisper_timer.Reset(WHISPER_SNOOZE_TIME);
 		}
 	}	  
 	m_popup_open = false;
@@ -370,12 +370,7 @@ CItemInfo* Miscellaneous::FindStealthCardInInventory()
 
 void Miscellaneous::TickWhisperWarner()
 {
-	auto currenttime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-	if (currenttime < m_ignore_whisperwarn_time) {
-		return;
-	}
-
-	if (m_whisperwarner_active && (currenttime - m_last_whisperwarn) >= WHISPER_WARNING_TIME)
+	if (m_whisperwarner_active && m_whisper_timer.IsReady())
 	{
 		CINFGameMainChat* chat = OSR_API->GetINFGameMainChat();
 		if (chat)
@@ -407,7 +402,7 @@ void Miscellaneous::TickWhisperWarner()
 					m_buddy->OpenMessageBoxAsync(msg, "Whisper Warning!", NotifyType::Warning, std::bind(&Miscellaneous::OnMessageBoxClose, this, std::placeholders::_1));
 					m_popup_open = true;
 				}
-				m_last_whisperwarn = currenttime;
+				m_whisper_timer.Reset(WHISPER_WARNING_TIME);
 
 				if (m_whisperwarner_closeall) {
 					m_buddy->DisableAllFeatures();
@@ -416,24 +411,14 @@ void Miscellaneous::TickWhisperWarner()
 		}
 	}
 }
-
-bool Miscellaneous::InventoryActionCheckTimeReady()
-{
-	return m_inv_action_check_time <= 0ms;
-}
-
-void Miscellaneous::ResetInventoryActionCheckTime()
-{
-	m_inv_action_check_time = CAPSULE_OPEN_REATTACK + std::chrono::milliseconds(m_buddy->GetRandInt32(0, 300));
-}
-
+	 	 
 void Miscellaneous::TickInventoryCleaning()
 {
 	if (m_clean_inventory && 
 		(!m_only_clean_while_stopped || OSR_API->GetAtumApplication()->m_pShuttleChild->m_bUnitStop) && 
 		(!m_only_clean_while_overheat || OSR_API->GetPrimaryWeapon()->m_bOverHeat))
 	{
-		if (InventoryActionCheckTimeReady())
+		if (m_inventory_action_timer.IsReady())
 		{
 			// first try to delete items to make space
 			if (TickItemDelete()) {
@@ -518,8 +503,8 @@ bool Miscellaneous::TickItemDelete()
 		if (iteminfo)
 		{ 
 			// delete item
-			OSR_API->DeleteItem(iteminfo, iteminfo->CurrentCount);	 			
-			m_inv_action_check_time = ITEM_DELETE_REATTACK + std::chrono::milliseconds(m_buddy->GetRandInt32(0, 500));
+			OSR_API->DeleteItem(iteminfo, iteminfo->CurrentCount);
+			m_inventory_action_timer.Reset(ITEM_DELETE_REATTACK, ITEM_DELETE_REATTACK_VARIANCE);
 			return true;
 		}		
 	}			 
@@ -532,7 +517,7 @@ bool Miscellaneous::TryOpenCapsule(ItemNumber capsule)
 	if (item)
 	{
 		OSR_API->SendUseItem(item);
-		ResetInventoryActionCheckTime();
+		m_inventory_action_timer.Reset(CAPSULE_OPEN_REATTACK, CAPSULE_OPEN_REATTACK_VARIANCE);
 		return true;
 	}
 	return false;
@@ -553,7 +538,7 @@ void Miscellaneous::TickItemSell()
 	if (m_selling_items)
 	{
 		auto current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-		if (current - m_last_itemsell > ITEM_SELL_REATTACK)
+		if (m_itemsell_timer.IsReady())
 		{
 			CItemInfo* item = GetNextItemForDelete();
 			if (!item) // no more items to sell
@@ -563,7 +548,7 @@ void Miscellaneous::TickItemSell()
 			}
 
 			if (TrySendSellItem(item, item->CurrentCount)) {
-				m_last_itemsell = current;
+				m_itemsell_timer.Reset(ITEM_SELL_REATTACK, ITEM_SELL_REATTACK_VARIANCE);
 			}
 		}
 	}

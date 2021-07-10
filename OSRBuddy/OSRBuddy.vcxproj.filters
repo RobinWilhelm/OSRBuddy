@@ -328,9 +328,6 @@
     <ClInclude Include="GrindBot.h">
       <Filter>Features</Filter>
     </ClInclude>
-    <ClInclude Include="QAngle.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="MathHelper.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -344,6 +341,9 @@
       <Filter>SDK</Filter>
     </ClInclude>
     <ClInclude Include="GambleFixes.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="BuddyTimer.h">
       <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
@@ -429,13 +429,13 @@
     <ClCompile Include="GrindBot.cpp">
       <Filter>Features</Filter>
     </ClCompile>
-    <ClCompile Include="MathHelper.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
     <ClCompile Include="D3D9Renderer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="D3D9Font.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="BuddyTimer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>

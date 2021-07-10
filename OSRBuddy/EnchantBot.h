@@ -5,20 +5,24 @@
 #include "OSRAPI.h"
 
 #include "OsrItemInfo.h"
+#include "BuddyTimer.h"
 
 #ifdef RELEASE_SETHIA
 #define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (2000)
 #define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (600)	// button clicks and item movement
 #else
-#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (1600)
-#define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (400)	// button clicks and item movement
+#define ENCHANT_TIME_BASE 2000ms		
+#define ENCHANT_TIME_VARIANCE 1000ms
+
+#define ENCHANT_ACTION_TIME_BASE 300ms	// button clicks and item movement
+#define ENCHANT_ACTION_TIME_VARIANCE 500ms	
 #endif // RELEASE_SETHIA
 						 
 #define COLOR_ENCHANTITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green
 #define COLOR_ENCHANTITEM_LT_100 (ImColor(0xFF, 0xBB, 0x33).Value) // orange
 #define COLOR_ENCHANTITEM_EQ_0	(ImColor(0xFF, 0x00, 0x00).Value) // red
 
-#define COST_ENCHANT_SINGLE 2800
+
 
 class CItemInfo;
 			    
@@ -91,12 +95,6 @@ private:
 	void ResetLab();
 	void UpdateEnchantStats();
 
-	void UpdateCheckTime(float elapsedTime);
-	bool InternalActionCheckTimeReady();
-	bool EnchantCheckTimeReady();
-	void ResetInternalActionCheckTime(bool random = true);
-	void ResetEnchantCheckTime(bool random = true);
-
 	bool IsValidEnchantItem(ITEM_BASE* enchantItem);
 	void SetEnchantItem(UID64_t uid);
 	  
@@ -132,9 +130,10 @@ private:
 	bool					m_selectNewEnchantItem;
 	EnchantItemKind			m_enchantTargetKind;
 	OsrItemInfo				m_enchant_item;		
+												  
+	BuddyTimer				m_enchant_timer;
+	BuddyTimer				m_action_timer;
 
-	float					m_enchantCheckTime;
-	float					m_internalActionCheckTime;	// button clicks and item movement 
 	EnchantAction			m_next_action;
 	bool					m_waiting_for_answer;
 

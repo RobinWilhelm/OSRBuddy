@@ -7,6 +7,7 @@
 #include "Miscellaneous.h"
 #include "D3D9Renderer.h"
 #include <cmath>
+#include "Utility.h"
 
 #define TARGET_LOCK_THRESHOLD    45.0f
 
@@ -19,7 +20,6 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_kitbot = nullptr;
     m_get_new_target = true;   
 
-    m_update_mob_list_check_time = 0ms;
     m_mobs.clear(); 
 
     m_shoot_all_goldies = true;
@@ -30,13 +30,15 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_target_mode = TargetMode::CrosshairDistance;
 
 
-    m_smoothtype = SmoothType::Distance;
+    m_smoothtype = SmoothType::Time;
     m_smooth_factor_distance = 0.5f;
     m_smooth_factor_time = 0.5f;
 
     m_aimtime_current = 0ms;
     m_aimtime_final = 0ms;
     m_anti_ram = true;
+
+    m_update_mobs_timer = BuddyTimer(UPDATE_GRINDMOBS_TIME);
 }   
 
 void GrindBot::Tick()
@@ -72,6 +74,8 @@ void GrindBot::Tick()
             return;
         }
 
+        // ------------------------ 
+        // re-think this
         if (!m_target)
         {
             m_no_target_time += std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
@@ -85,6 +89,7 @@ void GrindBot::Tick()
                 m_kitbot->ToggleSKill(SkillType::Siege_Mode, false);
             }
         } 
+        // ------------------------ 
 
         if (!IsValidTargetMonster(m_target) || !CanShootAtTarget(m_target))
         {
@@ -328,7 +333,8 @@ bool GrindBot::OnReadPacket(unsigned short msgtype, byte* packet)
             {
                 //um_target->m_info.CurrentHP = 0; 
                 auto monsterinfo = FindGrindMonsterInfo(m_target->m_info.MonsterUnitKind);
-                if (monsterinfo != m_mobs.end())                 {
+                if (monsterinfo != m_mobs.end())                 
+                {
                     monsterinfo->second.killed++;
                     m_total_mobs_killed++;
                 }
@@ -551,32 +557,14 @@ void GrindBot::ToggleGrinding()
         break;
     }  
 }
-
-
-bool GrindBot::ShouldCheck_GrindMobs()
-{
-    return m_update_mob_list_check_time <= 0ms;
-}
-
-void GrindBot::Reset_GrindMobsCheckTime()
-{
-    m_update_mob_list_check_time = UPDATE_GRINDMOBS_TIME;
-}
-
+  
 void GrindBot::Reset_NewTargetDelayTime()
 {
-    m_shoot_new_target_delay = std::chrono::milliseconds(m_buddy->GetRandInt32(m_humanized_target_delay_min, m_humanized_target_delay_max));
+    m_shoot_new_target_delay = std::chrono::milliseconds(Utility::GetRandInt32(m_humanized_target_delay_min, m_humanized_target_delay_max));
 }
 
 void GrindBot::UpdateCheckTime()
-{   
-    if (m_update_mob_list_check_time > 0ms) {
-        m_update_mob_list_check_time -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
-    }
-    if (m_update_mob_list_check_time < 0ms) {
-        m_update_mob_list_check_time = 0ms;
-    }
-    
+{
     if (m_shoot_new_target_delay > 0ms) {
         m_shoot_new_target_delay -= std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
     }
@@ -593,7 +581,7 @@ void GrindBot::UpdateGrindingTime()
 
 void GrindBot::UpdateGrindMobInfo()
 {   
-    if (ShouldCheck_GrindMobs())
+    if (m_update_mobs_timer.IsReady())
     {
         if (m_grinding_map != 0 && m_grinding_map == OSR_API->GetCurrentMapChannelIndex().MapIndex)
         {
@@ -653,20 +641,12 @@ bool GrindBot::IsMonsterDead(CMonsterData* monster)
     return false;
 }
 
-QAngle GrindBot::CalcAngle(const D3DXVECTOR3& source, const D3DXVECTOR3& target)
-{
-    QAngle angles;
-    D3DXVECTOR3 delta = target - source;
-    MathHelper::VectorToAngles(delta, angles);
-    return angles;
-}
-
 void GrindBot::SmoothDeltaAngle(float& deltaAng)
 {
     switch (m_smoothtype)
     {
     case SmoothType::Distance:
-        deltaAng /= std::max(1.0f,(m_smooth_factor_distance * 75));
+        deltaAng /= std::max(1.0f,(m_smooth_factor_distance * 50));
         break;
     case SmoothType::Time:
         float degree = RAD2DEG(deltaAng);  

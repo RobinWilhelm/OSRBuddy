@@ -8,7 +8,9 @@
 
 class Utility
 {
-public:
+public:    
+    static int GetRandInt32(int min, int max);
+
     static HWND FindWindowFromProcessId(DWORD dwProcessId);
           
     // from learn_more https://github.com/learn-more/findpattern-bench/blob/master/patterns/learn_more.h

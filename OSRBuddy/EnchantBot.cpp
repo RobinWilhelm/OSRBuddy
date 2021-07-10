@@ -4,6 +4,7 @@
 #include "Utility.h"
 #include "OsrItemInfo.h"
 #include "OSRAPI.h"
+#include "Utility.h"
 
 
 EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
@@ -26,6 +27,9 @@ EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_using_enchprot_e5 = false;
 	m_using_speedcard = false;
 
+	m_enchant_timer = BuddyTimer(ENCHANT_TIME_BASE, ENCHANT_TIME_VARIANCE);
+	m_action_timer = BuddyTimer(ENCHANT_ACTION_TIME_BASE, ENCHANT_ACTION_TIME_VARIANCE);
+
 	ZeroMemory(&m_statisticsSession, sizeof(EnchantStatistics));
 }
 
@@ -34,9 +38,7 @@ EnchantBot::~EnchantBot()
 }
 
 void EnchantBot::Tick()
-{
-	UpdateCheckTime(OSR_API->GetElapsedTime());
-
+{												   
 	if (!IsEnabled()) {
 		return;
 	}
@@ -240,7 +242,7 @@ void EnchantBot::ResetCurrentEnchantItem()
 
 void EnchantBot::ResetLab()
 {
-	OSR_API->OnButtonClick(TO_INT(LabButtonCode::Cancel));
+	//OSR_API->OnButtonClick(TO_INT(LabButtonCode::Cancel));
 	m_using_chancecard_8 = false;
 	m_using_enchprot_e1 = false;
 	m_using_enchprot_e5 = false;
@@ -267,55 +269,7 @@ void EnchantBot::UpdateEnchantStats()
 	}
 }
 
-void EnchantBot::UpdateCheckTime(float elapsedTime)
-{
-	if (m_enchantCheckTime > 0.0f)
-	{
-		m_enchantCheckTime -= elapsedTime * 1000;
-		if (m_enchantCheckTime < 0.0f) {
-			m_enchantCheckTime = 0.0f;
-		}
-	}
-
-	if (m_internalActionCheckTime > 0.0f)
-	{
-		m_internalActionCheckTime -= elapsedTime * 1000;
-		if (m_internalActionCheckTime < 0.0f) {
-			m_internalActionCheckTime = 0.0f;
-		}
-	}
-}
-
-bool EnchantBot::InternalActionCheckTimeReady()
-{
-	return m_internalActionCheckTime == 0.0f;
-}
-
-bool EnchantBot::EnchantCheckTimeReady()
-{
-	return m_enchantCheckTime == 0.0f;
-}
-
-void EnchantBot::ResetInternalActionCheckTime(bool random)
-{
-	if (random) {
-		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 500));
-	}
-	else {
-		m_internalActionCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION);
-	}
-}
-
-void EnchantBot::ResetEnchantCheckTime(bool random)
-{
-	if (random) {
-		m_enchantCheckTime = static_cast<float>(ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS + m_buddy->GetRandInt32(0, 1500));
-	}
-	else {
-		m_enchantCheckTime = static_cast<float>ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS;
-	}
-}
-
+  
 bool EnchantBot::IsValidEnchantItem(ITEM_BASE* enchantItem)
 {
 	return (IS_WEAPON(enchantItem->Kind) || enchantItem->Kind == ITEMKIND_DEFENSE);
@@ -512,7 +466,7 @@ void EnchantBot::RenderSettings()
 				}
 				if (ImGui::Button("Enchant"))
 				{
-					if (m_state == EnchantBotState::STANDBY && EnchantCheckTimeReady()) {
+					if (m_state == EnchantBotState::STANDBY && m_enchant_timer.IsReady()) {
 						SetEnchantBotState(EnchantBotState::ENCHANT_SINGLE);
 					}
 				}
@@ -647,11 +601,14 @@ void EnchantBot::RenderStatisticsPopup()
 					ImGui::Separator();
 					ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
+						ImGui::SetColumnWidth(0, 150);
+						ImGui::SetColumnWidth(1, 75);
 						ImGui::Text("E1 Protects");
 						ImGui::Text("E5 Protects");
 						ImGui::Text("8%% Chance Cards");
 						ImGui::Text("Enchantcards");
 						ImGui::Text("Speedcards");
+						ImGui::Text("Energy/Shield Cards");
 					}
 					ImGui::NextColumn();
 					{
@@ -721,11 +678,14 @@ void EnchantBot::RenderStatisticsPopup()
 					//ImGui::Text(std::to_string(m_statisticsWeapon.m_enchantStats[5][0]).c_str());
 					ImGui::BeginColumns("WeaponStatColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
+						ImGui::SetColumnWidth(0, 150);
+						ImGui::SetColumnWidth(1, 75);
 						ImGui::Text("E1 Protects");
 						ImGui::Text("E5 Protects");
 						ImGui::Text("8%% Chance Cards");
 						ImGui::Text("Enchantcards");
 						ImGui::Text("Speedcards");
+						ImGui::Text("Energy/Shield Cards");
 					}
 					ImGui::NextColumn();
 					{
@@ -829,11 +789,11 @@ void EnchantBot::AddEnchantToList(EnchantItemType enchanttype, EnchantListType& 
 
 bool EnchantBot::DoEnchantAction(EnchantAction action)
 {
-	if (!InternalActionCheckTimeReady()) {
+	if (!m_action_timer.IsReady()) {
 		return false;
 	}
 	else {
-		ResetInternalActionCheckTime();
+		m_action_timer.Reset();
 	}
 
 	if (m_currentEnchantItemUID == 0) {
@@ -852,10 +812,10 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 	{
 	case EnchantAction::Add_EnchantItem:
 		// Enchanting should have a minimum time between each complete enchants, independetly from the time between the single enchant actions
-		if (!EnchantCheckTimeReady()) {
+		if (!m_enchant_timer.IsReady()) {
 			return false;
 		}
-		ResetEnchantCheckTime();
+		m_enchant_timer.Reset();
 		// first item will be the item to be enchanted
 		enchantitem = m_enchant_item.GetItemInfo();
 		break;
@@ -1158,10 +1118,10 @@ void EnchantBot::UpdateTotalCost()
 
 bool EnchantBot::TrySimulateButtonClick(LabButtonCode button)
 {
-	if (InternalActionCheckTimeReady())
+	if (m_action_timer.IsReady())
 	{
 		OSR_API->OnButtonClick(TO_INT(button));
-		ResetInternalActionCheckTime();
+		m_action_timer.Reset();
 		return true;
 	}
 	else {

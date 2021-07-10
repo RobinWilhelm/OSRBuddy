@@ -6,6 +6,7 @@
 #include <chrono>
 #include <map>
 #include "MathHelper.h" 
+#include "BuddyTimer.h"
 
 #define UPDATE_GRINDMOBS_TIME 500ms
 #define NO_TARGET_SIEGE_DISABLE_TIME 1500ms
@@ -84,7 +85,6 @@ private:
 	std::map<INT, GrindMonsterInfo>::iterator FindGrindMonsterInfo(int monsterunitkind);
 
 	bool IsMonsterDead(CMonsterData* monster);
-	QAngle CalcAngle(const D3DXVECTOR3& source, const D3DXVECTOR3& target);
 	void SmoothDeltaAngle(float& deltaAng);
 
 private:
@@ -119,7 +119,8 @@ private:
 	float m_smooth_factor_distance;
 	float m_smooth_factor_time;		
 
-	std::chrono::milliseconds m_update_mob_list_check_time;
+	
+	BuddyTimer m_update_mobs_timer;
 	std::chrono::milliseconds m_no_target_time;
 	std::chrono::milliseconds m_shoot_new_target_delay;
 

@@ -5,6 +5,7 @@
 #include "OSRAPI.h"
 #include "OSRBuddyDefine.h"
 #include "OSRImGuiMenu.h" 
+#include "Utility.h"
 
 #include <algorithm> // std::find
 
@@ -69,6 +70,9 @@ GambleBot::GambleBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 
 	ZeroMemory(&m_suffix_selection, sizeof(FixSelection));
 	ZeroMemory(&m_prefix_selection, sizeof(FixSelection));
+
+	m_gamble_timer = BuddyTimer(GAMBLE_TIME_BASE, GAMBLE_TIME_VARIANCE);
+	m_action_timer = BuddyTimer(GAMBLE_ACTION_TIME_BASE, GAMBLE_ACTION_VARIANCE);
 }
 
 GambleBot::~GambleBot()
@@ -77,9 +81,7 @@ GambleBot::~GambleBot()
 }
 
 void GambleBot::Tick()
-{	
-	UpdateCheckTime(OSR_API->GetElapsedTime());
-
+{												 
 	if (!IsEnabled()) {
 		return;
 	}
@@ -264,7 +266,7 @@ void GambleBot::RenderImGui()
 					}
 					if (ImGui::Button("Gamble"))
 					{
-						if (m_state == GambleBotState::STANDBY && GambleCheckTimeReady()) {
+						if (m_state == GambleBotState::STANDBY && m_gamble_timer.IsReady()) {
 							SetGambleBotState(GambleBotState::GAMBLING);
 						}
 					}
@@ -461,65 +463,16 @@ void GambleBot::SetGambleItem(UID64_t uid)
 
 bool GambleBot::TrySimulateButtonClick(LabButtonCode button)
 {
-	if (InternalActionCheckTimeReady()) 
+	if (m_action_timer.IsReady())
 	{
 		OSR_API->OnButtonClick((int)button);
-		ResetInternalActionCheckTime(true);
+		m_action_timer.Reset();
 		return true;
 	}
 	else {
 		return false;
 	}  	
-}
-
-void GambleBot::UpdateCheckTime(float elapsedTime)
-{
-	if (m_gamble_check_time > 0.0f)
-	{
-		m_gamble_check_time -= elapsedTime * 1000;
-		if (m_gamble_check_time < 0.0f) {
-			m_gamble_check_time = 0.0f;
-		}
-	}
-
-	if (m_internal_action_check_time > 0.0f)
-	{
-		m_internal_action_check_time -= elapsedTime * 1000;
-		if (m_internal_action_check_time < 0.0f) {
-			m_internal_action_check_time = 0.0f;
-		}
-	} 
-}
-
-bool GambleBot::GambleCheckTimeReady()
-{
-	return m_gamble_check_time == 0.0f;
-}
-
-bool GambleBot::InternalActionCheckTimeReady()
-{
-	return m_internal_action_check_time == 0.0f;
-}
-
-void GambleBot::ResetGambleCheckTime(bool random)
-{	
-	if (random) {
-		m_gamble_check_time = static_cast<float>(GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES + m_buddy->GetRandInt32(0, 700));
-	}
-	else {
-		m_gamble_check_time = static_cast<float>GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES;
-	}	
-}
-
-void GambleBot::ResetInternalActionCheckTime(bool random)
-{
-	if (random) {
-		m_internal_action_check_time = static_cast<float>(GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 300));
-	}
-	else {
-		m_internal_action_check_time = static_cast<float>GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION;
-	}
-}
+}	 	
 
 bool GambleBot::CheckRarePrefix(CItemInfo* weapon)
 {
@@ -996,13 +949,13 @@ bool GambleBot::TryTargetItemToInventory()
 
 bool GambleBot::TryDoGambleAction()
 {
-	if (!GambleCheckTimeReady()) {
+	if (!m_gamble_timer.IsReady()) {
 		return false;
 	}
 
 	if (!m_needed_source_items.empty())
 	{  
-		if (!InternalActionCheckTimeReady()) {
+		if (!m_action_timer.IsReady()) {
 			return false;
 		}
 
@@ -1022,7 +975,7 @@ bool GambleBot::TryDoGambleAction()
 			m_gamble_item.UpdateItemInfo();
 		}
 
-		ResetInternalActionCheckTime(true);
+		m_action_timer.Reset();
 		return false;
 	}
 	else
@@ -1031,7 +984,7 @@ bool GambleBot::TryDoGambleAction()
 			return false;
 		}
 
-		ResetGambleCheckTime(true);
+		m_gamble_timer.Reset();
 	} 
 	
 	return true;
@@ -1238,11 +1191,12 @@ void GambleBot::AddNeededSourceItems(GambleAction action)
 
 void GambleBot::Reset()
 {
-	if (TrySimulateButtonClick(LabButtonCode::Cancel))
+	//if (TrySimulateButtonClick(LabButtonCode::Cancel))
 	{
 		SetGambleItem(m_current_gambleitem_uid);
 		SetGambleBotState(GambleBotState::STANDBY);
 		m_next_gamble_action = DetermineNextAction();
+		m_waiting_for_answer = false;
 	}
 }
 

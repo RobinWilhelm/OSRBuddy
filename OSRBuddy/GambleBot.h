@@ -5,16 +5,23 @@
 #include "SDK/ObjectDefine.h"	// INVEN_DISPLAY_INFO
 #include "OSRAPI.h"
 #include "EnchantBot.h"
+#include "BuddyTimer.h"
 
 
 #include "OsrItemInfo.h"
 
 #ifdef RELEASE_SETHIA
-#define GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES (1500)           // minimum time between to complete gamble actions (add/remove fix) 
-#define GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (600)	// button clicks and item movement
+#define GAMBLE_TIME_BASE 2000ms           // minimum time between to complete gamble actions (add/remove fix) 
+#define GAMBLE_TIME_VARIANCE 600ms
+
+#define GAMBLE_ACTION_TIME_BASE 400ms	// button clicks and item movement
+#define GAMBLE_ACTION_VARIANCE 600ms	
 #else
-#define GAMBLEBOT_MIN_TIME_BETWEEN_GAMBLES (1500)           // minimum time between to complete gamble actions (add/remove fix) 
-#define GAMBLEBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (400)	// button clicks and item movement
+#define GAMBLE_TIME_BASE 2000ms           // minimum time between to complete gamble actions (add/remove fix) 
+#define GAMBLE_TIME_VARIANCE 500ms
+
+#define GAMBLE_ACTION_TIME_BASE 300ms	// button clicks and item movement
+#define GAMBLE_ACTION_VARIANCE 500ms	
 #endif // RELEASE_SETHIA
 
 #define COLOR_GAMBLEITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green
@@ -61,12 +68,12 @@ enum class FixCategory
 
 struct FixSelection
 {
-	bool		AllNonGreen;
-	FixCategory			Pierce;
-	FixCategory			ProbDamage;
-	FixCategory			ProbReattack;
-	FixCategory			ReattackDamage;
-	FixCategory			Any;
+	bool AllNonGreen;
+	FixCategory	Pierce;
+	FixCategory	ProbDamage;
+	FixCategory	ProbReattack;
+	FixCategory	ReattackDamage;
+	FixCategory	Any;
 };
 
 
@@ -101,12 +108,7 @@ private:
 	void SetGambleItem(UID64_t uid);
 	void ResetGambleItem();
 
-	bool TryTargetItemToInventory();			   
-	void UpdateCheckTime(float elapsedTime);
-	bool GambleCheckTimeReady();
-	bool InternalActionCheckTimeReady();
-	void ResetGambleCheckTime(bool random = true);
-	void ResetInternalActionCheckTime(bool random = true);
+	bool TryTargetItemToInventory();			
 	bool CheckRarePrefix(CItemInfo* weapon);
 	bool CheckRareSuffix(CItemInfo* weapon);
 	const char* GetGambleActionString(GambleAction);
@@ -138,8 +140,11 @@ private:
 	std::queue<GambleItem>	m_needed_source_items;
 	bool					m_waiting_for_answer;
 
-	float					m_gamble_check_time;			// time between two complete gambles	
-	float					m_internal_action_check_time;	// time between two button clicks and item movement   	
+	BuddyTimer				m_gamble_timer;		// time between two complete gambles	
+	BuddyTimer				m_action_timer;		// time between two button clicks and item movement  
+
+	float					m_gamble_check_time;			
+	float					m_internal_action_check_time;	 	
 	   
 	int						m_amount_SG_ADV_Prefix;
 	int						m_amount_SG_ADV_Suffix;

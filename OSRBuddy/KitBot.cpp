@@ -7,6 +7,7 @@
 #include <algorithm>    
 #include "AtumError.h" 
 #include "AtumProtocol.h"
+#include "Utility.h"
 
 #define KIT_RESEND_TIME 100ms
 #define AUTOBUFF_CHECK_TIME 1s
@@ -1142,10 +1143,10 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                 switch (m_settings.kitmode)
                 {
                 case KitBuffBot::Humanized:
-                    additional_time = std::chrono::milliseconds(m_buddy->GetRandInt32(100, 700));
+                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
                     break;
                 case KitBuffBot::Sleepy:
-                    additional_time = std::chrono::milliseconds(m_buddy->GetRandInt32(500, 1500));
+                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
                     break;
                 }
                 m_energykit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
@@ -1167,10 +1168,10 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                 switch (m_settings.kitmode)
                 {
                 case KitBuffBot::Humanized:
-                    additional_time = std::chrono::milliseconds(m_buddy->GetRandInt32(100, 700));
+                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
                     break;
                 case KitBuffBot::Sleepy:
-                    additional_time = std::chrono::milliseconds(m_buddy->GetRandInt32(500, 1500));
+                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
                     break;
                 }
                 m_shieldkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
@@ -1193,10 +1194,10 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                 switch (m_settings.kitmode)
                 {
                 case KitBuffBot::Humanized:
-                    additional_time = std::chrono::milliseconds(m_buddy->GetRandInt32(100, 700));
+                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
                     break;
                 case KitBuffBot::Sleepy:
-                    additional_time = std::chrono::milliseconds(m_buddy->GetRandInt32(500, 2000));
+                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 2000));
                     break;
                 }
                 m_skillpkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
@@ -1373,10 +1374,10 @@ void KitBuffBot::TickAutoKit()
             switch (m_settings.kitmode)
             {
             case KitBuffBot::Humanized:
-                m_shieldkit_firstuse_delay = std::chrono::milliseconds(m_buddy->GetRandInt32(200, 1000));
+                m_shieldkit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(200, 1000));
                 break;
             case KitBuffBot::Sleepy:
-                m_shieldkit_firstuse_delay = std::chrono::milliseconds(m_buddy->GetRandInt32(800, 2500));
+                m_shieldkit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(800, 2500));
                 break;
             default:
                 break;
@@ -1423,10 +1424,10 @@ void KitBuffBot::TickAutoKit()
             switch (m_settings.kitmode)
             {
             case KitBuffBot::Humanized:
-                m_energykit_firstuse_delay = std::chrono::milliseconds(m_buddy->GetRandInt32(300, 700));
+                m_energykit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(300, 700));
                 break;
             case KitBuffBot::Sleepy:
-                m_energykit_firstuse_delay = std::chrono::milliseconds(m_buddy->GetRandInt32(500, 2000));
+                m_energykit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(500, 2000));
                 break;
             default:
                 break;

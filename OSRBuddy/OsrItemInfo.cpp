@@ -91,11 +91,11 @@ bool OsrItemInfo::Update(UID64_t uid)
 
 bool OsrItemInfo::UpdateItemInfo()
 {  
-	CItemInfo* iinfo = OSR_API->FindItemFromSource(m_UID);
+	CItemInfo* iinfo = OSR_API->FindItemInInventoryByUniqueNumber(m_UID);
 	if (!iinfo) {
-		iinfo = OSR_API->FindItemFromSource(m_UID);
+		iinfo = OSR_API->FindItemFromTarget(m_UID);
 		if (!iinfo) {
-			iinfo = OSR_API->FindItemInInventoryByUniqueNumber(m_UID);
+			iinfo = OSR_API->FindItemFromSource(m_UID);
 			if (!iinfo) {
 				return false;
 			}

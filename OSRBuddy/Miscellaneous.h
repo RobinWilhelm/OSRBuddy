@@ -3,7 +3,7 @@
 #include <chrono>
 #include <atomic>
 #include "OSRBuddyDefine.h"
-			
+#include "BuddyTimer.h"
 
 class CItemInfo;
 
@@ -30,8 +30,6 @@ private:
 	CItemInfo* FindStealthCardInInventory();  	  
 
 	void TickWhisperWarner();
-	bool InventoryActionCheckTimeReady();
-	void ResetInventoryActionCheckTime();
 	void TickInventoryCleaning();
 	void TickCapsuleOpening();
 	bool TickItemDelete();
@@ -47,12 +45,14 @@ private:
 
 	bool m_whisperwarner_snooze_enabled;
 	std::chrono::milliseconds m_ignore_whisperwarn_time;
-	std::chrono::milliseconds m_last_whisperwarn;
 	std::atomic<bool> m_popup_open;
 	
+	BuddyTimer m_inventory_action_timer;
+	BuddyTimer m_whisper_timer;
+	BuddyTimer m_itemsell_timer;
+	   
 	bool m_autoflip;
 
-	std::chrono::milliseconds m_inv_action_check_time;
 	bool m_clean_inventory;
 	bool m_only_clean_while_stopped;
 	bool m_only_clean_while_overheat;
@@ -76,7 +76,6 @@ private:
 	long long m_deleted_item;
 
 	bool m_selling_items;
-	std::chrono::milliseconds m_last_itemsell;
 	bool m_awaiting_sell_ok;
 	bool m_in_sell_building;
 	long long m_sold_item;

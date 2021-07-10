@@ -95,10 +95,7 @@ HRESULT __stdcall D3DInternalBase::Reset_hooked(IDirect3DDevice9* device, D3DPRE
 D3DInternalBase::D3DInternalBase()
 {
     g_D3DInternalBase = this;
-    m_doUnload = false;
-    std::random_device device;
-    m_random_generator = std::unique_ptr<std::mt19937>(new std::mt19937(device()));
-
+    m_doUnload = false;                                                                 
 }
 
 D3DInternalBase::~D3DInternalBase()
@@ -234,17 +231,7 @@ void D3DInternalBase::OnAfterReset(IDirect3DDevice9* device, D3DPRESENT_PARAMETE
     m_renderer->OnResetDevice();
     m_imguimenu->AfterReset();
 }
-
-int D3DInternalBase::GetRandInt32(int min, int max)
-{
-    if (min == max) {
-        return min;
-    }
-
-    std::uniform_int_distribution<int> distribution(min, max);
-    return distribution(*m_random_generator.get());
-}
-
+   
 bool D3DInternalBase::HookWindowProcedure(HWND window)
 {
     SetLastError(0);

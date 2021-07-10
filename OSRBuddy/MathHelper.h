@@ -1,7 +1,6 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "QAngle.h"
 #include <d3dx9math.h>
 
 #ifndef M_PI
@@ -17,11 +16,3 @@
 #ifndef DEG2RAD
 #define DEG2RAD( x  )  ( (float)(x) * (float)(M_PI_F / 180.f) )
 #endif
-
-
-namespace MathHelper
-{
-	inline void SinCos(float radians, float* sine, float* cosine);
-	void AngleVectors(const QAngle& angles, D3DXVECTOR3* forward, D3DXVECTOR3* right, D3DXVECTOR3* up);
-	bool VectorToAngles(const D3DXVECTOR3& forward, QAngle& angles);
-}

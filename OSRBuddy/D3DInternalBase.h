@@ -4,19 +4,16 @@
 #include <memory>
 #include "Trampoline.h"
 #include "ImGuiBase.h"
-#include <random>	   
 #include "D3D9Renderer.h"
 
 #include <d3d9.h>
 #pragma comment(lib,"d3d9.lib")
 
-
 																				 
 using EndSceneType	= HRESULT(__stdcall*)(IDirect3DDevice9*);	  
 using PresentType	= HRESULT(__stdcall*)(IDirect3DDevice9* , const RECT *, const RECT *, HWND, const RGNDATA *);
 using ResetType		= HRESULT(__stdcall*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-																  
-
+		
 
 enum class RenderHookOption
 {
@@ -39,7 +36,7 @@ class D3DInternalBase
 
 public:
 	virtual bool Start() = 0;
-	int GetRandInt32(int min, int max);
+	static int GetRandInt32(int min, int max);
 	HWND GetHwnd() { return m_hWindow; };
 
 protected:
@@ -94,7 +91,5 @@ protected:
 	HWND m_hWindow;
 
 	std::unique_ptr<ImGuiBase> m_imguimenu;		  
-
-	std::unique_ptr<std::mt19937> m_random_generator;	  	  
 	std::unique_ptr<D3D9Renderer> m_renderer;
 };

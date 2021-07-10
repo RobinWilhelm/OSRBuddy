@@ -4,6 +4,7 @@
 #include <Psapi.h>
 #pragma comment( lib, "psapi.lib" )
 
+#include <random>	 
 
 #define INRANGE(x,a,b)		(x >= a && x <= b) 
 #define getBits( x )		(INRANGE(x,'0','9') ? (x - '0') : ((x&(~0x20)) - 'A' + 0xa))
@@ -38,6 +39,19 @@ BOOL CALLBACK EnumWindowsCallback(HWND hWnd, LPARAM lParam)
     return TRUE;
     
 }  
+
+int Utility::GetRandInt32(int min, int max)
+{
+    if (min >= max) {
+        return min;
+    }
+
+    static std::random_device device;
+    static std::mt19937 random_generator = std::mt19937(device());
+                                    
+    std::uniform_int_distribution<int> distribution(min, max);
+    return distribution(random_generator);
+}
 
 HWND Utility::FindWindowFromProcessId(DWORD dwProcessId) {
     EnumData ed = { dwProcessId };

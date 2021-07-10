@@ -199,6 +199,7 @@
     <ClInclude Include="AtumProtocol.h" />
     <ClInclude Include="AtumTypedef.h" />
     <ClInclude Include="BuddyAPI.h" />
+    <ClInclude Include="BuddyTimer.h" />
     <ClInclude Include="D3D9Font.h" />
     <ClInclude Include="D3D9Renderer.h" />
     <ClInclude Include="GambleFixes.h" />
@@ -235,7 +236,6 @@
     <ClInclude Include="OSRBuddy.h" />
     <ClInclude Include="OSRImGuiMenu.h" />
     <ClInclude Include="PersistingTools.h" />
-    <ClInclude Include="QAngle.h" />
     <ClInclude Include="SDK\AppEffectData.h" />
     <ClInclude Include="SDK\AtumApplication.h" />
     <ClInclude Include="SDK\AtumData.h" />
@@ -315,9 +315,9 @@
   <ItemGroup>
     <ClCompile Include="AntiAntiCheat.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
+    <ClCompile Include="BuddyTimer.cpp" />
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
-    <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Miscellaneous.cpp" />
     <ClCompile Include="OsrItemInfo.cpp" />
     <ClCompile Include="Console.cpp" />
