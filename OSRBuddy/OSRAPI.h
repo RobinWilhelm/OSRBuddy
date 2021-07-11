@@ -109,6 +109,8 @@ public:
 	bool IsInventoryFull();	 
 	bool IsLanded();
 	GearType UnitKindToGearType(USHORT unitkind);
+
+	int GetInventorySPI();
 	   	
 
 private:

@@ -489,7 +489,7 @@ void Miscellaneous::TickCapsuleOpening()
 			} 
 		}
 
-		if (m_open_spicapsule && TryOpenCapsule(ItemNumber::SPI_capsule)) {
+		if (m_open_spicapsule && OSR_API->GetInventorySPI() < (MAX_SPI - 200000) && TryOpenCapsule(ItemNumber::SPI_capsule)) {
 			return;
 		}
 	}

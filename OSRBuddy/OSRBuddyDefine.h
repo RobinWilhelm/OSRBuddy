@@ -7,6 +7,9 @@
 #define TO_ENUM(enumtype, number) (static_cast<enumtype>(number))
 #define TO_INT(enumnum) (static_cast<int>(enumnum))
 
+
+#define MAX_SPI 2000000000
+
 // price of 1 item in spi
 #define COST_WARPOINT 1250   
 #define COST_ENCHANTPROTECT_E1 200000
@@ -15,7 +18,7 @@
 #define COST_ENCHANTCARD_COMMON 200000
 #define COST_ENCHANTCARD_SPEED (2000 * COST_WARPOINT)
 #define COST_ENCHANTCARD_ENERGYSHIELD (2000 * COST_WARPOINT) 
-#define COST_ENCHANT_SINGLE 2800
+#define COST_ENCHANT_SINGLE 1400
 
 const std::vector<uint32_t> g_Enchant_probabilities{ 10000, 10000, 10000, 10000, 10000, 9000, 8000, 6000, 4000, 2000, 1000, 500, 100 };
       

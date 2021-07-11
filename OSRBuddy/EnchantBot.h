@@ -8,8 +8,11 @@
 #include "BuddyTimer.h"
 
 #ifdef RELEASE_SETHIA
-#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (2000)
-#define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (600)	// button clicks and item movement
+#define ENCHANT_TIME_BASE 2200ms		
+#define ENCHANT_TIME_VARIANCE 1000ms
+
+#define ENCHANT_ACTION_TIME_BASE 400ms	// button clicks and item movement
+#define ENCHANT_ACTION_TIME_VARIANCE 500ms	
 #else
 #define ENCHANT_TIME_BASE 2000ms		
 #define ENCHANT_TIME_VARIANCE 1000ms
@@ -75,6 +78,21 @@ struct EnchantStatistics
 	int	m_cost_total;
 };
 
+struct EnchantCardsAmount
+{
+	int accuracy;
+	int reattack;
+	int	damage;
+	int	speed;
+	int overheat;
+	int range;
+	int time;
+	int weight;
+	int shield;
+	int energy;
+	int energyshield;
+};
+
 class EnchantBot : public BuddyFeatureBase
 {
 public:
@@ -94,6 +112,7 @@ private:
 	void ResetCurrentEnchantItem();
 	void ResetLab();
 	void UpdateEnchantStats();
+	void UpdateInventoryEnchantCards();
 
 	bool IsValidEnchantItem(ITEM_BASE* enchantItem);
 	void SetEnchantItem(UID64_t uid);
@@ -141,6 +160,8 @@ private:
 	EnchantListType			m_wantedEnchants;
 
 	int						m_previous_enchantnum;
+
+	EnchantCardsAmount		m_inventory_enchantcards;  
 
 	// current amount of item in the inventory
 	int						m_amount_enchprot_e1;

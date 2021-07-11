@@ -3607,24 +3607,7 @@ struct MAP_INFO
 };
 typedef vector<MAP_INFO>		vectorMAP_INFO;
 
-// String Conversion Functions
-const char* GetCharacterString(const CHARACTER* pCharac, string& str);
-const char* GetItemString(const ITEM_BASE* pItemBase, string& str);
-const char* GetItemGeneralString(const ITEM_GENERAL* pItemGeneral, string& str);
-const char* GetItemSkillString(const ITEM_SKILL* pItemSkill, string& str);
-const char* DBG_GET_POSITION_STRING(D3DXVECTOR3& vec, string& str);
-const char* GetRaceString(USHORT race);
-char* Underbar2Space(char* string);
-const char* GetTimeString(string& str);
 
-const char* GetMapString(MAP_CHANNEL_INDEX& refMapChannelIndex, string& str);
-#define GET_MAP_STRING(refMapChannelIndex)	GetMapString(refMapChannelIndex, string())
-
-BYTE* GetIPAddressInBytes(char* i_szIPAddress, BYTE* o_pIPArray);
-const char* GetIPAddressString(BYTE* i_pIPArray, STRNBUF& i_strnbuf);
-const char* GetItemDesParameter(BYTE i_byDesParameter);
-BOOL GIsValidInfuenceType(BYTE i_byInfluenceTy);
-char* GGetLowerCase(char* o_szLowercaseSting, char* i_szString, int nMaxStringSize);
 
 enum EN_CHECK_TYPE
 {

@@ -11,7 +11,7 @@
 
 // pierce
 std::vector<AdvancedPrefix> GoodAdvanced_Pierce_PrefixList = { AdvancedPrefix::Bandit, AdvancedPrefix::Traitor, AdvancedPrefix::Archrival, AdvancedPrefix::Adversary, AdvancedPrefix::Bane, AdvancedPrefix::Challenger, AdvancedPrefix::Stronghold };
-std::vector<AdvancedPrefix> BestAdvanced_Pierce_PrefixList = { AdvancedPrefix::Bandit};
+std::vector<AdvancedPrefix> BestAdvanced_Pierce_PrefixList = { AdvancedPrefix::Bandit, AdvancedPrefix::Traitor};
 std::vector<StandardPrefix> GoodStandard_Pierce_PrefixList = { StandardPrefix::Bandit, StandardPrefix::Traitor, StandardPrefix::Archrival, StandardPrefix::Adversary, StandardPrefix::Bane, StandardPrefix::Challenger_1, StandardPrefix::Challenger_2, StandardPrefix::Stronghold };
 std::vector<StandardPrefix> BestStandard_Pierce_PrefixList = { StandardPrefix::Bandit, StandardPrefix::Traitor };
 
@@ -22,7 +22,7 @@ std::vector<StandardPrefix> GoodStandard_ProbReattack_PrefixList = { StandardPre
 std::vector<StandardPrefix> BestStandard_ProbReattack_PrefixList = { StandardPrefix::Legend, StandardPrefix::Bio };
 
 std::vector<AdvancedSuffix> GoodAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Legend, AdvancedSuffix::Bio, AdvancedSuffix::Meteo, AdvancedSuffix::Silence, AdvancedSuffix::Attack };
-std::vector<AdvancedSuffix> BestAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Legend};
+std::vector<AdvancedSuffix> BestAdvanced_ProbReattack_SuffixList = { AdvancedSuffix::Legend, AdvancedSuffix::Bio };
 std::vector<StandardSuffix> GoodStandard_ProbReattack_SuffixList = { StandardSuffix::Legend, StandardSuffix::Bio, StandardSuffix::Meteo, StandardSuffix::Silence, StandardSuffix::Attack };
 std::vector<StandardSuffix> BestStandard_ProbReattack_SuffixList = { StandardSuffix::Legend, StandardSuffix::Bio };
 

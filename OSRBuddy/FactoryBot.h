@@ -2,13 +2,20 @@
 #include "BuddyFeatureBase.h"	
 #include "CookBook.h"
 #include "OSRBuddyDefine.h"
+#include "BuddyTimer.h"
 
 #ifdef RELEASE_SETHIA
-#define ENCHANTBOT_MIN_TIME_BETWEEN_ENCHANTS (2000)
-#define ENCHANTBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (600)	// button clicks and item movement
-#else
-#define FACTORYBOT_MIN_TIME_BETWEEN_CRAFTS (2100)
-#define FACTORYBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION (700)	// button clicks and item movement
+#define FACTORYBOT_TIME_BASE 2000ms           // minimum time between to complete gamble actions (add/remove fix) 
+#define FACTORYBOT_TIME_VARIANCE 500ms
+
+#define FACTORYBOT_ACTION_TIME_BASE 300ms	// button clicks and item movement
+#define FACTORYBOT_ACTION_VARIANCE 500ms	
+#else  	
+#define FACTORYBOT_TIME_BASE 2000ms           // minimum time between to complete gamble actions (add/remove fix) 
+#define FACTORYBOT_TIME_VARIANCE 500ms
+
+#define FACTORYBOT_ACTION_TIME_BASE 300ms	// button clicks and item movement
+#define FACTORYBOT_ACTION_VARIANCE 500ms	  
 #endif // RELEASE_SETHIA
 
 enum class FactoryBotState {
@@ -38,12 +45,6 @@ private:
 	void DoStackedCrafting();
 	bool TrySimulateOkButton(LabButtonCode code);
 
-	void UpdateCheckTime(float elapsedTime);
-	bool InternalActionCheckTimeReady();
-	bool CraftCheckTimeReady();
-	void ResetInternalActionCheckTime(bool random = true);
-	void ResetCraftCheckTime(bool random = true);
-
 	void CalculateFreeInventorySpace();
 	void CalculateMaxCraftableFromRessources();
 	void UpdateTotalGambleItemAmount();
@@ -59,9 +60,9 @@ private:
 	int m_max_from_ressources;
 	int m_max_amount;
 	bool m_open_instant;
-
-	float	m_craftCheckTime;
-	float   m_internalActionCheckTime;	// button clicks and item movement 
+							
+	BuddyTimer m_craft_timer;
+	BuddyTimer m_action_timer;
 	bool	m_waiting_for_answer;
 
 	bool m_selected_recipie;

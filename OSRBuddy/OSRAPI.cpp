@@ -826,6 +826,11 @@ GearType OldSchoolRivalsAPI::UnitKindToGearType(USHORT unitkind)
 		return GearType::AGear;
 }
 
+int OldSchoolRivalsAPI::GetInventorySPI()
+{
+	return m_atumapplication->m_pInterface->m_pGameMain->m_pInven->m_nItemSpi;
+}
+
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)
 {
 	D3DXMatrixMultiply(&pframeCur->matCombined, &pframeCur->matRot, &matCur);

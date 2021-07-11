@@ -343,11 +343,14 @@
     <ClInclude Include="GambleFixes.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="CookBook.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="FactoryBot.h">
       <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="BuddyTimer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="CookBook.h">
+      <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

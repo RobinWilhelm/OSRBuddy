@@ -4,6 +4,7 @@
 #include "OSRAPI.h"
 #include "CookBook.h"
 #include "OSRBuddyDefine.h"
+#include "Utility.h"
 
 FactoryBot::FactoryBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
@@ -18,6 +19,8 @@ FactoryBot::FactoryBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_walker = 0;
 	m_crafted = 0;
 	m_cook_book = CookBook();
+	m_craft_timer = BuddyTimer(FACTORYBOT_TIME_BASE, FACTORYBOT_TIME_VARIANCE);
+	m_action_timer = BuddyTimer(FACTORYBOT_ACTION_TIME_BASE, FACTORYBOT_ACTION_VARIANCE);
 }
 
 FactoryBot::~FactoryBot()
@@ -25,9 +28,7 @@ FactoryBot::~FactoryBot()
 }
 
 void FactoryBot::Tick()
-{
-	UpdateCheckTime(OSR_API->GetElapsedTime());
-
+{												   
 	if (!IsEnabled()) {
 		return;
 	}
@@ -53,8 +54,10 @@ void FactoryBot::Tick()
 		SetRecipe(7036910);
 	case FactoryBotState::CRAFT:
 		if (m_waiting_for_answer) {
-			if (TrySimulateOkButton(LabButtonCode::Ok)) {
+			if (TrySimulateOkButton(LabButtonCode::Ok)) 
+			{
 				m_waiting_for_answer = false;
+				m_craft_timer.Reset();
 			}
 		}
 		else
@@ -96,7 +99,7 @@ void FactoryBot::RenderImGui()
 			ImGui::SliderInt("Wanted Amount", &m_wanted_amount, 0, m_max_amount);
 			if (ImGui::Button("Craft"))
 			{
-				if (m_state == FactoryBotState::STANDBY && CraftCheckTimeReady()) {
+				if (m_state == FactoryBotState::STANDBY && m_craft_timer.IsReady()) {
 						SetFactoryBotState(FactoryBotState::CRAFT);
 				}
 			}
@@ -118,11 +121,11 @@ void FactoryBot::SetRecipe(int id) {
 
 bool FactoryBot::DoCrafting(int walk)
 {
-	if (!InternalActionCheckTimeReady()) {
+	if (!m_action_timer.IsReady()) {
 		return false;
 	}
 	else {
-		ResetInternalActionCheckTime();
+		m_action_timer.Reset();
 	}
 
 	CItemInfo* item = nullptr;
@@ -135,7 +138,7 @@ bool FactoryBot::DoCrafting(int walk)
 			return false;
 		}
 		OSR_API->InvenToSourceItem(item, m_ingredients_for_recipie.at(walk).amount, true);
-		ResetInternalActionCheckTime(true);
+		m_action_timer.Reset();
 		return true;
 	}
 
@@ -153,66 +156,17 @@ void FactoryBot::DoStackedCrafting()
 
 bool FactoryBot::TrySimulateOkButton(LabButtonCode button)
 {
-	if (InternalActionCheckTimeReady())
+	if (m_action_timer.IsReady())
 	{
 		OSR_API->OnButtonClick((int)button, true);
-		ResetInternalActionCheckTime(true);
+		m_action_timer.Reset();
 		return true;
 	}
 	else {
 		return false;
 	}
 }
-
-void FactoryBot::UpdateCheckTime(float elapsedTime)
-{
-	if (m_craftCheckTime > 0.0f)
-	{
-		m_craftCheckTime -= elapsedTime * 1000;
-		if (m_craftCheckTime < 0.0f) {
-			m_craftCheckTime = 0.0f;
-		}
-	}
-
-	if (m_internalActionCheckTime > 0.0f)
-	{
-		m_internalActionCheckTime -= elapsedTime * 1000;
-		if (m_internalActionCheckTime < 0.0f) {
-			m_internalActionCheckTime = 0.0f;
-		}
-	}
-}
-
-bool FactoryBot::InternalActionCheckTimeReady()
-{
-	return m_internalActionCheckTime == 0.0f;
-}
-
-bool FactoryBot::CraftCheckTimeReady()
-{
-	return m_craftCheckTime == 0.0f;
-}
-
-void FactoryBot::ResetInternalActionCheckTime(bool random)
-{
-	if (random) {
-		m_internalActionCheckTime = static_cast<float>(FACTORYBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION + m_buddy->GetRandInt32(0, 500));
-	}
-	else {
-		m_internalActionCheckTime = static_cast<float>(FACTORYBOT_MIN_TIME_BETWEEN_INTERNAL_ACTION);
-	}
-}
-
-void FactoryBot::ResetCraftCheckTime(bool random)
-{
-	if (random) {
-		m_craftCheckTime = static_cast<float>(FACTORYBOT_MIN_TIME_BETWEEN_CRAFTS + m_buddy->GetRandInt32(0, 1500));
-	}
-	else {
-		m_craftCheckTime = static_cast<float>FACTORYBOT_MIN_TIME_BETWEEN_CRAFTS;
-	}
-}
-
+   	   
 void FactoryBot::CalculateFreeInventorySpace()
 {
 	int maxInvent = OSR_API->GetMaxInventorySize();

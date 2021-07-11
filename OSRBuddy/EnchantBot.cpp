@@ -30,6 +30,8 @@ EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_enchant_timer = BuddyTimer(ENCHANT_TIME_BASE, ENCHANT_TIME_VARIANCE);
 	m_action_timer = BuddyTimer(ENCHANT_ACTION_TIME_BASE, ENCHANT_ACTION_TIME_VARIANCE);
 
+	m_enchantTargetKind = EnchantItemKind::Weapon_advanced;
+
 	ZeroMemory(&m_statisticsSession, sizeof(EnchantStatistics));
 }
 
@@ -77,7 +79,6 @@ void EnchantBot::Tick()
 			if (targetitem && TryTargetItemToInventory())
 			{
 				m_waiting_for_answer = false;
-				UpdateEnchantItemAmount();
 				// item should be in inventory now, set the current enchant item again					
 				SetEnchantItem(m_currentEnchantItemUID);				
 				m_next_action = EnchantAction::Add_EnchantItem;
@@ -95,7 +96,7 @@ void EnchantBot::Tick()
 						m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
 					} 					
 					SetEnchantBotState(EnchantBotState::STANDBY);
-				}
+				}	
 				UpdateEnchantStats();
 			}
 		}
@@ -133,6 +134,7 @@ void EnchantBot::RenderImGui()
 				ResetCurrentEnchantItem();
 				m_selectNewEnchantItem = true;
 				SetEnchantBotState(EnchantBotState::STANDBY);
+				ZeroMemory(&m_inventory_enchantcards, sizeof(EnchantCardsAmount));
 			}
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Press the \"Select New\" button and then click on an weapon/armor in inventory to select a new enchant item.");
@@ -206,7 +208,7 @@ void EnchantBot::RenderSuccessPercentage(int enchstep, int total_tries, int fail
 	ImColor color = ImColor(255,255,0,255);
 	float color_ratio = std::min(1.0f, fabs(delta) / probabiliy * 10.0f);
 
-	if (delta > -0.05f) // bad -> gradually remove green
+	if (delta > 0.03f) // bad -> gradually remove green
 	{
 		color.Value.y = 1.0f - color_ratio;
 	}
@@ -269,6 +271,60 @@ void EnchantBot::UpdateEnchantStats()
 	}
 }
 
+void EnchantBot::UpdateInventoryEnchantCards()
+{	   
+	GearType geartype = OSR_API->GetPlayerGearType();
+	if (m_currentEnchantItemUID != 0) {
+		geartype = OSR_API->UnitKindToGearType(m_enchant_item.GetItemInfo()->m_pItemInfo->ReqUnitKind);
+	}
+	CItemInfo* iteminfo = nullptr;
+
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Accuracy, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+			m_inventory_enchantcards.accuracy = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Reattack, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.reattack = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::MinMax, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.damage = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Speed, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.speed = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Range, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.range = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Time, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.time = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Weight, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.weight = iteminfo->CurrentCount;
+	}	 
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Overheating, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.overheat = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Shield, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.shield = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::Energy, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.energy = iteminfo->CurrentCount;
+	}
+	iteminfo = GetEnchantItemFromInventory(EnchantItemType::EnergyShield, m_enchantTargetKind, geartype);
+	if (iteminfo) {
+		m_inventory_enchantcards.energyshield = iteminfo->CurrentCount;
+	}			
+}
+
   
 bool EnchantBot::IsValidEnchantItem(ITEM_BASE* enchantItem)
 {
@@ -287,7 +343,7 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 	m_enchant_item = OsrItemInfo(uid);
 	m_buddy->GetPersistingTools()->CloseStream();
 	m_buddy->GetPersistingTools()->SetItem(uid);
-	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();
+	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();	   	
 
 	if (!m_enchant_item.IsArmor() && !m_enchant_item.IsWeapon()) 
 	{
@@ -310,6 +366,8 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 	else {
 		m_enchantTargetKind = EnchantItemKind::Armor;
 	}
+
+	UpdateEnchantItemAmount();
 
 	ResetEnchantList(m_currentEnchants);
 	for (auto enchant : m_enchant_item.GetItemInfo()->m_vecDefEnchant)
@@ -485,8 +543,7 @@ void EnchantBot::RenderEnchantItemText()
 
 void EnchantBot::RenderEnchantButtons()
 { 
-	ImGui::Dummy(ImVec2(0, 5));
-
+	ImGui::Spacing();
 	int wantend_enchant_count = m_wantedEnchants.size();	  
 					   
 	if ((m_currentEnchantItemUID != 0 && m_enchant_item.IsWeapon()) || m_currentEnchantItemUID == 0)
@@ -494,28 +551,47 @@ void EnchantBot::RenderEnchantButtons()
 		if (ImGui::Button("Reattack Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Reattack, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.reattack);
+
 		if (ImGui::Button("Accuracy Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Accuracy, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.accuracy);
+
 		if (ImGui::Button("Attack Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::MinMax, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.damage);
+
 		if ((m_currentEnchantItemUID != 0 && IS_SECONDARY_WEAPON_1(m_enchant_item.GetItemInfo()->Kind)) || !m_currentEnchantItemUID == 0)
 		{
 			if (ImGui::Button("Speed Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 				AddEnchantToList(EnchantItemType::Speed, m_wantedEnchants);
 			}
+			ImGui::SameLine();
+			RenderColoredEnchantItemAmount(m_inventory_enchantcards.speed);
 		}		
 		
 		if (ImGui::Button("Weight Card", ImVec2(100, 20)) && wantend_enchant_count <= 13) {
 			AddEnchantToList(EnchantItemType::Weight, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.weight);
+
 		if (ImGui::Button("Range Card", ImVec2(100, 20)) && wantend_enchant_count <= 13) {
 			AddEnchantToList(EnchantItemType::Range, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.range);
+
 		if (ImGui::Button("Time Card", ImVec2(100, 20)) && wantend_enchant_count <= 13) {
 			AddEnchantToList(EnchantItemType::Time, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.time);
 		
 	}
 	else if ((m_currentEnchantItemUID != 0 && m_enchant_item.IsArmor()) || m_currentEnchantItemUID == 0)
@@ -523,12 +599,20 @@ void EnchantBot::RenderEnchantButtons()
 		if (ImGui::Button("Shield Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Shield, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.shield);
+
 		if (ImGui::Button("Energy Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::Energy, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.energy);
+
 		if (ImGui::Button("Energy/Shield Card", ImVec2(100, 20)) && wantend_enchant_count < 13) {
 			AddEnchantToList(EnchantItemType::EnergyShield, m_wantedEnchants);
 		}
+		ImGui::SameLine();
+		RenderColoredEnchantItemAmount(m_inventory_enchantcards.energyshield);
 	}  	
 
 	ImGui::NewLine();
@@ -574,7 +658,7 @@ void EnchantBot::RenderStatisticsPopup()
 					ImGui::Text("Run View");
 					ImGui::Separator();
 
-					ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("SessionRunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
 						for (int i = 0; i < 6; i++)
 						{
@@ -599,10 +683,10 @@ void EnchantBot::RenderStatisticsPopup()
 				{
 					ImGui::Text("Used Items and Cost (Session):");
 					ImGui::Separator();
-					ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("SessionCostColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
 						ImGui::SetColumnWidth(0, 150);
-						ImGui::SetColumnWidth(1, 75);
+						ImGui::SetColumnWidth(1, 65);
 						ImGui::Text("E1 Protects");
 						ImGui::Text("E5 Protects");
 						ImGui::Text("8%% Chance Cards");
@@ -649,7 +733,7 @@ void EnchantBot::RenderStatisticsPopup()
 					ImGui::Text("Overall Weapons statistics");
 					ImGui::Separator();
 
-					ImGui::BeginColumns("RunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("WeaponRunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
 						for (int i = 0; i < 6; i++)
 						{
@@ -676,10 +760,10 @@ void EnchantBot::RenderStatisticsPopup()
 					ImGui::Separator();
 					//ImGui::Text("E11 Tries: ");
 					//ImGui::Text(std::to_string(m_statisticsWeapon.m_enchantStats[5][0]).c_str());
-					ImGui::BeginColumns("WeaponStatColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("WeaponCostColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
 						ImGui::SetColumnWidth(0, 150);
-						ImGui::SetColumnWidth(1, 75);
+						ImGui::SetColumnWidth(1, 65);
 						ImGui::Text("E1 Protects");
 						ImGui::Text("E5 Protects");
 						ImGui::Text("8%% Chance Cards");
@@ -1069,6 +1153,8 @@ void EnchantBot::UpdateEnchantItemAmount()
 	if (e1_enchprot) {
 		m_amount_enchprot_e1 = e1_enchprot->CurrentCount;
 	}
+
+	UpdateInventoryEnchantCards();
 }
 
 void EnchantBot::UpdateTotalCost()
@@ -1190,4 +1276,4 @@ void EnchantBot::OnEnable()
 		MessageBeep(MB_ICONWARNING);
 		Enable(false);
 	}
-}
+} 
