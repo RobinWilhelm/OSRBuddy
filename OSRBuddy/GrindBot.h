@@ -8,12 +8,13 @@
 #include "MathHelper.h" 
 #include "BuddyTimer.h"
 
-#define UPDATE_GRINDMOBS_TIME 500ms
-#define NO_TARGET_SIEGE_DISABLE_TIME 1500ms
-#define NO_TARGET_STOP_SHOOTING_TIME 600ms
+#define UPDATE_GRINDMOBS_TIME 1000ms
+#define NO_TARGET_SIEGE_DISABLE_TIME 1000ms
 
 #define MIN_NEW_TARGET_DELAY_TIME 50ms
 #define MAX_NEW_TARGET_DELAY_TIME 300ms
+
+#define ANTI_RAM_CHECK_RADIUS 250
 
 class KitBuffBot; 
 class Miscellaneous;
@@ -73,9 +74,7 @@ private:
 	CMonsterData* FindNewTarget(float max_distance, bool front_only = false);
 	void AimAtTarget(CMonsterData* m_target);
 	void ToggleGrinding();
-	
-	bool ShouldCheck_GrindMobs();
-	void Reset_GrindMobsCheckTime();
+							 
 	void Reset_NewTargetDelayTime();
 
 	void UpdateCheckTime();
@@ -109,11 +108,12 @@ private:
 	bool m_shoot_all_goldies;
 	bool m_prioritise_closer_mobs;
 	bool m_anti_ram;
+
 	TargetMode m_target_mode;
 
-	bool m_humanized_overshoot;
-	int m_humanized_target_delay_min;
-	int m_humanized_target_delay_max;
+	bool m_keep_shooting;
+	int m_target_delay_min;
+	int m_target_delay_max;
 
 	SmoothType m_smoothtype;  
 	float m_smooth_factor_distance;

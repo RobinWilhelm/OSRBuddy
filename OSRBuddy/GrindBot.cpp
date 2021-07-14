@@ -24,9 +24,9 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 
     m_shoot_all_goldies = true;
     m_front_only = true;
-    m_humanized_overshoot = true;
-    m_humanized_target_delay_min = MIN_NEW_TARGET_DELAY_TIME.count();
-    m_humanized_target_delay_max = MAX_NEW_TARGET_DELAY_TIME.count();
+    m_keep_shooting = true;
+    m_target_delay_min = MIN_NEW_TARGET_DELAY_TIME.count();
+    m_target_delay_max = MAX_NEW_TARGET_DELAY_TIME.count();
     m_target_mode = TargetMode::CrosshairDistance;
 
 
@@ -79,13 +79,10 @@ void GrindBot::Tick()
         if (!m_target)
         {
             m_no_target_time += std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
-            if ((m_no_target_time - m_shoot_new_target_delay) >= NO_TARGET_STOP_SHOOTING_TIME)
+            if (m_no_target_time >= NO_TARGET_SIEGE_DISABLE_TIME) 
             {
                 OSR_API->UsePrimaryWeapon(false);
                 OSR_API->UseSecondaryWeapon(false);
-            }  
-
-            if (m_no_target_time >= NO_TARGET_SIEGE_DISABLE_TIME) {
                 m_kitbot->ToggleSKill(SkillType::Siege_Mode, false);
             }
         } 
@@ -115,7 +112,7 @@ void GrindBot::Tick()
         } 
         else
         {
-            if (!m_humanized_overshoot) 
+            if (!m_keep_shooting) 
             {
                 OSR_API->UsePrimaryWeapon(false);
                 OSR_API->UseSecondaryWeapon(false);
@@ -172,33 +169,33 @@ void GrindBot::RenderImGui()
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
                 }
-                ImGui::Checkbox("Overshoot", &m_humanized_overshoot);
+                ImGui::Checkbox("Keep shooting", &m_keep_shooting);
                 if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Will continue to shoot for some time after a mob died.");
+                    ImGui::SetTooltip("Will continue to shoot while aiming at the next target.");
                 }                
                 ImGui::Checkbox("Anti ram", &m_anti_ram);
                 if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Will prioritise close targets that could ram the gear and turn it upside down.");
-                }
+                    ImGui::SetTooltip("Will prioritise close targets (250m).");
+                }                   
                   
                 ImGui::NewLine();
                 ImGui::Text("Targeting delay");
                 ImGui::Separator();
                 ImGui::BeginColumns("TargetDelayColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
                 { 
-                    if(ImGui::SliderInt("Min", &m_humanized_target_delay_min, 0, 500))
+                    if(ImGui::SliderInt("Min", &m_target_delay_min, 0, 500))
                     {
-                        if (m_humanized_target_delay_min > m_humanized_target_delay_max) {
-                            m_humanized_target_delay_min = m_humanized_target_delay_max;
+                        if (m_target_delay_min > m_target_delay_max) {
+                            m_target_delay_min = m_target_delay_max;
                         }
                     }
                 }
                 ImGui::NextColumn();
                 {
-                    if (ImGui::SliderInt("Max", &m_humanized_target_delay_max, 0, 500)) 
+                    if (ImGui::SliderInt("Max", &m_target_delay_max, 0, 500)) 
                     { 
-                        if (m_humanized_target_delay_min > m_humanized_target_delay_max) {
-                            m_humanized_target_delay_max = m_humanized_target_delay_min;
+                        if (m_target_delay_min > m_target_delay_max) {
+                            m_target_delay_max = m_target_delay_min;
                         }
                     }
                 }
@@ -412,6 +409,9 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
     float min_distance_prio = 999999;
     CMonsterData* newtarget_prio = nullptr;   
 
+    float min_distance_anitram = 999999;
+    CMonsterData* newtarget_antiram = nullptr;
+
     D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
     D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
 
@@ -424,17 +424,28 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
             return false;
         }
 
-        if (GetTargetDistance(monster) > max_distance) {
+        float target_dist = GetTargetDistance(monster);
+        if (target_dist > max_distance) {
             return false;
         }
 
         if (CanShootAtTarget(monster))
         {
             float dist = 9999999.0f;
+            if (m_anti_ram && target_dist <= ANTI_RAM_CHECK_RADIUS)
+            {
+                if (target_dist < min_distance_anitram)
+                {
+                    min_distance_anitram = target_dist;
+                    newtarget_antiram = monster;
+                    return true;
+                }
+            }
+
             switch (m_target_mode)
             {
             case TargetMode::GearDistance:
-                dist = GetTargetDistance(monster);
+                dist = target_dist;
                 break;
             case TargetMode::CrosshairDistance:                   
                 D3DXVECTOR3 targetDir = monster->m_vPos - mousepos;
@@ -457,6 +468,7 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
                 newtarget_prio = monster;
             }
         }
+        return true;
     };    
            
     if (front_only)
@@ -474,8 +486,8 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
             checkTarget(monster.second);
         }        
     } 
-   
-    return (newtarget_prio) ? newtarget_prio : newtarget;
+
+    return  (newtarget_antiram) ? newtarget_antiram : ((newtarget_prio) ? newtarget_prio : newtarget);
 }
 
 void GrindBot::AimAtTarget(CMonsterData* m_target)
@@ -560,7 +572,7 @@ void GrindBot::ToggleGrinding()
   
 void GrindBot::Reset_NewTargetDelayTime()
 {
-    m_shoot_new_target_delay = std::chrono::milliseconds(Utility::GetRandInt32(m_humanized_target_delay_min, m_humanized_target_delay_max));
+    m_shoot_new_target_delay = std::chrono::milliseconds(Utility::GetRandInt32(m_target_delay_min, m_target_delay_max));
 }
 
 void GrindBot::UpdateCheckTime()
@@ -683,6 +695,7 @@ void GrindBot::OnEnable()
     m_total_mobs_killed = 0;
     m_mobs.clear();
 
+    /*
     // sommer event special, always add these monster to the list
     GrindMonsterInfo gmi;
     gmi.clean_name = "Dropped Ball";
@@ -693,7 +706,7 @@ void GrindBot::OnEnable()
     m_mobs.insert({ 2098100 , gmi});
     gmi.clean_name = "Flying Ball";  
     m_mobs.insert({ 2098000 , gmi });  
-
+    */
     m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;    
                                    
     // reset grinding timer
@@ -851,9 +864,9 @@ void GrindBot::GetNewTarget()
     {
         CMonsterData* new_target = nullptr;
         // try to find a close target first, to prevent getting rammed
-        if (m_anti_ram) {
-            new_target = FindNewTarget(250, m_front_only);
-        }
+        //if (m_anti_ram) {
+        //    new_target = FindNewTarget(250, m_front_only);
+        //}
 
         if (!new_target) {
             new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f - 50, m_front_only);

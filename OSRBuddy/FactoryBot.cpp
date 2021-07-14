@@ -211,7 +211,7 @@ void FactoryBot::SetMaxAmount()
 
 std::string FactoryBot::GetName() const
 {
-	return "FactoryBot Pre Alpha";
+	return "Eiskrem Machine Alpha";
 }
 
 FeatureType FactoryBot::GetType() const
