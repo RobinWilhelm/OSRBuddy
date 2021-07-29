@@ -251,8 +251,8 @@ void GrindBot::RenderImGui()
             ImGui::Text("Statistics");
             ImGui::Separator();
 
-            std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
-            ImGui::Text(grindtime.c_str());
+            //std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
+            ImGui::Text(("Grinding Time: " + m_grind_time_string).c_str());
 
             std::string mobskilled = "Mobs killed: " + std::to_string(m_total_mobs_killed);
             ImGui::Text(mobskilled.c_str());
@@ -588,7 +588,11 @@ void GrindBot::UpdateCheckTime()
 void GrindBot::UpdateGrindingTime()
 {
     auto current = std::chrono::system_clock::now();
+    static auto last_time = m_grinding_time;
     m_grinding_time = m_grinding_time_total + std::chrono::duration_cast<std::chrono::milliseconds>(current - m_grinding_start);
+    if (m_grinding_time - last_time >= 1s) {
+        m_grind_time_string = Utility::GetTimeString(m_grinding_time);
+    }
 }
 
 void GrindBot::UpdateGrindMobInfo()
@@ -712,6 +716,7 @@ void GrindBot::OnEnable()
     // reset grinding timer
     m_grinding_time = 0ms;
     m_grinding_time_total = 0ms;
+    m_grind_time_string = Utility::GetTimeString(m_grinding_time);
 
     m_kitbot = static_cast<KitBuffBot*>(m_buddy->GetFeatureByType(FeatureType::KitBuffBot));
     if (m_kitbot)

@@ -36,6 +36,7 @@ private:
 	bool TryOpenCapsule(ItemNumber capsule);
 	void TickItemSell();
 	void TickAutoFlip();
+	void TickBossWarner();
 
 private:
 	bool m_whisperwarner_active;
@@ -45,13 +46,16 @@ private:
 
 	bool m_whisperwarner_snooze_enabled;
 	std::chrono::milliseconds m_ignore_whisperwarn_time;
-	std::atomic<bool> m_popup_open;
+	std::atomic<bool> m_whisper_popup_open;
 	
 	BuddyTimer m_inventory_action_timer;
 	BuddyTimer m_whisper_timer;
 	BuddyTimer m_itemsell_timer;
-	   
+	BuddyTimer m_bosscheck_timer;
+
 	bool m_autoflip;
+	bool m_bosswarner;
+	bool m_boss_popup_open;
 
 	bool m_clean_inventory;
 	bool m_only_clean_while_stopped;
@@ -64,6 +68,7 @@ private:
 	bool m_open_mineralcapsule;
 	bool m_open_wpcapsule;
 	bool m_open_soccer_ball_capsule;
+	bool m_open_vanillaicecream_capsule;
 	bool m_delete_items;
 	bool m_delete_weapons;
 	bool m_delete_engines;

@@ -4,11 +4,14 @@
 #include <iomanip>
 #include <sstream>
 #include <locale>
+#include <chrono>
                    
 
 class Utility
 {
 public:    
+    static std::string GetTimeString(std::chrono::milliseconds ms);
+
     static int GetRandInt32(int min, int max);
 
     static HWND FindWindowFromProcessId(DWORD dwProcessId);

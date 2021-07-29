@@ -40,6 +40,27 @@ BOOL CALLBACK EnumWindowsCallback(HWND hWnd, LPARAM lParam)
     
 }  
 
+std::string Utility::GetTimeString(std::chrono::milliseconds ms)
+{ 
+    // convert to std::time_t in order to convert to std::tm (broken time)
+    //auto timer = std::chrono::system_clock::to_time_t(std::chrono::time_point<std::chrono::system_clock>(ms));
+
+    // convert to broken time
+    std::tm bt;
+    //localtime_s(&bt, &timer);
+
+    std::ostringstream oss;
+
+    bt.tm_sec = (ms.count() / 1000) % 60;
+    bt.tm_min = (ms.count() / 60000) % 60;
+    bt.tm_hour = (ms.count() / 3600000) % 24;
+
+    oss << std::put_time(&bt, "%H:%M:%S"); // HH:MM:SS
+    //oss << '.' << std::setfill('0') << std::setw(3) << ms.count();
+
+    return oss.str();
+}
+
 int Utility::GetRandInt32(int min, int max)
 {
     if (min >= max) {

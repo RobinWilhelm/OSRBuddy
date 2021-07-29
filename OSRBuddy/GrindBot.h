@@ -95,6 +95,7 @@ private:
 	std::chrono::milliseconds m_grinding_time;
 	std::chrono::milliseconds m_grinding_time_total;
 	std::chrono::time_point<std::chrono::system_clock> m_grinding_start;
+	std::string m_grind_time_string;
 
 	std::chrono::milliseconds m_aimtime_current;
 	std::chrono::milliseconds m_aimtime_final;
@@ -125,6 +126,5 @@ private:
 	std::chrono::milliseconds m_shoot_new_target_delay;
 
 	std::map<INT, GrindMonsterInfo> m_mobs;
-	int m_total_mobs_killed;
-
+	int m_total_mobs_killed;  
 };

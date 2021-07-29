@@ -7,7 +7,7 @@
 #define WHISPER_WARNING_TIME 10s
 #define WHISPER_SNOOZE_TIME 2min		  
 
-#define CAPSULE_OPEN_REATTACK 100ms
+#define CAPSULE_OPEN_REATTACK 300ms
 #define CAPSULE_OPEN_REATTACK_VARIANCE 300ms
    
 #define ITEM_DELETE_REATTACK 400ms
@@ -44,6 +44,11 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_sold_item = 0;
 	m_deleted_item = 0;	
 	m_open_capsules = true;
+
+	m_open_vanillaicecream_capsule = false;
+		
+	m_bosscheck_timer = BuddyTimer(1s);
+	m_bosswarner = false;
 }
 
 Miscellaneous::~Miscellaneous()
@@ -66,6 +71,7 @@ void Miscellaneous::Tick()
 	TickItemSell();
 	TickWhisperWarner();
 	TickInventoryCleaning();
+	TickBossWarner();
 }
 
 void Miscellaneous::RenderImGui()
@@ -106,6 +112,7 @@ void Miscellaneous::RenderImGui()
 				ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
 				ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
 				ImGui::Checkbox("Fantasy Globe MC", &m_open_fantasyglobemineralcapsule);
+				ImGui::Checkbox("Vanilla Ice Cream", &m_open_vanillaicecream_capsule);
 			}
 			ImGui::NextColumn();
 			{
@@ -180,6 +187,7 @@ void Miscellaneous::RenderImGui()
 				ImGui::Checkbox("Autoflip", &m_autoflip);
 			}
 			ImGui::EndDisabledMode();
+			ImGui::Checkbox("Boss Warner", &m_bosswarner);
 		}
 		ImGui::EndChild();	
 	}
@@ -287,7 +295,7 @@ bool Miscellaneous::TrySendSellItem(CItemInfo* item, int count)
 
 void Miscellaneous::OnMessageBoxClose(int result)
 {
-	if (result == 1) // ok button
+	if (m_whisper_popup_open && result == 1) // ok button
 	{
 		// set all messages as read 
 		CINFGameMainChat* chat = OSR_API->GetINFGameMainChat();
@@ -304,8 +312,13 @@ void Miscellaneous::OnMessageBoxClose(int result)
 			auto currenttime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
 			m_whisper_timer.Reset(WHISPER_SNOOZE_TIME);
 		}
+		m_whisper_popup_open = false;
 	}	  
-	m_popup_open = false;
+
+	if (m_boss_popup_open && result == 1)
+	{  
+		m_boss_popup_open = false;
+	}
 }
 
 
@@ -387,7 +400,7 @@ void Miscellaneous::TickWhisperWarner()
 			if (whisperer.size() > 0)
 			{ 			
 				m_buddy->NotifySound(NotifyType::Warning);
-				if (!m_popup_open && m_buddy->NotificationPopupAllowed())
+				if (!m_whisper_popup_open && m_buddy->NotificationPopupAllowed())
 				{
 					std::string msg;
 					bool first = true;
@@ -400,7 +413,7 @@ void Miscellaneous::TickWhisperWarner()
 					}
 					msg += (first) ? " has whispered you!" : " have whispered you!";					
 					m_buddy->OpenMessageBoxAsync(msg, "Whisper Warning!", NotifyType::Warning, std::bind(&Miscellaneous::OnMessageBoxClose, this, std::placeholders::_1));
-					m_popup_open = true;
+					m_whisper_popup_open = true;
 				}
 				m_whisper_timer.Reset(WHISPER_WARNING_TIME);
 
@@ -449,6 +462,11 @@ void Miscellaneous::TickCapsuleOpening()
 		if (m_open_soccer_ball_capsule && TryOpenCapsule(ItemNumber::Soccer_Ball_Capsule)) {
 			return;
 		}
+
+		if (m_open_vanillaicecream_capsule && TryOpenCapsule(ItemNumber::Vanilla_Ice_Cream)) {
+			return;
+		}
+
 
 		if (m_open_wpcapsule)
 		{	
@@ -558,5 +576,28 @@ void Miscellaneous::TickAutoFlip()
 {
 	if (m_autoflip && OSR_API->IsLanded() && OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y < 0) {
 		OSR_API->GetAtumApplication()->m_pShuttleChild->m_vUp.y *= -1;
+	}
+}
+
+void Miscellaneous::TickBossWarner()
+{
+	if (m_bosswarner && m_bosscheck_timer.IsReady())
+	{
+		// search all mobs
+		for (auto& monster : OSR_API->GetSceneData()->m_mapMonsterList)
+		{
+			if (COMPARE_MPOPTION_BIT(monster.second->m_pMonsterInfo->MPOption, MPOPTION_BIT_BOSS_MONSTER)) 
+			{
+				m_buddy->NotifySound(NotifyType::Information);
+
+				if (!m_boss_popup_open && m_buddy->NotificationPopupAllowed())
+				{
+					std::string msg = std::string(monster.second->m_pMonsterInfo->MonsterName) + " just appeared.";
+					m_buddy->OpenMessageBoxAsync(msg, "Boss Notifcation", NotifyType::Information);
+					m_boss_popup_open = true;
+				}
+			}	
+		} 
+		m_bosscheck_timer.Reset();
 	}
 }
