@@ -588,6 +588,21 @@ void Miscellaneous::TickBossWarner()
 		{
 			if (COMPARE_MPOPTION_BIT(monster.second->m_pMonsterInfo->MPOption, MPOPTION_BIT_BOSS_MONSTER)) 
 			{
+				// ignore some "bosses"
+				switch (static_cast<MonsterUnitKind>(monster.second->m_pMonsterInfo->MonsterUnitKind))
+				{
+				case MonsterUnitKind::ESP_Crystal:
+				case MonsterUnitKind::ESP_Crystal_2:
+				case MonsterUnitKind::Crazy_Orbituary:
+				case MonsterUnitKind::Cylinder_Control_Panel:
+				case MonsterUnitKind::Gigantic_God_Heart:
+				case MonsterUnitKind::Gigantic_God_Heart_2:
+				case MonsterUnitKind::Shrine_Laboratory:
+				case MonsterUnitKind::Shrine_Laboratory_2:
+				case MonsterUnitKind::Symbol_of_Vatallus:
+					continue;
+				}			
+
 				m_buddy->NotifySound(NotifyType::Information);
 
 				if (!m_boss_popup_open && m_buddy->NotificationPopupAllowed())

@@ -744,4 +744,15 @@ enum class MonsterUnitKind : unsigned int
     Dropped_Ball = 2098100,
 
     Scout_Guard_Ani = 2030100,
+
+    // bosses
+    ESP_Crystal = 2050500,
+    ESP_Crystal_2 = 2053100,
+    Gigantic_God_Heart = 2039100,
+    Gigantic_God_Heart_2 = 2041000,
+    Cylinder_Control_Panel = 2039300,
+    Shrine_Laboratory = 2049900,
+    Shrine_Laboratory_2 = 2051100,
+    Symbol_of_Vatallus = 2083700,
+    Crazy_Orbituary = 2097900,
 };
