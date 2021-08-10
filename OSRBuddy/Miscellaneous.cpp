@@ -586,9 +586,10 @@ void Miscellaneous::TickBossWarner()
 		// search all mobs
 		for (auto& monster : OSR_API->GetSceneData()->m_mapMonsterList)
 		{
-			if (COMPARE_MPOPTION_BIT(monster.second->m_pMonsterInfo->MPOption, MPOPTION_BIT_BOSS_MONSTER)) 
+			if (COMPARE_MPOPTION_BIT(monster.second->m_pMonsterInfo->MPOption, MPOPTION_BIT_BOSS_MONSTER) 
+				|| monster.second->m_pMonsterInfo->MonsterUnitKind == static_cast<int>(MonsterUnitKind::Black_Widow)) // black widow is not marked as a boss
 			{
-				// ignore some "bosses"
+				// ignore some useless bosses
 				switch (static_cast<MonsterUnitKind>(monster.second->m_pMonsterInfo->MonsterUnitKind))
 				{
 				case MonsterUnitKind::ESP_Crystal:

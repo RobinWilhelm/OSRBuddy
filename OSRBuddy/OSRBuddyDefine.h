@@ -755,4 +755,5 @@ enum class MonsterUnitKind : unsigned int
     Shrine_Laboratory_2 = 2051100,
     Symbol_of_Vatallus = 2083700,
     Crazy_Orbituary = 2097900,
+    Black_Widow = 2065700,
 };
