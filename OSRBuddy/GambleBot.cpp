@@ -27,14 +27,14 @@ std::vector<StandardSuffix> GoodStandard_ProbReattack_SuffixList = { StandardSuf
 std::vector<StandardSuffix> BestStandard_ProbReattack_SuffixList = { StandardSuffix::Legend, StandardSuffix::Bio };
 
 // minmax prob
-std::vector<AdvancedPrefix> GoodAdvanced_ProbDamage_PrefixList = { AdvancedPrefix::Navas, AdvancedPrefix::Agareth, AdvancedPrefix::Asmodi, AdvancedPrefix::Kobal, AdvancedPrefix::Warrior, AdvancedPrefix::Hound, AdvancedPrefix::Proson, AdvancedPrefix::Aloken, AdvancedPrefix::Tobit };
+std::vector<AdvancedPrefix> GoodAdvanced_ProbDamage_PrefixList = { AdvancedPrefix::Navas, AdvancedPrefix::Agareth, AdvancedPrefix::Asmodi, AdvancedPrefix::Kobal, AdvancedPrefix::Warrior, AdvancedPrefix::Hound, AdvancedPrefix::Proson, AdvancedPrefix::Aloken, AdvancedPrefix::Tobit, AdvancedPrefix::Neopyte};
 std::vector<AdvancedPrefix> BestAdvanced_ProbDamage_PrefixList = { AdvancedPrefix::Navas, AdvancedPrefix::Agareth, AdvancedPrefix::Asmodi, AdvancedPrefix::Kobal, AdvancedPrefix::Warrior, };
-std::vector<StandardPrefix> GoodStandard_ProbDamage_PrefixList = { StandardPrefix::Navas, StandardPrefix::Agareth, StandardPrefix::Asmodi, StandardPrefix::Kobal, StandardPrefix::Warrior, StandardPrefix::Hound, StandardPrefix::Proson, StandardPrefix::Aloken, StandardPrefix::Tobit };
+std::vector<StandardPrefix> GoodStandard_ProbDamage_PrefixList = { StandardPrefix::Navas, StandardPrefix::Agareth, StandardPrefix::Asmodi, StandardPrefix::Kobal, StandardPrefix::Warrior, StandardPrefix::Hound, StandardPrefix::Proson, StandardPrefix::Aloken, StandardPrefix::Tobit, StandardPrefix::Neopyte };
 std::vector<StandardPrefix> BestStandard_ProbDamage_PrefixList = { StandardPrefix::Navas, StandardPrefix::Agareth, StandardPrefix::Asmodi, StandardPrefix::Kobal, StandardPrefix::Warrior, };
 
-std::vector<AdvancedSuffix> GoodAdvanced_ProbDamage_SuffixList = { AdvancedSuffix::Navas, AdvancedSuffix::Agareth, AdvancedSuffix::Asmodi, AdvancedSuffix::Kobal, AdvancedSuffix::Warrior, AdvancedSuffix::Hound, AdvancedSuffix::Proson, AdvancedSuffix::Aloken, AdvancedSuffix::Tobit };
+std::vector<AdvancedSuffix> GoodAdvanced_ProbDamage_SuffixList = { AdvancedSuffix::Navas, AdvancedSuffix::Agareth, AdvancedSuffix::Asmodi, AdvancedSuffix::Kobal, AdvancedSuffix::Warrior, AdvancedSuffix::Hound, AdvancedSuffix::Proson, AdvancedSuffix::Aloken, AdvancedSuffix::Tobit, AdvancedSuffix::Neophyte };
 std::vector<AdvancedSuffix> BestAdvanced_ProbDamage_SuffixList = { AdvancedSuffix::Navas, AdvancedSuffix::Agareth, AdvancedSuffix::Asmodi, AdvancedSuffix::Kobal, AdvancedSuffix::Warrior, };
-std::vector<StandardSuffix> GoodStandard_ProbDamage_SuffixList = { StandardSuffix::Navas, StandardSuffix::Agareth, StandardSuffix::Asmodi, StandardSuffix::Kobal, StandardSuffix::Warrior, StandardSuffix::Hound, StandardSuffix::Proson, StandardSuffix::Aloken, StandardSuffix::Tobit };
+std::vector<StandardSuffix> GoodStandard_ProbDamage_SuffixList = { StandardSuffix::Navas, StandardSuffix::Agareth, StandardSuffix::Asmodi, StandardSuffix::Kobal, StandardSuffix::Warrior, StandardSuffix::Hound, StandardSuffix::Proson, StandardSuffix::Aloken, StandardSuffix::Tobit, StandardSuffix::Neophyte };
 std::vector<StandardSuffix> BestStandard_ProbDamage_SuffixList = { StandardSuffix::Navas, StandardSuffix::Agareth, StandardSuffix::Asmodi, StandardSuffix::Kobal, StandardSuffix::Warrior, };
 
 // reattack minmax
@@ -318,7 +318,7 @@ void GambleBot::DrawSettings()
 			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);
 			ImGui::ComboEx("Prob/Damage", reinterpret_cast<int*>(&m_prefix_selection.ProbDamage), items, 3, -1, false);
 			if (ImGui::IsItemHovered()) {
-				ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit");
+				ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit, Neopyte");
 			}
 			ImGui::PopStyleColor();
 
@@ -375,7 +375,7 @@ void GambleBot::DrawSettings()
 		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);	   
 		ImGui::ComboEx("Prob/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbDamage), items, 3, -1, false);
 		if (ImGui::IsItemHovered()) {
-			ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit");
+			ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit, Neophyte");
 		}	  
 		ImGui::PopStyleColor();
 
