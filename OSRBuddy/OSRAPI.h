@@ -111,6 +111,9 @@ public:
 	GearType UnitKindToGearType(USHORT unitkind);
 
 	int GetInventorySPI();
+
+	// Checks if a given monster is a boss monster. Ignores useless bosses without drops
+	bool IsGoodBossMonster(CMonsterData* monster);
 	   	
 
 private:

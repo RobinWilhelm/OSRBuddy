@@ -77,27 +77,23 @@ void EnchantBot::Tick()
 		{
 			CItemInfo* targetitem = OSR_API->FindItemFromTarget(m_currentEnchantItemUID);
 			if (targetitem && TryTargetItemToInventory())
-			{
-				m_waiting_for_answer = false;
-				// item should be in inventory now, set the current enchant item again					
-				SetEnchantItem(m_currentEnchantItemUID);				
-				m_next_action = EnchantAction::Add_EnchantItem;
-
+			{ 
 				if (!m_auto_enchant) {
 					SetEnchantBotState(EnchantBotState::STANDBY);
-				} 
+				}
 
 				if (EnchantFinished())
-				{ 
+				{
 					m_buddy->NotifySound(NotifyType::Information);
 					if (m_buddy->NotificationPopupAllowed())
 					{
 						std::string msg = "Successfully enchanted to E" + std::to_string(m_wantedEnchants.size());
 						m_buddy->OpenMessageBoxAsync(msg, GetName(), NotifyType::Warning);
-					} 					
+					}
 					SetEnchantBotState(EnchantBotState::STANDBY);
-				}	
+				}
 				UpdateEnchantStats();
+				m_waiting_for_answer = false; 				
 			}
 		}
 		else
@@ -1221,6 +1217,11 @@ bool EnchantBot::TryTargetItemToInventory()
 	if (!TrySimulateButtonClick(LabButtonCode::Ok)) {
 		return false;
 	}
+
+	// item should be in inventory now, set the current enchant item again					
+	SetEnchantItem(m_currentEnchantItemUID);
+	m_next_action = EnchantAction::Add_EnchantItem;
+	return true;
 }
 
 bool EnchantBot::EnchantFinished()

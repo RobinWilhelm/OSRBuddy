@@ -586,33 +586,18 @@ void Miscellaneous::TickBossWarner()
 		// search all mobs
 		for (auto& monster : OSR_API->GetSceneData()->m_mapMonsterList)
 		{
-			if (COMPARE_MPOPTION_BIT(monster.second->m_pMonsterInfo->MPOption, MPOPTION_BIT_BOSS_MONSTER) 
-				|| monster.second->m_pMonsterInfo->MonsterUnitKind == static_cast<int>(MonsterUnitKind::Black_Widow)) // black widow is not marked as a boss
+			if (!OSR_API->IsGoodBossMonster(monster.second)) {
+				continue;
+			}
+		
+			m_buddy->NotifySound(NotifyType::Information);
+
+			if (!m_boss_popup_open && m_buddy->NotificationPopupAllowed())
 			{
-				// ignore some useless bosses
-				switch (static_cast<MonsterUnitKind>(monster.second->m_pMonsterInfo->MonsterUnitKind))
-				{
-				case MonsterUnitKind::ESP_Crystal:
-				case MonsterUnitKind::ESP_Crystal_2:
-				case MonsterUnitKind::Crazy_Orbituary:
-				case MonsterUnitKind::Cylinder_Control_Panel:
-				case MonsterUnitKind::Gigantic_God_Heart:
-				case MonsterUnitKind::Gigantic_God_Heart_2:
-				case MonsterUnitKind::Shrine_Laboratory:
-				case MonsterUnitKind::Shrine_Laboratory_2:
-				case MonsterUnitKind::Symbol_of_Vatallus:
-					continue;
-				}			
-
-				m_buddy->NotifySound(NotifyType::Information);
-
-				if (!m_boss_popup_open && m_buddy->NotificationPopupAllowed())
-				{
-					std::string msg = std::string(monster.second->m_pMonsterInfo->MonsterName) + " just appeared.";
-					m_buddy->OpenMessageBoxAsync(msg, "Boss Notifcation", NotifyType::Information);
-					m_boss_popup_open = true;
-				}
-			}	
+				std::string msg = std::string(monster.second->m_pMonsterInfo->MonsterName) + " just appeared.";
+				m_buddy->OpenMessageBoxAsync(msg, "Boss Notifcation", NotifyType::Information);
+				m_boss_popup_open = true;
+			}
 		} 
 		m_bosscheck_timer.Reset();
 	}

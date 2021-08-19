@@ -164,7 +164,11 @@ void GrindBot::RenderImGui()
                 ImGui::Checkbox("Shoot and prio all goldies", &m_shoot_all_goldies);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot an prioritise all gold mobs, even if they are not in the monster selection list yet.");
-                }                         
+                }        
+                ImGui::Checkbox("Shoot and prio all bosses", &m_prio_bossmonster);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Will shoot an prioritise boss mobs, even if they are not in the monster selection list yet.");
+                }
                 ImGui::Checkbox("Visible only", &m_front_only);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
@@ -462,7 +466,7 @@ CMonsterData* GrindBot::FindNewTarget(float max_distance, bool front_only)
             }
 
             auto monsterinfo = FindGrindMonsterInfo(monster->m_pMonsterInfo->MonsterUnitKind);
-            if (monsterinfo->second.priority && dist < min_distance_prio)
+            if ((monsterinfo->second.priority || (m_prio_bossmonster && OSR_API->IsGoodBossMonster(monster))) && dist < min_distance_prio)
             {
                 min_distance_prio = dist;
                 newtarget_prio = monster;
@@ -674,7 +678,11 @@ void GrindBot::SmoothDeltaAngle(float& deltaAng)
         m_aimtime_current += std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
 
         if (m_aimtime_current > m_aimtime_final)
-            m_aimtime_current = m_aimtime_final; 
+        {
+            m_aimtime_current = m_aimtime_final;
+            return;
+        }
+
 
         float percent = static_cast<float>(m_aimtime_current.count()) / static_cast<float>(m_aimtime_final.count());
         deltaAng *= percent;
@@ -726,6 +734,8 @@ void GrindBot::OnEnable()
         ZeroMemory(&kitbot_settings, sizeof(KitBuffBot::KitSettings));
 
         kitbot_settings.kitmode = KitBuffBot::Mode::Humanized;
+        kitbot_settings.use_energy_type_b = true;
+        kitbot_settings.use_shield_type_b = true;
         kitbot_settings.use_energy_type_c = true;
         kitbot_settings.use_shield_type_c = true;
         kitbot_settings.use_ammobox       = true;

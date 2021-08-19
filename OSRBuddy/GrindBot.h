@@ -109,6 +109,7 @@ private:
 	bool m_shoot_all_goldies;
 	bool m_prioritise_closer_mobs;
 	bool m_anti_ram;
+	bool m_prio_bossmonster;
 
 	TargetMode m_target_mode;
 
