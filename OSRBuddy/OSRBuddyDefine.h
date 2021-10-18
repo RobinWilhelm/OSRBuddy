@@ -167,7 +167,8 @@ enum class GearType
     IGear,
     BGear,
     MGear,
-    AGear
+    AGear,
+    Unknown
 };
 
 enum class MapIndex
@@ -300,6 +301,7 @@ enum class ItemNumber : int
     // Inventory Cleaning
     Square_Watermelon_Gift = 7023970,
     Fantasy_Globe_Mineral_Capsule = 7023480,
+    Halloween_Capsule = 1700300,
 
 
     WP_Capsule_3 = 7030448,
@@ -742,6 +744,11 @@ enum class MonsterUnitKind : unsigned int
     Icecream_Tank = 2106000,
     Flying_Ball = 2098000,
     Dropped_Ball = 2098100,
+
+    // halloween event
+    Mutant_Pumpkin = 2090900,
+    Halloween_Bat = 2100900,
+
 
     Scout_Guard_Ani = 2030100,
 

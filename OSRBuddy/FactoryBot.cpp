@@ -179,7 +179,7 @@ void FactoryBot::CalculateMaxCraftableFromRessources()
 	UpdateTotalGambleItemAmount();
 	int hold;
 	for (const auto& ingred : m_ingredients_for_recipie) {
-		hold = std::floor(m_ressources_in_inventory.at(ingred.itemnumber) / ingred.amount);
+		hold = TO_INT(std::floor(m_ressources_in_inventory.at(ingred.itemnumber) / ingred.amount));
 		if ((m_max_from_ressources == 0 && hold > 0) || hold < m_max_from_ressources)
 		{
 			m_max_from_ressources = hold;

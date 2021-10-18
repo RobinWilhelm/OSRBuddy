@@ -713,7 +713,7 @@ UID32_t KitBuffBot::GetBestHealTarget()
             continue;
         }   
 
-        int member_energy_missing = member->m_pEnemyData->m_infoCharacter.HP - member->m_pEnemyData->m_infoCharacter.CurrentHP;
+        int member_energy_missing = member->m_pEnemyData->m_infoCharacter.HP - TO_INT(member->m_pEnemyData->m_infoCharacter.CurrentHP);
         if (member_energy_missing > most_missing_energy)
         {
             most_missing_energy = member_energy_missing;
@@ -760,7 +760,7 @@ UID32_t KitBuffBot::GetBestRepairTarget()
             continue;
         }
 
-        int member_shield_missing = member->m_pEnemyData->m_infoCharacter.DP - member->m_pEnemyData->m_infoCharacter.CurrentDP;
+        int member_shield_missing = member->m_pEnemyData->m_infoCharacter.DP - TO_INT(member->m_pEnemyData->m_infoCharacter.CurrentDP);
         if (member_shield_missing > most_missing_shield)
         {
             most_missing_shield = member_shield_missing;
@@ -1142,10 +1142,10 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                 std::chrono::milliseconds additional_time = 34ms;
                 switch (m_settings.kitmode)
                 {
-                case KitBuffBot::Humanized:
+                case KitBuffBot::Mode::Humanized:
                     additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
                     break;
-                case KitBuffBot::Sleepy:
+                case KitBuffBot::Mode::Sleepy:
                     additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
                     break;
                 }
@@ -1167,10 +1167,10 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                 std::chrono::milliseconds additional_time = 34ms;
                 switch (m_settings.kitmode)
                 {
-                case KitBuffBot::Humanized:
+                case KitBuffBot::Mode::Humanized:
                     additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
                     break;
-                case KitBuffBot::Sleepy:
+                case KitBuffBot::Mode::Sleepy:
                     additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
                     break;
                 }
@@ -1193,10 +1193,10 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                 std::chrono::milliseconds additional_time = 33ms;
                 switch (m_settings.kitmode)
                 {
-                case KitBuffBot::Humanized:
+                case KitBuffBot::Mode::Humanized:
                     additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
                     break;
-                case KitBuffBot::Sleepy:
+                case KitBuffBot::Mode::Sleepy:
                     additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 2000));
                     break;
                 }
@@ -1373,10 +1373,10 @@ void KitBuffBot::TickAutoKit()
         {
             switch (m_settings.kitmode)
             {
-            case KitBuffBot::Humanized:
+            case KitBuffBot::Mode::Humanized:
                 m_shieldkit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(200, 1000));
                 break;
-            case KitBuffBot::Sleepy:
+            case KitBuffBot::Mode::Sleepy:
                 m_shieldkit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(800, 2500));
                 break;
             default:
@@ -1423,10 +1423,10 @@ void KitBuffBot::TickAutoKit()
         {
             switch (m_settings.kitmode)
             {
-            case KitBuffBot::Humanized:
+            case KitBuffBot::Mode::Humanized:
                 m_energykit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(300, 700));
                 break;
-            case KitBuffBot::Sleepy:
+            case KitBuffBot::Mode::Sleepy:
                 m_energykit_firstuse_delay = std::chrono::milliseconds(Utility::GetRandInt32(500, 2000));
                 break;
             default:

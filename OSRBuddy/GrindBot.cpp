@@ -38,6 +38,17 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_aimtime_final = 0ms;
     m_anti_ram = true;
 
+    m_awaiting_siege_toggle_ok = false;
+    m_grinding_map = 0;
+    m_grinding_time = 0s;
+    m_grinding_time_total = 0s;
+    m_miscfeatures = nullptr;
+    m_no_target_time = 0s;
+    m_prio_bossmonster = true;
+    m_prioritise_closer_mobs = false;
+    m_shoot_new_target_delay = 0s;
+    m_total_mobs_killed = 0;
+
     m_update_mobs_timer = BuddyTimer(UPDATE_GRINDMOBS_TIME);
 }   
 
@@ -707,7 +718,7 @@ void GrindBot::OnEnable()
     m_total_mobs_killed = 0;
     m_mobs.clear();
 
-    /*
+#ifdef SUMMER_EVENT
     // sommer event special, always add these monster to the list
     GrindMonsterInfo gmi;
     gmi.clean_name = "Dropped Ball";
@@ -715,10 +726,25 @@ void GrindBot::OnEnable()
     gmi.killed = 0;
     gmi.priority = true;
     gmi.shoot = true;
-    m_mobs.insert({ 2098100 , gmi});
+    m_mobs.insert({ TO_INT(MonsterUnitKind::Dropped_Ball) , gmi});
     gmi.clean_name = "Flying Ball";  
-    m_mobs.insert({ 2098000 , gmi });  
-    */
+    m_mobs.insert({ TO_INT(MonsterUnitKind::Flying_Ball) , gmi });
+#endif
+
+ 
+    // halloween event special, always add these monster to the list
+#ifdef HALLOWEEN_EVENT
+    GrindMonsterInfo gmi;
+    gmi.clean_name = "Halloween Bat";
+    gmi.goldy = true;
+    gmi.killed = 0;
+    gmi.priority = true;
+    gmi.shoot = true;
+    m_mobs.insert({ TO_INT(MonsterUnitKind::Halloween_Bat) , gmi});
+    gmi.clean_name = "Mutant Pumpkin";
+    m_mobs.insert({ TO_INT(MonsterUnitKind::Mutant_Pumpkin) , gmi });
+#endif
+
     m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;    
                                    
     // reset grinding timer
@@ -741,10 +767,10 @@ void GrindBot::OnEnable()
         kitbot_settings.use_ammobox       = true;
 
         kitbot_settings.use_spkit_type_c = true;
-        kitbot_settings.spkit_type_c_minvalue = OSR_API->GetMaxSkillp() * 0.6f;
+        kitbot_settings.spkit_type_c_minvalue = TO_INT(OSR_API->GetMaxSkillp() * 0.6f);
 
         kitbot_settings.use_spkit_type_b = true;
-        kitbot_settings.spkit_type_b_minvalue = OSR_API->GetMaxSkillp()* 0.2f;
+        kitbot_settings.spkit_type_b_minvalue = TO_INT(OSR_API->GetMaxSkillp()* 0.2f);
 
         m_kitbot->SetSettings(kitbot_settings);
         
@@ -884,7 +910,7 @@ void GrindBot::GetNewTarget()
         //}
 
         if (!new_target) {
-            new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f - 50, m_front_only);
+            new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f, m_front_only);
         }
 
         if (new_target)

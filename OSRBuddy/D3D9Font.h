@@ -3,7 +3,7 @@
 #include <d3d9.h>
 
 
-class ID3DXFont;
+struct ID3DXFont;
 
 
 class D3D9Font

@@ -1,5 +1,13 @@
 #include "Visuals.h"
 
+Visuals::Visuals(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
+{
+}
+
+Visuals::~Visuals()
+{
+}
+
 FeatureType Visuals::GetType() const
 {
 	return FeatureType::Visuals;

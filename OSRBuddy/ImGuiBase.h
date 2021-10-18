@@ -4,7 +4,7 @@
 #include "imgui/imgui_addition.h"
 
 
-class IDirect3DDevice9;
+struct IDirect3DDevice9;
 
 class ImGuiBase
 {

@@ -69,6 +69,8 @@ private:
 	bool m_open_wpcapsule;
 	bool m_open_soccer_ball_capsule;
 	bool m_open_vanillaicecream_capsule;
+	bool m_open_halloween_capsule;
+
 	bool m_delete_items;
 	bool m_delete_weapons;
 	bool m_delete_engines;

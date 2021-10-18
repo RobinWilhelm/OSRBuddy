@@ -121,12 +121,12 @@ bool OldSchoolRivalsAPI::IsShuttleDead()
 
 int OldSchoolRivalsAPI::GetCurrentEnergy()
 {
-	return m_atumapplication->m_pShuttleChild->m_fNextHP;
+	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextHP);
 }
 
 int OldSchoolRivalsAPI::GetCurrentShield()
 {
-	return m_atumapplication->m_pShuttleChild->m_fNextDP;
+	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextDP);
 }
 
 int OldSchoolRivalsAPI::GetMaxEnergy()
@@ -141,12 +141,12 @@ int OldSchoolRivalsAPI::GetMaxShield()
 
 int OldSchoolRivalsAPI::GetCurrentSkillp()
 {
-	return m_atumapplication->m_pShuttleChild->m_fNextSP;
+	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextSP);
 }
 
 int OldSchoolRivalsAPI::GetCurrentFuel()
 {
-	return m_atumapplication->m_pShuttleChild->m_fNextEP;
+	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextEP);
 }
 
 int OldSchoolRivalsAPI::GetMaxSkillp()
@@ -369,7 +369,11 @@ COLLISION_RESULT OldSchoolRivalsAPI::CheckCollMeshRangeObject(CObjRender* objren
 						SDrawElement* pdeCur;
 						SFrame* pframeCur;
 
-						pdeCur = pObjectMonster->m_pObjMesh->m_pdeHead;
+						pdeCur = 0;
+						if (pObjectMonster->m_pObjMesh) {
+							pdeCur = pObjectMonster->m_pObjMesh->m_pdeHead;
+						}
+
 						while (pdeCur != NULL)
 						{
 							pdeCur->fCurTime = pObjectMonster->m_fCurrentTime * 160;
@@ -502,6 +506,8 @@ GearType OldSchoolRivalsAPI::GetPlayerGearType()
 	if (IS_ST(m_atumapplication->m_pShuttleChild->m_myShuttleInfo.UnitKind)) {
 		return GearType::IGear;
 	}
+
+	return GearType::Unknown;
 }
 
 MapIndex OldSchoolRivalsAPI::GetCurrentMap()
@@ -824,6 +830,8 @@ GearType OldSchoolRivalsAPI::UnitKindToGearType(USHORT unitkind)
 
 	if (IS_AGEAR(unitkind))
 		return GearType::AGear;
+
+	return GearType::Unknown;
 }
 
 int OldSchoolRivalsAPI::GetInventorySPI()
@@ -1077,7 +1085,7 @@ BOOL OldSchoolRivalsAPI::IsTileMapRenderEnable(USHORT nMapIndex)
 		return it->second->TileRenderingFlag;
 	}
 
-	m_atumapplication->m_pDatabase->m_DefMapInfo.TileRenderingFlag;
+	return m_atumapplication->m_pDatabase->m_DefMapInfo.TileRenderingFlag;
 }
 
 BOOL OldSchoolRivalsAPI::CheckIsWater(CShuttleChild* shuttlechild, D3DXVECTOR3 vPos)

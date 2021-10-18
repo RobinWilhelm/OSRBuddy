@@ -86,6 +86,8 @@
 #ifndef __ATUM_PROTOCOL_H__
 #define __ATUM_PROTOCOL_H__
 
+#pragma warning(disable : 5208) // robz: disable warninge message spam
+
 #include "windows.h"
 //#include "DefineGlobal.h"
 //#include "SocketHeader.h"

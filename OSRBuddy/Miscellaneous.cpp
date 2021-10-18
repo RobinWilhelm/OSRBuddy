@@ -1,6 +1,6 @@
 #include "Miscellaneous.h"
-#include "imgui/imgui.h" 
-#include "OSRAPI.h";
+#include "imgui/imgui.h"
+#include "OSRAPI.h"
 #include "OSRBuddy.h"
 #include "SDK/AtumApplication.h"
 
@@ -46,6 +46,7 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_open_capsules = true;
 
 	m_open_vanillaicecream_capsule = false;
+	m_open_halloween_capsule = false;
 		
 	m_bosscheck_timer = BuddyTimer(1s);
 	m_bosswarner = false;
@@ -119,6 +120,7 @@ void Miscellaneous::RenderImGui()
 				ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
 				ImGui::Checkbox("WP Capsules", &m_open_wpcapsule);
 				ImGui::Checkbox("Soccer Ball Capsule", &m_open_soccer_ball_capsule);
+				ImGui::Checkbox("Halloween Capsule", &m_open_halloween_capsule);
 			}
 			ImGui::EndColumns();
 			ImGui::NewLine();
@@ -464,6 +466,10 @@ void Miscellaneous::TickCapsuleOpening()
 		}
 
 		if (m_open_vanillaicecream_capsule && TryOpenCapsule(ItemNumber::Vanilla_Ice_Cream)) {
+			return;
+		}
+
+		if (m_open_halloween_capsule && TryOpenCapsule(ItemNumber::Halloween_Capsule)) {
 			return;
 		}
 

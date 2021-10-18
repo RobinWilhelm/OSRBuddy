@@ -542,7 +542,7 @@ public:
 	// 2009. 11. 02 by ckPark ÀÎÇÇ´ÏÆ¼ ÇÊµå ÀÎ½ºÅÏ½º ´øÁ¯ ½Ã½ºÅÛ
 	CInfinityManager* m_pInfinityManager;		// ÀÎÇÇ´ÏÆ¼ UI°ü·Ã Á¤º¸
 
-	typedef enum ARENASOCKET_TYPE { ARENASOCKET_ARENA, ARENASOCKET_INFINITY, ARENASOCKET_NONE };
+	enum ARENASOCKET_TYPE { ARENASOCKET_ARENA, ARENASOCKET_INFINITY, ARENASOCKET_NONE };
 
 	ARENASOCKET_TYPE			m_ArenaSocketType;		// ¾Æ·¹³ª ¼ÒÄÏ Å¸ÀÔ
 

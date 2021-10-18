@@ -195,12 +195,31 @@ bool OSRBuddyMain::Start()
 
         m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
                  
-        RegisterFeature(new KitBuffBot(this)); 
-        RegisterFeature(new GrindBot(this));          
-        RegisterFeature(new GambleBot(this));
+#ifdef FEATURE_KITBOT
+        RegisterFeature(new KitBuffBot(this));
+#endif
+#ifdef FEATURE_ENCHANTBOT
         RegisterFeature(new EnchantBot(this));
+#endif
+#ifdef FEATURE_GAMBLEBOT
+        RegisterFeature(new GambleBot(this));
+#endif
+#ifdef FEATURE_GRINDBOT
+        RegisterFeature(new GrindBot(this));
+#endif
+#ifdef FEATURE_MISCELLANEOUS
+        RegisterFeature(new Miscellaneous(this));
+#endif
+#ifdef FEATURE_FACTORYBOT
         RegisterFeature(new FactoryBot(this));
-        RegisterFeature(new Miscellaneous(this));    
+#endif
+#ifdef FEATURE_TEST
+        RegisterFeature(new TestItemUse(this));
+#endif
+#ifdef FEATURE_VISUALS
+        RegisterFeature(new Visuals(this));
+#endif
+    
         //RegisterFeature(new TestItemUse(this));
 
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {

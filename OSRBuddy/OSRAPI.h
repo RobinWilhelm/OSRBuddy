@@ -1,4 +1,5 @@
 #pragma once
+#include "Content.h"
 #include "SDK/AtumApplication.h"
 #include <memory>
 #include "OSRBuddyDefine.h"
@@ -7,7 +8,10 @@
 
 class OldSchoolRivalsAPI
 {			
-	OldSchoolRivalsAPI() { };
+	OldSchoolRivalsAPI() 
+	{ 
+		m_atumapplication = nullptr;
+	};
 	OldSchoolRivalsAPI(const OldSchoolRivalsAPI& other) = delete;
 	OldSchoolRivalsAPI& operator=(const OldSchoolRivalsAPI& other) = delete;
 

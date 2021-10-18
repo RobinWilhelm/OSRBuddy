@@ -95,7 +95,15 @@ HRESULT __stdcall D3DInternalBase::Reset_hooked(IDirect3DDevice9* device, D3DPRE
 D3DInternalBase::D3DInternalBase()
 {
     g_D3DInternalBase = this;
-    m_doUnload = false;                                                                 
+    m_doUnload = false;       
+    m_OriginalWndproc = 0;
+    m_d3d9device = nullptr;
+    m_hWindow = 0;
+    m_hookoption = RenderHookOption::ENDSCENE;
+    m_hooktype = RenderHookType::VMT;
+    m_orig_endscene = nullptr;
+    m_orig_present = nullptr;
+    m_orig_reset = nullptr;
 }
 
 D3DInternalBase::~D3DInternalBase()
@@ -158,9 +166,9 @@ bool D3DInternalBase::InitD3DHooks(RenderHookType hooktype, RenderHookOption hoo
         if (!m_trampoline_reset->Hook()) {
             return false;
         }       
-        
-        return true;        
+        return true;
     }
+    return false;
 }
 
 void D3DInternalBase::ShutdownD3DHooks()

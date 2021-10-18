@@ -1,0 +1,18 @@
+#pragma once
+
+//#define SUMMER_EVENT
+#define HALLOWEEN_EVENT
+
+
+#define FEATURE_ENCHANTBOT
+#define FEATURE_GAMBLEBOT
+#define FEATURE_GRINDBOT
+#define FEATURE_KITBOT
+#define FEATURE_MISCELLANEOUS
+
+#ifdef RELEASE_DEBUG
+#define FEATURE_FACTORYBOT
+#define FEATURE_TEST
+//#define FEATURE_VISUALS
+#endif
+

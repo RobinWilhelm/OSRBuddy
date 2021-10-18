@@ -48,7 +48,7 @@ struct PlayerSkillInfo
 class KitBuffBot : public BuddyFeatureBase
 {
 public:	 
-	enum Mode
+	enum class Mode
 	{
 		Rage,
 		Humanized,

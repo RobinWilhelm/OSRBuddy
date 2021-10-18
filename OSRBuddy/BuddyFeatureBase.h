@@ -1,4 +1,5 @@
 #pragma once
+#include "Content.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_win32.h"
@@ -8,7 +9,7 @@
    	 
 class OSRBuddyMain;
 class OldSchoolRivalsAPI;
-class IDirect3DDevice9;
+struct IDirect3DDevice9;
 class D3D9Renderer;
 
 enum class FeatureType : int
@@ -35,8 +36,10 @@ class BuddyFeatureBase
 	BuddyFeatureBase& operator=(const BuddyFeatureBase&) = delete;
 
 public: 	
-	BuddyFeatureBase(OSRBuddyMain* osr) {
+	BuddyFeatureBase(OSRBuddyMain* osr) 
+	{
 		m_buddy = osr;
+		m_enabled = false;
 	}
 
 	virtual ~BuddyFeatureBase() {
