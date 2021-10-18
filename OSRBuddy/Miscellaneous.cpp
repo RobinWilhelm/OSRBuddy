@@ -46,8 +46,11 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_open_capsules = true;
 
 	m_open_vanillaicecream_capsule = false;
+#ifdef HALLOWEEN_EVENT
+	m_open_halloween_capsule = true;
+#else
 	m_open_halloween_capsule = false;
-		
+#endif
 	m_bosscheck_timer = BuddyTimer(1s);
 	m_bosswarner = false;
 }
