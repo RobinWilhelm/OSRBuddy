@@ -2,12 +2,13 @@
 #include <vector>
 #include <map>
 
-struct Ingredient {
+struct Ingredient 
+{
 	int itemnumber;
 	int amount;
 };
 
-struct Recipie 
+struct Recipe 
 {
 	std::vector<Ingredient> ingreds;
 	int itemid;
@@ -18,8 +19,8 @@ class CookBook
 {
 public:
 	CookBook();
-	std::map<int, Recipie> GetRecipies();
-	Recipie getRecipie(int id);
+	std::map<int, Recipe> GetRecipies();
+	Recipe getRecipie(int id);
 private:
-	std::map<int, Recipie> m_recipies;
+	std::map<int, Recipe> m_recipies;
 };

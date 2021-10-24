@@ -337,9 +337,7 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 
 	m_next_action = EnchantAction::Add_EnchantItem;
 	m_enchant_item = OsrItemInfo(uid);
-	m_buddy->GetPersistingTools()->CloseStream();
-	m_buddy->GetPersistingTools()->SetItem(uid);
-	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();	   	
+
 
 	if (!m_enchant_item.IsArmor() && !m_enchant_item.IsWeapon()) 
 	{
@@ -348,6 +346,12 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 	}  		
 	
 	m_currentEnchantItemUID = uid;
+
+	m_buddy->GetPersistingTools()->CloseStream();
+	m_buddy->GetPersistingTools()->SetItem(uid);
+	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();
+	UpdateTotalCost();
+
 
 	if (m_enchant_item.IsWeapon())
 	{	 
@@ -642,29 +646,70 @@ void EnchantBot::RenderColoredEnchantItemAmount(int amount)
 
 void EnchantBot::RenderStatisticsPopup()
 {
-	ImGui::SetNextWindowSize(ImVec2(600.0f, 350.0f));
+	ImGui::SetNextWindowSize(ImVec2(500.0f, 350.0f));
 	if (ImGui::BeginPopup("StatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
 	{ 	
-		ImGui::BeginColumns("StatisticsColums", 2, ImGuiColumnsFlags_NoResize);
+		ImGui::BeginColumns("StatisticsColums", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 		{
+			// descriptions
+			ImGui::BeginChild("StatisticDescriptionsChild");
+			{
+				ImGui::Text("Current statistics:");
+				ImGui::Separator();
+
+				ImGui::BeginGroup();
+				{
+					ImGui::Text("E5  -> E6:");
+					ImGui::Text("E6  -> E7:");
+					ImGui::Text("E7  -> E8:");
+					ImGui::Text("E8  -> E9:");
+					ImGui::Text("E9  -> E10:");
+					ImGui::Text("E10 -> E11:");
+					//ImGui::Text("E11 -> E12:");
+				}
+				ImGui::EndGroup();
+
+				ImGui::NewLine();
+
+				ImGui::BeginGroup();
+				{
+					ImGui::Text("Used Items and Cost:");
+					ImGui::Separator();
+
+					ImGui::Text("E1 Protects:");
+					ImGui::Text("E5 Protects:");
+					ImGui::Text("8%% Chance Cards:");
+					ImGui::Text("Enchantcards:");
+					ImGui::Text("Speedcards:");
+					ImGui::Text("Energy/Shield Cards:");
+
+					ImGui::NewLine();
+					ImGui::Separator();
+					ImGui::Text("Total spi cost:");
+					ImGui::Separator();
+				}
+				ImGui::EndGroup();
+			}
+			ImGui::EndChild();
+
+			ImGui::NextColumn();
+			// session statistics
 			ImGui::BeginChild("StatisticSessionChild");
 			{
 				ImGui::BeginGroup(); // run view
 				{
-					ImGui::Text("Run View");
+					ImGui::Text("Session");
 					ImGui::Separator();
 
-					ImGui::BeginColumns("SessionRunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("SessionRunViewColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
+						ImGui::SetColumnWidth(0, 90);
 						for (int i = 0; i < 6; i++)
 						{
-							std::string enchstep = "E" + std::to_string(i + 5) + " -> " + "E" + std::to_string(i + 6) + ":";
-							ImGui::Text(enchstep.c_str());
-							ImGui::NextColumn();
-							std::string triesfails = std::to_string(m_statisticsSession.m_enchantStats[i][0]) + " - " + std::to_string(m_statisticsSession.m_enchantStats[i][1]);
-							ImGui::DrawTextCentered(triesfails, ImGui::GetColumnWidth());
+							std::string triesfails = std::to_string(m_statisticsSession.m_enchantStats[i][0] - m_statisticsSession.m_enchantStats[i][1]) + " - " + std::to_string(m_statisticsSession.m_enchantStats[i][0]);
+							ImGui::Text(triesfails.c_str());
 							if (ImGui::IsItemHovered()) {
-								ImGui::SetTooltip("total tries - total fails");
+								ImGui::SetTooltip("success - total tries");
 							}
 							ImGui::NextColumn();
 							RenderSuccessPercentage(i + 5, m_statisticsSession.m_enchantStats[i][0], m_statisticsSession.m_enchantStats[i][1]);
@@ -677,21 +722,11 @@ void EnchantBot::RenderStatisticsPopup()
 				ImGui::NewLine();
 				ImGui::BeginGroup();
 				{
-					ImGui::Text("Used Items and Cost (Session):");
+					ImGui::NewLine();
 					ImGui::Separator();
-					ImGui::BeginColumns("SessionCostColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("SessionCostColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize); 				
 					{
-						ImGui::SetColumnWidth(0, 150);
-						ImGui::SetColumnWidth(1, 65);
-						ImGui::Text("E1 Protects");
-						ImGui::Text("E5 Protects");
-						ImGui::Text("8%% Chance Cards");
-						ImGui::Text("Enchantcards");
-						ImGui::Text("Speedcards");
-						ImGui::Text("Energy/Shield Cards");
-					}
-					ImGui::NextColumn();
-					{
+						ImGui::SetColumnWidth(0, 90);
 						ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e1).c_str());
 						ImGui::Text(std::to_string(m_statisticsSession.m_used_enchprots_e5).c_str());
 						ImGui::Text(std::to_string(m_statisticsSession.m_used_chancecards_8).c_str());
@@ -711,8 +746,6 @@ void EnchantBot::RenderStatisticsPopup()
 					ImGui::EndColumns();
 					ImGui::NewLine();
 					ImGui::Separator();
-					ImGui::Text("Total spi cost:");
-					ImGui::SameLine();
 					ImGui::Text(m_cost_total_string.c_str());
 					ImGui::Separator();
 				}
@@ -726,23 +759,21 @@ void EnchantBot::RenderStatisticsPopup()
 			{
 				ImGui::BeginGroup(); // run view
 				{
-					ImGui::Text("Overall Weapons statistics");
+					ImGui::Text("This weapon");
 					ImGui::Separator();
 
-					ImGui::BeginColumns("WeaponRunViewColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("WeaponRunViewColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
+						ImGui::SetColumnWidth(0, 90);
 						for (int i = 0; i < 6; i++)
 						{
-							std::string enchstep = "E" + std::to_string(i + 5) + " -> " + "E" + std::to_string(i + 6) + ":";
-							ImGui::Text(enchstep.c_str());
-							ImGui::NextColumn();
-							std::string triesfails = std::to_string(m_statisticsWeapon.m_enchantStats[i][0]) + " - " + std::to_string(m_statisticsWeapon.m_enchantStats[i][1]);
-							ImGui::DrawTextCentered(triesfails, ImGui::GetColumnWidth());
+							std::string triesfails = std::to_string(m_statisticsWeapon.m_enchantStats[i][0] - m_statisticsWeapon.m_enchantStats[i][1]) + " - " + std::to_string(m_statisticsWeapon.m_enchantStats[i][0]);
+							ImGui::Text(triesfails.c_str());
 							if (ImGui::IsItemHovered()) {
-								ImGui::SetTooltip("total tries - total fails");
+								ImGui::SetTooltip("success - total tries");
 							}
 							ImGui::NextColumn();
-							RenderSuccessPercentage(i + 5, m_statisticsWeapon.m_enchantStats[i][0], m_statisticsWeapon.m_enchantStats[i][1]);
+							RenderSuccessPercentage(i + 5, m_statisticsSession.m_enchantStats[i][0], m_statisticsSession.m_enchantStats[i][1]);
 							ImGui::NextColumn();
 						}
 					}
@@ -752,23 +783,11 @@ void EnchantBot::RenderStatisticsPopup()
 				ImGui::NewLine();
 				ImGui::BeginGroup();
 				{
-					ImGui::Text("Used Items and Cost (Weapon):");
+					ImGui::NewLine();
 					ImGui::Separator();
-					//ImGui::Text("E11 Tries: ");
-					//ImGui::Text(std::to_string(m_statisticsWeapon.m_enchantStats[5][0]).c_str());
-					ImGui::BeginColumns("WeaponCostColumns", 3, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+					ImGui::BeginColumns("WeaponCostColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 					{
-						ImGui::SetColumnWidth(0, 150);
-						ImGui::SetColumnWidth(1, 65);
-						ImGui::Text("E1 Protects");
-						ImGui::Text("E5 Protects");
-						ImGui::Text("8%% Chance Cards");
-						ImGui::Text("Enchantcards");
-						ImGui::Text("Speedcards");
-						ImGui::Text("Energy/Shield Cards");
-					}
-					ImGui::NextColumn();
-					{
+						ImGui::SetColumnWidth(0, 90);
 						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e1).c_str());
 						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_enchprots_e5).c_str());
 						ImGui::Text(std::to_string(m_statisticsWeapon.m_used_chancecards_8).c_str());
@@ -788,8 +807,8 @@ void EnchantBot::RenderStatisticsPopup()
 					ImGui::EndColumns();
 					ImGui::NewLine();
 					ImGui::Separator();
-					ImGui::Text("Total spi cost:");
-					ImGui::SameLine();
+					//ImGui::Text("Total spi cost:");
+					//ImGui::SameLine();
 					ImGui::Text(m_cost_total_string_W.c_str());
 					ImGui::Separator();
 				}

@@ -73,7 +73,7 @@ private:
 	int m_crafted;
 
 	CookBook m_cook_book;
-	Recipie m_chosen_recipie;
+	Recipe m_chosen_recipie;
 	std::vector<Ingredient> m_ingredients_for_recipie;
 	std::map<int, int> m_ressources_in_inventory;
 

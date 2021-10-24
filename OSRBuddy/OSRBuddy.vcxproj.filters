@@ -355,6 +355,9 @@
     <ClInclude Include="Content.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="FactoryBot2.h">
+      <Filter>Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -452,6 +455,9 @@
     </ClCompile>
     <ClCompile Include="CookBook.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="FactoryBot2.cpp">
+      <Filter>Features</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

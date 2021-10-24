@@ -220,8 +220,6 @@ bool OSRBuddyMain::Start()
         RegisterFeature(new Visuals(this));
 #endif
     
-        //RegisterFeature(new TestItemUse(this));
-
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
             throw exception("D3D9 Hooks failed to initialise");
         }

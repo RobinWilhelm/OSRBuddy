@@ -205,6 +205,7 @@
     <ClInclude Include="D3D9Font.h" />
     <ClInclude Include="D3D9Renderer.h" />
     <ClInclude Include="FactoryBot.h" />
+    <ClInclude Include="FactoryBot2.h" />
     <ClInclude Include="GambleFixes.h" />
     <ClInclude Include="INFBase.h" />
     <ClInclude Include="MathHelper.h" />
@@ -323,6 +324,7 @@
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
     <ClCompile Include="FactoryBot.cpp" />
+    <ClCompile Include="FactoryBot2.cpp" />
     <ClCompile Include="Miscellaneous.cpp" />
     <ClCompile Include="OsrItemInfo.cpp" />
     <ClCompile Include="Console.cpp" />

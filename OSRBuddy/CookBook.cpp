@@ -5,7 +5,7 @@
 //todo: über json füllen
 CookBook::CookBook()
 {
-	Recipie vanillaIceCream = Recipie();
+	Recipe vanillaIceCream = Recipe();
 	vanillaIceCream.itemid = 7036910;
 	vanillaIceCream.stackable = false;
 
@@ -33,14 +33,14 @@ CookBook::CookBook()
 
 	vanillaIceCream.ingreds.push_back(cream);
 
-	m_recipies.insert(std::pair<int, Recipie>(vanillaIceCream.itemid, vanillaIceCream));
+	m_recipies.insert(std::pair<int, Recipe>(vanillaIceCream.itemid, vanillaIceCream));
 }
-std::map<int, Recipie> CookBook::GetRecipies()
+std::map<int, Recipe> CookBook::GetRecipies()
 {
 	return m_recipies;
 }
 
-Recipie CookBook::getRecipie(int id)
+Recipe CookBook::getRecipie(int id)
 {
 	return m_recipies.at(id);
 }

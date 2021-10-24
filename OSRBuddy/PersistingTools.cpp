@@ -25,6 +25,8 @@ void PersistingTools::SetItem(UID64_t uid) {
     m_fileName = std::to_string(uid) + ".json";
     m_fullpath = m_workingDirectory + "\\" + m_fileName;
     struct stat buffer;
+    ZeroMemory(&m_statistics, sizeof(EnchantStatistics));
+
     if (stat(m_fullpath.c_str(), &buffer) == 0) {
         m_file.open(m_fullpath, ios::in);
         m_file >> m_j;
@@ -48,7 +50,7 @@ void PersistingTools::SetItem(UID64_t uid) {
         m_statistics.m_used_enchprots_e5 = (int) m_j["protect5"];
         m_statistics.m_used_enchantcards = (int) m_j["cards"];
         m_statistics.m_used_speedcards = (int) m_j["specialcards"];
-        m_statistics.m_used_chancecards_8 = m_j["usedluckycards"];
+        m_statistics.m_used_chancecards_8 = (int) m_j["usedluckycards"];
         m_file.close();
     }
     else {
