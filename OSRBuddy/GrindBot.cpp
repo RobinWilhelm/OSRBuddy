@@ -764,7 +764,6 @@ void GrindBot::OnEnable()
         kitbot_settings.use_shield_type_b = true;
         kitbot_settings.use_energy_type_c = true;
         kitbot_settings.use_shield_type_c = true;
-        kitbot_settings.use_ammobox       = true;
 
         kitbot_settings.use_spkit_type_c = true;
         kitbot_settings.spkit_type_c_minvalue = TO_INT(OSR_API->GetMaxSkillp() * 0.6f);
@@ -783,8 +782,11 @@ void GrindBot::OnEnable()
     }
 
     m_miscfeatures = static_cast<Miscellaneous*>(m_buddy->GetFeatureByType(FeatureType::Miscellaneous));
-    if (m_miscfeatures) {
+    if (m_miscfeatures)
+    {
         m_miscfeatures->ActivateInventoryCleaning(true);
+        m_miscfeatures->ActivateAutoAmmo(true);
+        m_miscfeatures->ActivateAutoFlip(true);
     }
 
     OSR_API->UsePrimaryWeapon(false);
@@ -801,8 +803,11 @@ void GrindBot::OnDisable()
         m_kitbot->Enable(false);
     }
 
-    if (m_miscfeatures) {
+    if (m_miscfeatures) 
+    {
         m_miscfeatures->ActivateInventoryCleaning(false);
+        m_miscfeatures->ActivateAutoAmmo(false);
+        m_miscfeatures->ActivateAutoFlip(false);
     }
 }
 

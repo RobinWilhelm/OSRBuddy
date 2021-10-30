@@ -865,6 +865,42 @@ bool OldSchoolRivalsAPI::IsGoodBossMonster(CMonsterData* monster)
 	return false;
 }
 
+bool OldSchoolRivalsAPI::PlayerIsInSellBuilding()
+{
+	if (OSR_API->IsInBuilding() &&
+		(IS_ITEM_SHOP_TYPE(OSR_API->GetCurrentBuilding().BuildingKind) || 
+		IS_WARPOINT_SHOP_TYPE(OSR_API->GetCurrentBuilding().BuildingKind)))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool OldSchoolRivalsAPI::SendSellItem(CItemInfo* item, int count)
+{
+	if (item && count <= item->CurrentCount && PlayerIsInSellBuilding())
+	{
+		MSG_FC_SHOP_SELL_ITEM sMsg;
+		memset(&sMsg, 0x00, sizeof(sMsg));
+		char buffer[SIZE_MAX_PACKET];
+
+		if (IS_COUNTABLE_ITEM(item->Kind)) {
+			sMsg.Amount = count;
+		}
+		else {
+			sMsg.Amount = 1;
+		}
+		sMsg.ItemKind = item->Kind;
+		sMsg.ItemUniqueNumber = item->UniqueNumber;
+		sMsg.BuildingIndex = OSR_API->GetCurrentBuilding().BuildingIndex;
+		int nType = T_FC_SHOP_SELL_ITEM;
+		memcpy(buffer, &nType, SIZE_FIELD_TYPE_HEADER);
+		memcpy(buffer + SIZE_FIELD_TYPE_HEADER, &sMsg, sizeof(sMsg));
+		return WritePacket(reinterpret_cast<byte*>(buffer), SIZE_FIELD_TYPE_HEADER + sizeof(sMsg));
+	}
+	return false;
+}
+
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)
 {
 	D3DXMatrixMultiply(&pframeCur->matCombined, &pframeCur->matRot, &matCur);

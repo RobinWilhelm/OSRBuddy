@@ -68,10 +68,7 @@ public:
 			use_energy_type_a = other.use_energy_type_a;
 			use_energy_type_b = other.use_energy_type_b;
 			use_energy_type_c = other.use_energy_type_c;
-			use_ammobox = other.use_ammobox;
 			use_fuel = other.use_fuel;
-			//use_stealthcard = other.use_stealthcard;
-			//use_rabbitnecklace = other.use_rabbitnecklace;
 
 			field_healings_active = other.field_healings_active; 
 			field_repair_active = other.field_repair_active; 
@@ -98,10 +95,7 @@ public:
 		bool use_energy_type_a;
 		bool use_energy_type_b;
 		bool use_energy_type_c;
-		bool use_ammobox;
 		bool use_fuel;
-		bool use_stealthcard;
-		bool use_rabbitnecklace;  
 
 		bool field_healings_active;
 		bool field_repair_active;

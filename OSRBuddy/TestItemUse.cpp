@@ -201,7 +201,7 @@ void TestItemUse::RenderImGui()
 		if (fd) {
 			DumpRareItemInfoToFile(fd);
 			fclose(fd);
-			MessageBox(0, "Finished", 0, 0);
+			MessageBox(0, "Finished", "Dump all RareItem", 0);
 		}
 	}
 
@@ -212,7 +212,7 @@ void TestItemUse::RenderImGui()
 		if (fd) {
 			SaveMysterInfoToFile(fd);
 			fclose(fd);
-			MessageBox(0, "Finished", 0, 0);
+			MessageBox(0, "Finished", "Save Mistery Info", 0);
 		}
 	}
 

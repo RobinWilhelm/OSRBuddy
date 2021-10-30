@@ -295,27 +295,26 @@ void Miscellaneous::ActivateInventoryCleaning(bool active)
 
 bool Miscellaneous::TrySendSellItem(CItemInfo* item, int count)
 {
-	if (item && count <= item->CurrentCount && !m_awaiting_sell_ok && m_in_sell_building)
-	{	 		
-		MSG_FC_SHOP_SELL_ITEM sMsg;
-		memset(&sMsg, 0x00, sizeof(sMsg));
-		char buffer[SIZE_MAX_PACKET];
-
-		if (IS_COUNTABLE_ITEM(item->Kind)) {
-			sMsg.Amount = count;
-		}
-		else {
-			sMsg.Amount = 1;
-		}
-		sMsg.ItemKind = item->Kind;
-		sMsg.ItemUniqueNumber = item->UniqueNumber;
-		sMsg.BuildingIndex = OSR_API->GetCurrentBuilding().BuildingIndex;
-		int nType = T_FC_SHOP_SELL_ITEM;
-		memcpy(buffer, &nType, SIZE_FIELD_TYPE_HEADER);
-		memcpy(buffer + SIZE_FIELD_TYPE_HEADER, &sMsg, sizeof(sMsg));
-		return OSR_API->WritePacket(reinterpret_cast<byte*>(buffer), SIZE_FIELD_TYPE_HEADER + sizeof(sMsg));
+	if (!m_awaiting_sell_ok)
+	{	
+		return OSR_API->SendSellItem(item, count);
 	} 
 	return false;
+}
+
+void Miscellaneous::ActivateAutoFlip(bool on)
+{
+	m_autoflip = on;
+}
+
+void Miscellaneous::ActivateAutoAmmo(bool on)
+{
+	m_use_ammobox = on;
+}
+
+void Miscellaneous::ActivateAutoStealthcard(bool on)
+{
+	m_use_stealthcard = on;
 }
 
 void Miscellaneous::OnMessageBoxClose(int result)
@@ -573,7 +572,7 @@ bool Miscellaneous::TryOpenCapsule(ItemNumber capsule)
 void Miscellaneous::TickItemSell()
 {	
 	// check if player is in a building where it is possible to sell items
-	if (OSR_API->IsInBuilding() && (IS_ITEM_SHOP_TYPE(OSR_API->GetCurrentBuilding().BuildingKind) || IS_WARPOINT_SHOP_TYPE(OSR_API->GetCurrentBuilding().BuildingKind))) {  				
+	if (OSR_API->PlayerIsInSellBuilding()) {  				
 		m_in_sell_building = true;
 	}
 	else 

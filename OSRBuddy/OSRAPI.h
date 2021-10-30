@@ -118,7 +118,12 @@ public:
 
 	// Checks if a given monster is a boss monster. Ignores useless bosses without drops
 	bool IsGoodBossMonster(CMonsterData* monster);
-	   	
+	
+	// returns true if player can sell items right now
+	bool PlayerIsInSellBuilding();
+
+	// sell the specified items to npc
+	bool SendSellItem(CItemInfo* item, int count);
 
 private:
 	// collision stuff

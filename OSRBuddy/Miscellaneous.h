@@ -24,6 +24,10 @@ public:
 	void ActivateInventoryCleaning(bool active);
 	bool TrySendSellItem(CItemInfo* item, int count);
 
+	void ActivateAutoFlip(bool on);
+	void ActivateAutoAmmo(bool on);
+	void ActivateAutoStealthcard(bool on);
+
 private:
 	void OnMessageBoxClose(int result);
 	CItemInfo* GetNextItemForDelete();	
