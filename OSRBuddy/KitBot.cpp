@@ -21,6 +21,7 @@ KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {       
     ZeroMemory(&m_settings, sizeof(KitBuffBot::KitSettings));
 
+    m_settings.kitmode = KitBuffBot::Mode::Humanized;
     m_shieldkit_reattack_time = 0ms;
     m_energykit_reattack_time = 0ms;
     m_skillpkit_reattack_time = 0ms;
@@ -287,16 +288,7 @@ bool KitBuffBot::KitTimerReady(KitType kittype)
     }      
 }
 
-bool KitBuffBot::TryUseAmmunitionBox()
-{
-    CItemInfo* ammobox = OSR_API->FindItemInInventoryByItemNum(ItemNumber::AmmunitionRechargeBox);
-    if (!ammobox)
-        return false;
- 
-    OSR_API->SendUseItem(ammobox);
-    m_awaiting_server_ok_ammobox = true;
-    return true;
-}
+
 
 KitType KitBuffBot::GetKitTypeFromItem(CItemInfo* item)
 {
@@ -618,17 +610,14 @@ void KitBuffBot::OnUseSkillError(MSG_ERROR* error)
 
 bool KitBuffBot::ShouldUseHealingField()
 {
-    // check if any party member in range has missing energy
-    int shield_missing = 0;
+    // check my shield
     auto playerpos = OSR_API->GetShuttlePosition();
-    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 350) 
+    if (OSR_API->GetMaxShield() - OSR_API->GetCurrentShield() >= 150) 
     {
-        if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
-            return true;
-        }
-        shield_missing++;
+        return true;
     }
 
+    // check if any party member in range has missing shield
     for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
     {
         if (!partymember->m_bUserLogOn || !partymember->m_pEnemyData) {
@@ -640,31 +629,23 @@ bool KitBuffBot::ShouldUseHealingField()
         float distance = D3DXVec3Length(&delta);
         if (distance <= 3000.0f)  // hardcoded for now, this value is accurate for all field healings above level 54
         {
-            if (partymember->m_pEnemyData->m_infoCharacter.DP - partymember->m_pEnemyData->m_infoCharacter.CurrentDP >= 350)
+            if (partymember->m_pEnemyData->m_infoCharacter.DP - partymember->m_pEnemyData->m_infoCharacter.CurrentDP >= 150)
             {
-                shield_missing++;
+                return true;
             }
         }
     }
-    // only use healing field if at two or more party members in range are missing energy
-    if (shield_missing < 2) {
-        return false;
-    }
 
-    return true;
+    return false;
 }
 
 bool KitBuffBot::ShouldUseEnergizeField()
 {
-    // check if any party member in range has missing energy
-    int energy_missing = 0;
+    // check my energy
     auto playerpos = OSR_API->GetShuttlePosition();
-    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 200) 
+    if (OSR_API->GetMaxEnergy() - OSR_API->GetCurrentEnergy() >= 100) 
     {
-        if (OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo.size() == 0) {
-            return true;
-        }
-        energy_missing++;
+        return true;
     }
 
     for (auto& partymember : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pClientParty->m_vecPartyEnemyInfo)
@@ -678,18 +659,14 @@ bool KitBuffBot::ShouldUseEnergizeField()
         float distance = D3DXVec3Length(&delta);
         if (distance <= 3000.0f) // hardcoded for now, this value is accurate for all field healings above level 54
         {
-            if (partymember->m_pEnemyData->m_infoCharacter.HP - partymember->m_pEnemyData->m_infoCharacter.CurrentHP >= 200)
+            if (partymember->m_pEnemyData->m_infoCharacter.HP - partymember->m_pEnemyData->m_infoCharacter.CurrentHP >= 100)
             {
-                energy_missing++;
+                return true;
             }
         }
     }
-    // only use energize field if at two or more party members in range are missing energy
-    if (energy_missing < 2) {
-        return false;
-    }
 
-    return true;
+    return false;
 }
 
 UID32_t KitBuffBot::GetBestHealTarget()
@@ -829,7 +806,6 @@ void KitBuffBot::Tick()
     TickAutoKit();
     TickAutoBuff();
     TickAutoHeals();
-    TickAutoAmmo();
 }
      
 void KitBuffBot::RenderImGui()
@@ -967,10 +943,6 @@ void KitBuffBot::RenderImGui()
             ImGui::BeginColumns("OthersColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
             {                 
                 ImGui::Checkbox("Fuel Kit", &m_settings.use_fuel);
-            }
-            ImGui::NextColumn();
-            {
-                ImGui::Checkbox("Ammunition Box", &m_settings.use_ammobox);
             }
         }
         ImGui::EndChild();
@@ -1212,15 +1184,6 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
         case ItemNumber::E_Type_CondensedFuel:
             m_awaiting_server_ok_fuel = false;
             break;
-        }
-        break;
-    }
-    case T_FC_BATTLE_PRI_BULLET_RELOADED:
-    case T_FC_BATTLE_SEC_BULLET_RELOADED:
-    {
-        MSG_FC_BATTLE_PRI_BULLET_RELOADED* reloaded_msg = (MSG_FC_BATTLE_PRI_BULLET_RELOADED*)packet;
-        if (reloaded_msg->RechargeType == BULLET_RECHARGE_TYPE_BULLET_ITEM && m_awaiting_server_ok_ammobox) {
-            m_awaiting_server_ok_ammobox = false;
         }
         break;
     }   
@@ -1512,14 +1475,7 @@ void KitBuffBot::TickAutoBuff()
     }      
 }
 
-void KitBuffBot::TickAutoAmmo()
-{
-    if (m_settings.use_ammobox && !m_awaiting_server_ok_ammobox && 
-       (OSR_API->GetPrimaryWeaponAmmo() == 0 || OSR_API->GetSecondaryWeaponAmmo() == 0)) 
-    {
-        TryUseAmmunitionBox();
-    }
-}
+
 
 void KitBuffBot::TickAutoHeals()
 {

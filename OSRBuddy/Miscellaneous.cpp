@@ -16,7 +16,7 @@
 #define ITEM_SELL_REATTACK 250ms
 #define ITEM_SELL_REATTACK_VARIANCE 100ms
 
-
+#define AUTO_ITEM_REATTACK 1s
 
 Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
@@ -52,6 +52,7 @@ Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_open_halloween_capsule = false;
 #endif
 	m_bosscheck_timer = BuddyTimer(1s);
+	m_autoitems_timer = BuddyTimer(AUTO_ITEM_REATTACK);
 	m_bosswarner = false;
 }
 
@@ -76,6 +77,13 @@ void Miscellaneous::Tick()
 	TickWhisperWarner();
 	TickInventoryCleaning();
 	TickBossWarner();
+
+	if (m_autoitems_timer.IsReady())
+	{
+		TickAutoStealthcard();
+		TickAutoAmmo();
+		m_autoitems_timer.Reset();
+	}
 }
 
 void Miscellaneous::RenderImGui()
@@ -193,6 +201,8 @@ void Miscellaneous::RenderImGui()
 			}
 			ImGui::EndDisabledMode();
 			ImGui::Checkbox("Boss Warner", &m_bosswarner);
+			ImGui::Checkbox("Auto Ammobox", &m_use_ammobox);
+			ImGui::Checkbox("Auto Stealthcards", &m_use_stealthcard);
 		}
 		ImGui::EndChild();	
 	}
@@ -203,6 +213,15 @@ bool Miscellaneous::OnReadPacket(unsigned short msgtype, byte* packet)
 {
 	switch (msgtype)
 	{
+	case T_FC_BATTLE_PRI_BULLET_RELOADED:
+	case T_FC_BATTLE_SEC_BULLET_RELOADED:
+	{
+		MSG_FC_BATTLE_PRI_BULLET_RELOADED* reloaded_msg = (MSG_FC_BATTLE_PRI_BULLET_RELOADED*)packet;
+		if (reloaded_msg->RechargeType == BULLET_RECHARGE_TYPE_BULLET_ITEM && m_awaiting_server_ok_ammobox) {
+			m_awaiting_server_ok_ammobox = false;
+		}
+		break;
+	}
 	case T_FC_STORE_UPDATE_ITEM_COUNT:
 	{
 		MSG_FC_STORE_UPDATE_ITEM_COUNT* msg = (MSG_FC_STORE_UPDATE_ITEM_COUNT*)packet;
@@ -243,6 +262,7 @@ bool Miscellaneous::OnReadPacket(unsigned short msgtype, byte* packet)
 		}
 		break;
 	}  
+
 	return false;
 }
 
@@ -610,4 +630,55 @@ void Miscellaneous::TickBossWarner()
 		} 
 		m_bosscheck_timer.Reset();
 	}
+}
+
+void Miscellaneous::TickAutoStealthcard()
+{
+	if (m_use_stealthcard)
+	{
+		bool stealthcard_active = false;
+		for (auto iteminfo : OSR_API->GetInterface()->m_pGameMain->m_pInfSkill->m_vecItemFontInfo)
+		{
+			// check if a stealth card is active
+			switch (TO_ENUM(ItemNumber,iteminfo->pItemInfo->ItemNum))
+			{
+			case ItemNumber::Mini_Stealth_Card:
+			case ItemNumber::Starter_Mini_Stealth_Card:
+			case ItemNumber::Stealth_Card_30m:
+			case ItemNumber::Stealth_Card_2h:
+				stealthcard_active = true;
+				break;
+			default:
+				continue;
+			}
+			break;
+		}
+
+		if (!stealthcard_active)
+		{
+			CItemInfo* stealthcard = FindStealthCardInInventory();
+			if (stealthcard)
+				OSR_API->SendUseItem(stealthcard);
+		}
+	}
+}
+
+void Miscellaneous::TickAutoAmmo()
+{
+	if (m_use_ammobox && !m_awaiting_server_ok_ammobox &&
+		(OSR_API->GetPrimaryWeaponAmmo() == 0 || OSR_API->GetSecondaryWeaponAmmo() == 0))
+	{
+		TryUseAmmunitionBox();
+	}
+}
+
+bool Miscellaneous::TryUseAmmunitionBox()
+{
+	CItemInfo* ammobox = OSR_API->FindItemInInventoryByItemNum(ItemNumber::AmmunitionRechargeBox);
+	if (!ammobox)
+		return false;
+
+	OSR_API->SendUseItem(ammobox);
+	m_awaiting_server_ok_ammobox = true;
+	return true;
 }

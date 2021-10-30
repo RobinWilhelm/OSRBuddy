@@ -37,13 +37,20 @@ private:
 	void TickItemSell();
 	void TickAutoFlip();
 	void TickBossWarner();
+	void TickAutoStealthcard();
+	void TickAutoAmmo();
+
+	bool TryUseAmmunitionBox();
 
 private:
 	bool m_whisperwarner_active;
 	bool m_whisperwarner_closeall;
 
-	bool m_use_ammobox; //todo
+	bool m_use_ammobox;
+	bool m_use_stealthcard;
+	
 
+	bool m_awaiting_server_ok_ammobox;
 	bool m_whisperwarner_snooze_enabled;
 	std::chrono::milliseconds m_ignore_whisperwarn_time;
 	std::atomic<bool> m_whisper_popup_open;
@@ -52,6 +59,7 @@ private:
 	BuddyTimer m_whisper_timer;
 	BuddyTimer m_itemsell_timer;
 	BuddyTimer m_bosscheck_timer;
+	BuddyTimer m_autoitems_timer;
 
 	bool m_autoflip;
 	bool m_bosswarner;

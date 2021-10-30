@@ -284,6 +284,7 @@
     <ClInclude Include="SDK\INFImage.h" />
     <ClInclude Include="SDK\INFImageBtn.h" />
     <ClInclude Include="SDK\INFInvenExtend.h" />
+    <ClInclude Include="SDK\INFSkill.h" />
     <ClInclude Include="SDK\Interface.h" />
     <ClInclude Include="SDK\ItemInfo.h" />
     <ClInclude Include="SDK\MeshRender.h" />

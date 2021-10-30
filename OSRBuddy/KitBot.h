@@ -125,7 +125,6 @@ public:
 	// The reason for false could be that requiered kits are not in inventory or the server has not answered the last request yet
 	bool TryUseKit(KitType type, KitCategory category);
 	bool KitTimerReady(KitType kittype);
-	bool TryUseAmmunitionBox();
 
 	KitType	GetKitTypeFromItem(CItemInfo* item);
 
@@ -167,7 +166,6 @@ protected:
 private:
 	void TickAutoKit();
 	void TickAutoBuff();
-	void TickAutoAmmo();
 	void TickAutoHeals();
 
 	void GrabPlayerSkills();
@@ -186,8 +184,7 @@ private:
 
 	bool m_awaiting_server_ok_shield;
 	bool m_awaiting_server_ok_energy;
-	bool m_awaiting_server_ok_skill;		   
-	bool m_awaiting_server_ok_ammobox;
+	bool m_awaiting_server_ok_skill;	
 	bool m_awaiting_server_ok_fuel;   
 
 	std::vector<PlayerSkillInfo*> m_playerskills;

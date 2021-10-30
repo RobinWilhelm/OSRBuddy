@@ -358,6 +358,9 @@
     <ClInclude Include="FactoryBot2.h">
       <Filter>Features</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\INFSkill.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

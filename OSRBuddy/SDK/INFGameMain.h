@@ -28,7 +28,7 @@
 // end 2008. 12. 23 by ckPark 스킬 사용 지연 사용 지연
 
 #include "INFGameMainChat.h"
-
+#include "INFSkill.h"
 
 
 //#include "INFQuickSlot.h"
@@ -221,7 +221,7 @@ class CD3DHanFont;
 class DataHeader;
 class CINFGameHelpDesk;
 class CINFQuest;
-class CINFSkill;
+//class CINFSkill;
 class CINFGameCountDown;
 class CINFDamageView;
 class CINFOtherCharInfo;
