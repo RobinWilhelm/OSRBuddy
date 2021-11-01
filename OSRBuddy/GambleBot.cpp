@@ -7,6 +7,8 @@
 #include "OSRImGuiMenu.h" 
 #include "Utility.h"
 
+
+
 #include <algorithm> // std::find
 
 // pierce
@@ -184,7 +186,7 @@ void GambleBot::RenderImGui()
 				ImGui::Text("Select item to start gambling.");
 			}
 			else {
-				DrawFullWeaponName();
+				m_gamble_item.RenderImGui();
 			}
 		}
 		ImGui::EndGroup();
@@ -315,28 +317,28 @@ void GambleBot::DrawSettings()
 				ImGui::SetTooltip("Stops if any of the below good/best fixes are found");
 			}
 
-			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);
+			ImGui::PushStyleColor(ImGuiCol_Text, AceColouredString::TranslateAceCharToColor('e').Value);
 			ImGui::ComboEx("Prob/Damage", reinterpret_cast<int*>(&m_prefix_selection.ProbDamage), items, 3, -1, false);
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit, Neopyte");
 			}
 			ImGui::PopStyleColor();
 
-			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('c').Value);
+			ImGui::PushStyleColor(ImGuiCol_Text, AceColouredString::TranslateAceCharToColor('c').Value);
 			ImGui::ComboEx("Prob/Reattack", reinterpret_cast<int*>(&m_prefix_selection.ProbReattack), items, 3, -1, false);
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Best: Legend, Bio\nGood: Legend, Bio, Attack, Silence, Meteo");
 			}
 			ImGui::PopStyleColor();
 
-			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('r').Value);
+			ImGui::PushStyleColor(ImGuiCol_Text, AceColouredString::TranslateAceCharToColor('r').Value);
 			ImGui::ComboEx("Reattack/Damage", reinterpret_cast<int*>(&m_prefix_selection.ReattackDamage), items, 3, -1, false);
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Best: Max, Squire\nGood: Max, Squire, Major, Rukieper");
 			}
 			ImGui::PopStyleColor();
 
-			ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('y').Value);
+			ImGui::PushStyleColor(ImGuiCol_Text, AceColouredString::TranslateAceCharToColor('y').Value);
 			ImGui::ComboEx("Pierce", reinterpret_cast<int*>(&m_prefix_selection.Pierce), items, 3, -1, false);
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Best: Bandit, Traitor\nGood: Bandit, Traitor, Archrival, Adversary, Bane, Challenger, Stronghold");
@@ -372,21 +374,21 @@ void GambleBot::DrawSettings()
 			ImGui::SetTooltip("Stops if any of the below good/best fixes are found");
 		}
 
-		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('e').Value);	   
+		ImGui::PushStyleColor(ImGuiCol_Text, AceColouredString::TranslateAceCharToColor('e').Value);
 		ImGui::ComboEx("Prob/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbDamage), items, 3, -1, false);
 		if (ImGui::IsItemHovered()) {
 			ImGui::SetTooltip("Best: Navas, Agareth, Asmodi, Kobal, Warrior\nGood: Navas, Agareth, Asmodi, Kobal, Warrior, Hound, Proson, Aloken, Tobit, Neophyte");
 		}	  
 		ImGui::PopStyleColor();
 
-		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('c').Value);
+		ImGui::PushStyleColor(ImGuiCol_Text, AceColouredString::TranslateAceCharToColor('c').Value);
 		ImGui::ComboEx("Prob/Reattack##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ProbReattack), items, 3, -1, false);
 		if (ImGui::IsItemHovered()) {
 			ImGui::SetTooltip("Best: Legend, Bio\nGood: Legend, Bio, Attack, Silence, Meteo");
 		}
 		ImGui::PopStyleColor();
 
-		ImGui::PushStyleColor(ImGuiCol_Text, OSRImGuiMenu::TranslateAceCharToColor('r').Value);
+		ImGui::PushStyleColor(ImGuiCol_Text, AceColouredString::TranslateAceCharToColor('r').Value);
 		ImGui::ComboEx("Reattack/Damage##Suffix", reinterpret_cast<int*>(&m_suffix_selection.ReattackDamage), items, 3, -1, false);
 		if (ImGui::IsItemHovered()) {
 			ImGui::SetTooltip("Best: Max, Squire\nGood: Max, Squire, Major, Rukieper");
@@ -395,11 +397,6 @@ void GambleBot::DrawSettings()
 		ImGui::PopItemWidth();
 	}
 	ImGui::EndChild(); 
-}
-
-void GambleBot::DrawFullWeaponName()
-{
-	OSRImGuiMenu::DrawOsrItemName(m_gamble_item);
 }
 
 void GambleBot::DrawColoredGambleItemAmount(int amount)

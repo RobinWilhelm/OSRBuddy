@@ -7,8 +7,6 @@ class CItemInfo;
 
 
 
-
-
 class OSRImGuiMenu : public ImGuiBase
 {
 public:
@@ -25,8 +23,8 @@ public:
 	// Geerbt über ImGuiBase
 	virtual void Render() override;
 
-	static ImColor TranslateAceCharToColor(char color);
-	static void DrawOsrItemName(const OsrItemInfo& item);
+	//static ImColor TranslateAceCharToColor(char color);
+	//static void DrawOsrItemName(const OsrItemInfo& item);
 
 private:
 	OSRBuddyMain* m_osrbuddy;

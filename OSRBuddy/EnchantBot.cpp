@@ -143,7 +143,7 @@ void EnchantBot::RenderImGui()
 				ImGui::Text("Select item to start enchanting.");
 			}
 			else {
-				RenderEnchantItemText();
+				m_enchant_item.RenderImGui();
 			}
 		}
 		ImGui::EndGroup();
@@ -534,11 +534,6 @@ void EnchantBot::RenderSettings()
 		ImGui::EndChild();
 	}
 	ImGui::EndColumns();
-}
-
-void EnchantBot::RenderEnchantItemText()
-{  
-	OSRImGuiMenu::DrawOsrItemName(m_enchant_item);
 }
 
 void EnchantBot::RenderEnchantButtons()

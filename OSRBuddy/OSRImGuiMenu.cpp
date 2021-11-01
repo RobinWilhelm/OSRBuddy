@@ -105,6 +105,7 @@ void OSRImGuiMenu::Render()
     ImGui::End();
 }
  
+/*
 ImColor OSRImGuiMenu::TranslateAceCharToColor(char color)
 {
     switch (std::tolower(color))
@@ -144,8 +145,8 @@ void OSRImGuiMenu::DrawOsrItemName(const OsrItemInfo& item)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, item.GetPrefixColor().Value);
         ImGui::Text(item.GetCleanPrefixName().c_str());
-        ImGui::SameLine();
         ImGui::PopStyleColor();
+        ImGui::SameLine();
     }
 
     ImGui::PushStyleColor(ImGuiCol_Text, item.GetItemNameColor().Value);
@@ -163,10 +164,10 @@ void OSRImGuiMenu::DrawOsrItemName(const OsrItemInfo& item)
 
     if (item.IsWeapon() && !item.GetCleanSuffixName().empty())
     {
-        ImGui::PushStyleColor(ImGuiCol_Text, item.GetSuffixColor().Value);
         ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Text, item.GetSuffixColor().Value);
         ImGui::Text(item.GetCleanSuffixName().c_str());
         ImGui::PopStyleColor();
     }
 }
-
+  */

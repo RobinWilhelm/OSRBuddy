@@ -99,7 +99,6 @@ private:
 	void Reset();
 
 	void DrawSettings();
-	void DrawFullWeaponName();
 	void DrawColoredGambleItemAmount(int amount);
 
 	void SetGambleBotState(GambleBotState state);

@@ -4,6 +4,7 @@
 #include "SDK/AtumParam.h"
 #include "ImGuiBase.h"
 
+#include "AceColouredString.h"
 
 class CItemInfo;
 
@@ -32,6 +33,7 @@ public:
 	ImColor GetPrefixColor() const;
 	ImColor GetSuffixColor() const;
 
+	void RenderImGui() const;
 
 private:
 	UID64_t		m_UID;
@@ -43,6 +45,10 @@ private:
 	std::string	m_clean_suffix_name;
 	ImColor		m_prefix_color;
 	ImColor		m_suffix_color;
+							   
+	AceColouredString m_name;
+	AceColouredString m_prefix;
+	AceColouredString m_suffix;
 
 	std::string	m_enchant_count_string;
 };

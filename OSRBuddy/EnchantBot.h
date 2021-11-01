@@ -118,7 +118,6 @@ private:
 	void SetEnchantItem(UID64_t uid);
 	  
 	void RenderSettings();
-	void RenderEnchantItemText();
 	void RenderEnchantButtons();
 	void RenderColoredEnchantItemAmount(int amount);
 	void RenderStatisticsPopup();

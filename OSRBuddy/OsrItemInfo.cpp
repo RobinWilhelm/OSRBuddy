@@ -29,62 +29,25 @@ bool OsrItemInfo::Update(UID64_t uid)
 		m_UID = 0;
 		return false;
 	}
-			   
-	m_clean_item_name = std::string(m_item_info->m_pItemInfo->ItemName);
-	if (m_clean_item_name[0] == '\\')  // check if name has a colorcode in its name
-	{
-		m_name_color = OSRImGuiMenu::TranslateAceCharToColor(m_clean_item_name[1]);
-		m_clean_item_name.erase(m_clean_item_name.begin(), m_clean_item_name.begin() + 2);
-		//m_clean_item_name.erase(m_clean_item_name.end() - 2, m_clean_item_name.end());
-	}
-	else
-	{
-		m_name_color = 0xFFFFFFFF;
-	}
-
-	// determine the prefix and suffix colors
+	
+	m_name = AceColouredString(m_item_info->m_pItemInfo->ItemName);
 	if (m_item_info->m_pRefPrefixRareInfo)
 	{
-		m_clean_prefix_name = std::string(m_item_info->m_pRefPrefixRareInfo->Name);
-
-		if (m_item_info->m_pRefPrefixRareInfo->Name[0] == '\\')  // check if prefix has a colorcode in its name
-		{
-			m_prefix_color = OSRImGuiMenu::TranslateAceCharToColor(m_item_info->m_pRefPrefixRareInfo->Name[1]);
-			m_clean_prefix_name.erase(m_clean_prefix_name.begin(), m_clean_prefix_name.begin() + 2);
-			m_clean_prefix_name.erase(m_clean_prefix_name.end() - 2, m_clean_prefix_name.end());
-		}
-		else
-		{
-			m_prefix_color = OSRImGuiMenu::TranslateAceCharToColor('g');
-		}
-
-		m_clean_prefix_name += " (" + std::to_string(m_item_info->m_pRefPrefixRareInfo->CodeNum) + ")";
+	 	m_prefix = AceColouredString(m_item_info->m_pRefPrefixRareInfo->Name, ImColor(0x00, 0xFF, 0x00));
 	}
-	else {
-		m_clean_prefix_name.clear();
+	else 
+	{
+		m_prefix.Clear();
 	}
 
 	if (m_item_info->m_pRefSuffixRareInfo)
 	{
-		m_clean_suffix_name = std::string(m_item_info->m_pRefSuffixRareInfo->Name);
-
-		if (m_item_info->m_pRefSuffixRareInfo->Name[0] == '\\')  // check if prefix has a colorcode in its name
-		{
-			m_suffix_color = OSRImGuiMenu::TranslateAceCharToColor(m_item_info->m_pRefSuffixRareInfo->Name[1]);
-			m_clean_suffix_name.erase(m_clean_suffix_name.begin(), m_clean_suffix_name.begin() + 2);
-			m_clean_suffix_name.erase(m_clean_suffix_name.end() - 2, m_clean_suffix_name.end());
-		}
-		else
-		{
-			m_suffix_color = OSRImGuiMenu::TranslateAceCharToColor('g');
-		}
-
-		m_clean_suffix_name += " (" + std::to_string(m_item_info->m_pRefSuffixRareInfo->CodeNum) + ")";
+		m_suffix = AceColouredString(m_item_info->m_pRefSuffixRareInfo->Name, ImColor(0x00, 0xFF, 0x00));
 	}
-	else {
-		m_clean_suffix_name.clear();
+	else
+	{
+		m_suffix.Clear();
 	}
-
 	m_enchant_count_string = "E:" + std::to_string(m_item_info->m_nEnchantNumber);	  	
 	return true;
 }
@@ -131,17 +94,17 @@ CItemInfo* OsrItemInfo::GetItemInfo()  const
 
 std::string OsrItemInfo::GetCleanName() const
 {
-	return m_clean_item_name;
+	return m_name.GetCleanText();
 }
 
 std::string OsrItemInfo::GetCleanPrefixName() const
 {
-	return m_clean_prefix_name;
+	return m_prefix.GetCleanText();
 }
 
 std::string OsrItemInfo::GetCleanSuffixName() const
 {
-	return m_clean_suffix_name;
+	return m_suffix.GetCleanText();
 }
 
 std::string OsrItemInfo::GetEnchantText() const
@@ -151,15 +114,44 @@ std::string OsrItemInfo::GetEnchantText() const
 
 ImColor OsrItemInfo::GetItemNameColor() const
 {
-	return m_name_color;
+	return m_name.GetColor();
 }
 
 ImColor OsrItemInfo::GetPrefixColor() const
 {
-	return m_prefix_color;
+	return m_prefix.GetColor();
 }
 
 ImColor OsrItemInfo::GetSuffixColor() const
 {
-	return m_suffix_color;
+	return m_suffix.GetColor();
+}
+
+void OsrItemInfo::RenderImGui() const
+{	
+	if (GetUID() == 0) {
+		return;
+	}
+
+	if (IsWeapon() && !GetCleanPrefixName().empty())
+	{
+		m_prefix.RenderImGui();
+		ImGui::SameLine();
+	}
+
+	m_name.RenderImGui();
+	ImGui::SameLine();
+
+	if (IsWeapon() || IsArmor())
+	{
+		ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0xFF, 0xBB, 0x33).Value);
+		ImGui::Text(GetEnchantText().c_str());
+		ImGui::PopStyleColor();
+	}
+
+	if (IsWeapon() && !GetCleanSuffixName().empty())
+	{
+		ImGui::SameLine();
+		m_suffix.RenderImGui();
+	}
 }

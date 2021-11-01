@@ -6,11 +6,16 @@ class AceColouredString
 {
 public:
 	AceColouredString();
-	AceColouredString(std::string text);
+	AceColouredString(std::string text, ImColor defaultcol = 0xFFFFFFFF);
 
-	ImColor GetColor();
-	std::string GetCleanText();
-	std::string GetOriginalText();
+	ImColor GetColor() const;
+	std::string GetCleanText() const;
+	std::string GetOriginalText() const;
+
+	void Clear();
+	void RenderImGui() const;
+
+	static ImColor TranslateAceCharToColor(char color);
 
 private:
 	std::string m_original_text;
