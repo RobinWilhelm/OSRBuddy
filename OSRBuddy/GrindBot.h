@@ -18,7 +18,7 @@
 
 class KitBuffBot; 
 class Miscellaneous;
-
+class InventoryManager;
 
 struct GrindMonsterInfo
 {
@@ -91,6 +91,7 @@ private:
 	GrindBot::State m_current_state;
 	KitBuffBot* m_kitbot;
 	Miscellaneous* m_miscfeatures;
+	InventoryManager* m_invenmanager;
 
 	std::chrono::milliseconds m_grinding_time;
 	std::chrono::milliseconds m_grinding_time_total;
@@ -105,7 +106,7 @@ private:
 	bool m_awaiting_siege_toggle_ok;
 	bool m_on_target;	 
 	bool m_get_new_target;
-	bool m_front_only;
+	bool m_visible_only;
 	bool m_shoot_all_goldies;
 	bool m_prioritise_closer_mobs;
 	bool m_anti_ram;

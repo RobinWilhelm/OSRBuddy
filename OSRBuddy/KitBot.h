@@ -167,11 +167,12 @@ private:
 	void OnUseEnergyError(MSG_ERROR* error);
 	void OnUseSkillError(MSG_ERROR* error);
 
-	bool ShouldUseHealingField();
-	bool ShouldUseEnergizeField();
+	bool ShouldUseRepairField();	// shield
+	bool ShouldUseHealingField();	// energy
 
-	UID32_t GetBestHealTarget();
-	UID32_t GetBestRepairTarget();
+	UID32_t GetBestRepairTarget();	// shield
+	UID32_t GetBestHealTarget();	// energy
+	
 
 private:   
 	KitSettings m_settings;

@@ -22,7 +22,8 @@ enum class FeatureType : int
 	AntiRandomness,
 	GrindBot,
 	Visuals,
-	Miscellaneous
+	Miscellaneous,
+	InventoryManager,
 };
 			 
 class BuddyFeatureBase

@@ -193,6 +193,7 @@
     <Bscmake />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AceColouredString.h" />
     <ClInclude Include="AntiAntiCheat.h" />
     <ClInclude Include="AtumDateTime.h" />
     <ClInclude Include="AtumError.h" />
@@ -207,7 +208,9 @@
     <ClInclude Include="FactoryBot.h" />
     <ClInclude Include="FactoryBot2.h" />
     <ClInclude Include="GambleFixes.h" />
+    <ClInclude Include="ImComboBox.h" />
     <ClInclude Include="INFBase.h" />
+    <ClInclude Include="InventoryManager.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Miscellaneous.h" />
     <ClInclude Include="OsrItemInfo.h" />
@@ -318,6 +321,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AceColouredString.cpp" />
     <ClCompile Include="AntiAntiCheat.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
     <ClCompile Include="BuddyTimer.cpp" />
@@ -326,6 +330,8 @@
     <ClCompile Include="D3D9Renderer.cpp" />
     <ClCompile Include="FactoryBot.cpp" />
     <ClCompile Include="FactoryBot2.cpp" />
+    <ClCompile Include="ImComboBox.cpp" />
+    <ClCompile Include="InventoryManager.cpp" />
     <ClCompile Include="Miscellaneous.cpp" />
     <ClCompile Include="OsrItemInfo.cpp" />
     <ClCompile Include="Console.cpp" />

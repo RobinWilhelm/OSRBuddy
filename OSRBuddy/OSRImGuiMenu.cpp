@@ -8,6 +8,8 @@
 
 #include "OSRAPI.h"
 
+#define FEATURE_ACTIVE_TEXTCOL ImColor(0x00, 0xFF, 0x00)
+
 void OSRImGuiMenu::Render()
 {      
     ImGui::SetNextWindowSize(ImVec2(700, 500));                   
@@ -82,7 +84,16 @@ void OSRImGuiMenu::Render()
             for (auto& feature : m_osrbuddy->GetAllFeatures())
             {
                 std::string tabname = feature->GetName();
-                if (ImGui::BeginTabItem(tabname.c_str()))
+                if (feature->IsEnabled()) {
+                    ImGui::PushStyleColor(ImGuiCol_Text, FEATURE_ACTIVE_TEXTCOL.Value);
+                }                                               
+
+                bool tab_open = ImGui::BeginTabItem(tabname.c_str());
+                if (feature->IsEnabled()) {
+                    ImGui::PopStyleColor();
+                }
+
+                if (tab_open)
                 {
                     feature->RenderImGui();
                     ImGui::EndTabItem();

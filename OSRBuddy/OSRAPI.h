@@ -78,18 +78,20 @@ public:
 
 	//CINFGameMain
 	INVEN_DISPLAY_INFO* GetSelectedItem();
+	
 
 	// CINFInvExtend
 	void SendUseItem(ITEM_GENERAL* item); 
 	void DeleteItem(ITEM_GENERAL* item, int count);
-
+	void SendChangeWearWindowPos(int nWindowPosition);
+	//void SetSelectItem(INVEN_DISPLAY_INFO* pDisplayInfo);
 
 	// CINFCharacterInfoExtend
 	void SendUseSkill(ITEM_BASE* skill);
 
 	// CStoreData
-	CItemInfo* FindItemInInventoryByItemNum(INT itemnum);
-	CItemInfo* FindItemInInventoryByItemNum(ItemNumber itemnum); 
+	CItemInfo* FindItemInInventoryByItemNum(INT itemnum, bool find_lowest_time = false);
+	CItemInfo* FindItemInInventoryByItemNum(ItemNumber itemnum, bool find_lowest_time = false);
 	CItemInfo* FindItemInInventoryByUniqueNumber(UID64_t hyUniqueNumber);
 					
 	// CAtumDatabase
@@ -124,6 +126,14 @@ public:
 
 	// sell the specified items to npc
 	bool SendSellItem(CItemInfo* item, int count);
+
+	//
+	bool IsActiveItem(INT itemnumber);
+	bool IsActiveItem(ItemNumber itemnumber);
+	bool IsStealthCardActive();	
+
+	bool TryEquipItem(CItemInfo* item);
+	ITEM_BASE* GetEquippedItem(EQUIP_POS position);
 
 private:
 	// collision stuff

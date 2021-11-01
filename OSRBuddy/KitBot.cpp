@@ -16,6 +16,9 @@
 #define TARGETHEAL_SPECIAL_REATTACK 3200ms // reattack time if a mgear uses target heal or target repair on someone else than himself
 #define FUEL_KIT_THRESHOLD 20
 
+#define SHIELDKIT_COLOR ImColor(0,50,234,255) 
+#define ENERGYKIT_COLOR ImColor(234,0,0,255) 
+#define SKILLPKIT_COLOR ImColor(247,148,29,255) 
 
 KitBuffBot::KitBuffBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {       
@@ -287,8 +290,6 @@ bool KitBuffBot::KitTimerReady(KitType kittype)
         break;
     }      
 }
-
-
 
 KitType KitBuffBot::GetKitTypeFromItem(CItemInfo* item)
 {
@@ -608,7 +609,7 @@ void KitBuffBot::OnUseSkillError(MSG_ERROR* error)
     }
 }
 
-bool KitBuffBot::ShouldUseHealingField()
+bool KitBuffBot::ShouldUseRepairField()
 {
     // check my shield
     auto playerpos = OSR_API->GetShuttlePosition();
@@ -639,7 +640,7 @@ bool KitBuffBot::ShouldUseHealingField()
     return false;
 }
 
-bool KitBuffBot::ShouldUseEnergizeField()
+bool KitBuffBot::ShouldUseHealingField()
 {
     // check my energy
     auto playerpos = OSR_API->GetShuttlePosition();
@@ -1527,6 +1528,7 @@ void KitBuffBot::TickAutoHeals()
             }
         }    
          
+        // shield
         if (m_settings.field_healings_active)
         {
             PlayerSkillInfo* healingfield = FindPlayerSkill(SkillType::Healing_Field);
@@ -1537,10 +1539,11 @@ void KitBuffBot::TickAutoHeals()
             }
         }
 
+        // energy
         if (m_settings.field_repair_active) 
         {
             PlayerSkillInfo* energizefield = FindPlayerSkill(SkillType::Repair_Field);
-            if (energizefield && energizefield->skillinfo->m_fCheckReattackTime <= 0.0f && energizefield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseEnergizeField())
+            if (energizefield && energizefield->skillinfo->m_fCheckReattackTime <= 0.0f && energizefield->skillinfo->ItemInfo->ReqSP <= currentsp && ShouldUseRepairField())
             {
                 TryUseSkill(energizefield);
                 currentsp -= energizefield->skillinfo->ItemInfo->ReqSP;

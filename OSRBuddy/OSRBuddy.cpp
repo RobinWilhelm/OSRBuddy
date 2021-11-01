@@ -11,6 +11,7 @@
 #include "FactoryBot.h"
 #include "Visuals.h"
 #include "Miscellaneous.h"
+#include "InventoryManager.h"
                                 
 #include "AntiAntiCheat.h"
 #include "PatternManager.h"
@@ -206,6 +207,9 @@ bool OSRBuddyMain::Start()
 #endif
 #ifdef FEATURE_GRINDBOT
         RegisterFeature(new GrindBot(this));
+#endif
+#ifdef FEATURE_INVENTORYMANAGER             
+        RegisterFeature(new InventoryManager(this));
 #endif
 #ifdef FEATURE_MISCELLANEOUS
         RegisterFeature(new Miscellaneous(this));

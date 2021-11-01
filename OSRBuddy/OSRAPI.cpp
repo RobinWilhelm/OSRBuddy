@@ -13,6 +13,7 @@
 
 #include <minwindef.h>
 
+class CINFInven;
 
 #define SIZE_MAX_ADDABLE_INVENTORY_COUNT 100
 #define SIZE_MAX_ITEM_GENERAL 60
@@ -26,7 +27,8 @@ using GetServerRareItemInfoType = RARE_ITEM_INFO * (__thiscall*)(CAtumDatabase *
 using ChangeSkillState = void(__thiscall*)(CSkillInfo * ecx, int dwState, int nTempSkillItemNum);
 using CalcObjectSourceScreenCoordsType = void(__thiscall*)(CAtumApplication * ecx, D3DXVECTOR3 vObjPos, int iScreenWidth, int iScreenHeight, int& iCoordX, int& iCoordY, int& iCoordW);
 using DeleteSelectItemType = void(__thiscall*)(CINFInvenExtend * ecx, int count);
-
+using SendChangeWearWindowPosType = void(__thiscall*)(CINFInvenExtend* ecx, int nWindowPosition);
+using SetSelectItemType = void(__thiscall*)(CINFInven* ecx, INVEN_DISPLAY_INFO* pDisplayInfo);
 
 OldSchoolRivalsAPI* OldSchoolRivalsAPI::instance  = nullptr;
 
@@ -672,30 +674,44 @@ void OldSchoolRivalsAPI::SendUseSkill(ITEM_BASE* skill)
 	}
 }
 
-CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByItemNum(INT itemnum)
+CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByItemNum(INT itemnum, bool find_lowest_time)
 {
-#ifndef _DEBUG	  // structure of std::map is different in debugmode which leads to crash 
 	CStoreData* storedata = m_atumapplication->m_pShuttleChild->m_pStoreData;
 	if (!storedata) {
 		return nullptr;
 	}
 
+	float passtime = -1.0f;
+	CItemInfo* lowest_time_item = nullptr;
 	CMapItemInventoryIterator it = storedata->m_mapItemUniqueNumber.begin();
 	while (it != storedata->m_mapItemUniqueNumber.end())
 	{
 		if (it->second->ItemNum == itemnum)
 		{
-			return it->second;
+			if (find_lowest_time)
+			{
+			   if(it->second->m_fItemPassTime > passtime)
+			   {
+				   passtime = it->second->m_fItemPassTime;
+				   lowest_time_item = it->second;
+			   }
+			}
+			else {
+				return it->second;
+			}
 		}
 		it++;
 	}
-#endif // ! _DEBUG
+
+	if (find_lowest_time) {
+		return lowest_time_item;
+	}
 	return nullptr;
 }
 
-CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByItemNum(ItemNumber itemnum)
+CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByItemNum(ItemNumber itemnum, bool find_lowest_time)
 {
-	return FindItemInInventoryByItemNum(TO_INT(itemnum));
+	return FindItemInInventoryByItemNum(TO_INT(itemnum), find_lowest_time);
 }
 
 CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByUniqueNumber(UID64_t hyUniqueNumber)
@@ -899,6 +915,115 @@ bool OldSchoolRivalsAPI::SendSellItem(CItemInfo* item, int count)
 		return WritePacket(reinterpret_cast<byte*>(buffer), SIZE_FIELD_TYPE_HEADER + sizeof(sMsg));
 	}
 	return false;
+}
+
+bool OldSchoolRivalsAPI::IsActiveItem(INT itemnumber)
+{
+	for (auto iteminfo : OSR_API->GetInterface()->m_pGameMain->m_pInfSkill->m_vecItemFontInfo)
+	{
+		if (itemnumber == iteminfo->pItemInfo->ItemNum) {
+			return true;
+		}
+	}
+}
+
+bool OldSchoolRivalsAPI::IsActiveItem(ItemNumber itemnumber)
+{
+	return IsActiveItem(TO_INT(itemnumber));
+}
+
+bool OldSchoolRivalsAPI::IsStealthCardActive()
+{
+	bool stealthcard_active = false;
+	for (auto iteminfo : OSR_API->GetInterface()->m_pGameMain->m_pInfSkill->m_vecItemFontInfo)
+	{
+		// check if a stealth card is active
+		switch (TO_ENUM(ItemNumber, iteminfo->pItemInfo->ItemNum))
+		{
+		case ItemNumber::Mini_Stealth_Card:
+		case ItemNumber::Starter_Mini_Stealth_Card:
+		case ItemNumber::Stealth_Card_30m:
+		case ItemNumber::Stealth_Card_2h:
+			stealthcard_active = true;
+			break;
+		default:
+			continue;
+		}
+		break;
+	}
+	return stealthcard_active;
+}
+
+void OldSchoolRivalsAPI::SendChangeWearWindowPos(int nWindowPosition)
+{
+	static SendChangeWearWindowPosType sendChangeWearWindowPosFn = reinterpret_cast<SendChangeWearWindowPosType>(PatternManager::Get(OffsetIdentifier::CINFInvenExtend__SendChangeWearWindowPos).address);
+	CINFInvenExtend* inven = m_atumapplication->m_pInterface->m_pGameMain->m_pInven;
+	if (sendChangeWearWindowPosFn && inven){
+		sendChangeWearWindowPosFn(inven, nWindowPosition);
+	}
+}
+
+/*
+void OldSchoolRivalsAPI::SetSelectItem(INVEN_DISPLAY_INFO* pDisplayInfo)
+{
+	static SetSelectItemType setSelectItemFn = reinterpret_cast<SetSelectItemType>(PatternManager::Get(OffsetIdentifier::CINFInven__SetSelectItem).address);
+	CINFGameMain* gamemain = m_atumapplication->m_pInterface->m_pGameMain;
+	if (setSelectItemFn && gamemain) {
+		setSelectItemFn(gamemain, pDisplayInfo);
+	}
+}
+*/
+bool OldSchoolRivalsAPI::TryEquipItem(CItemInfo* item)
+{
+	if (item)
+	{
+		switch (item->ItemInfo->Position)
+		{
+		case POS_PROWIN:
+		case POS_PROWOUT:
+		case POS_WINGIN:
+		case POS_WINGOUT:
+		case POS_PROW:
+		case POS_CENTER:
+		case POS_REAR:
+		case POS_ACCESSORY_UNLIMITED:
+		case POS_ACCESSORY_TIME_LIMIT:	// 2006-03-31 by ispark
+		case POS_PET:
+			stSelectItem buffer = m_atumapplication->m_pInterface->m_pGameMain->m_stSelectItem;
+			m_atumapplication->m_pInterface->m_pGameMain->m_stSelectItem = stSelectItem();
+
+			INVEN_DISPLAY_INFO idi;
+			idi.pItem = item;
+			m_atumapplication->m_pInterface->m_pGameMain->m_stSelectItem.pSelectItem = &idi;
+			SendChangeWearWindowPos(item->ItemInfo->Position);
+			m_atumapplication->m_pInterface->m_pGameMain->m_stSelectItem = buffer;
+			return true;
+		}
+	}
+	return false;
+}
+
+ITEM_BASE* OldSchoolRivalsAPI::GetEquippedItem(EQUIP_POS position)
+{
+	switch (position)
+	{
+	case POS_PROWIN:
+	case POS_PROWOUT:
+	case POS_WINGIN:
+	case POS_WINGOUT:
+	case POS_PROW:
+	case POS_CENTER:
+	case POS_REAR:
+	case POS_ACCESSORY_UNLIMITED:
+	case POS_ACCESSORY_TIME_LIMIT:	// 2006-03-31 by ispark
+	case POS_PET:
+		CINFInvenExtend* inven = m_atumapplication->m_pInterface->m_pGameMain->m_pInven;
+		if (inven && inven->m_pWearDisplayInfo[position])
+		{
+			return inven->m_pWearDisplayInfo[position]->pItem;
+		}
+	}
+	return nullptr;
 }
 
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)

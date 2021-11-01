@@ -24,6 +24,8 @@ enum class OffsetIdentifier
 	CSkillInfo__ChangeSkillState,
 	CAtumApplication__CalcObjectSourceScreenCoords,
 	CINFInvenExtend__DeleteSelectItem,
+	CINFInvenExtend__SendChangeWearWindowPos,
+	CINFInven__SetSelectItem,
 };
 		
 
@@ -52,7 +54,10 @@ public:
 		PatternManager::m_patterninfos.push_back({ OffsetIdentifier::CSkillInfo__ChangeSkillState, "8B 45 08 56 48 8B F1 89 74 24 18 57 83 F8 05 0F 87 ?? ?? ?? ?? FF 24 85", -0x1A, nullptr, 6 });
 		PatternManager::m_patterninfos.push_back({ OffsetIdentifier::CAtumApplication__CalcObjectSourceScreenCoords, "0F 11 44 24 14 53 66 0F 6E C8 8B C1 F7 D8 C7 44 24 3C 00 00 80 3F", -0x2D, nullptr, 6 });
 		PatternManager::m_patterninfos.push_back({ OffsetIdentifier::CINFInvenExtend__DeleteSelectItem, "56 8B F1 57 8B 86 98 01 00 00 8B BE 9C 01 00 00 85 C0 75 08 85 FF 0F 84 63 01 00 00", -0x1A, nullptr, 6 });
-		 
+		PatternManager::m_patterninfos.push_back({ OffsetIdentifier::CINFInvenExtend__SendChangeWearWindowPos, "85 D2 74 75 8A 42 3C 84 C0 74 28 3C 01 74 24 3C 02 74 20 3C 03 74 1C", -0x39, nullptr, 6 });
+		PatternManager::m_patterninfos.push_back({ OffsetIdentifier::CINFInven__SetSelectItem, "85 FF 74 51 83 BE 4C 07 00 00 00 75 7C 85 FF 74 44 8B 8E EC 00 00 00", -0x9, nullptr,7 });
+
+
 		uintptr_t ace_modulebase = (uintptr_t)GetModuleHandle("ACEonline.atm");
 		if (!ace_modulebase) {
 			throw std::exception("Module ACEonline.atm not found");

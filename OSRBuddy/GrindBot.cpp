@@ -5,6 +5,7 @@
 #include <string> 
 #include "KitBot.h"
 #include "Miscellaneous.h"
+#include "InventoryManager.h"
 #include "D3D9Renderer.h"
 #include <cmath>
 #include "Utility.h"
@@ -23,7 +24,7 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_mobs.clear(); 
 
     m_shoot_all_goldies = true;
-    m_front_only = true;
+    m_visible_only = true;
     m_keep_shooting = true;
     m_target_delay_min = MIN_NEW_TARGET_DELAY_TIME.count();
     m_target_delay_max = MAX_NEW_TARGET_DELAY_TIME.count();
@@ -138,7 +139,7 @@ void GrindBot::Tick()
             // check if a monster has come close to the player  
             if (m_anti_ram)
             {
-                CMonsterData* closetarget = FindNewTarget(250, m_front_only);
+                CMonsterData* closetarget = FindNewTarget(250, m_visible_only);
                 if (closetarget) {
                     ChangeTarget(closetarget);
                 }
@@ -180,7 +181,7 @@ void GrindBot::RenderImGui()
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot an prioritise boss mobs, even if they are not in the monster selection list yet.");
                 }
-                ImGui::Checkbox("Visible only", &m_front_only);
+                ImGui::Checkbox("Visible only", &m_visible_only);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
                 }
@@ -730,8 +731,7 @@ void GrindBot::OnEnable()
     gmi.clean_name = "Flying Ball";  
     m_mobs.insert({ TO_INT(MonsterUnitKind::Flying_Ball) , gmi });
 #endif
-
- 
+          
     // halloween event special, always add these monster to the list
 #ifdef HALLOWEEN_EVENT
     GrindMonsterInfo gmi;
@@ -784,9 +784,15 @@ void GrindBot::OnEnable()
     m_miscfeatures = static_cast<Miscellaneous*>(m_buddy->GetFeatureByType(FeatureType::Miscellaneous));
     if (m_miscfeatures)
     {
-        m_miscfeatures->ActivateInventoryCleaning(true);
+        //m_miscfeatures->ActivateInventoryCleaning(true);
         m_miscfeatures->ActivateAutoAmmo(true);
         m_miscfeatures->ActivateAutoFlip(true);
+    }
+
+    m_invenmanager = static_cast<InventoryManager*>(m_buddy->GetFeatureByType(FeatureType::InventoryManager));
+    if (m_invenmanager)
+    {
+        m_invenmanager->ActivateInventoryCleaning(true);
     }
 
     OSR_API->UsePrimaryWeapon(false);
@@ -805,9 +811,13 @@ void GrindBot::OnDisable()
 
     if (m_miscfeatures) 
     {
-        m_miscfeatures->ActivateInventoryCleaning(false);
         m_miscfeatures->ActivateAutoAmmo(false);
         m_miscfeatures->ActivateAutoFlip(false);
+    }
+
+    if (m_invenmanager)
+    {
+        m_invenmanager->ActivateInventoryCleaning(false);
     }
 }
 
@@ -915,7 +925,7 @@ void GrindBot::GetNewTarget()
         //}
 
         if (!new_target) {
-            new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f, m_front_only);
+            new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f, m_visible_only);
         }
 
         if (new_target)
