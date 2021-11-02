@@ -158,6 +158,8 @@ private:
 	EnchantListType			m_currentEnchants;
 	EnchantListType			m_wantedEnchants;
 
+	int						m_wanted_enchants_sel_idx;
+
 	int						m_previous_enchantnum;
 
 	EnchantCardsAmount		m_inventory_enchantcards;  

@@ -22,7 +22,7 @@ public:
 	void ActivateInventoryCleaning(bool active);
 	bool TrySendSellItem(CItemInfo* item, int count);
 	bool TryOpenCapsule(ItemNumber capsule);
-	bool IsSelectedItem(CItemInfo* item);
+	bool ItemInSelection(CItemInfo* item);
 	CItemInfo* GetNextItemForDelete();
 	int GetSelectedItemAmount();
 

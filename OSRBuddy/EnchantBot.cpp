@@ -12,6 +12,7 @@ EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_state = EnchantBotState::STANDBY;
 	ResetEnchantList(m_currentEnchants);
 	ResetEnchantList(m_wantedEnchants);
+
 	m_amount_chancecard_8 = 0;
 	m_amount_enchprot_e1 = 0;
 	m_amount_enchprot_e5 = 0;
@@ -448,8 +449,7 @@ void EnchantBot::SetEnchantItem(UID64_t uid)
 }
   
 void EnchantBot::RenderSettings()
-{	
-	int wanted_idx = 0;		  
+{	  
 	ImGui::BeginColumns("SettingsColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
 	{
 		ImGui::SetColumnWidth(0, 320);
@@ -462,7 +462,7 @@ void EnchantBot::RenderSettings()
 				ImGui::Separator();
 				
 				ImGui::PushItemWidth(130);
-				ImGui::EnchantList("##wanted_enchants", &wanted_idx, m_wantedEnchants, 13);
+				ImGui::EnchantList("##wanted_enchants", &m_wanted_enchants_sel_idx, m_wantedEnchants, 13);
 				ImGui::PopItemWidth(); 			
 			}
 			ImGui::NextColumn();
@@ -570,6 +570,7 @@ void EnchantBot::RenderEnchantButtons()
 			RenderColoredEnchantItemAmount(m_inventory_enchantcards.speed);
 		}		
 		
+		/*
 		if (ImGui::Button("Weight Card", ImVec2(100, 20)) && wantend_enchant_count <= 13) {
 			AddEnchantToList(EnchantItemType::Weight, m_wantedEnchants);
 		}
@@ -587,7 +588,7 @@ void EnchantBot::RenderEnchantButtons()
 		}
 		ImGui::SameLine();
 		RenderColoredEnchantItemAmount(m_inventory_enchantcards.time);
-		
+		*/
 	}
 	else if ((m_currentEnchantItemUID != 0 && m_enchant_item.IsArmor()) || m_currentEnchantItemUID == 0)
 	{
@@ -821,6 +822,9 @@ void EnchantBot::ResetEnchantList(EnchantListType& enchantlist)
 {
 	enchantlist.clear();
 	AddEnchantToList(EnchantItemType::None, enchantlist);	// dummy enchant
+	if (enchantlist == m_wantedEnchants) {
+		m_wanted_enchants_sel_idx = 0;
+	}
 }
 	
 void EnchantBot::AddEnchantToList(EnchantItemType enchanttype, EnchantListType& enchantlist)
@@ -878,7 +882,33 @@ void EnchantBot::AddEnchantToList(EnchantItemType enchanttype, EnchantListType& 
 	default:
 		break;
 	} 	
-	enchantlist.push_back(etp);
+	
+	if (enchantlist == m_wantedEnchants && !enchantlist.empty())
+	{
+		EnchantListType::iterator it = enchantlist.begin() + m_wanted_enchants_sel_idx;
+		enchantlist.insert(it + 1, etp);
+		
+		if (it != enchantlist.end() - 1)
+		{
+			// update texts	when the insertion was not at the end
+			int enchantnum = 1;
+			for (auto& enchantlistitem : enchantlist)
+			{
+				std::string enchantstr = "E:" + std::to_string(enchantnum);
+				if (enchantnum < 10) {
+					enchantstr += " ";
+				}
+				enchantlistitem.second.replace(0, 4, enchantstr);
+				enchantnum++;
+			}
+		}
+
+		m_wanted_enchants_sel_idx++;
+	}
+	else
+	{
+		enchantlist.push_back(etp);
+	}
 }
 
 bool EnchantBot::DoEnchantAction(EnchantAction action)

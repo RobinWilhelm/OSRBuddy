@@ -6,27 +6,20 @@
 
 #define WHISPER_WARNING_TIME 10s
 #define WHISPER_SNOOZE_TIME 2min		  
-
-#define CAPSULE_OPEN_REATTACK 300ms
-#define CAPSULE_OPEN_REATTACK_VARIANCE 300ms
    
-#define ITEM_DELETE_REATTACK 400ms
-#define ITEM_DELETE_REATTACK_VARIANCE 500ms
-
-#define ITEM_SELL_REATTACK 250ms
-#define ITEM_SELL_REATTACK_VARIANCE 100ms
-
 #define AUTO_ITEM_REATTACK 1s
+#define BOSS_CHECK_REATTACK 1s
+#define UPDATE_CHARM_COMBO_REATTACK 250ms
 
 Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
 	m_whisperwarner_active = false;	
 	m_whisperwarner_snooze_enabled = true;
  
-	m_bosscheck_timer = BuddyTimer(1s);
+	m_bosscheck_timer = BuddyTimer(BOSS_CHECK_REATTACK);
 	m_autoitems_timer = BuddyTimer(AUTO_ITEM_REATTACK);
 	m_bosswarner = false;
-	m_update_charms_timer = BuddyTimer(1s);
+	m_update_charms_timer = BuddyTimer(UPDATE_CHARM_COMBO_REATTACK);
 	m_selected_combo_item = ImGui::ComboItem();
 }
 
@@ -46,6 +39,10 @@ std::string Miscellaneous::GetName() const
 
 void Miscellaneous::Tick()
 {  			   
+	if (!IsEnabled()) {
+		return;
+	}
+
 	TickAutoFlip();
 	TickWhisperWarner();
 	TickBossWarner();
@@ -55,26 +52,21 @@ void Miscellaneous::Tick()
 		TickAutoStealthcard();
 		TickAutoAmmo();
 		TickAutoRabbit();
+		TickAutoCharm();
 		m_autoitems_timer.Reset();
 	}
-
-	if (m_update_charms_timer.IsReady())
-	{
-		UpdateCharmsComboBox();
-		TickAutoCharm();
-		m_update_charms_timer.Reset();
-	}
-
-	
 }
 
 void Miscellaneous::RenderImGui()
 {
+	DrawEnableCheckBox();
 	ImGui::NewLine();
+	
 	ImGui::BeginColumns("MiscColumns", 2, ImGuiColumnsFlags_NoResize);
 	{
 		ImGui::BeginChild("MiscColumn1", ImVec2(), false);
 		{
+			ImGui::Separator();
 			ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear);
 			{
 				ImGui::Checkbox("Autoflip", &m_autoflip);
@@ -122,7 +114,14 @@ void Miscellaneous::RenderImGui()
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Will automatically use the selected charm.");
 			}
-			ImGui::VectorCombo("Select charm:", m_combo_items, m_selected_combo_item, ImGuiComboFlags_None);
+			if (ImGui::VectorCombo("Select charm:", m_combo_items, m_selected_combo_item, ImGuiComboFlags_None))
+			{
+				if (m_update_charms_timer.IsReady())
+				{
+					UpdateCharmsComboBox();
+					m_update_charms_timer.Reset();
+				} 				
+			}
 			ImGui::SameLine();
 		}
 		ImGui::EndChild();	

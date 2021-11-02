@@ -158,7 +158,7 @@ void GrindBot::RenderImGui()
     ImGui::NewLine();
     ImGui::BeginColumns("GrindBotColumns", 2, ImGuiColumnsFlags_NoResize);
     {
-        ImGui::SetColumnWidth(0, 400);
+        ImGui::SetColumnWidth(0, 350);
         ImGui::BeginChild("GrindBotColumn1", ImVec2(), false);
         {              
             ImGui::BeginDisabledMode(OSR_API->GetPlayerGearType() != GearType::AGear || !IsEnabled());
@@ -173,11 +173,11 @@ void GrindBot::RenderImGui()
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Gear distance: Will shoot the nearest mob first.\nCrosshair distance: Will shoot the mob closest to the crosshair first.");
                 }
-                ImGui::Checkbox("Shoot and prio all goldies", &m_shoot_all_goldies);
+                ImGui::Checkbox("Auto goldies", &m_shoot_all_goldies);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot an prioritise all gold mobs, even if they are not in the monster selection list yet.");
                 }        
-                ImGui::Checkbox("Shoot and prio all bosses", &m_prio_bossmonster);
+                ImGui::Checkbox("Auto bosses", &m_prio_bossmonster);
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Will shoot an prioritise boss mobs, even if they are not in the monster selection list yet.");
                 }
@@ -233,27 +233,6 @@ void GrindBot::RenderImGui()
                     ImGui::SliderFloat("###distanceSmoothfactor", &m_smooth_factor_distance, 0, 1);
                 }
                 ImGui::PopItemWidth();
-                /*
-                ImGui::BeginColumns("AimSmoothingColumns", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-                {
-                    if (m_smoothtype == SmoothType::Time) {
-                        ImGui::SliderFloat("X", &m_time_smooth_x, 0, 1);
-                    }
-                    else {
-                        ImGui::SliderFloat("X", &m_dist_smooth_x, 0, 1);
-                    }
-                }
-                ImGui::NextColumn();
-                {
-                    if (m_smoothtype == SmoothType::Time) {
-                        ImGui::SliderFloat("Y", &m_time_smooth_y, 0, 1);
-                    }
-                    else {
-                        ImGui::SliderFloat("Y", &m_dist_smooth_y, 0, 1);
-                    }
-                }
-                ImGui::EndColumns();
-                */
             }
             ImGui::EndDisabledMode();
         }
@@ -267,7 +246,6 @@ void GrindBot::RenderImGui()
             ImGui::Text("Statistics");
             ImGui::Separator();
 
-            //std::string grindtime = "Grinding Time: " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(m_grinding_time).count());
             ImGui::Text(("Grinding Time: " + m_grind_time_string).c_str());
 
             std::string mobskilled = "Mobs killed: " + std::to_string(m_total_mobs_killed);
@@ -304,17 +282,29 @@ void GrindBot::RenderImGui()
                 ImGui::Text("Monster Selection");
                 ImGui::Separator();
 
-                ImGui::BeginColumns("MonsterSelectColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+                ImGui::BeginColumns("MonsterSelectColumns", 3, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
                 {
+                    ImGui::SetColumnWidth(0, 200);
+                    ImGui::SetColumnWidth(1, 80);
                     ImGui::Text("Shoot at");
                     ImGui::NextColumn();
                     ImGui::Text("Prioritise");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Prioritised targets will be shot first if possible.");
+                    }
+                    ImGui::NextColumn();
+                    ImGui::Text("Count");
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Amount of monsters in range and currently hitable.");
+                    }
                     ImGui::NextColumn();
                     for (auto& monsterinfo : m_mobs)
                     {
                         ImGui::Checkbox(monsterinfo.second.clean_name.c_str(), &monsterinfo.second.shoot);
                         ImGui::NextColumn();
                         ImGui::Checkbox(("###" + monsterinfo.second.clean_name).c_str(), &monsterinfo.second.priority);
+                        ImGui::NextColumn();
+                        ImGui::Text(monsterinfo.second.count_text.c_str());
                         ImGui::NextColumn();
                     }
                 }
@@ -617,6 +607,10 @@ void GrindBot::UpdateGrindMobInfo()
     {
         if (m_grinding_map != 0 && m_grinding_map == OSR_API->GetCurrentMapChannelIndex().MapIndex)
         {
+            for (auto& monsterinfo : m_mobs) {
+                monsterinfo.second.count = 0;
+            }
+
             for (auto& monster : OSR_API->GetSceneData()->m_mapMonsterList)
             {
                 // check if mob is already in the map, if not -> insert it
@@ -633,6 +627,10 @@ void GrindBot::UpdateGrindMobInfo()
                     gmi.priority = false;
                     gmi.goldy = false;
                     gmi.killed = 0;
+                    if(CanShootAtTarget(monster.second))
+                        gmi.count = 1;
+                    else
+                        gmi.count = 0;
 
                     if (gmi.clean_name[0] == '\\')
                     {
@@ -649,6 +647,14 @@ void GrindBot::UpdateGrindMobInfo()
               
                     m_mobs.insert({ monster.second->m_info.MonsterUnitKind, gmi });
                 }
+                else
+                {
+                    if (CanShootAtTarget(monster.second))
+                        monsterinfo->second.count++;
+                }
+            }
+            for (auto& monsterinfo : m_mobs) {
+                monsterinfo.second.count_text = std::to_string(monsterinfo.second.count);
             }
         }
     }
@@ -784,7 +790,7 @@ void GrindBot::OnEnable()
     m_miscfeatures = static_cast<Miscellaneous*>(m_buddy->GetFeatureByType(FeatureType::Miscellaneous));
     if (m_miscfeatures)
     {
-        //m_miscfeatures->ActivateInventoryCleaning(true);
+        m_miscfeatures->Enable(true);
         m_miscfeatures->ActivateAutoAmmo(true);
         m_miscfeatures->ActivateAutoFlip(true);
     }
@@ -792,6 +798,7 @@ void GrindBot::OnEnable()
     m_invenmanager = static_cast<InventoryManager*>(m_buddy->GetFeatureByType(FeatureType::InventoryManager));
     if (m_invenmanager)
     {
+        m_invenmanager->Enable(true);
         m_invenmanager->ActivateInventoryCleaning(true);
     }
 
@@ -811,12 +818,14 @@ void GrindBot::OnDisable()
 
     if (m_miscfeatures) 
     {
+        m_miscfeatures->Enable(false);
         m_miscfeatures->ActivateAutoAmmo(false);
         m_miscfeatures->ActivateAutoFlip(false);
     }
 
     if (m_invenmanager)
     {
+        m_invenmanager->Enable(false);
         m_invenmanager->ActivateInventoryCleaning(false);
     }
 }

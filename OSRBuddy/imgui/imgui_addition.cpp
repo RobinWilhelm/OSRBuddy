@@ -40,16 +40,14 @@ void ImGui::EndDisabledMode()
 void ImGui::DrawTextCentered(std::string text, float total_width)
 {
     float font_size = ImGui::GetFontSize() * text.size() / 2;
-    //ImGui::SameLine(total_width / 2 - font_size + (font_size / 2));
+    ImGui::Dummy(ImVec2(total_width / 2 - font_size + (font_size / 2), 0));
     ImGui::Text(text.c_str());
 }
 
 bool ImGui::EnchantList(const char* label, int* currIndex, EnchantListType& values, int heightInItems)
 {       
     if (values.empty()) { return false; }
-    return ListBox(label, currIndex, vector_getter,
-        static_cast<void*>(&values), values.size(), heightInItems);
-    
+    return ListBox(label, currIndex, vector_getter, static_cast<void*>(&values), values.size(), heightInItems);     
 }
 
 void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)

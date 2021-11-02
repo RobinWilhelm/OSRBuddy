@@ -26,7 +26,9 @@ struct GrindMonsterInfo
 	bool shoot;
 	bool priority;
 	uint32_t killed;
-	bool goldy;				
+	bool goldy;	
+	uint32_t count;
+	std::string count_text;
 };
 
 enum class SmoothType

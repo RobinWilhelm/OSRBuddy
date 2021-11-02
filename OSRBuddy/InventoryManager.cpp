@@ -64,13 +64,21 @@ std::string InventoryManager::GetName() const
 
 void InventoryManager::Tick()
 {  	
+	if (!IsEnabled()) {
+		return;
+	}
+
 	TickItemSell();
 	TickInventoryCleaning();
 }
 
 void InventoryManager::RenderImGui()
 {
+	DrawEnableCheckBox();
+	ImGui::NewLine();
+
 	ImGui::Text("Only perform actions when:");
+	ImGui::SameLine();
 	ImGui::Checkbox("Gear is b-stopped", &m_only_clean_while_stopped);
 	ImGui::SameLine();
 	ImGui::Checkbox("Standard weapon is overheated", &m_only_clean_while_overheat);
@@ -81,14 +89,11 @@ void InventoryManager::RenderImGui()
 		{
 			ImGui::Separator();
 			ImGui::Text("Automatic Capsule Opening");
-			ImGui::Separator();
-			ImGui::NewLine();
-			ImGui::Checkbox("Active###enableCapsuleOpening", &m_open_capsules);
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Will automatically open the below specified items.");
-			}	
-			ImGui::NewLine();
+			}
 			ImGui::Separator();
+			ImGui::Checkbox("Auto open capsules", &m_open_capsules);
 			ImGui::NewLine();
 			ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
 			ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
@@ -174,7 +179,7 @@ bool InventoryManager::OnReadPacket(unsigned short msgtype, byte* packet)
 {
 	switch (msgtype)
 	{
-case T_FC_STORE_UPDATE_ITEM_COUNT:
+	case T_FC_STORE_UPDATE_ITEM_COUNT:
 	{
 		MSG_FC_STORE_UPDATE_ITEM_COUNT* msg = (MSG_FC_STORE_UPDATE_ITEM_COUNT*)packet;
 		if (msg->ItemUpdateType == IUT_GENERAL && msg->ItemUniqueNumber == m_deleted_item)
@@ -267,7 +272,7 @@ bool InventoryManager::TryOpenCapsule(ItemNumber capsule)
 	return false;
 }
 
-bool InventoryManager::IsSelectedItem(CItemInfo* item)
+bool InventoryManager::ItemInSelection(CItemInfo* item)
 {
 	if ((m_delete_weapons && IS_WEAPON(item->Kind)) ||
 		(m_delete_marks && item->Kind == ITEMKIND_MARK) ||
@@ -315,7 +320,7 @@ CItemInfo* InventoryManager::GetNextItemForDelete()
 	for (auto mapentry : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pStoreData->m_mapItemUniqueNumber)
 	{
 		CItemInfo* iteminfo = mapentry.second;
-		if (IsSelectedItem(iteminfo)) {
+		if (ItemInSelection(iteminfo)) {
 			return iteminfo;
 		}
 	}
@@ -331,7 +336,7 @@ int InventoryManager::GetSelectedItemAmount()
 		for (auto mapentry : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pStoreData->m_mapItemUniqueNumber)
 		{
 			CItemInfo* iteminfo = mapentry.second;
-			if (IsSelectedItem(iteminfo)) {
+			if (ItemInSelection(iteminfo)) {
 				m_selected_item_count++;
 			}
 		}
