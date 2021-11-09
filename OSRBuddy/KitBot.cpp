@@ -50,127 +50,107 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
     switch (type)
     {
     case KitType::SHIELD:
+        /*
         if (m_awaiting_server_ok_shield) {
             return false;
         }
-
+        */
         switch (category)
         {
         case KitCategory::S_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_ShieldKit_1);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_ShieldKit_2);
-                if (invkit) 
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             }
             break;
         case KitCategory::A_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_ShieldKit_1);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_ShieldKit_2);
-                if (invkit) 
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             }
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_ShieldKit);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             break;
         case KitCategory::C_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_ShieldKit);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             break;  
         } 
         break;
     case KitType::ENERGY:
+        /*
         if (m_awaiting_server_ok_energy) {
             return false;
         }
-
+        */
         switch (category)
         {
         case KitCategory::S_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_RepairKit_1);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::S_Type_RepairKit_2);
-                if (invkit) 
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             }
             break;
         case KitCategory::A_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_RepairKit_1);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_RepairKit_2);
-                if (invkit) 
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             }
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_RepairKit);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             break;
         case KitCategory::C_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_RepairKit);
-            if (invkit)  
-            {
-                OSR_API->SendUseItem(invkit);           
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             break;       
         } 
         break;
     case KitType::SKILLPOINT:
+        /*
         if (m_awaiting_server_ok_skill) {
             return false;
-        }      
+        } 
+        */
         switch (category)
         {
         case KitCategory::S_TYPE:
@@ -179,26 +159,20 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
             if (is_mgear)
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPit_MG);
-                if (invkit) 
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             } 
 
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPKit_1);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             else
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::A_Type_SkillPKit_2);
-                if (invkit) 
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             }
             break;
@@ -206,44 +180,38 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
             if (is_mgear)
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_SkillPKit_MG);
-                if (invkit)
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             }
 
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_SkillPKit);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             break;
         case KitCategory::C_TYPE:
             if (is_mgear)
             {
                 invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_SkillPKit_MG);
-                if (invkit)
-                {
-                    OSR_API->SendUseItem(invkit);
-                    return true;
+                if (invkit) {
+                    return OSR_API->TrySendUseItem(invkit);
                 }
             }
 
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::C_Type_SkillPKit);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             break;    
         }
         break;
     case KitType::FUEL:
+        /*
         if (m_awaiting_server_ok_fuel) {
             return false;
         }
+        */
         switch (category)
         {
         case KitCategory::S_TYPE:
@@ -252,10 +220,8 @@ bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
             break;
         case KitCategory::B_TYPE:
             invkit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::B_Type_CondensedFuel);
-            if (invkit) 
-            {
-                OSR_API->SendUseItem(invkit);
-                return true;
+            if (invkit) {
+                return OSR_API->TrySendUseItem(invkit);
             }
             break;
         case KitCategory::C_TYPE:
@@ -471,7 +437,8 @@ bool KitBuffBot::TryUseSkill(PlayerSkillInfo* skillinfo)
         return false;
     }
 
-    OSR_API->SendUseSkill(skillinfo->skillinfo);
+    return OSR_API->TrySendUseSkill(skillinfo->skillinfo);
+    //OSR_API->SendUseSkill(skillinfo->skillinfo);
     return true;
 }
 
@@ -1097,97 +1064,93 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
     switch (msgtype)
     {    
     case  T_FC_ITEM_USE_ENERGY_OK:
-    {
-        MSG_FC_ITEM_USE_ENERGY_OK* msg = (MSG_FC_ITEM_USE_ENERGY_OK*)packet;
-        CItemInfo* kit = nullptr;
-        switch (TO_ENUM(ItemNumber, msg->ItemNum))
         {
-        case ItemNumber::S_Type_RepairKit_1:
-        case ItemNumber::S_Type_RepairKit_2:
-        case ItemNumber::A_Type_RepairKit_1:
-        case ItemNumber::A_Type_RepairKit_2:
-        case ItemNumber::B_Type_RepairKit:
-        case ItemNumber::C_Type_RepairKit:
-            kit = OSR_API->FindItemInInventoryByItemNum(msg->ItemNum);
-            if (kit)
+            MSG_FC_ITEM_USE_ENERGY_OK* msg = (MSG_FC_ITEM_USE_ENERGY_OK*)packet;
+            CItemInfo* kit = nullptr;
+            switch (TO_ENUM(ItemNumber, msg->ItemNum))
             {
-                // KitBot::Rage == no additional time
-                std::chrono::milliseconds additional_time = 34ms;
-                switch (m_settings.kitmode)
+            case ItemNumber::S_Type_RepairKit_1:
+            case ItemNumber::S_Type_RepairKit_2:
+            case ItemNumber::A_Type_RepairKit_1:
+            case ItemNumber::A_Type_RepairKit_2:
+            case ItemNumber::B_Type_RepairKit:
+            case ItemNumber::C_Type_RepairKit:
+                kit = OSR_API->FindItemInInventoryByItemNum(msg->ItemNum);
+                if (kit)
                 {
-                case KitBuffBot::Mode::Humanized:
-                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
-                    break;
-                case KitBuffBot::Mode::Sleepy:
-                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
-                    break;
+                    // KitBot::Rage == no additional time
+                    std::chrono::milliseconds additional_time = 34ms;
+                    switch (m_settings.kitmode)
+                    {
+                    case KitBuffBot::Mode::Humanized:
+                        additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
+                        break;
+                    case KitBuffBot::Mode::Sleepy:
+                        additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
+                        break;
+                    }
+                    m_energykit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
+                    m_energykit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
                 }
-                m_energykit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
-                m_energykit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-                m_awaiting_server_ok_energy = false;
-            }
-            break;
-        case ItemNumber::S_Type_ShieldKit_1:
-        case ItemNumber::S_Type_ShieldKit_2:
-        case ItemNumber::A_Type_ShieldKit_1:
-        case ItemNumber::A_Type_ShieldKit_2:
-        case ItemNumber::B_Type_ShieldKit:
-        case ItemNumber::C_Type_ShieldKit:
-            kit = OSR_API->FindItemInInventoryByItemNum(msg->ItemNum);
-            if (kit)
-            {
-                // KitBot::Rage == no additional time
-                std::chrono::milliseconds additional_time = 34ms;
-                switch (m_settings.kitmode)
+                break;
+            case ItemNumber::S_Type_ShieldKit_1:
+            case ItemNumber::S_Type_ShieldKit_2:
+            case ItemNumber::A_Type_ShieldKit_1:
+            case ItemNumber::A_Type_ShieldKit_2:
+            case ItemNumber::B_Type_ShieldKit:
+            case ItemNumber::C_Type_ShieldKit:
+                kit = OSR_API->FindItemInInventoryByItemNum(msg->ItemNum);
+                if (kit)
                 {
-                case KitBuffBot::Mode::Humanized:
-                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
-                    break;
-                case KitBuffBot::Mode::Sleepy:
-                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
-                    break;
+                    // KitBot::Rage == no additional time
+                    std::chrono::milliseconds additional_time = 34ms;
+                    switch (m_settings.kitmode)
+                    {
+                    case KitBuffBot::Mode::Humanized:
+                        additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
+                        break;
+                    case KitBuffBot::Mode::Sleepy:
+                        additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 1500));
+                        break;
+                    }
+                    m_shieldkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
+                    m_shieldkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
                 }
-                m_shieldkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
-                m_shieldkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-                m_awaiting_server_ok_shield = false;
-            }
-            break;
-        case ItemNumber::A_Type_SkillPKit_1:
-        case ItemNumber::A_Type_SkillPKit_2:
-        case ItemNumber::B_Type_SkillPKit:
-        case ItemNumber::C_Type_SkillPKit:
-        case ItemNumber::A_Type_SkillPit_MG:
-        case ItemNumber::B_Type_SkillPKit_MG:
-        case ItemNumber::C_Type_SkillPKit_MG:
-            kit = OSR_API->FindItemInInventoryByItemNum(msg->ItemNum);
-            if (kit)
-            {
-                // KitBot::Rage == no additional time
-                std::chrono::milliseconds additional_time = 33ms;
-                switch (m_settings.kitmode)
+                break;
+            case ItemNumber::A_Type_SkillPKit_1:
+            case ItemNumber::A_Type_SkillPKit_2:
+            case ItemNumber::B_Type_SkillPKit:
+            case ItemNumber::C_Type_SkillPKit:
+            case ItemNumber::A_Type_SkillPit_MG:
+            case ItemNumber::B_Type_SkillPKit_MG:
+            case ItemNumber::C_Type_SkillPKit_MG:
+                kit = OSR_API->FindItemInInventoryByItemNum(msg->ItemNum);
+                if (kit)
                 {
-                case KitBuffBot::Mode::Humanized:
-                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
-                    break;
-                case KitBuffBot::Mode::Sleepy:
-                    additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 2000));
-                    break;
+                    // KitBot::Rage == no additional time
+                    std::chrono::milliseconds additional_time = 33ms;
+                    switch (m_settings.kitmode)
+                    {
+                    case KitBuffBot::Mode::Humanized:
+                        additional_time = std::chrono::milliseconds(Utility::GetRandInt32(100, 700));
+                        break;
+                    case KitBuffBot::Mode::Sleepy:
+                        additional_time = std::chrono::milliseconds(Utility::GetRandInt32(500, 2000));
+                        break;
+                    }
+                    m_skillpkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
+                    m_skillkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
                 }
-                m_skillpkit_reattack_time = std::chrono::milliseconds(kit->m_pItemInfo->ReAttacktime) + additional_time;
-                m_skillkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-                m_awaiting_server_ok_skill = false;
-            }
-            break;
+                break;
     
-        case ItemNumber::B_Type_CondensedFuel:
-        case ItemNumber::C_Type_CondensedFuel:
-        case ItemNumber::D_Type_CondensedFuel:
-        case ItemNumber::E_Type_CondensedFuel:
-            m_awaiting_server_ok_fuel = false;
-            break;
-        }
+            case ItemNumber::B_Type_CondensedFuel:
+            case ItemNumber::C_Type_CondensedFuel:
+            case ItemNumber::D_Type_CondensedFuel:
+            case ItemNumber::E_Type_CondensedFuel:
+                break;
+            }
+        }   
         break;
-    }   
     case T_FC_SKILL_USE_SKILL_OK: 
         {
             MSG_FC_SKILL_USE_SKILL_OK* use_skill_ok_msg = (MSG_FC_SKILL_USE_SKILL_OK*)packet;
@@ -1204,31 +1167,8 @@ bool KitBuffBot::OnReadPacket(unsigned short msgtype, byte* packet)
                     break;
                 }
             }
-            break;
         }
-    case  T_FC_SKILL_CANCEL_SKILL_OK:
-        {
-            MSG_FC_SKILL_CANCEL_SKILL_OK* cancel_skill_ok_msg = (MSG_FC_SKILL_CANCEL_SKILL_OK*)packet;
-            break;
-        }
-    case T_FC_SKILL_INVALIDATE_SKILL:
-        {
-            MSG_FC_SKILL_INVALIDATE_SKILL* invalidate_skill_msg = (MSG_FC_SKILL_INVALIDATE_SKILL*)packet;
-            break;
-        } 
-    case T_ERROR:  
-        {
-            MSG_ERROR* error_msg = (MSG_ERROR*)packet;
-            switch (error_msg->MsgType)
-            {
-            case T_FC_ITEM_USE_ENERGY:
-                OnUseEnergyError(error_msg);
-                break;
-            case T_FC_SKILL_USE_SKILL:
-                OnUseSkillError(error_msg);
-                break;
-            }
-        }
+        break;  
     }
   
     return false;
@@ -1239,63 +1179,56 @@ bool KitBuffBot::OnWritePacket(unsigned short msgtype, byte* packet)
     switch (msgtype)
     {
     case T_FC_ITEM_USE_ENERGY:
-    {
-        MSG_FC_ITEM_USE_ENERGY* msg_use_energy = (MSG_FC_ITEM_USE_ENERGY*)packet;
-        CItemInfo* uitem = OSR_API->FindItemInInventoryByUniqueNumber(msg_use_energy->ItemUniqueNumber);
-        if (uitem)
         {
-            auto current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-
-            KitType kittype = GetKitTypeFromItem(uitem);
-            switch (kittype)
+            MSG_FC_ITEM_USE_ENERGY* msg_use_energy = (MSG_FC_ITEM_USE_ENERGY*)packet;
+            CItemInfo* uitem = OSR_API->FindItemInInventoryByUniqueNumber(msg_use_energy->ItemUniqueNumber);
+            if (uitem)
             {
-            case KitType::NONE:
-                break;
-            case KitType::SHIELD:
-                m_awaiting_server_ok_shield = true;
-                m_shieldkit_last_send = current;
-                break;
-            case KitType::ENERGY:
-                m_awaiting_server_ok_energy = true;
-                m_energykit_last_send = current;
-                break;
-            case KitType::SKILLPOINT:
-                m_awaiting_server_ok_skill = true;
-                m_skillkit_last_send = current;
-                break;
-            case KitType::FUEL:
-                m_awaiting_server_ok_fuel = true;
-                m_fuelkit_last_send = current;
-                break;
+                auto current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+
+                KitType kittype = GetKitTypeFromItem(uitem);
+                switch (kittype)
+                {
+                case KitType::NONE:
+                    break;
+                case KitType::SHIELD:
+                    //m_awaiting_server_ok_shield = true;
+                    m_shieldkit_last_send = current;
+                    break;
+                case KitType::ENERGY:
+                    //m_awaiting_server_ok_energy = true;
+                    m_energykit_last_send = current;
+                    break;
+                case KitType::SKILLPOINT:
+                    //m_awaiting_server_ok_skill = true;
+                    m_skillkit_last_send = current;
+                    break;
+                case KitType::FUEL:
+                    //m_awaiting_server_ok_fuel = true;
+                    m_fuelkit_last_send = current;
+                    break;
+                }
             }
-        }
-    }                           
+        }       
+        break;
     case T_FC_SKILL_USE_SKILL:
         {
             MSG_FC_SKILL_USE_SKILL* msg_use_skill = (MSG_FC_SKILL_USE_SKILL*)packet;
             PlayerSkillInfo* pskill = FindPlayerSkill(msg_use_skill->SkillItemID.ItemNum);
             if (pskill) {
                 pskill->last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-            }
-            break;
+            }            
         }    
+        break;
     case T_FC_SKILL_CANCEL_SKILL:
         {
             MSG_FC_SKILL_CANCEL_SKILL* msg_cancel_skill = (MSG_FC_SKILL_CANCEL_SKILL*)packet;
             PlayerSkillInfo* pskill = FindPlayerSkill(msg_cancel_skill->SkillItemID.ItemNum);
             if (pskill) {
                 pskill->last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-            }
-            break;
-        }                         
-    case T_FC_SKILL_SETUP_SKILL_OK:
-    case T_FC_SKILL_CONFIRM_USE:
-    case T_FC_SKILL_PREPARE_USE:
-    case T_FC_SKILL_SETUP_SKILL:
-    case T_FC_SKILL_USE_SKILLPOINT:
-        {
-            MSG_FC_SKILL_PREPARE_USE* msg_prepare_skill = (MSG_FC_SKILL_PREPARE_USE*)packet;
-        }
+            }                     
+        }    
+        break;
     }
     return 0;
 }

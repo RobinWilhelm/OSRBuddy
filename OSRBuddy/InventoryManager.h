@@ -16,11 +16,8 @@ public:
 	virtual std::string GetName() const override;
 	virtual void Tick() override;
 	virtual void RenderImGui() override;
-	virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
-	virtual bool OnWritePacket(unsigned short msgtype, byte* packet) override;
 
 	void ActivateInventoryCleaning(bool active);
-	bool TrySendSellItem(CItemInfo* item, int count);
 	bool TryOpenCapsule(ItemNumber capsule);
 	bool ItemInSelection(CItemInfo* item);
 	CItemInfo* GetNextItemForDelete();

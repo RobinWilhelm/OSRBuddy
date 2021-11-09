@@ -1,5 +1,7 @@
 #pragma once
 
+#define OSRBUDDY_DEBUG
+
 //#define SUMMER_EVENT
 #define HALLOWEEN_EVENT
 
@@ -12,8 +14,11 @@
 #define FEATURE_INVENTORYMANAGER
 
 #ifdef RELEASE_DEBUG
-	#define FEATURE_FACTORYBOT
+	//#define FEATURE_FACTORYBOT
 	#define FEATURE_TEST
-	//#define FEATURE_VISUALS
+	//#define OSRBUDDY_SHOW_DEBUGINFO
 #endif
 
+#ifdef OSRBUDDY_DEBUG
+#define FEATURE_DEBUGINFO
+#endif

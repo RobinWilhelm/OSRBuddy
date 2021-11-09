@@ -211,6 +211,8 @@
     <ClInclude Include="ImComboBox.h" />
     <ClInclude Include="INFBase.h" />
     <ClInclude Include="InventoryManager.h" />
+    <ClInclude Include="IOPacketManager.h" />
+    <ClInclude Include="IPacketWatcher.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Miscellaneous.h" />
     <ClInclude Include="OsrItemInfo.h" />
@@ -311,7 +313,7 @@
     <ClInclude Include="TestItemUse.h" />
     <ClInclude Include="Trampoline.h" />
     <ClInclude Include="Utility.h" />
-    <ClInclude Include="Visuals.h" />
+    <ClInclude Include="DebugInfo.h" />
     <ClInclude Include="VMTHook.h" />
     <ClInclude Include="GrindBot.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Sethia|Win32'">false</ExcludedFromBuild>
@@ -332,6 +334,7 @@
     <ClCompile Include="FactoryBot2.cpp" />
     <ClCompile Include="ImComboBox.cpp" />
     <ClCompile Include="InventoryManager.cpp" />
+    <ClCompile Include="IOPacketManager.cpp" />
     <ClCompile Include="Miscellaneous.cpp" />
     <ClCompile Include="OsrItemInfo.cpp" />
     <ClCompile Include="Console.cpp" />
@@ -360,7 +363,7 @@
     <ClCompile Include="PersistingTools.cpp" />
     <ClCompile Include="TestItemUse.cpp" />
     <ClCompile Include="Utility.cpp" />
-    <ClCompile Include="Visuals.cpp" />
+    <ClCompile Include="DebugInfo.cpp" />
     <ClCompile Include="GrindBot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Sethia|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>

@@ -129,71 +129,6 @@ void Miscellaneous::RenderImGui()
 	ImGui::EndColumns();
 }
 
-bool Miscellaneous::OnReadPacket(unsigned short msgtype, byte* packet)
-{
-	switch (msgtype)
-	{
-	case T_FC_ITEM_USE_ENERGY_OK:
-	{
-		MSG_FC_ITEM_USE_ENERGY_OK* msg = (MSG_FC_ITEM_USE_ENERGY_OK*)packet;
-		switch (TO_ENUM(ItemNumber, msg->ItemNum))
-		{
-		case ItemNumber::AmmunitionRechargeBox:
-			m_awaiting_server_ok_ammobox = false;
-			break;
-		case ItemNumber::Rabbit_Necklace:
-			m_awaiting_server_ok_rabbit = false;
-			break;
-		case ItemNumber::Mini_Stealth_Card:
-		case ItemNumber::Starter_Mini_Stealth_Card:
-		case ItemNumber::Stealth_Card_30m:
-		case ItemNumber::Stealth_Card_2h:
-			m_awaiting_server_ok_stealthcard = false;
-			break;
-		}
-	}
-	case T_FC_BATTLE_PRI_BULLET_RELOADED:
-	case T_FC_BATTLE_SEC_BULLET_RELOADED:
-		{
-			MSG_FC_BATTLE_PRI_BULLET_RELOADED* reloaded_msg = (MSG_FC_BATTLE_PRI_BULLET_RELOADED*)packet;
-			if (reloaded_msg->RechargeType == BULLET_RECHARGE_TYPE_BULLET_ITEM && m_awaiting_server_ok_ammobox) {
-				m_awaiting_server_ok_ammobox = false;
-			}
-			break;
-		}
-	}
-	return false;
-}
-
-bool Miscellaneous::OnWritePacket(unsigned short msgtype, byte* packet)
-{
-	switch (msgtype)
-	{
-	case T_FC_ITEM_USE_ENERGY:
-		{
-			MSG_FC_ITEM_USE_ENERGY* msg_use_energy = (MSG_FC_ITEM_USE_ENERGY*)packet;
-			CItemInfo* uitem = OSR_API->FindItemInInventoryByUniqueNumber(msg_use_energy->ItemUniqueNumber);
-			switch (TO_ENUM(ItemNumber, uitem->ItemNum))
-			{
-			case ItemNumber::AmmunitionRechargeBox:
-				m_awaiting_server_ok_ammobox = true;
-				break;
-			case ItemNumber::Rabbit_Necklace:
-				m_awaiting_server_ok_rabbit = true;
-				break;
-			case ItemNumber::Mini_Stealth_Card:
-			case ItemNumber::Starter_Mini_Stealth_Card:
-			case ItemNumber::Stealth_Card_30m:
-			case ItemNumber::Stealth_Card_2h:
-				m_awaiting_server_ok_stealthcard = true;
-				break;
-			}
-		}
-		break;
-	}
-	return false;
-}
-
 void Miscellaneous::ActivateAutoFlip(bool on)
 {
 	m_autoflip = on;
@@ -364,32 +299,31 @@ void Miscellaneous::TickBossWarner()
 
 void Miscellaneous::TickAutoStealthcard()
 {		
-	if (m_use_stealthcard && !m_awaiting_server_ok_stealthcard && !OSR_API->IsStealthCardActive() )
+	if (m_use_stealthcard && !OSR_API->IsStealthCardActive() )
 	{
 		CItemInfo* stealthcard = FindStealthCardInInventory();
 		if (stealthcard)
-			OSR_API->SendUseItem(stealthcard);
+			OSR_API->TrySendUseItem(stealthcard);
 	}
 }
 
 void Miscellaneous::TickAutoAmmo()
 {
-	if (m_use_ammobox && !m_awaiting_server_ok_ammobox &&
-		(OSR_API->GetPrimaryWeaponAmmo() == 0 || OSR_API->GetSecondaryWeaponAmmo() == 0))
+	if (m_use_ammobox && (OSR_API->GetPrimaryWeaponAmmo() == 0 || OSR_API->GetSecondaryWeaponAmmo() == 0))
 	{
 		CItemInfo* ammobox = OSR_API->FindItemInInventoryByItemNum(ItemNumber::AmmunitionRechargeBox);
 		if (ammobox)
-			OSR_API->SendUseItem(ammobox);			
+			OSR_API->TrySendUseItem(ammobox);			
 	}
 }
 
 void Miscellaneous::TickAutoRabbit()
 {
-	if (m_use_rabbit && !m_awaiting_server_ok_rabbit && !OSR_API->IsActiveItem(ItemNumber::Rabbit_Necklace))
+	if (m_use_rabbit && !OSR_API->IsActiveItem(ItemNumber::Rabbit_Necklace))
 	{
 		CItemInfo* rabbit = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Rabbit_Necklace);
 		if (rabbit)
-			OSR_API->SendUseItem(rabbit);
+			OSR_API->TrySendUseItem(rabbit);
 	}
 }
 

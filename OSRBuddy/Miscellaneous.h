@@ -20,8 +20,6 @@ public:
 	virtual std::string GetName() const override;
 	virtual void Tick() override;
 	virtual void RenderImGui() override;
-	virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
-	virtual bool OnWritePacket(unsigned short msgtype, byte* packet) override;
 
 	void ActivateAutoFlip(bool on);
 	void ActivateAutoAmmo(bool on);

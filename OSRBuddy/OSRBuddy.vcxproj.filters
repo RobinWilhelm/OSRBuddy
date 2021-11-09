@@ -280,7 +280,7 @@
     <ClInclude Include="SDK\ClientParty.h">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="Visuals.h">
+    <ClInclude Include="DebugInfo.h">
       <Filter>Features</Filter>
     </ClInclude>
     <ClInclude Include="AtumError.h">
@@ -370,6 +370,12 @@
     <ClInclude Include="ImComboBox.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="IOPacketManager.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="IPacketWatcher.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -438,7 +444,7 @@
     <ClCompile Include="PatternManager.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Visuals.cpp">
+    <ClCompile Include="DebugInfo.cpp">
       <Filter>Features</Filter>
     </ClCompile>
     <ClCompile Include="OsrItemInfo.cpp">
@@ -479,6 +485,9 @@
     </ClCompile>
     <ClCompile Include="ImComboBox.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="IOPacketManager.cpp">
+      <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

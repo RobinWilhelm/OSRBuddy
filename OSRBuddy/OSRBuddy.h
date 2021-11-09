@@ -6,6 +6,7 @@
 #include "Console.h"
 #include <chrono>
 #include "PersistingTools.h"
+#include "IOPacketManager.h"
 
 class CInterface;
 class CWinSocket;
@@ -75,7 +76,8 @@ public:
 	
 	void BlockMouseInput(bool on);		   
 
-	PersistingTools* GetPersistingTools() { return &m_persistingTools; }
+	PersistingTools* GetPersistingTools()	{ return &m_persistingTools; };
+	IOPacketManager* GetPacketManager()		{ return m_packetmanager.get(); };
 
 private:
 	void static MessageBoxThreadFunction(std::string message, std::string header, NotifyType type, std::function<void(int)> callback = nullptr);
@@ -152,4 +154,6 @@ private:
 	bool m_allow_notify_popups;
 	PersistingTools m_persistingTools;
 	bool m_block_mouse;
+
+	std::unique_ptr<IOPacketManager> m_packetmanager;
 };

@@ -769,7 +769,7 @@ void EnchantBot::RenderStatisticsPopup()
 								ImGui::SetTooltip("success - total tries");
 							}
 							ImGui::NextColumn();
-							RenderSuccessPercentage(i + 5, m_statisticsSession.m_enchantStats[i][0], m_statisticsSession.m_enchantStats[i][1]);
+							RenderSuccessPercentage(i + 5, m_statisticsWeapon.m_enchantStats[i][0], m_statisticsWeapon.m_enchantStats[i][1]);
 							ImGui::NextColumn();
 						}
 					}

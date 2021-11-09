@@ -9,7 +9,7 @@
 #include "EnchantBot.h"
 #include "GrindBot.h"
 #include "FactoryBot.h"
-#include "Visuals.h"
+#include "DebugInfo.h"
 #include "Miscellaneous.h"
 #include "InventoryManager.h"
                                 
@@ -176,8 +176,9 @@ bool OSRBuddyMain::Start()
 #endif // _DEBUG 
 
         PatternManager::Init();
+        m_packetmanager = std::make_unique<IOPacketManager>();
 
-        if (!OldSchoolRivalsAPI::CreateAndCheckConsistence()) {
+        if (!OldSchoolRivalsAPI::CreateAndCheckConsistence(m_packetmanager.get())) {
             throw exception("Structures outdated");
         }
 
@@ -195,6 +196,7 @@ bool OSRBuddyMain::Start()
         }    
 
         m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
+
                  
 #ifdef FEATURE_KITBOT
         RegisterFeature(new KitBuffBot(this));
@@ -220,8 +222,8 @@ bool OSRBuddyMain::Start()
 #ifdef FEATURE_TEST
         RegisterFeature(new TestItemUse(this));
 #endif
-#ifdef FEATURE_VISUALS
-        RegisterFeature(new Visuals(this));
+#ifdef FEATURE_DEBUGINFO
+        RegisterFeature(new DebugInfo(this));
 #endif
     
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
@@ -570,7 +572,7 @@ bool OSRBuddyMain::GetCursorPosition(LPPOINT pos)
 
 void OSRBuddyMain::OnReadPacket(DWORD wParam, UINT nSocketNotifyType)
 {       
-    MessageType_t	nType = 0;       
+    MessageType_t nType = 0;       
     CFieldWinSocket* pFieldSocket = OSR_API->GetFieldWinSocket(nSocketNotifyType);   
     if (!pFieldSocket || pFieldSocket->m_queueRecvMessage.empty()) {
         return;
@@ -584,9 +586,12 @@ void OSRBuddyMain::OnReadPacket(DWORD wParam, UINT nSocketNotifyType)
         packet = packet_buffer.front();
         packet_buffer.pop();                                            
         nType = *(MessageType_t*)packet;  
+
+        m_packetmanager->OnReadPacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)));
+
         for (auto feature : m_features)
         {
-            if (feature->OnReadPacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)))) {
+            if (static_cast<IPacketWatcher*>(feature)->OnReadPacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)))) {
                 break;
             }
         }   
@@ -596,13 +601,15 @@ void OSRBuddyMain::OnReadPacket(DWORD wParam, UINT nSocketNotifyType)
 
 void OSRBuddyMain::OnWritePacket(LPCSTR pPacket, int nLength)
 {
-    MessageType_t	nType = 0;
+    MessageType_t nType = 0;
     byte* packet = (byte*)pPacket;
     nType = *(MessageType_t*)packet;
 
+    m_packetmanager->OnWritePacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)));
+
     for (auto feature : m_features)
     {
-        if (feature->OnWritePacket(nType, packet + sizeof(MessageType_t))) {
+        if (static_cast<IPacketWatcher*>(feature)->OnWritePacket(nType, packet + sizeof(MessageType_t))) {
             break;
         }
     }

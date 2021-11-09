@@ -4,6 +4,9 @@
 #include "OSRBuddy.h"
 #include "SDK/AtumApplication.h"
 
+#include "SDK/AtumProtocol.h"
+#include "SDK/AtumError.h"
+
 #define CAPSULE_OPEN_REATTACK 300ms
 #define CAPSULE_OPEN_REATTACK_VARIANCE 300ms
 
@@ -175,97 +178,16 @@ void InventoryManager::RenderImGui()
 	ImGui::EndColumns();
 }
 
-bool InventoryManager::OnReadPacket(unsigned short msgtype, byte* packet)
-{
-	switch (msgtype)
-	{
-	case T_FC_STORE_UPDATE_ITEM_COUNT:
-	{
-		MSG_FC_STORE_UPDATE_ITEM_COUNT* msg = (MSG_FC_STORE_UPDATE_ITEM_COUNT*)packet;
-		if (msg->ItemUpdateType == IUT_GENERAL && msg->ItemUniqueNumber == m_deleted_item)
-		{
-			m_deleted_item = 0;
-			m_awaiting_delete_ok = false;
-		}
-
-		if (msg->ItemUpdateType == IUT_SHOP && msg->ItemUniqueNumber == m_sold_item)
-		{
-			m_sold_item = 0;
-			m_awaiting_sell_ok = false;
-		}
-	}
-	break;
-	case T_FC_STORE_DELETE_ITEM:
-	{
-		MSG_FC_STORE_DELETE_ITEM* msg = (MSG_FC_STORE_DELETE_ITEM*)packet;
-		if (msg->ItemDeletionType == IUT_GENERAL && msg->ItemUniqueNumber == m_deleted_item)
-		{
-			m_deleted_item = 0;
-			m_awaiting_delete_ok = false;
-		}
-
-		if (msg->ItemDeletionType == IUT_SHOP && msg->ItemUniqueNumber == m_sold_item)
-		{
-			m_sold_item = 0;
-			m_awaiting_sell_ok = false;
-		}
-	}
-	break;
-	case T_ERROR:
-		MSG_ERROR* msg = (MSG_ERROR*)packet;
-		if (msg->MsgType == T_FC_SHOP_SELL_ITEM)
-		{
-			m_awaiting_sell_ok = false;
-		}
-		break;
-	}
-	return false;
-}
-
-bool InventoryManager::OnWritePacket(unsigned short msgtype, byte* packet)
-{
-	switch (msgtype)
-	{
-	case T_FC_ITEM_THROW_AWAY_ITEM:
-		{
-			MSG_FC_ITEM_THROW_AWAY_ITEM* msg = (MSG_FC_ITEM_THROW_AWAY_ITEM*)packet;
-			m_deleted_item = msg->ItemUniqueNumber;
-			m_awaiting_delete_ok = true;
-			m_item_selection_dirty = true;
-		}
-		break;
-	case T_FC_SHOP_SELL_ITEM:
-		{
-			MSG_FC_SHOP_SELL_ITEM* msg = (MSG_FC_SHOP_SELL_ITEM*)packet;
-			m_sold_item = msg->ItemUniqueNumber;
-			m_awaiting_sell_ok = true;
-			m_item_selection_dirty = true;
-		}
-		break;
-	}
-	return false;
-}
-
 void InventoryManager::ActivateInventoryCleaning(bool active)
 {
 	m_clean_inventory = active;
 }
 
-bool InventoryManager::TrySendSellItem(CItemInfo* item, int count)
-{
-	if (!m_awaiting_sell_ok)
-	{
-		return OSR_API->SendSellItem(item, count);
-	}
-	return false;
-}
-
 bool InventoryManager::TryOpenCapsule(ItemNumber capsule)
 {		
 	CItemInfo* item = OSR_API->FindItemInInventoryByItemNum(capsule);
-	if (item)
+	if (item && OSR_API->TrySendUseItem(item))
 	{
-		OSR_API->SendUseItem(item);
 		m_inventory_action_timer.Reset(CAPSULE_OPEN_REATTACK, CAPSULE_OPEN_REATTACK_VARIANCE);
 		return true;
 	}
@@ -477,7 +399,7 @@ void InventoryManager::TickItemSell()
 				return;
 			}
 
-			if (TrySendSellItem(item, item->CurrentCount)) {
+			if (OSR_API->TrySendSellItem(item, item->CurrentCount)) {
 				m_inventory_action_timer.Reset(ITEM_SELL_REATTACK, ITEM_SELL_REATTACK_VARIANCE);
 			}
 		}

@@ -1,5 +1,6 @@
 #pragma once
 #include "Content.h"
+#include "IPacketWatcher.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_win32.h"
@@ -21,12 +22,12 @@ enum class FeatureType : int
 	FactoryBot,
 	AntiRandomness,
 	GrindBot,
-	Visuals,
+	DebugInfo,
 	Miscellaneous,
 	InventoryManager,
 };
 			 
-class BuddyFeatureBase
+class BuddyFeatureBase : public IPacketWatcher
 {
 	friend class OSRBuddyMain;
 	friend class ImGuiBase;	 	
@@ -56,8 +57,6 @@ public:
 	virtual void RenderImGui() = 0;		   
 
 	virtual void Render(D3D9Renderer* renderer) { return; };
-	virtual bool OnReadPacket(unsigned short msgtype, byte* packet) { return false; };
-	virtual bool OnWritePacket(unsigned short msgtype, byte* packet) { return false; };
 	virtual int WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) { return 0; };
 		
 	void Enable(bool enable);

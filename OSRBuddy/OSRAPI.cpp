@@ -29,10 +29,12 @@ using CalcObjectSourceScreenCoordsType = void(__thiscall*)(CAtumApplication * ec
 using DeleteSelectItemType = void(__thiscall*)(CINFInvenExtend * ecx, int count);
 using SendChangeWearWindowPosType = void(__thiscall*)(CINFInvenExtend* ecx, int nWindowPosition);
 using SetSelectItemType = void(__thiscall*)(CINFInven* ecx, INVEN_DISPLAY_INFO* pDisplayInfo);
+using UpdateItemCountType = void(__thiscall*)(CStoreData* ecx, UID64_t nUniqueNumber, INT nCount);
+
 
 OldSchoolRivalsAPI* OldSchoolRivalsAPI::instance  = nullptr;
 
-bool OldSchoolRivalsAPI::CreateAndCheckConsistence()
+bool OldSchoolRivalsAPI::CreateAndCheckConsistence(IOPacketManager* packetmanager)
 {
 	// correct process?
 	uintptr_t ace_modulebase = (uintptr_t)GetModuleHandle("ACEonline.atm");
@@ -54,7 +56,8 @@ bool OldSchoolRivalsAPI::CreateAndCheckConsistence()
 		  
 	// Create game API and return  
 	OldSchoolRivalsAPI::instance = new OldSchoolRivalsAPI();
-	OldSchoolRivalsAPI::instance->m_atumapplication					= atumapplication;
+	OldSchoolRivalsAPI::instance->m_atumapplication	= atumapplication;
+	OldSchoolRivalsAPI::instance->m_packetmanager = packetmanager;
 	return true;
 }
 
@@ -716,7 +719,6 @@ CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByItemNum(ItemNumber itemnum, 
 
 CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByUniqueNumber(UID64_t hyUniqueNumber)
 {
-#ifndef _DEBUG	  // structure of std::map is different in debugmode which leads to crash 
 	CStoreData* storedata = m_atumapplication->m_pShuttleChild->m_pStoreData;
 	if (!storedata) {
 		return nullptr;
@@ -727,8 +729,17 @@ CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByUniqueNumber(UID64_t hyUniqu
 	{
 		return it->second;
 	}
-#endif // ! _DEBUG
 	return nullptr;
+}
+
+void OldSchoolRivalsAPI::UpdateItemCount(UID64_t nUniqueNumber, INT nCount)
+{
+	static 	UpdateItemCountType updateItemCountFn = reinterpret_cast<UpdateItemCountType>(PatternManager::Get(OffsetIdentifier::CStoreData__UpdateItemCount).address);
+	CStoreData* storedata = m_atumapplication->m_pShuttleChild->m_pStoreData;
+	if (updateItemCountFn && storedata)
+	{
+		updateItemCountFn(storedata, nUniqueNumber, nCount);
+	}
 }
 
 RARE_ITEM_INFO* OldSchoolRivalsAPI::GetServerRareItemInfo(int nCodeNum)
@@ -892,7 +903,7 @@ bool OldSchoolRivalsAPI::PlayerIsInSellBuilding()
 	return false;
 }
 
-bool OldSchoolRivalsAPI::SendSellItem(CItemInfo* item, int count)
+void OldSchoolRivalsAPI::SendSellItem(CItemInfo* item, int count)
 {
 	if (item && count <= item->CurrentCount && PlayerIsInSellBuilding())
 	{
@@ -912,9 +923,8 @@ bool OldSchoolRivalsAPI::SendSellItem(CItemInfo* item, int count)
 		int nType = T_FC_SHOP_SELL_ITEM;
 		memcpy(buffer, &nType, SIZE_FIELD_TYPE_HEADER);
 		memcpy(buffer + SIZE_FIELD_TYPE_HEADER, &sMsg, sizeof(sMsg));
-		return WritePacket(reinterpret_cast<byte*>(buffer), SIZE_FIELD_TYPE_HEADER + sizeof(sMsg));
+		WritePacket(reinterpret_cast<byte*>(buffer), SIZE_FIELD_TYPE_HEADER + sizeof(sMsg));
 	}
-	return false;
 }
 
 bool OldSchoolRivalsAPI::IsActiveItem(INT itemnumber)
@@ -1024,6 +1034,57 @@ ITEM_BASE* OldSchoolRivalsAPI::GetEquippedItem(EQUIP_POS position)
 		}
 	}
 	return nullptr;
+}
+
+bool OldSchoolRivalsAPI::TrySendUseItem(ITEM_GENERAL* item)
+{
+	if (!item)	{
+		return false;
+	}
+	
+	if (item->ItemInfo->Kind == ITEMKIND_RANDOMBOX) {
+		if (m_packetmanager->OpenRandomBoxWaitingOk()) {
+			return false;
+		} 			
+	}
+	else {
+		if (m_packetmanager->UseItemWaitingOk(item->ItemNum)) {
+			return false;
+		}
+	}
+
+	SendUseItem(item);
+	return true;
+}
+
+bool OldSchoolRivalsAPI::TrySendUseSkill(ITEM_BASE* skill)
+{
+	if (!skill || m_packetmanager->UseItemWaitingOk(skill->ItemNum)) {
+		return false;
+	}
+
+	SendUseSkill(skill);
+	return true;
+}
+
+bool OldSchoolRivalsAPI::TrySendSellItem(CItemInfo* item, int count)
+{
+	if (!item || m_packetmanager->SellItemWaitingOk()) {
+		return false;
+	}
+
+	SendSellItem(item, count);
+	return true;
+}
+
+bool OldSchoolRivalsAPI::TryDeleteItem(CItemInfo* item, int count)
+{
+	if (!item || m_packetmanager->DeleteItemWaitingOk()) {
+		return false;
+	}
+
+	DeleteItem(item, count);
+	return true;
 }
 
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)

@@ -5,8 +5,9 @@
 #include "OSRBuddyDefine.h"
 #include <d3d9.h>
    
+class IOPacketManager;
 
-class OldSchoolRivalsAPI
+class OldSchoolRivalsAPI 
 {			
 	OldSchoolRivalsAPI() 
 	{ 
@@ -16,7 +17,7 @@ class OldSchoolRivalsAPI
 	OldSchoolRivalsAPI& operator=(const OldSchoolRivalsAPI& other) = delete;
 
 public:
-	static bool CreateAndCheckConsistence();
+	static bool CreateAndCheckConsistence(IOPacketManager* packetmanager);
 	static OldSchoolRivalsAPI* GetInstance();
 		 
 	CAtumApplication* GetAtumApplication();
@@ -93,6 +94,8 @@ public:
 	CItemInfo* FindItemInInventoryByItemNum(INT itemnum, bool find_lowest_time = false);
 	CItemInfo* FindItemInInventoryByItemNum(ItemNumber itemnum, bool find_lowest_time = false);
 	CItemInfo* FindItemInInventoryByUniqueNumber(UID64_t hyUniqueNumber);
+	// WARNING: this only updates the client side!!!! 
+	void UpdateItemCount(UID64_t nUniqueNumber, INT nCount);  
 					
 	// CAtumDatabase
 	RARE_ITEM_INFO* GetServerRareItemInfo(int nCodeNum);
@@ -125,7 +128,7 @@ public:
 	bool PlayerIsInSellBuilding();
 
 	// sell the specified items to npc
-	bool SendSellItem(CItemInfo* item, int count);
+	void SendSellItem(CItemInfo* item, int count);
 
 	//
 	bool IsActiveItem(INT itemnumber);
@@ -134,6 +137,11 @@ public:
 
 	bool TryEquipItem(CItemInfo* item);
 	ITEM_BASE* GetEquippedItem(EQUIP_POS position);
+
+	bool TrySendUseItem(ITEM_GENERAL* item);
+	bool TrySendUseSkill(ITEM_BASE* skill);
+	bool TrySendSellItem(CItemInfo* item, int count);
+	bool TryDeleteItem(CItemInfo* item, int count);
 
 private:
 	// collision stuff
@@ -150,7 +158,8 @@ private:
 
 private:
 	static OldSchoolRivalsAPI* instance;
-	CAtumApplication*			m_atumapplication;
+	IOPacketManager* m_packetmanager;
+	CAtumApplication* m_atumapplication;
 };
 
 #ifndef OSR_API

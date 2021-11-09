@@ -41,6 +41,7 @@ void ImGui::DrawTextCentered(std::string text, float total_width)
 {
     float font_size = ImGui::GetFontSize() * text.size() / 2;
     ImGui::Dummy(ImVec2(total_width / 2 - font_size + (font_size / 2), 0));
+    ImGui::SameLine();
     ImGui::Text(text.c_str());
 }
 
