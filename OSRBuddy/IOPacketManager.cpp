@@ -6,7 +6,7 @@
 #ifdef OSRBUDDY_DEBUG
 #define DEBUG_INCREMENT(x) (x)++
 #else
-#define DEBUG_INCREMENT(x)
+#define DEBUG_INCREMENT(x) (x)++
 #endif
 
 
@@ -22,7 +22,6 @@ IOPacketManager::IOPacketManager()
 bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 {
 	DEBUG_INCREMENT(m_debug_info.total_recieved);
-
 	switch (msgtype)
 	{
 	case T_FC_ITEM_USE_ENERGY_OK:
@@ -268,9 +267,5 @@ void IOPacketManager::SetWaitingUseItemAll(bool waiting)
 
 PacketDebugLog IOPacketManager::GetDebugInfo()
 {
-#ifdef RELEASE_DEBUG
-	return m_debug_info;
-#else
-	return PacketDebugLog();
-#endif	  	
+	return m_debug_info;  	  	
 }

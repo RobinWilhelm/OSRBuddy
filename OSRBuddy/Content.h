@@ -16,7 +16,7 @@
 #ifdef RELEASE_DEBUG
 	//#define FEATURE_FACTORYBOT
 	#define FEATURE_TEST
-	//#define OSRBUDDY_SHOW_DEBUGINFO
+	#define OSRBUDDY_DEBUG
 #endif
 
 #ifdef OSRBUDDY_DEBUG
