@@ -973,19 +973,9 @@ void OldSchoolRivalsAPI::SendChangeWearWindowPos(int nWindowPosition)
 	}
 }
 
-/*
-void OldSchoolRivalsAPI::SetSelectItem(INVEN_DISPLAY_INFO* pDisplayInfo)
-{
-	static SetSelectItemType setSelectItemFn = reinterpret_cast<SetSelectItemType>(PatternManager::Get(OffsetIdentifier::CINFInven__SetSelectItem).address);
-	CINFGameMain* gamemain = m_atumapplication->m_pInterface->m_pGameMain;
-	if (setSelectItemFn && gamemain) {
-		setSelectItemFn(gamemain, pDisplayInfo);
-	}
-}
-*/
 bool OldSchoolRivalsAPI::TryEquipItem(CItemInfo* item)
 {
-	if (item)
+	if (item && !m_packetmanager->ChangeWindowPositionWaitingOk())
 	{
 		switch (item->ItemInfo->Position)
 		{

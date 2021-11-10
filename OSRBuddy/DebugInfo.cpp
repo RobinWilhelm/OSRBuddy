@@ -33,17 +33,18 @@ void DebugInfo::Tick()
 			m_pdl_old_next_index = 0;
 		}
 
-		m_pdl_last_second.use_skill_sent		= m_pdl_old[last_index].use_skill_sent			- m_pdl_old[m_pdl_old_next_index].use_skill_sent;
-		m_pdl_last_second.cancel_skill_sent		= m_pdl_old[last_index].cancel_skill_sent		- m_pdl_old[m_pdl_old_next_index].cancel_skill_sent;
-		m_pdl_last_second.use_item_sent			= m_pdl_old[last_index].use_item_sent			- m_pdl_old[m_pdl_old_next_index].use_item_sent;
-		m_pdl_last_second.use_energy_sent		= m_pdl_old[last_index].use_energy_sent			- m_pdl_old[m_pdl_old_next_index].use_energy_sent;
-		m_pdl_last_second.throw_away_item_sent	= m_pdl_old[last_index].throw_away_item_sent	- m_pdl_old[m_pdl_old_next_index].throw_away_item_sent;
-		m_pdl_last_second.sell_item_sent		= m_pdl_old[last_index].cancel_skill_sent		- m_pdl_old[m_pdl_old_next_index].cancel_skill_sent;
-		m_pdl_last_second.use_randombox_sent	= m_pdl_old[last_index].use_randombox_sent		- m_pdl_old[m_pdl_old_next_index].use_randombox_sent;
-		m_pdl_last_second.total_sent			= m_pdl_old[last_index].total_sent				- m_pdl_old[m_pdl_old_next_index].total_sent;
-		m_pdl_last_second.errors_recieved		= m_pdl_old[last_index].errors_recieved			- m_pdl_old[m_pdl_old_next_index].errors_recieved;
-		m_pdl_last_second.total_recieved		= m_pdl_old[last_index].total_recieved			- m_pdl_old[m_pdl_old_next_index].total_recieved;
-
+		m_pdl_last_second.use_skill_sent				= m_pdl_old[last_index].use_skill_sent					- m_pdl_old[m_pdl_old_next_index].use_skill_sent;
+		m_pdl_last_second.cancel_skill_sent				= m_pdl_old[last_index].cancel_skill_sent				- m_pdl_old[m_pdl_old_next_index].cancel_skill_sent;
+		m_pdl_last_second.use_item_sent					= m_pdl_old[last_index].use_item_sent					- m_pdl_old[m_pdl_old_next_index].use_item_sent;
+		m_pdl_last_second.use_energy_sent				= m_pdl_old[last_index].use_energy_sent					- m_pdl_old[m_pdl_old_next_index].use_energy_sent;
+		m_pdl_last_second.throw_away_item_sent			= m_pdl_old[last_index].throw_away_item_sent			- m_pdl_old[m_pdl_old_next_index].throw_away_item_sent;
+		m_pdl_last_second.sell_item_sent				= m_pdl_old[last_index].cancel_skill_sent				- m_pdl_old[m_pdl_old_next_index].cancel_skill_sent;
+		m_pdl_last_second.use_randombox_sent			= m_pdl_old[last_index].use_randombox_sent				- m_pdl_old[m_pdl_old_next_index].use_randombox_sent;	
+		m_pdl_last_second.change_window_postion_sent	= m_pdl_old[last_index].change_window_postion_sent		- m_pdl_old[m_pdl_old_next_index].change_window_postion_sent;
+		m_pdl_last_second.total_sent					= m_pdl_old[last_index].total_sent						- m_pdl_old[m_pdl_old_next_index].total_sent;
+		m_pdl_last_second.errors_recieved				= m_pdl_old[last_index].errors_recieved					- m_pdl_old[m_pdl_old_next_index].errors_recieved;
+		m_pdl_last_second.total_recieved				= m_pdl_old[last_index].total_recieved					- m_pdl_old[m_pdl_old_next_index].total_recieved;
+																											
 		m_pdl_timer.Reset();
 	}
 }
@@ -64,6 +65,7 @@ void DebugInfo::RenderImGui()
 			ImGui::Text("T_FC_ITEM_THROW_AWAY_ITEM");
 			ImGui::Text("T_FC_SHOP_SELL_ITEM");
 			ImGui::Text("T_FC_ITEM_USE_RANDOMBOX");
+			ImGui::Text("T_FC_ITEM_CHANGE_WINDOW_POSITION");
 			ImGui::Text("All sent:");
 			ImGui::NewLine();
 			ImGui::Text("Packet type recieved");
@@ -82,6 +84,7 @@ void DebugInfo::RenderImGui()
 			ImGui::Text(std::to_string(m_pdl_current.throw_away_item_sent).c_str());
 			ImGui::Text(std::to_string(m_pdl_current.sell_item_sent).c_str());
 			ImGui::Text(std::to_string(m_pdl_current.use_randombox_sent).c_str());
+			ImGui::Text(std::to_string(m_pdl_current.change_window_postion_sent).c_str());
 			ImGui::Text(std::to_string(m_pdl_current.total_sent).c_str());
 			ImGui::NewLine();
 			ImGui::Text("Total count recieved");
@@ -100,6 +103,7 @@ void DebugInfo::RenderImGui()
 			ImGui::Text(std::to_string(m_pdl_last_second.throw_away_item_sent).c_str());
 			ImGui::Text(std::to_string(m_pdl_last_second.sell_item_sent).c_str());
 			ImGui::Text(std::to_string(m_pdl_last_second.use_randombox_sent).c_str());
+			ImGui::Text(std::to_string(m_pdl_last_second.change_window_postion_sent).c_str());
 			ImGui::Text(std::to_string(m_pdl_last_second.total_sent).c_str());
 			ImGui::NewLine();
 			ImGui::Text("Last second recieved");

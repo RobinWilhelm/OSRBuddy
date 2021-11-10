@@ -38,7 +38,7 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 		break;
 	// special case for ammoboxes
 	// they dont get an OK message but these two messages:
-	//case T_FC_BATTLE_PRI_BULLET_RELOADED:
+	case T_FC_BATTLE_PRI_BULLET_RELOADED:
 	case T_FC_BATTLE_SEC_BULLET_RELOADED:
 		{
 			MSG_FC_BATTLE_PRI_BULLET_RELOADED* reloaded_msg = (MSG_FC_BATTLE_PRI_BULLET_RELOADED*)packet;
@@ -74,6 +74,12 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 			if (msg->ItemUpdateType == IUT_RANDOMBOX && msg->ItemUniqueNumber == m_randombox_open_sent) {
 				m_randombox_open_sent = 0;
 			}
+
+			CItemInfo* item = OSR_API->FindItemInInventoryByUniqueNumber(msg->ItemUniqueNumber);
+			if (item) {
+				SetWaitingUseItem(item->ItemNum, false);
+			}
+
 		}
 	break;
 	case T_FC_STORE_DELETE_ITEM:
@@ -89,6 +95,11 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 
 			if (msg->ItemDeletionType == IUT_RANDOMBOX && msg->ItemUniqueNumber == m_randombox_open_sent) {
 				m_randombox_open_sent = 0;
+			}
+
+			CItemInfo* item = OSR_API->FindItemInInventoryByUniqueNumber(msg->ItemUniqueNumber);
+			if (item) {
+				SetWaitingUseItem(item->ItemNum, false);
 			}
 		}
 		break;
@@ -122,7 +133,14 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 			SetWaitingUseItem(msg_cancel_skill->SkillItemID.ItemNum, false);
 		}
 		break;
-	break;
+	case T_FC_ITEM_CHANGE_WINDOW_POSITION_OK:
+		{
+			MSG_FC_ITEM_CHANGE_WINDOW_POSITION_OK* msg = (MSG_FC_ITEM_CHANGE_WINDOW_POSITION_OK*)packet;
+			if (msg->UniqueNumberDest  == m_change_window_position_sent) {
+				m_change_window_position_sent = 0;
+			}
+		}
+		break;
 
 	case T_ERROR:
 		DEBUG_INCREMENT(m_debug_info.errors_recieved);
@@ -228,6 +246,13 @@ bool IOPacketManager::OnWritePacket(unsigned short msgtype, byte* packet)
 			MSG_FC_ITEM_USE_RANDOMBOX* msg = (MSG_FC_ITEM_USE_RANDOMBOX*)packet;
 			m_randombox_open_sent = msg->ItemUID;
 			DEBUG_INCREMENT(m_debug_info.use_randombox_sent);
+		}
+		break;
+	case T_FC_ITEM_CHANGE_WINDOW_POSITION:
+		{
+			MSG_FC_ITEM_CHANGE_WINDOW_POSITION* msg = (MSG_FC_ITEM_CHANGE_WINDOW_POSITION*)packet;
+			m_change_window_position_sent = msg->ToItemUniqueNumber;
+			DEBUG_INCREMENT(m_debug_info.change_window_postion_sent);
 		}
 		break;
 	}

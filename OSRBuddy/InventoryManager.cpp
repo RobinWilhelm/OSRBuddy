@@ -25,7 +25,7 @@ InventoryManager::InventoryManager(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy
 	m_open_spicapsule = false;
 	m_open_fantasyglobemineralcapsule = true;
 	m_open_mineralcapsule = true;
-	m_open_wpcapsule = false;
+	m_open_wpcapsule = true;
 	m_open_soccer_ball_capsule = true;
 	m_delete_items = false;
 	m_delete_items_maxlevel = 20;

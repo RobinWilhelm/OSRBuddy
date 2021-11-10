@@ -771,8 +771,9 @@ void GrindBot::OnEnable()
         kitbot_settings.use_energy_type_c = true;
         kitbot_settings.use_shield_type_c = true;
 
-        kitbot_settings.use_spkit_type_c = true;
-        kitbot_settings.spkit_type_c_minvalue = TO_INT(OSR_API->GetMaxSkillp() * 0.6f);
+
+        //kitbot_settings.use_spkit_type_c = true;
+        //kitbot_settings.spkit_type_c_minvalue = TO_INT(OSR_API->GetMaxSkillp() * 0.6f);
 
         kitbot_settings.use_spkit_type_b = true;
         kitbot_settings.spkit_type_b_minvalue = TO_INT(OSR_API->GetMaxSkillp()* 0.2f);
