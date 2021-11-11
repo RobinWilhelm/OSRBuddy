@@ -50,6 +50,10 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_shoot_new_target_delay = 0s;
     m_total_mobs_killed = 0;
 
+    m_currentBS = 0;
+    m_nextBS = 0;
+    m_selected = false;
+
     m_update_mobs_timer = BuddyTimer(UPDATE_GRINDMOBS_TIME);
 }   
 
@@ -74,7 +78,19 @@ void GrindBot::Tick()
     {
     case GrindBot::State::WAITING:   
         // show the user what the next targets would be
-        m_get_new_target = true;                             
+        m_get_new_target = true;   
+        if (m_select_swapbs)
+        {
+            CItemInfo* current = OSR_API->GetPrimaryWeapon()->m_pItemInfo;
+            INVEN_DISPLAY_INFO* selected = OSR_API->GetSelectedItem();
+            if (selected && selected->pItem->UniqueNumber != current->UniqueNumber && IsValidPrimaryWeapon(selected->pItem)) // didnt select the current bs	
+            {
+                m_currentBS = current->UniqueNumber;
+                m_nextBS = selected->pItem->UniqueNumber;
+                m_select_swapbs = false;
+                m_selected = true;
+            }
+        }
         break;
 
     case GrindBot::State::SIEGEING:
@@ -82,6 +98,9 @@ void GrindBot::Tick()
         // check for overheat and valid target first
         if (OSR_API->GetPrimaryWeapon()->m_bOverHeat) 
         {
+            if (m_enable_bs_hotswap) {
+                m_swapped = false;
+            }
             ChangeState(GrindBot::State::OVERHEATED);
             return;
         }
@@ -134,6 +153,12 @@ void GrindBot::Tick()
 
     case GrindBot::State::OVERHEATED: 
         UpdateGrindingTime();
+        if (m_enable_bs_hotswap && m_selected) {
+            if (!m_swapped) 
+            {
+                m_swapped = Swap();
+            }
+        }
         if (!OSR_API->GetPrimaryWeapon()->m_bOverHeat) 
         {
             // check if a monster has come close to the player  
@@ -233,6 +258,24 @@ void GrindBot::RenderImGui()
                     ImGui::SliderFloat("###distanceSmoothfactor", &m_smooth_factor_distance, 0, 1);
                 }
                 ImGui::PopItemWidth();
+                ImGui::NewLine();
+                ImGui::Checkbox("Activate BS HotSwap", &m_enable_bs_hotswap);
+                if (m_enable_bs_hotswap) {
+                    if (ImGui::Button("Select New"))
+                    {
+                        m_select_swapbs = true;
+                    }
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Press the \"Select New\" button and then click on a weapon to swap to while overheated");
+                    }
+                    ImGui::SameLine();
+                    if (m_select_swapbs) {
+                        ImGui::Text("waiting for selection...");
+                    }
+                    else if (m_nextBS == 0) {
+                        ImGui::Text("Select item to start enchanting.");
+                    }
+                }
             }
             ImGui::EndDisabledMode();
         }
@@ -706,6 +749,26 @@ void GrindBot::SmoothDeltaAngle(float& deltaAng)
         deltaAng *= percent;
         break;
     }
+}
+
+bool GrindBot::IsValidPrimaryWeapon(ITEM_BASE* item)
+{
+    return (IS_PRIMARY_WEAPON(item->Kind) && IS_AGEAR(item->ItemInfo->ReqUnitKind));
+}
+
+bool GrindBot::Swap()
+{
+    CItemInfo* swapBS = OSR_API->FindItemInInventoryByUniqueNumber(m_nextBS);
+    if (swapBS)
+    {
+        if (OSR_API->TryEquipItem(swapBS))
+        {
+            m_nextBS = m_currentBS;
+            m_currentBS = swapBS->UniqueNumber;
+            return true;
+        }
+    }
+    return false;
 }
 
        

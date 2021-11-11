@@ -88,6 +88,9 @@ private:
 	bool IsMonsterDead(CMonsterData* monster);
 	void SmoothDeltaAngle(float& deltaAng);
 
+	bool IsValidPrimaryWeapon(ITEM_BASE* item);
+	bool Swap();
+
 private:
 	CMonsterData* m_target;
 	GrindBot::State m_current_state;
@@ -113,6 +116,10 @@ private:
 	bool m_prioritise_closer_mobs;
 	bool m_anti_ram;
 	bool m_prio_bossmonster;
+	bool m_enable_bs_hotswap;
+	bool m_select_swapbs;
+	bool m_swapped;
+	bool m_selected;
 
 	TargetMode m_target_mode;
 
@@ -131,4 +138,7 @@ private:
 
 	std::map<INT, GrindMonsterInfo> m_mobs;
 	int m_total_mobs_killed;  
+
+	UID64_t m_currentBS;
+	UID64_t m_nextBS;
 };
