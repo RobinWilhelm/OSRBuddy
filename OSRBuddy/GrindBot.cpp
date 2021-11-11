@@ -273,8 +273,12 @@ void GrindBot::RenderImGui()
                         ImGui::Text("waiting for selection...");
                     }
                     else if (m_nextBS == 0) {
-                        ImGui::Text("Select item to start enchanting.");
+                        ImGui::Text("Select an AG-Weapon");
                     }
+                }
+                if (m_selected && m_enable_bs_hotswap)
+                {
+                    ImGui::Text("Weapon selected!");
                 }
             }
             ImGui::EndDisabledMode();
