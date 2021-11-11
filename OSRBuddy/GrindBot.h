@@ -119,6 +119,7 @@ private:
 	bool m_enable_bs_hotswap;
 	bool m_select_swapbs;
 	bool m_swapped;
+	bool m_selected;
 
 	TargetMode m_target_mode;
 

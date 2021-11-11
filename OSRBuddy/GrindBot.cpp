@@ -52,6 +52,7 @@ GrindBot::GrindBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 
     m_currentBS = 0;
     m_nextBS = 0;
+    m_selected = false;
 
     m_update_mobs_timer = BuddyTimer(UPDATE_GRINDMOBS_TIME);
 }   
@@ -87,6 +88,7 @@ void GrindBot::Tick()
                 m_currentBS = current->UniqueNumber;
                 m_nextBS = selected->pItem->UniqueNumber;
                 m_select_swapbs = false;
+                m_selected = true;
             }
         }
         break;
@@ -151,7 +153,7 @@ void GrindBot::Tick()
 
     case GrindBot::State::OVERHEATED: 
         UpdateGrindingTime();
-        if (m_enable_bs_hotswap) {
+        if (m_enable_bs_hotswap && m_selected) {
             if (!m_swapped) 
             {
                 m_swapped = Swap();
