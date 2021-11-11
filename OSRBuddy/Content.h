@@ -1,6 +1,9 @@
 #pragma once
 
 #define OSRBUDDY_DEBUG
+//#define OSRBUDDY_MANUALMAP
+
+
 
 //#define SUMMER_EVENT
 #define HALLOWEEN_EVENT
@@ -21,4 +24,8 @@
 
 #ifdef OSRBUDDY_DEBUG
 #define FEATURE_DEBUGINFO
+#endif
+
+#ifdef OSRBUDDY_MANUALMAP
+#define BUDDY_EXPORTS
 #endif
