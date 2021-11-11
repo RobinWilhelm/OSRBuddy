@@ -41,8 +41,8 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 	case T_FC_BATTLE_PRI_BULLET_RELOADED:
 	case T_FC_BATTLE_SEC_BULLET_RELOADED:
 		{
-			MSG_FC_BATTLE_PRI_BULLET_RELOADED* reloaded_msg = (MSG_FC_BATTLE_PRI_BULLET_RELOADED*)packet;
-			if (reloaded_msg->RechargeType == BULLET_RECHARGE_TYPE_BULLET_ITEM) 
+			MSG_FC_BATTLE_PRI_BULLET_RELOADED* msg = (MSG_FC_BATTLE_PRI_BULLET_RELOADED*)packet;
+			if (msg->RechargeType == BULLET_RECHARGE_TYPE_BULLET_ITEM)
 			{
 				SetWaitingUseItem(TO_INT(ItemNumber::AmmunitionRechargeBox), false);  	
 			}  			
@@ -50,14 +50,14 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 		break;
 	case T_FC_SKILL_USE_SKILL_OK:
 		{
-			MSG_FC_SKILL_USE_SKILL_OK* msg_use_skill = (MSG_FC_SKILL_USE_SKILL_OK*)packet;
-			SetWaitingUseItem(msg_use_skill->SkillItemID.ItemNum, false);
+			MSG_FC_SKILL_USE_SKILL_OK* msg = (MSG_FC_SKILL_USE_SKILL_OK*)packet;
+			SetWaitingUseItem(msg->SkillItemID.ItemNum, false);
 		}
 		break;
 	case T_FC_SKILL_CANCEL_SKILL_OK:
 		{
-			MSG_FC_SKILL_CANCEL_SKILL_OK* msg_cancel_skill = (MSG_FC_SKILL_CANCEL_SKILL_OK*)packet;
-			SetWaitingUseItem(msg_cancel_skill->SkillItemID.ItemNum, false);
+			MSG_FC_SKILL_CANCEL_SKILL_OK* msg = (MSG_FC_SKILL_CANCEL_SKILL_OK*)packet;
+			SetWaitingUseItem(msg->SkillItemID.ItemNum, false);
 		}
 		break;
 	case T_FC_STORE_UPDATE_ITEM_COUNT:
@@ -81,7 +81,7 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 			}
 
 		}
-	break;
+		break;
 	case T_FC_STORE_DELETE_ITEM:
 		{
 			MSG_FC_STORE_DELETE_ITEM* msg = (MSG_FC_STORE_DELETE_ITEM*)packet;
@@ -105,32 +105,32 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 		break;
 	case T_FC_SKILL_CANCEL_PREPARE_OK:
 		{
-			MSG_FC_SKILL_CANCEL_PREPARE_OK* msg_cancel_skill = (MSG_FC_SKILL_CANCEL_PREPARE_OK*)packet;
-			SetWaitingUseItem(msg_cancel_skill->SkillItemID.ItemNum, false);
+			MSG_FC_SKILL_CANCEL_PREPARE_OK* msg = (MSG_FC_SKILL_CANCEL_PREPARE_OK*)packet;
+			SetWaitingUseItem(msg->SkillItemID.ItemNum, false);
 		}
 		break;
-	case T_FC_SKILL_CONFIRM_USE_ACK:
+	case T_FC_SKILL_CONFIRM_USE:
 		{
-			MSG_FC_SKILL_CONFIRM_USE_ACK* msg_cancel_skill = (MSG_FC_SKILL_CONFIRM_USE_ACK*)packet;
-			SetWaitingUseItem(msg_cancel_skill->UsingSkillItemNum, false);
+			MSG_FC_SKILL_CONFIRM_USE* msg = (MSG_FC_SKILL_CONFIRM_USE*)packet;
+			SetWaitingUseItem(msg->UsingSkillItemNum, false);
 		}
 		break;
 	case T_FC_SKILL_PREPARE_USE_OK:
 		{
-			MSG_FC_SKILL_PREPARE_USE_OK* msg_cancel_skill = (MSG_FC_SKILL_PREPARE_USE_OK*)packet;
-			SetWaitingUseItem(msg_cancel_skill->SkillItemID.ItemNum, false);
+			MSG_FC_SKILL_PREPARE_USE_OK* msg = (MSG_FC_SKILL_PREPARE_USE_OK*)packet;
+			SetWaitingUseItem(msg->SkillItemID.ItemNum, false);
 		}
 		break;
 	case T_FC_SKILL_SETUP_SKILL_OK:
 		{
-			MSG_FC_SKILL_SETUP_SKILL_OK* msg_cancel_skill = (MSG_FC_SKILL_SETUP_SKILL_OK*)packet;
-			SetWaitingUseItem(msg_cancel_skill->ItemSkill.ItemNum, false);
+			MSG_FC_SKILL_SETUP_SKILL_OK* msg = (MSG_FC_SKILL_SETUP_SKILL_OK*)packet;
+			SetWaitingUseItem(msg->ItemSkill.ItemNum, false);
 		}
 		break;
 	case T_FC_SKILL_INVALIDATE_SKILL:
 		{
-			MSG_FC_SKILL_INVALIDATE_SKILL* msg_cancel_skill = (MSG_FC_SKILL_INVALIDATE_SKILL*)packet;
-			SetWaitingUseItem(msg_cancel_skill->SkillItemID.ItemNum, false);
+			MSG_FC_SKILL_INVALIDATE_SKILL* msg = (MSG_FC_SKILL_INVALIDATE_SKILL*)packet;
+			SetWaitingUseItem(msg->SkillItemID.ItemNum, false);
 		}
 		break;
 	case T_FC_ITEM_CHANGE_WINDOW_POSITION_OK:
@@ -143,45 +143,47 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 		break;
 
 	case T_ERROR:
-		DEBUG_INCREMENT(m_debug_info.errors_recieved);
-
-		MSG_ERROR* msg = (MSG_ERROR*)packet;
-		switch (msg->MsgType)
 		{
-		case T_FC_ITEM_USE_ENERGY: 
-		case T_FC_SKILL_USE_SKILL:	
+			DEBUG_INCREMENT(m_debug_info.errors_recieved);
+
+			MSG_ERROR* msg = (MSG_ERROR*)packet;
+			switch (msg->MsgType)
 			{
-				SetWaitingUseItemAll(false);
-			}
-			break;
-		case T_FC_SHOP_SELL_ITEM:
-			{
-				m_sell_sent = 0;
-			}
-			break;
-		case T_FC_ITEM_USE_RANDOMBOX:
-			{
-				switch (msg->ErrorCode)
+			case T_FC_ITEM_USE_ENERGY:
+			case T_FC_SKILL_USE_SKILL:
 				{
-					// sometimes it happens that client and server are not anymore in sync with the inventory items	while trying to open capsules
-					// idk for sure why this happens, but to fix it we can just remove the items from clientside that dont exist anymore on the server
-				case ERR_PROTOCOL_NO_SUCH_ITEM:
+					SetWaitingUseItemAll(false);
+				}
+				break;
+			case T_FC_SHOP_SELL_ITEM:
+				{
+					m_sell_sent = 0;
+				}
+			break;
+			case T_FC_ITEM_USE_RANDOMBOX:
+				{
+					switch (msg->ErrorCode)
 					{
-						//remove item directly from client side item list
-						CStoreData* storedata = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pStoreData;
-						CMapItemInventoryIterator it = storedata->m_mapItemUniqueNumber.find(msg->ErrParam1);
-						if (it != storedata->m_mapItemUniqueNumber.end())
+						// sometimes it happens that client and server are not anymore in sync with the inventory items	while trying to open capsules
+						// idk for sure why this happens, but to fix it we can just remove the items from clientside that dont exist anymore on the server
+					case ERR_PROTOCOL_NO_SUCH_ITEM:
 						{
-							CItemInfo* pItemInfo = it->second;
-							storedata->m_mapItemUniqueNumber.erase(it);
-							CMapItemWindowInventoryIterator it2 = storedata->m_mapItemWindowPosition.find(pItemInfo->ItemWindowIndex);
-							if (it2 != storedata->m_mapItemWindowPosition.end())
+							//remove item directly from client side item list
+							CStoreData* storedata = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pStoreData;
+							CMapItemInventoryIterator it = storedata->m_mapItemUniqueNumber.find(msg->ErrParam1);
+							if (it != storedata->m_mapItemUniqueNumber.end())
 							{
-								storedata->m_mapItemWindowPosition.erase(it2);
+								CItemInfo* pItemInfo = it->second;
+								storedata->m_mapItemUniqueNumber.erase(it);
+								CMapItemWindowInventoryIterator it2 = storedata->m_mapItemWindowPosition.find(pItemInfo->ItemWindowIndex);
+								if (it2 != storedata->m_mapItemWindowPosition.end())
+								{
+									storedata->m_mapItemWindowPosition.erase(it2);
+								}
 							}
 						}
-					}
 					break;
+					}
 				}
 				break;
 			}
@@ -197,8 +199,8 @@ bool IOPacketManager::OnWritePacket(unsigned short msgtype, byte* packet)
 	{
 	case T_FC_ITEM_USE_ENERGY:
 		{
-			MSG_FC_ITEM_USE_ENERGY* msg_use_energy = (MSG_FC_ITEM_USE_ENERGY*)packet;
-			CItemInfo* item = OSR_API->FindItemInInventoryByUniqueNumber(msg_use_energy->ItemUniqueNumber);
+			MSG_FC_ITEM_USE_ENERGY* msg = (MSG_FC_ITEM_USE_ENERGY*)packet;
+			CItemInfo* item = OSR_API->FindItemInInventoryByUniqueNumber(msg->ItemUniqueNumber);
 			SetWaitingUseItem(item->ItemNum, true);
 
 			DEBUG_INCREMENT(m_debug_info.use_energy_sent);
@@ -215,15 +217,15 @@ bool IOPacketManager::OnWritePacket(unsigned short msgtype, byte* packet)
 		break;
 	case T_FC_SKILL_USE_SKILL:
 		{
-			MSG_FC_SKILL_USE_SKILL* msg_use_skill = (MSG_FC_SKILL_USE_SKILL*)packet;  		
-			SetWaitingUseItem(msg_use_skill->SkillItemID.ItemNum, true);
+			MSG_FC_SKILL_USE_SKILL* msg = (MSG_FC_SKILL_USE_SKILL*)packet;
+			SetWaitingUseItem(msg->SkillItemID.ItemNum, true);
 			DEBUG_INCREMENT(m_debug_info.use_skill_sent);
 		}
 		break;
 	case T_FC_SKILL_CANCEL_SKILL:
 		{
-			MSG_FC_SKILL_CANCEL_SKILL* msg_cancel_skill = (MSG_FC_SKILL_CANCEL_SKILL*)packet;	
-			SetWaitingUseItem(msg_cancel_skill->SkillItemID.ItemNum, true);
+			MSG_FC_SKILL_CANCEL_SKILL* msg = (MSG_FC_SKILL_CANCEL_SKILL*)packet;
+			SetWaitingUseItem(msg->SkillItemID.ItemNum, true);
 			DEBUG_INCREMENT(m_debug_info.cancel_skill_sent);
 		}
 		break;
@@ -264,29 +266,43 @@ bool IOPacketManager::OnWritePacket(unsigned short msgtype, byte* packet)
 bool IOPacketManager::UseItemWaitingOk(int itemnumber)
 {
 	auto entry = m_useitem_packetstate.find(itemnumber);
-	if (entry != m_useitem_packetstate.end()) {
-		return entry->second;
+	if (entry != m_useitem_packetstate.end()) 
+	{
+		if (entry->second.waiting)
+		{
+			auto now = std::chrono::system_clock::now();
+			if (now - entry->second.last_send < PACKET_RESEND_ALLOW_TIME) {
+				return true;
+			}
+		}
 	}
-	else {
-		return false;
-	}
+	return false;
 }
 
 void IOPacketManager::SetWaitingUseItem(int itemnumber, bool waiting)
 {
 	auto entry = m_useitem_packetstate.find(itemnumber);
+	PacketState ps;
+	ps.waiting = waiting;
+	if (waiting) {
+		ps.last_send = std::chrono::system_clock::now();
+	}
 	if (entry != m_useitem_packetstate.end()) {
-		entry->second = waiting;
+		entry->second = ps;
 	}
 	else {
-		m_useitem_packetstate.insert({ itemnumber, waiting });
+		m_useitem_packetstate.insert({ itemnumber, ps });
 	}
 }
 
 void IOPacketManager::SetWaitingUseItemAll(bool waiting)
 {
-	for (auto& item : m_useitem_packetstate) {
-		item.second = waiting;
+	for (auto& item : m_useitem_packetstate) 
+	{
+		item.second.waiting = waiting;
+		if (waiting) {
+			item.second.last_send = std::chrono::system_clock::now();
+		}
 	}
 }
 

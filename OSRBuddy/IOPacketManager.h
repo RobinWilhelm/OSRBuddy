@@ -3,6 +3,9 @@
 #include <unordered_map>
 #include "SDK/AtumError.h"
 #include "SDK/AtumParam.h"
+#include <chrono>
+
+#define PACKET_RESEND_ALLOW_TIME 300ms
 
 struct PacketDebugLog
 {
@@ -41,7 +44,13 @@ public:
 	PacketDebugLog GetDebugInfo();
 
 private:
-	std::unordered_map<int, bool> m_useitem_packetstate;
+	struct PacketState
+	{
+		bool waiting;
+		std::chrono::system_clock::time_point last_send;
+	};
+
+	std::unordered_map<int, PacketState> m_useitem_packetstate;
 	UID64_t m_delete_sent; // unique item number of the last sent delete item packet
 	UID64_t m_sell_sent;	// unique item number of the last sent sell item packet
 	UID64_t m_randombox_open_sent;
