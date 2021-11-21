@@ -287,49 +287,37 @@ void EnchantBot::UpdateInventoryEnchantCards()
 	CItemInfo* iteminfo = nullptr;
 
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Accuracy, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-			m_inventory_enchantcards.accuracy = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.accuracy = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Reattack, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.reattack = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.reattack = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::MinMax, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.damage = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.damage = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Speed, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.speed = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.speed = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Range, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.range = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.range = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Time, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.time = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.time = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Weight, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.weight = iteminfo->CurrentCount;
-	}	 
+	m_inventory_enchantcards.weight = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Overheating, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.overheat = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.overheat = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Shield, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.shield = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.shield = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::Energy, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.energy = iteminfo->CurrentCount;
-	}
+	m_inventory_enchantcards.energy = (iteminfo) ? iteminfo->CurrentCount : 0;
+
 	iteminfo = GetEnchantItemFromInventory(EnchantCard::EnergyShield, m_enchantTargetKind, geartype);
-	if (iteminfo) {
-		m_inventory_enchantcards.energyshield = iteminfo->CurrentCount;
-	}			
+	m_inventory_enchantcards.energyshield = (iteminfo) ? iteminfo->CurrentCount : 0;   			
 }
 
   
@@ -470,8 +458,7 @@ void EnchantBot::RenderSettings()
 			ImGui::EndColumns();
 		}
 		ImGui::EndChild();
-	}
-	
+	}	
 	ImGui::NextColumn();
 	{
 		ImGui::BeginChild("SettingsCol2");
@@ -513,18 +500,18 @@ void EnchantBot::RenderSettings()
 				ImGui::Text("Control");
 				ImGui::Separator();
 
-				if (ImGui::Checkbox("Optimise protects", &m_optimiseEnchanting))
+				if (ImGui::Checkbox("Optimize Protects", &m_optimiseEnchanting))
 				{
 					SetOptimizedEnchantSettings(m_optimiseEnchanting);
 				}
 				if (ImGui::IsItemHovered()) {
-					ImGui::SetTooltip("Automatically set optimised protect card settign.");
+					ImGui::SetTooltip("Automatically set optimized protect card setting.");
 				}
-				ImGui::Checkbox("Use chance cards", &m_withLuckyCard);
+				ImGui::Checkbox("Use Chance Cards", &m_withLuckyCard);
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip("Uses the configured Percent Enchant Chance Cards to enchant.");
 				}
-				ImGui::Checkbox("Auto enchant", &m_auto_enchant);
+				ImGui::Checkbox("Auto Enchant", &m_auto_enchant);
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip("Enchants until the target is reached or there are no enchantment items left.");
 				}
@@ -1383,19 +1370,13 @@ CItemInfo* EnchantBot::GetEnchantItemFromInventory(EnchantChance enchantitem)
 void EnchantBot::UpdateEnchantItemAmount()
 {
 	CItemInfo* chancecard_8 = OSR_API->FindItemInInventoryByItemNum(ItemNumber::EnchantChance8PercentCard);
-	if (chancecard_8) {
-		m_amount_chancecard_8 = chancecard_8->CurrentCount;
-	}
+	m_amount_chancecard_8 = (chancecard_8) ? chancecard_8->CurrentCount : 0;
 
 	CItemInfo* chancecard_5 = OSR_API->FindItemInInventoryByItemNum(ItemNumber::EnchantChance5PercentCard);
-	if (chancecard_5) {
-		m_amount_chancecard_5 = chancecard_5->CurrentCount;
-	}
+	m_amount_chancecard_5 = (chancecard_5) ? chancecard_5->CurrentCount : 0;
 
 	CItemInfo* chancecard_3 = OSR_API->FindItemInInventoryByItemNum(ItemNumber::EnchantChance3PercentCard);
-	if (chancecard_3) {
-		m_amount_chancecard_3 = chancecard_3->CurrentCount;
-	}
+	m_amount_chancecard_3 = (chancecard_3) ? chancecard_3->CurrentCount : 0;
 
 	int amount_e5_prot = 0;
 	CItemInfo* e5_enchprot = OSR_API->FindItemInInventoryByItemNum(ItemNumber::EnchantItemProtectCard);
@@ -1409,9 +1390,7 @@ void EnchantBot::UpdateEnchantItemAmount()
 	m_amount_enchprot_e5 = amount_e5_prot;
 
 	CItemInfo* e1_enchprot = OSR_API->FindItemInInventoryByItemNum(ItemNumber::BasicItemProtectCard);
-	if (e1_enchprot) {
-		m_amount_enchprot_e1 = e1_enchprot->CurrentCount;
-	}
+	m_amount_enchprot_e1 = (e1_enchprot) ? e1_enchprot->CurrentCount : 0;
 
 	UpdateInventoryEnchantCards();
 }
