@@ -115,9 +115,9 @@ struct EnchantStatistics
 	uint32_t	m_used_speedcards;
 	uint32_t	m_used_energyshieldcard;
 
-	uint32_t	m_used_prefixwhipes;
+	uint32_t	m_used_prefixwipes;
 	uint32_t	m_used_prefixcards;
-	uint32_t	m_used_suffixwhipes;
+	uint32_t	m_used_suffixwipes;
 	uint32_t	m_used_suffixcards;
 
 	uint32_t	m_cost_enchprots_e1;

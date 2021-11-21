@@ -243,6 +243,7 @@ void EnchantBot::SetEnchantBotState(EnchantBotState state)
 
 void EnchantBot::ResetCurrentEnchantItem()
 {
+	m_buddy->GetPersistingTools()->PersistEnchantments(m_statisticsWeapon);
 	m_buddy->GetPersistingTools()->CloseStream();
 	m_currentEnchantItemUID = 0; 
 	ResetEnchantList(m_currentEnchantDisplayList);		
