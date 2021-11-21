@@ -85,7 +85,7 @@ void TestItemUse::RenderImGui()
 	}
 
 	if(m_item_reattack > 0)
-		m_item_reattack -= osr->GetElapsedTime();
+		m_item_reattack -= static_cast<int>(osr->GetElapsedTime());
 
 	static std::string test1;
 	test1 = std::to_string(osr->GetAtumApplication()->m_dwInetAnticheatCheckTime);

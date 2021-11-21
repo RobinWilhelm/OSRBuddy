@@ -136,6 +136,13 @@ void OsrItemInfo::RenderImGui() const
 	if (IsWeapon() && !GetCleanPrefixName().empty())
 	{
 		m_prefix.RenderImGui();
+#ifdef RELEASE_DEBUG
+		if (m_item_info->m_pRefPrefixRareInfo)
+		{
+			ImGui::SameLine();
+			ImGui::Text(std::to_string(m_item_info->m_pRefPrefixRareInfo->CodeNum).c_str());
+		}
+#endif
 		ImGui::SameLine();
 	}
 
@@ -153,5 +160,12 @@ void OsrItemInfo::RenderImGui() const
 	{
 		ImGui::SameLine();
 		m_suffix.RenderImGui();
+#ifdef RELEASE_DEBUG
+		if (m_item_info->m_pRefSuffixRareInfo)
+		{
+			ImGui::SameLine();
+			ImGui::Text(std::to_string(m_item_info->m_pRefSuffixRareInfo->CodeNum).c_str());
+		}
+#endif
 	}
 }

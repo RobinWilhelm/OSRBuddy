@@ -28,6 +28,53 @@
 
 
 class CItemInfo;
+
+enum class EnchantCard : uint32_t
+{
+	None,
+	Accuracy,
+	Reattack,
+	MinMax,
+	Speed,
+	Overheating,
+	Range,
+	Time,
+	Weight,
+	Shield,
+	Energy,
+	EnergyShield,
+};
+
+enum class EnchantProtect : uint32_t
+{
+	None,
+	E1,
+	E5,
+};
+
+enum class EnchantChance : uint32_t
+{
+	None,
+	Percent_3,
+	Percent_5,
+	Percent_8,
+};
+
+struct EnchantInformation
+{
+	EnchantInformation() 
+	{
+		enchant = EnchantCard::None;
+		protect = EnchantProtect::None;
+		chance	= EnchantChance::None;
+	}
+
+	EnchantCard enchant;
+	EnchantProtect protect;
+	EnchantChance chance;
+};
+
+using EnchantInfoList = std::vector<EnchantInformation>;
 			    
 enum class EnchantItemKind
 {
@@ -55,27 +102,35 @@ enum class EnchantAction
  
 struct EnchantStatistics
 {
-	int m_enchantStats[6][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };	 // total_tries, fails
+	uint32_t m_enchantStats[8][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };	 // total_tries, fails
 
-	int	m_used_enchprots_e1;
-	int	m_used_enchprots_e5;
-	int	m_used_chancecards_8;
-	int	m_used_enchantcards;
-	int	m_used_speedcards;
-	int m_used_energyshieldcard;
+	uint32_t	m_used_enchprots_e1;
+	uint32_t	m_used_enchprots_e5;
 
-	int m_used_prefixwhipes;
-	int m_used_prefixcards;
-	int m_used_suffixwhipes;
-	int m_used_suffixcards;
+	uint32_t	m_used_chancecards_3;
+	uint32_t	m_used_chancecards_5;
+	uint32_t	m_used_chancecards_8;
 
-	int	m_cost_enchprots_e1;
-	int	m_cost_enchprots_e5;
-	int	m_cost_chancecards_8;
-	int	m_cost_enchantcards;
-	int	m_cost_speedcards;
-	int m_cost_energyshieldcard;
-	int	m_cost_total;
+	uint32_t	m_used_enchantcards;
+	uint32_t	m_used_speedcards;
+	uint32_t	m_used_energyshieldcard;
+
+	uint32_t	m_used_prefixwhipes;
+	uint32_t	m_used_prefixcards;
+	uint32_t	m_used_suffixwhipes;
+	uint32_t	m_used_suffixcards;
+
+	uint32_t	m_cost_enchprots_e1;
+	uint32_t	m_cost_enchprots_e5;
+
+	uint32_t	m_cost_chancecards_3;
+	uint32_t	m_cost_chancecards_5;
+	uint32_t	m_cost_chancecards_8;
+
+	uint32_t	m_cost_enchantcards;
+	uint32_t	m_cost_speedcards;
+	uint32_t	m_cost_energyshieldcard;
+	uint32_t	m_cost_total;
 };
 
 struct EnchantCardsAmount
@@ -93,6 +148,8 @@ struct EnchantCardsAmount
 	int energyshield;
 };
 
+
+
 class EnchantBot : public BuddyFeatureBase
 {
 public:
@@ -105,6 +162,7 @@ public:
 	virtual std::string GetName() const override;
 	virtual FeatureType GetType() const override;
 	virtual void OnEnable() override;
+	virtual void OnDisable() override;
 
 private:	   	
 	EnchantBotState GetEnchantBotState();
@@ -115,7 +173,7 @@ private:
 	void UpdateInventoryEnchantCards();
 
 	bool IsValidEnchantItem(ITEM_BASE* enchantItem);
-	void SetEnchantItem(UID64_t uid);
+	void SetNewEnchantItem(UID64_t uid);
 	  
 	void RenderSettings();
 	void RenderEnchantButtons();
@@ -123,11 +181,16 @@ private:
 	void RenderStatisticsPopup();
 	void RenderSuccessPercentage(int enchstep, int total_tries, int fails);
 
-	void ResetEnchantList(EnchantListType& enchantlist);
-	void AddEnchantToList(EnchantItemType enchanttype, EnchantListType& enchantlist);
-
+	void ResetEnchantList(ListVector& enchantlist);
+	void InsertEnchantList(ListVector& enchantlist, EnchantCard enchanttype);
+	void RemoveEnchantEntry(uint32_t enchantindex);
+	void RebuildWantedEnchantDisplayList();
+	void RebuildCurrentEnchantDisplayList();
+	
 	bool DoEnchantAction(EnchantAction action);
-	CItemInfo* GetEnchantItemFromInventory(EnchantItemType enchantitem, EnchantItemKind itemkind, GearType geartype);
+	static CItemInfo* GetEnchantItemFromInventory(EnchantCard enchantitem, EnchantItemKind itemkind, GearType geartype);
+	static CItemInfo* GetEnchantItemFromInventory(EnchantProtect enchantitem);
+	static CItemInfo* GetEnchantItemFromInventory(EnchantChance enchantitem);
 	void UpdateEnchantItemAmount();
 	void UpdateTotalCost();
 
@@ -136,7 +199,13 @@ private:
 
 	bool EnchantFinished();	   
 	EnchantAction GetNextAction();
+	void AddLastEnchantToStatistic(const EnchantInformation& enchantinfo);
 
+	static std::string GetEnchantItemText(EnchantCard enchantcard);
+	static std::string GetEnchantItemText(EnchantChance enchantchance);
+	static std::string GetEnchantItemText(EnchantProtect enchantprotect);
+
+	void SetOptimizedEnchantSettings(bool optimized);
 private:
 	EnchantBotState			m_state;
 	bool					m_auto_enchant;
@@ -155,8 +224,9 @@ private:
 	EnchantAction			m_next_action;
 	bool					m_waiting_for_answer;
 
-	EnchantListType			m_currentEnchants;
-	EnchantListType			m_wantedEnchants;
+	ListVector				m_currentEnchantDisplayList;
+	ListVector				m_wantedEnchantDisplayList;
+	EnchantInfoList			m_wantedEnchantInfo;
 
 	int						m_wanted_enchants_sel_idx;
 
@@ -167,6 +237,8 @@ private:
 	// current amount of item in the inventory
 	int						m_amount_enchprot_e1;
 	int						m_amount_enchprot_e5;
+	int						m_amount_chancecard_3;
+	int						m_amount_chancecard_5;
 	int						m_amount_chancecard_8;
 
 	// true if the item is in the lab source window
@@ -177,12 +249,14 @@ private:
 	bool					m_using_energyshieldcard;
 
 	EnchantStatistics       m_statisticsSession;
-	EnchantStatistics		m_statisticsWeapon;
+	EnchantStatistics		m_statisticsWeapon;	 	
 
 	// for buffering
 	std::string				m_cost_total_string;
 	std::string				m_cost_enchprots_e1_string;
 	std::string				m_cost_enchprots_e5_string;
+	std::string				m_cost_chancecards_3_string;
+	std::string				m_cost_chancecards_5_string;
 	std::string				m_cost_chancecards_8_string;
 	std::string				m_cost_enchantcards_string;
 	std::string				m_cost_speedcards_string;
@@ -192,8 +266,14 @@ private:
 	std::string				m_cost_total_string_W;
 	std::string				m_cost_enchprots_e1_string_W;
 	std::string				m_cost_enchprots_e5_string_W;
+	std::string				m_cost_chancecards_3_string_W;
+	std::string				m_cost_chancecards_5_string_W;
 	std::string				m_cost_chancecards_8_string_W;
 	std::string				m_cost_enchantcards_string_W;
 	std::string				m_cost_speedcards_string_W;
 	std::string				m_cost_energyshieldcards_string_W;
+
+	const char*				m_chance_card_combo_items;
+	const char*				m_enchant_card_combo_items;
+	const char*				m_protect_card_combo_items;
 };

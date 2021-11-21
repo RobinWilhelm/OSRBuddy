@@ -164,6 +164,11 @@ int OldSchoolRivalsAPI::GetMaxFuel()
 	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.EP;
 }
 	  	   
+CItemInfo* OldSchoolRivalsAPI::GetRadarItemInfo()
+{
+	return m_atumapplication->m_pShuttleChild->m_pRadarItemInfo;
+}
+
 int OldSchoolRivalsAPI::GetPrimaryWeaponAmmo()
 {
 	if (!GetPrimaryWeapon())
@@ -194,22 +199,32 @@ void OldSchoolRivalsAPI::UseSecondaryWeapon(bool use)
 	m_atumapplication->m_pShuttleChild->m_bRButtonState = use;
 }
 
-float OldSchoolRivalsAPI::GetRadarRangePrimary()
+float OldSchoolRivalsAPI::GetRadarRangePrimary(bool include_paramfactors)
 {
-	if (!m_atumapplication->m_pShuttleChild->m_pRadarItemInfo) {
+	CItemInfo* radar = GetRadarItemInfo();
+	if (!radar) {
 		return 0.0f;
-	}	 		
-
-	return m_atumapplication->m_pShuttleChild->m_pRadarItemInfo->m_pItemInfo->AbilityMin;
-}
-
-float OldSchoolRivalsAPI::GetRadarRangeSecondary()
-{
-	if (!m_atumapplication->m_pShuttleChild->m_pRadarItemInfo) {
-		return 0.0f;
+	}	 
+	float range = radar->m_pItemInfo->AbilityMin;
+	if (include_paramfactors) {
+		range *= (1.0f + m_atumapplication->m_pShuttleChild->m_paramFactor.pfm_ATTACK_RANGE_01);
 	}
 
-	return m_atumapplication->m_pShuttleChild->m_pRadarItemInfo->m_pItemInfo->AbilityMax;
+	return range;
+}
+
+float OldSchoolRivalsAPI::GetRadarRangeSecondary(bool include_paramfactors)
+{
+	CItemInfo* radar = GetRadarItemInfo();
+	if (!radar) {
+		return 0.0f;
+	}
+	float range = radar->m_pItemInfo->AbilityMax;
+	if (include_paramfactors) {
+		range *= (1.0f + m_atumapplication->m_pShuttleChild->m_paramFactor.pfm_ATTACK_RANGE_02);
+	}
+
+	return range;
 }
 
 D3DXVECTOR3 OldSchoolRivalsAPI::GetShuttlePosition()
@@ -935,6 +950,7 @@ bool OldSchoolRivalsAPI::IsActiveItem(INT itemnumber)
 			return true;
 		}
 	}
+	return false;
 }
 
 bool OldSchoolRivalsAPI::IsActiveItem(ItemNumber itemnumber)
@@ -1076,6 +1092,7 @@ bool OldSchoolRivalsAPI::TryDeleteItem(CItemInfo* item, int count)
 	DeleteItem(item, count);
 	return true;
 }
+
 
 HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX& matCur, D3DXVECTOR3 vPos, float fCheckDistance)
 {

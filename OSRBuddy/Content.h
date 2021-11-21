@@ -1,12 +1,12 @@
 #pragma once
 
-#define OSRBUDDY_DEBUG
+//#define OSRBUDDY_DEBUG
 //#define OSRBUDDY_MANUALMAP
 
 
 
 //#define SUMMER_EVENT
-#define HALLOWEEN_EVENT
+//#define HALLOWEEN_EVENT
 
 
 #define FEATURE_ENCHANTBOT

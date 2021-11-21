@@ -7,9 +7,9 @@
 #include <OSRBuddyDefine.h>
 
 static ImVector<ImRect> s_GroupPanelLabelStack;
-static bool s_disabled;
+static ImVector<bool> s_disabled;
 
-
+using ListVector = std::vector<std::string>;
 
 namespace ImGui 
 {
@@ -17,10 +17,11 @@ namespace ImGui
     void BeginDisabledMode(bool disabled);
     void EndDisabledMode();
 
-    void DrawTextCentered(std::string text, float total_width = ImGui::GetWindowSize().x);
+    void DrawTextCentered(std::string text, float total_width = ImGui::GetWindowContentRegionMax().x);
+    void DrawTextRightAligned(std::string text, float total_width = ImGui::GetWindowContentRegionMax().x);
 
     //https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#arrays
-    bool EnchantList(const char* label, int* currIndex, EnchantListType& values, int heightInItems = -1);
+    bool VectorListBox(const char* label, int* currIndex, ListVector values, int heightInItems = -1);
 
     void BeginGroupPanel(const char* name, const ImVec2& size = ImVec2(0.0f, 0.0f));
     void EndGroupPanel();

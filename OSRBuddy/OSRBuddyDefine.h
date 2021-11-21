@@ -14,6 +14,8 @@
 #define COST_WARPOINT 1250   
 #define COST_ENCHANTPROTECT_E1 200000
 #define COST_ENCHANTPROTECT_E5 500000
+#define COST_ENCHANT_CHANCE_3  (3000 * COST_WARPOINT)
+#define COST_ENCHANT_CHANCE_5  (5000 * COST_WARPOINT)
 #define COST_ENCHANT_CHANCE_8  (8000 * COST_WARPOINT)
 #define COST_ENCHANTCARD_COMMON 200000
 #define COST_ENCHANTCARD_SPEED (2000 * COST_WARPOINT)
@@ -177,29 +179,9 @@ enum class MapIndex
     InvasionWorld = 9050, 
 };
 
-enum class EnchantItemType
-{
-    None,
-    Accuracy,
-    Reattack,
-    MinMax,
-    Speed,
-    Overheating,
-    Range,
-    Time,
-    Weight,
-    Shield,
-    Energy,
-    EnergyShield,
-    EnchantProtectE1,
-    EnchantProtectE5,
-    EnchantChance3P,
-    EnchantChance5P,
-    EnchantChance8P
-};
 
-using EnchantTextPair = std::pair<EnchantItemType, std::string>;
-using EnchantListType = std::vector<EnchantTextPair>;
+
+using EnchantListType = std::vector<std::string>;
 
 enum class Desparam
 {

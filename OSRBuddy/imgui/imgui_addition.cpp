@@ -8,19 +8,18 @@
 #define COLOR_FANCYBBUTTON              (ImColor(0x2d, 0x37, 0x4f))
 
 //https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#arrays
-static auto vector_getter = [](void* vec, int idx, const char** out_text)
+static auto vectorlist_getter = [](void* vec, int idx, const char** out_text)
 {
-    auto& vector = *static_cast<EnchantListType*>(vec);
+    auto& vector = *static_cast<ListVector*>(vec);
     if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
-    *out_text = vector.at(idx).second.c_str();
+    *out_text = vector.at(idx).c_str();
     return true;
 };
 
-
 void ImGui::BeginDisabledMode(bool disabled)
 {    
-    s_disabled = disabled;
-    if (s_disabled)
+    s_disabled.push_back(disabled);
+    if (disabled)
     {
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
         ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -29,26 +28,33 @@ void ImGui::BeginDisabledMode(bool disabled)
 
 void ImGui::EndDisabledMode()
 {   
-    if (s_disabled)
+    bool disabled = s_disabled.back();
+    s_disabled.pop_back();
+    if (disabled)
     {
-        ImGui::PopItemFlag();
         ImGui::PopStyleVar();
-        s_disabled = false;
+        ImGui::PopItemFlag(); 
     }
 }
 
 void ImGui::DrawTextCentered(std::string text, float total_width)
-{
-    float font_size = ImGui::GetFontSize() * text.size() / 2;
-    ImGui::Dummy(ImVec2(total_width / 2 - font_size + (font_size / 2), 0));
-    ImGui::SameLine();
+{    
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + total_width / 2 - ImGui::CalcTextSize(text.c_str()).x / 2
+        - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x);
     ImGui::Text(text.c_str());
 }
 
-bool ImGui::EnchantList(const char* label, int* currIndex, EnchantListType& values, int heightInItems)
-{       
+void ImGui::DrawTextRightAligned(std::string text, float total_width)
+{
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + total_width - ImGui::CalcTextSize(text.c_str()).x
+        - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x);
+    ImGui::Text(text.c_str());
+}
+
+bool ImGui::VectorListBox(const char* label, int* currIndex, ListVector values, int heightInItems)
+{
     if (values.empty()) { return false; }
-    return ListBox(label, currIndex, vector_getter, static_cast<void*>(&values), values.size(), heightInItems);     
+    return ListBox(label, currIndex, vectorlist_getter, static_cast<void*>(&values), values.size(), heightInItems);
 }
 
 void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)

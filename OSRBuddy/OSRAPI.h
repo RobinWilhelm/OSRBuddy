@@ -42,12 +42,15 @@ public:
 	int GetMaxSkillp();
 	int GetMaxFuel();			   
 
+	CItemInfo* GetRadarItemInfo();
 	int GetPrimaryWeaponAmmo();
 	int GetSecondaryWeaponAmmo(); 
 	void UsePrimaryWeapon(bool use);
 	void UseSecondaryWeapon(bool use);
-	float GetRadarRangePrimary();
-	float GetRadarRangeSecondary();
+	// with include_paramfactor = true, range boost like siege mode or goggles will be considered
+	float GetRadarRangePrimary(bool include_paramfactors = false); 
+	// with include_paramfactor = true, range boost like siege mode or goggles will be considered
+	float GetRadarRangeSecondary(bool include_paramfactors = false);
 
 	D3DXVECTOR3 GetShuttlePosition();
 
@@ -142,6 +145,7 @@ public:
 	bool TrySendUseSkill(ITEM_BASE* skill);
 	bool TrySendSellItem(CItemInfo* item, int count);
 	bool TryDeleteItem(CItemInfo* item, int count);
+
 
 private:
 	// collision stuff

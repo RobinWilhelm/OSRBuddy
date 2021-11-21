@@ -139,7 +139,7 @@ void GrindBot::Tick()
         {
             OSR_API->UsePrimaryWeapon(true);
             // only use secondary if in radar range          
-            OSR_API->UseSecondaryWeapon(GetTargetDistance(m_target) < OSR_API->GetRadarRangeSecondary());        
+            OSR_API->UseSecondaryWeapon(GetTargetDistance(m_target) <= OSR_API->GetRadarRangeSecondary(true));        
         } 
         else
         {
@@ -426,7 +426,7 @@ bool GrindBot::CanShootAtTarget(CUnitData* target)
         return false;
     }
 
-    if (GetTargetDistance(target) > OSR_API->GetRadarRangePrimary() * 1.30f) {
+    if (GetTargetDistance(target) > OSR_API->GetRadarRangePrimary() * 1.3f /*siege mode range boost (we need the max range here, not the current range)*/) {
         return false;
     }
  
@@ -439,7 +439,7 @@ bool GrindBot::IsValidTargetMonster(CMonsterData* monster)
         return false;
     }  
 
-    if ( IsMonsterDead(monster)) {
+    if (IsMonsterDead(monster)) {
         return false;
     }
 
@@ -998,7 +998,7 @@ void GrindBot::GetNewTarget()
         //}
 
         if (!new_target) {
-            new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.30f, m_visible_only);
+            new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.3f /*siege mode range boost (we need the max range here, not the current range)*/, m_visible_only);
         }
 
         if (new_target)
