@@ -6,8 +6,9 @@
 #include <vector>
 
     
-#define TO_ENUM(enumtype, number) (static_cast<enumtype>(number))
-#define TO_INT(enumnum) (static_cast<int>(enumnum))
+#define TO_ENUM(enumtype, x) (static_cast<enumtype>(x))
+#define TO_INT(x) (static_cast<int>(x))
+#define TO_UINT(x) (static_cast<uint32_t>(x))
 
 
 #define MAX_SPI 2000000000

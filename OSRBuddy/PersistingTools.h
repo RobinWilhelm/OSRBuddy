@@ -2,6 +2,7 @@
 #include "AtumParam.h"
 #include "nlohmann/json.hpp"
 
+#include <memory>
 #include <fstream>
 
 struct ItemLabStatistics
@@ -37,24 +38,45 @@ struct ItemLabStatistics
 	uint32_t	m_cost_total;
 };
 
+template <typename DataType>
+class IPersistData
+{
+public:
+	virtual void Read(DataType& data) const = 0;
+	virtual void Save(const DataType& data) const = 0;
+};
+
+class ItemLabStatisticsJsonPersistence : public IPersistData<ItemLabStatistics>
+{
+	friend class PersistingTools;
+private:
+	ItemLabStatisticsJsonPersistence(std::string path) { m_fullpath = path; };
+
+public:
+	// Inherited via IPersist  	
+	virtual void Read(ItemLabStatistics& data) const override;
+	virtual void Save(const ItemLabStatistics& data) const override;
+
+private:
+	std::string m_fullpath;
+};
+
+using ItemLabPersistingPtr = std::unique_ptr<IPersistData<ItemLabStatistics>>;
 
 class PersistingTools
 {
 public:
 	PersistingTools();
+	/*
 	void SetItem(UID64_t item);
 	void CloseStream();
-	void PersistEnchantments(ItemLabStatistics enchstats);
-	ItemLabStatistics PersistingTools::GetStats();
-	void PersistingTools::PersistGambleCards(ItemLabStatistics enchstats);
-	
+	void SaveItemLabStatistics(const ItemLabStatistics& stats);
+	void PersistingTools::ReadItemLabStatistics(ItemLabStatistics& stats);	
+	*/
+	ItemLabPersistingPtr GetLabStatisticPersistence(UID64_t item_uid) const;
 
 private:
-	using json = nlohmann::json;
-	std::string m_fileName;
-	std::string m_workingDirectory;
-	std::string m_fullpath;
-    json m_j;
-	std::fstream m_file;
-	ItemLabStatistics m_statistics;
+	std::string m_executable_dir;
+	std::string m_osrbuddy_dir;
+	std::string m_labitems_dir;
 };

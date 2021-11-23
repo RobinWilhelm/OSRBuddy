@@ -42,7 +42,15 @@ bool ImGuiBase::Init(IDirect3DDevice9* device)
     }
 
     m_initialised = true;
-    m_standard_style = ImGui::GetStyle();
+    
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 0.0f;
+    style.FrameRounding = 0.0f;
+    style.ScrollbarRounding = 0.0f;
+    style.TabRounding = 0.0f;
+    style.PopupRounding = 0.0f;
+    style.ChildRounding = 0.0f;         
+    m_standard_style = style;
 
 
     // https://github.com/patrickcjk/imgui-notify

@@ -30,8 +30,10 @@ EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	m_action_timer = BuddyTimer(ENCHANT_ACTION_TIME_BASE, ENCHANT_ACTION_TIME_VARIANCE);
 
 	m_enchantTargetKind = EnchantItemKind::Weapon_advanced;
+	m_statistics_popup_open = false;
 
 	ZeroMemory(&m_statisticsSession, sizeof(ItemLabStatistics));
+	ZeroMemory(&m_statisticsWeapon, sizeof(ItemLabStatistics));
 }
 
 EnchantBot::~EnchantBot()
@@ -79,9 +81,10 @@ void EnchantBot::Tick()
 			{ 
 				// Update item
 				m_enchant_item.Update(m_currentEnchantItemUID);
-				m_buddy->GetPersistingTools()->PersistEnchantments(m_statisticsWeapon);
+				UpdateEnchantStats();
+				m_item_persisting->Save(m_statisticsWeapon);
+				//m_buddy->GetPersistingTools()->SaveItemLabStatistics(m_statisticsWeapon);
 				UpdateEnchantItemAmount();
-				UpdateTotalCost();
 				RebuildCurrentEnchantDisplayList();
 
 				if (!m_auto_enchant) {
@@ -98,7 +101,7 @@ void EnchantBot::Tick()
 					}
 					SetEnchantBotState(EnchantBotState::STANDBY);
 				}
-				UpdateEnchantStats();
+				
 				m_waiting_for_answer = false; 				
 			}
 		}
@@ -239,10 +242,14 @@ void EnchantBot::SetEnchantBotState(EnchantBotState state)
 
 void EnchantBot::ResetCurrentEnchantItem()
 {
-	m_buddy->GetPersistingTools()->PersistEnchantments(m_statisticsWeapon);
-	m_buddy->GetPersistingTools()->CloseStream();
-	m_currentEnchantItemUID = 0; 
-	ResetEnchantList(m_currentEnchantDisplayList);		
+	if (m_currentEnchantItemUID != 0)
+	{
+		m_item_persisting->Save(m_statisticsWeapon);
+		//m_buddy->GetPersistingTools()->SaveItemLabStatistics(m_statisticsWeapon);
+		//m_buddy->GetPersistingTools()->CloseStream();
+		m_currentEnchantItemUID = 0;
+		ResetEnchantList(m_currentEnchantDisplayList);
+	}	
 }
 
 void EnchantBot::ResetLab()
@@ -342,9 +349,13 @@ void EnchantBot::SetNewEnchantItem(UID64_t uid)
 	
 	m_currentEnchantItemUID = uid;
 
-	m_buddy->GetPersistingTools()->CloseStream();
-	m_buddy->GetPersistingTools()->SetItem(uid);
-	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();
+	m_item_persisting.reset();
+	m_item_persisting = m_buddy->GetPersistingTools()->GetLabStatisticPersistence(uid);
+	m_item_persisting->Read(m_statisticsWeapon);
+
+	//m_buddy->GetPersistingTools()->CloseStream();
+	//m_buddy->GetPersistingTools()->SetItem(uid);
+	//m_buddy->GetPersistingTools()->ReadItemLabStatistics(m_statisticsWeapon);
 	UpdateTotalCost();
 
 	auto old_enchanttargetkind = m_enchantTargetKind;
@@ -632,7 +643,8 @@ void EnchantBot::RenderStatisticsPopup()
 {
 	ImGui::SetNextWindowSize(ImVec2(550.0f, 390.0f));
 	if (ImGui::BeginPopup("StatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
-	{ 	
+	{ 
+		m_statistics_popup_open = true;
 		ImGui::BeginMenuBar();
 		{
 			ImGui::Text("EnchantBot Statistics Popup");
@@ -730,20 +742,20 @@ void EnchantBot::RenderStatisticsPopup()
 					}
 					ImGui::NextColumn();
 					{
-						ImGui::DrawTextRightAligned(m_cost_enchprots_e1_string.c_str(), ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_enchprots_e5_string.c_str(), ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_chancecards_3_string.c_str(), ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_chancecards_5_string.c_str(), ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_chancecards_8_string.c_str(), ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_enchantcards_string.c_str(), ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_speedcards_string.c_str(), ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_energyshieldcards_string.c_str(), ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_enchprots_e1, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_enchprots_e5, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_chancecards_3, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_chancecards_5, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_chancecards_8, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_enchantcards, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_speedcards, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_session.m_cost_energyshieldcards, ImGui::GetColumnWidth());
 					}
 					ImGui::EndColumns();
 					ImGui::NewLine();
 					ImGui::Separator();
 					//ImGui::Text(m_cost_total_string.c_str());
-					ImGui::DrawTextRightAligned(m_cost_total_string);
+					ImGui::DrawTextRightAligned(m_cost_session.m_cost_total);
 					ImGui::Separator();
 				}
 				ImGui::EndGroup();
@@ -796,21 +808,21 @@ void EnchantBot::RenderStatisticsPopup()
 					}
 					ImGui::NextColumn();
 					{
-						ImGui::DrawTextRightAligned(m_cost_enchprots_e1_string_W.c_str(),		ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_enchprots_e5_string_W.c_str(),		ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_chancecards_3_string_W.c_str(),		ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_chancecards_5_string_W.c_str(),		ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_chancecards_8_string_W.c_str(),		ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_enchantcards_string_W.c_str(),		ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_speedcards_string_W.c_str(),			ImGui::GetColumnWidth());
-						ImGui::DrawTextRightAligned(m_cost_energyshieldcards_string_W.c_str(),	ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_enchprots_e1, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_enchprots_e5, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_chancecards_3, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_chancecards_5, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_chancecards_8, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_enchantcards, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_speedcards, ImGui::GetColumnWidth());
+						ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_energyshieldcards, ImGui::GetColumnWidth());
 					}
 					ImGui::EndColumns();
 					ImGui::NewLine();
 					ImGui::Separator();
 					//ImGui::Text("Total spi cost:");
 					//ImGui::SameLine();
-					ImGui::DrawTextRightAligned(m_cost_total_string_W);
+					ImGui::DrawTextRightAligned(m_cost_weapon.m_cost_total);
 					//ImGui::Text(m_cost_total_string_W.c_str());
 					ImGui::Separator();
 				}
@@ -820,6 +832,10 @@ void EnchantBot::RenderStatisticsPopup()
 		}
 		ImGui::EndColumns();
 		ImGui::EndPopup();
+	}
+	else
+	{
+		m_statistics_popup_open = false;
 	}
 }
 
@@ -1166,6 +1182,11 @@ bool EnchantBot::DoEnchantAction(EnchantAction action)
 
 			auto prevEnchantInfo = m_wantedEnchantInfo.at(m_previous_enchantnum);
 			AddLastEnchantToStatistic(prevEnchantInfo);
+			
+			if (m_statistics_popup_open)
+			{
+				UpdateTotalCost();
+			}
 
 			/*
 			if (m_using_chancecard_8) 
@@ -1408,15 +1429,15 @@ void EnchantBot::UpdateTotalCost()
 		m_statisticsSession.m_cost_enchantcards + m_statisticsSession.m_cost_speedcards + m_statisticsSession.m_cost_energyshieldcard +
 		(m_statisticsSession.m_used_speedcards + m_statisticsSession.m_used_enchantcards + m_statisticsSession.m_used_energyshieldcard) * COST_ENCHANT_SINGLE;
 																													   
-	m_cost_enchprots_e1_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
-	m_cost_enchprots_e5_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_3_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_3 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_5_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_5 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_8_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
-	m_cost_enchantcards_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchantcards / 1000000.0f, 1) + "kk";
-	m_cost_speedcards_string		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_speedcards / 1000000.0f, 1) + "kk";
-	m_cost_energyshieldcards_string	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_energyshieldcard / 1000000.0f, 1) + "kk";
-	m_cost_total_string				= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_total / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_enchprots_e1		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_enchprots_e5		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_chancecards_3		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_3 / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_chancecards_5		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_5 / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_chancecards_8		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_enchantcards		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_speedcards		= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_speedcards / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_energyshieldcards	= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_energyshieldcard / 1000000.0f, 1) + "kk";
+	m_cost_session.m_cost_total				= Utility::to_string_with_precision<float>(m_statisticsSession.m_cost_total / 1000000.0f, 1) + "kk";
 
 	m_statisticsWeapon.m_cost_enchprots_e1		= m_statisticsWeapon.m_used_enchprots_e1 * COST_ENCHANTPROTECT_E1;
 	m_statisticsWeapon.m_cost_enchprots_e5		= m_statisticsWeapon.m_used_enchprots_e5 * COST_ENCHANTPROTECT_E5;
@@ -1433,15 +1454,15 @@ void EnchantBot::UpdateTotalCost()
 		m_statisticsWeapon.m_cost_enchantcards + m_statisticsWeapon.m_cost_speedcards + m_statisticsWeapon.m_cost_energyshieldcard +
 		(m_statisticsWeapon.m_used_speedcards + m_statisticsWeapon.m_used_enchantcards + m_statisticsWeapon.m_used_energyshieldcard) * COST_ENCHANT_SINGLE;
 
-	m_cost_enchprots_e1_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
-	m_cost_enchprots_e5_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_3_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_3 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_5_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_5 / 1000000.0f, 1) + "kk";
-	m_cost_chancecards_8_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
-	m_cost_enchantcards_string_W		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
-	m_cost_speedcards_string_W			= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_speedcards / 1000000.0f, 1) + "kk";
-	m_cost_energyshieldcards_string_W	= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_energyshieldcard / 1000000.0f, 1) + "kk";
-	m_cost_total_string_W				= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_total / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_enchprots_e1		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e1 / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_enchprots_e5		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchprots_e5 / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_chancecards_3		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_3 / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_chancecards_5		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_5 / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_chancecards_8		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_chancecards_8 / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_enchantcards		= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_enchantcards / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_speedcards			= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_speedcards / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_energyshieldcards	= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_energyshieldcard / 1000000.0f, 1) + "kk";
+	m_cost_weapon.m_cost_total				= Utility::to_string_with_precision<float>(m_statisticsWeapon.m_cost_total / 1000000.0f, 1) + "kk";
 }
 
 bool EnchantBot::TrySimulateButtonClick(LabButtonCode button)
@@ -1564,9 +1585,6 @@ void EnchantBot::AddLastEnchantToStatistic(const EnchantInformation& enchantinfo
 		m_statisticsWeapon.m_used_enchantcards++;
 		break;
 	}
-
-	m_buddy->GetPersistingTools()->PersistEnchantments(m_statisticsWeapon);
-	UpdateTotalCost();
 }
 
 std::string EnchantBot::GetEnchantItemText(EnchantCard enchantcard)
@@ -1667,8 +1685,4 @@ void EnchantBot::OnEnable()
 		MessageBeep(MB_ICONWARNING);
 		Enable(false);
 	}
-}
-void EnchantBot::OnDisable()
-{
-	m_buddy->GetPersistingTools()->CloseStream();
 }

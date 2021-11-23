@@ -452,9 +452,15 @@ void GambleBot::SetGambleItem(UID64_t uid)
 	}
 
 	// try to load previous statistics for this weapon
+	m_item_persisting.reset();
+	m_item_persisting = m_buddy->GetPersistingTools()->GetLabStatisticPersistence(uid);
+	m_item_persisting->Read(m_statisticsWeapon);
+
+	/*
 	m_buddy->GetPersistingTools()->CloseStream();
 	m_buddy->GetPersistingTools()->SetItem(uid);
-	m_statisticsWeapon = m_buddy->GetPersistingTools()->GetStats();		
+	m_buddy->GetPersistingTools()->ReadItemLabStatistics(m_statisticsWeapon);
+	*/
 
 	m_is_advanced_weapon = IS_SECONDARY_WEAPON_1(m_gamble_item.GetItemInfo()->Kind);
 	m_current_gambleitem_uid = uid;

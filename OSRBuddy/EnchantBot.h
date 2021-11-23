@@ -118,6 +118,18 @@ struct EnchantCardsAmount
 	int energyshield;
 };
 
+struct EnchantCostBuffer
+{
+	std::string	m_cost_total;
+	std::string	m_cost_enchprots_e1;
+	std::string	m_cost_enchprots_e5;
+	std::string	m_cost_chancecards_3;
+	std::string	m_cost_chancecards_5;
+	std::string	m_cost_chancecards_8;
+	std::string	m_cost_enchantcards;
+	std::string	m_cost_speedcards;
+	std::string	m_cost_energyshieldcards;
+};
 
 
 class EnchantBot : public BuddyFeatureBase
@@ -132,7 +144,6 @@ public:
 	virtual std::string GetName() const override;
 	virtual FeatureType GetType() const override;
 	virtual void OnEnable() override;
-	virtual void OnDisable() override;
 
 private:	   	
 	EnchantBotState GetEnchantBotState();
@@ -218,32 +229,13 @@ private:
 	bool					m_using_speedcard;
 	bool					m_using_energyshieldcard;
 
+	ItemLabPersistingPtr	m_item_persisting;
 	ItemLabStatistics       m_statisticsSession;
 	ItemLabStatistics		m_statisticsWeapon;	 	
 
-	// for buffering
-	std::string				m_cost_total_string;
-	std::string				m_cost_enchprots_e1_string;
-	std::string				m_cost_enchprots_e5_string;
-	std::string				m_cost_chancecards_3_string;
-	std::string				m_cost_chancecards_5_string;
-	std::string				m_cost_chancecards_8_string;
-	std::string				m_cost_enchantcards_string;
-	std::string				m_cost_speedcards_string;
-	std::string				m_cost_energyshieldcards_string;
+	bool					m_statistics_popup_open;
 
-	//for buffering of overall stats:
-	std::string				m_cost_total_string_W;
-	std::string				m_cost_enchprots_e1_string_W;
-	std::string				m_cost_enchprots_e5_string_W;
-	std::string				m_cost_chancecards_3_string_W;
-	std::string				m_cost_chancecards_5_string_W;
-	std::string				m_cost_chancecards_8_string_W;
-	std::string				m_cost_enchantcards_string_W;
-	std::string				m_cost_speedcards_string_W;
-	std::string				m_cost_energyshieldcards_string_W;
-
-	const char*				m_chance_card_combo_items;
-	const char*				m_enchant_card_combo_items;
-	const char*				m_protect_card_combo_items;
+	// for buffering strings that change semi often
+	EnchantCostBuffer		m_cost_session;
+	EnchantCostBuffer		m_cost_weapon;
 };

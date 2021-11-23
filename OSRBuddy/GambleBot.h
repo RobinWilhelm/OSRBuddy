@@ -155,6 +155,7 @@ private:
 	FixSelection			m_suffix_selection;
 	FixSelection			m_prefix_selection;		
 
+	ItemLabPersistingPtr	m_item_persisting;
 	ItemLabStatistics		m_statisticsWeapon;
 };
 
