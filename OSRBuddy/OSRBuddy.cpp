@@ -191,7 +191,7 @@ bool OSRBuddyMain::Start()
         }    
 
         m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
-        m_persistingTools = new PersistingTools();
+        m_persistingTools = std::make_unique<PersistingTools>();
                  
 #ifdef FEATURE_KITBOT
         RegisterFeature(new KitBuffBot(this));

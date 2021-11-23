@@ -75,7 +75,7 @@ public:
 	
 	void BlockMouseInput(bool on);		   
 
-	PersistingTools* GetPersistingTools()	{ return m_persistingTools; };
+	PersistingTools* GetPersistingTools()	{ return m_persistingTools.get(); };
 	IOPacketManager* GetPacketManager()		{ return m_packetmanager.get(); };
 
 private:
@@ -151,7 +151,7 @@ private:
 
 	bool m_allow_notify_sounds;
 	bool m_allow_notify_popups;
-	PersistingTools* m_persistingTools;
+	std::unique_ptr<PersistingTools> m_persistingTools;
 	bool m_block_mouse;
 
 	std::unique_ptr<IOPacketManager> m_packetmanager;
