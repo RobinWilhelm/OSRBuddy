@@ -1,5 +1,6 @@
 #pragma once
 #include "BuddyFeatureBase.h"
+
 #include <cstdio>
 
 struct RARE_ITEM_INFO;

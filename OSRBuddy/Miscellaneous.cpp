@@ -1,7 +1,11 @@
+#include "osrb_pch.h"
 #include "Miscellaneous.h"
+
 #include "imgui/imgui.h"
+
 #include "OSRAPI.h"
 #include "OSRBuddy.h"
+
 #include "SDK/AtumApplication.h"
 
 #define WHISPER_WARNING_TIME 10s

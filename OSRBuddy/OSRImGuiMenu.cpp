@@ -1,12 +1,13 @@
+#include "osrb_pch.h"
 #include "OSRImGuiMenu.h"
+
 #include "OSRBuddy.h"
-#include "Utility.h"
+#include "BuddyFeatureBase.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_win32.h"   
 
-#include "OSRAPI.h"
 
 #define FEATURE_ACTIVE_TEXTCOL ImColor(0x00, 0xFF, 0x00)
 
@@ -67,10 +68,12 @@ void OSRImGuiMenu::Render()
                         ImGui::Separator();
                         ImGui::Text("UI Themes");
                         ImGui::Separator();
-                        if (ImGui::Button("ImGui Standard")) {
+                        if (ImGui::Button("ImGui Standard")) 
+                        {
                             LoadStandardTheme();
                         }
-                        if (ImGui::Button("Classic Steam")) {
+                        if (ImGui::Button("Classic Steam")) 
+                        {
                             LoadClassicSteamTheme();
                         }
                     }
@@ -103,71 +106,12 @@ void OSRImGuiMenu::Render()
         ImGui::EndTabBar();
     }
     ImGui::End();
+
+    // Render toasts on top of everything, at the end of your code!
+    // You should push style vars here
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
+    ImGui::RenderNotifications();
+    ImGui::PopStyleVar(1); // Don't forget to Pop()
+    ImGui::PopStyleColor(1);
 }
- 
-/*
-ImColor OSRImGuiMenu::TranslateAceCharToColor(char color)
-{
-    switch (std::tolower(color))
-    {
-    case 'c':   // cyan
-        return ImColor(0x00, 0xFF, 0xFF);
-    case 'q':   // light grey
-        return ImColor(0xBA, 0xBA, 0xFF);
-    case 'e':   // orange
-        return ImColor(0xFF, 0xBB, 0x33);
-    case 'r':   // red
-        return ImColor(0xFF, 0x00, 0x00);
-    case 'a':   // grey
-        return ImColor(0xDE, 0xDE, 0xDE);
-    case 'g':   // green
-        return ImColor(0x00, 0xFF, 0x00);
-    case 'y':   // yellow
-        return ImColor(0xFF, 0xFF, 0x00);
-    case 'b':   // blue
-        return ImColor(0x00, 0x00, 0xFF);
-    case 'w':   // white
-        return ImColor(0xFF, 0xFF, 0xFF);
-    case 'm':   // violett / magenta
-        return ImColor(0xFF, 0x00, 0xFF);
-    default:    // white
-        return ImColor(0xFF, 0xFF,0xFF);
-    }
-}
-
-void OSRImGuiMenu::DrawOsrItemName(const OsrItemInfo& item)
-{
-    if (item.GetUID() == 0) {
-        return;
-    }
-
-    if (item.IsWeapon() && !item.GetCleanPrefixName().empty())
-    {
-        ImGui::PushStyleColor(ImGuiCol_Text, item.GetPrefixColor().Value);
-        ImGui::Text(item.GetCleanPrefixName().c_str());
-        ImGui::PopStyleColor();
-        ImGui::SameLine();
-    }
-
-    ImGui::PushStyleColor(ImGuiCol_Text, item.GetItemNameColor().Value);
-    ImGui::Text(item.GetCleanName().c_str());
-    ImGui::PopStyleColor();
-
-    ImGui::SameLine();
-
-    if (item.IsWeapon() || item.IsArmor())
-    {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0xFF, 0xBB, 0x33).Value);
-        ImGui::Text(item.GetEnchantText().c_str());
-        ImGui::PopStyleColor();
-    }
-
-    if (item.IsWeapon() && !item.GetCleanSuffixName().empty())
-    {
-        ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Text, item.GetSuffixColor().Value);
-        ImGui::Text(item.GetCleanSuffixName().c_str());
-        ImGui::PopStyleColor();
-    }
-}
-  */

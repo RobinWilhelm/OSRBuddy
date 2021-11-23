@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "InventoryManager.h"
 #include "imgui/imgui.h"
 #include "OSRAPI.h"

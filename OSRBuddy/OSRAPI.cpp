@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "OSRAPI.h"
 
 #include "Utility.h"
@@ -7,11 +8,8 @@
 #include "SDK/SceneData.h"
 
 #include "OSRBuddy.h"
+#include "IOPacketManager.h"
 
-#include <d3dx9.h>
-#pragma comment(lib,"d3dx9.lib")
-
-#include <minwindef.h>
 
 class CINFInven;
 

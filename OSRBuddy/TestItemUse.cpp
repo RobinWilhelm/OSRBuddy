@@ -1,8 +1,12 @@
+#include "osrb_pch.h"
 #include "TestItemUse.h"
-#include <string>
+
 #include "OSRBuddy.h"
 #include "OSRAPI.h"
 #include "KitBot.h"
+#include "Utility.h"
+
+#include <string>
 
 #define WEATHER_DEFAULT_FOG_START	50.0f
 #define WEATHER_DEFAULT_FOG_END		640.0f

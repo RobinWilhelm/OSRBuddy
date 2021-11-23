@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "Utility.h"
 #include <winternl.h>
 

@@ -1,6 +1,7 @@
 #pragma once
-#include <d3d9.h>
 #include "D3D9Font.h"
+
+#include <d3d9.h>
 #include <memory>
 
 class D3D9Renderer

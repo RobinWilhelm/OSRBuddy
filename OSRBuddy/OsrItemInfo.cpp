@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "OsrItemInfo.h"
 #include "OSRAPI.h"
 #include "OSRImGuiMenu.h" 

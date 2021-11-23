@@ -376,6 +376,30 @@
     <ClInclude Include="IPacketWatcher.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="imgui\fa_solid_900.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\font_awesome_5.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_notify.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="tahoma.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="osrb_pch.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Features.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="FeatureTypes.h">
+      <Filter>Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -489,6 +513,9 @@
     <ClCompile Include="IOPacketManager.cpp">
       <Filter>Base</Filter>
     </ClCompile>
+    <ClCompile Include="osrb_pch.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDK\d3dx9math.inl">
@@ -497,5 +524,10 @@
     <None Include="SDK\d3dxmath.inl">
       <Filter>SDK</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="imgui\LICENSE.txt">
+      <Filter>imgui</Filter>
+    </Text>
   </ItemGroup>
 </Project>

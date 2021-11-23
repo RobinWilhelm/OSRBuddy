@@ -1,6 +1,7 @@
+#include "osrb_pch.h"
 #include "PersistingTools.h"
-#include "EnchantBot.h"
 #include "nlohmann/json.hpp"
+
 #include <iostream>    
 #include <fstream>
 #include <iostream>
@@ -26,7 +27,7 @@ void PersistingTools::SetItem(UID64_t uid)
     m_fileName = std::to_string(uid) + ".json";
     m_fullpath = m_workingDirectory + "\\" + m_fileName;
     struct stat buffer;
-    ZeroMemory(&m_statistics, sizeof(EnchantStatistics));
+    ZeroMemory(&m_statistics, sizeof(ItemLabStatistics));
 
     if (stat(m_fullpath.c_str(), &buffer) == 0) 
     {
@@ -96,14 +97,14 @@ void PersistingTools::SetItem(UID64_t uid)
         m_j["chancecards_3"] = 0;
         m_j["chancecards_5"] = 0;
         m_j["chancecards_8"] = 0;
-        ZeroMemory(&m_statistics, sizeof(EnchantStatistics));
+        ZeroMemory(&m_statistics, sizeof(ItemLabStatistics));
         m_file.open(m_fullpath, ios::out);
         m_file << std::setw(4) << m_j << std::endl;
         m_file.close();
     }
 }
 
-EnchantStatistics PersistingTools::GetStats() 
+ItemLabStatistics PersistingTools::GetStats() 
 {
     return m_statistics;
 }
@@ -117,7 +118,7 @@ void PersistingTools::CloseStream()
 
 
 
-void PersistingTools::PersistEnchantments(EnchantStatistics enchstats) 
+void PersistingTools::PersistEnchantments(ItemLabStatistics enchstats) 
 {
     for (int i = 0; i < 8; i++) 
     {
@@ -138,7 +139,7 @@ void PersistingTools::PersistEnchantments(EnchantStatistics enchstats)
     m_file.close();
 }
 
-void PersistingTools::PersistGambleCards(EnchantStatistics enchstats) 
+void PersistingTools::PersistGambleCards(ItemLabStatistics enchstats) 
 {
     m_j["prefixwipes"] = enchstats.m_used_prefixwipes;
     m_j["prefixcards"] = enchstats.m_used_prefixcards;

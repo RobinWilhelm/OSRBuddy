@@ -1,5 +1,7 @@
+#include "osrb_pch.h"
 #include "AceColouredString.h"
 #include "OSRImGuiMenu.h"
+
 
 AceColouredString::AceColouredString()
 {

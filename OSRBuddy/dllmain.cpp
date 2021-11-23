@@ -1,4 +1,5 @@
 // dllmain.cpp : Definiert den Einstiegspunkt für die DLL-Anwendung.
+#include "osrb_pch.h"
 #include "OSRBuddy.h"
 #include "AntiAntiCheat.h"
 #include "Utility.h"

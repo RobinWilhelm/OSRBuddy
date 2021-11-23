@@ -3,7 +3,6 @@
 #include <cstring>
 #include <functional>
 #include <memory>	  
-#include "PatternManager.h"
 
 template <typename FuncType>
 class TrampolineHook

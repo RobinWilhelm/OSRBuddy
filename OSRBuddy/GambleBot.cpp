@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "GambleBot.h"
 
 #include "SDK/AtumApplication.h"
@@ -7,6 +8,7 @@
 #include "OSRImGuiMenu.h" 
 #include "Utility.h"
 
+#include "PersistingTools.h"
 
 
 #include <algorithm> // std::find

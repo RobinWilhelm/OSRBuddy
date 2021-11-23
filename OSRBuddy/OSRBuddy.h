@@ -1,12 +1,14 @@
 #pragma once
 #include "OSRBuddyDefine.h"
 #include "D3DInternalBase.h"
-#include "BuddyFeatureBase.h"
+#include "FeatureTypes.h"
+
 #include <vector>
-#include "Console.h"
 #include <chrono>
-#include "PersistingTools.h"
-#include "IOPacketManager.h"
+
+class PersistingTools;
+class IOPacketManager;
+class BuddyFeatureBase;
 
 class CInterface;
 class CWinSocket;
@@ -29,9 +31,8 @@ using CWinSocketWriteType = int(__thiscall*)(CWinSocket * ecx, LPCSTR pPacket, i
 using GetCursorPosType = BOOL(__stdcall*)(LPPOINT lpPoint);
 using SetCursorPosType = BOOL(__stdcall*)(int x, int y);
 
-   
-using FeatureKeyValue	= std::pair<FeatureType, BuddyFeatureBase*>;
-using FeatureContainer	= std::vector<BuddyFeatureBase*>;
+using FeatureKeyValue = std::pair<FeatureType, BuddyFeatureBase*>;
+using FeatureContainer = std::vector<BuddyFeatureBase*>;
 
 enum class NotifyType
 {
@@ -39,8 +40,6 @@ enum class NotifyType
 	Warning,
 	Error
 };
-
-
 
 class OSRBuddyMain : public D3DInternalBase
 {
@@ -53,7 +52,7 @@ public:
 	virtual bool Start() override;
 	ImGuiBase* GetMenu();
 	BuddyFeatureBase* GetFeatureByType(FeatureType type) const;
-	FeatureContainer GetAllFeatures() const;
+	const FeatureContainer& GetAllFeatures() const;
 	void RegisterFeature(BuddyFeatureBase* feature);
 	void ReleaseFeatures();
 	void DisableAllFeatures();				 // disable all features and close the imgui menu
@@ -76,7 +75,7 @@ public:
 	
 	void BlockMouseInput(bool on);		   
 
-	PersistingTools* GetPersistingTools()	{ return &m_persistingTools; };
+	PersistingTools* GetPersistingTools()	{ return m_persistingTools; };
 	IOPacketManager* GetPacketManager()		{ return m_packetmanager.get(); };
 
 private:
@@ -152,7 +151,7 @@ private:
 
 	bool m_allow_notify_sounds;
 	bool m_allow_notify_popups;
-	PersistingTools m_persistingTools;
+	PersistingTools* m_persistingTools;
 	bool m_block_mouse;
 
 	std::unique_ptr<IOPacketManager> m_packetmanager;

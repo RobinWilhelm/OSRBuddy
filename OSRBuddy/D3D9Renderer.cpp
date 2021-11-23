@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "D3D9Renderer.h"
 #include <d3dx9core.h>
 

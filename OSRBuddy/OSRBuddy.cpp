@@ -1,22 +1,17 @@
+#include "osrb_pch.h"
 #include "OSRBuddy.h"
-#include "Utility.h"
-#include <thread>            
-#include "OSRAPI.h"
-      
-#include "KitBot.h"
-#include "TestItemUse.h"
-#include "GambleBot.h"
-#include "EnchantBot.h"
-#include "GrindBot.h"
-#include "FactoryBot.h"
-#include "DebugInfo.h"
-#include "Miscellaneous.h"
-#include "InventoryManager.h"
-                                
+
+#include "Features.h"
 #include "AntiAntiCheat.h"
 #include "PatternManager.h"
-#include "Windowsx.h"  // get_x_lpraram && get_y_lparam
+#include "PersistingTools.h"
+#include "OSRImGuiMenu.h"
 
+#include "Utility.h"             
+#include "OSRAPI.h" 
+
+#include <thread> 
+#include "Windowsx.h"  // get_x_lpraram && get_y_lparam
 
 OSRBuddyMain* g_osrbuddy = nullptr;  // for the static hook methods
 
@@ -196,7 +191,7 @@ bool OSRBuddyMain::Start()
         }    
 
         m_renderer = std::make_unique<D3D9Renderer>(OSR_API->GetD3D9Device());
-
+        m_persistingTools = new PersistingTools();
                  
 #ifdef FEATURE_KITBOT
         RegisterFeature(new KitBuffBot(this));
@@ -487,7 +482,7 @@ void OSRBuddyMain::RegisterFeature(BuddyFeatureBase* feature)
     m_features.push_back(feature);
 }
 
-FeatureContainer OSRBuddyMain::GetAllFeatures() const
+const FeatureContainer& OSRBuddyMain::GetAllFeatures() const
 {
     return m_features;
 }

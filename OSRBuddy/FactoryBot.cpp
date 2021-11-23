@@ -1,10 +1,7 @@
+#include "osrb_pch.h"
 #include "FactoryBot.h"
-#include "OSRBuddy.h"
-#include "OSRImGuiMenu.h" 
-#include "OSRAPI.h"
 #include "CookBook.h"
-#include "OSRBuddyDefine.h"
-#include "Utility.h"
+#include "OSRAPI.h"
 
 FactoryBot::FactoryBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {

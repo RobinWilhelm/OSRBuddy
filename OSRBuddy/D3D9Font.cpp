@@ -1,5 +1,7 @@
+#include "osrb_pch.h"
 #include "D3D9Font.h"
 #include <d3dx9.h>
+#include <D3dx9core.h>
 
 
 D3D9Font::D3D9Font(IDirect3DDevice9* device, std::string name, int size, bool bold, bool italic)

@@ -1,10 +1,11 @@
 #pragma once
-#include "Content.h"
 #include "SDK/AtumApplication.h"
-#include <memory>
 #include "OSRBuddyDefine.h"
+#include "Content.h"
+
 #include <d3d9.h>
-   
+#include <memory>   
+
 class IOPacketManager;
 
 class OldSchoolRivalsAPI 

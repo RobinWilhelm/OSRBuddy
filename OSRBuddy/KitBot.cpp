@@ -1,13 +1,16 @@
+#include "osrb_pch.h"
 #include "KitBot.h"
 #include "OSRAPI.h"
-#include "SDK/AtumApplication.h"
 #include "OSRBuddy.h"
 #include "OSRBuddyDefine.h"
-#include <chrono>
-#include <algorithm>    
+#include "Utility.h"
+
+#include "SDK/AtumApplication.h"
 #include "AtumError.h" 
 #include "AtumProtocol.h"
-#include "Utility.h"
+
+#include <chrono>
+#include <algorithm>  
 
 #define KIT_RESEND_TIME 100ms
 #define AUTOBUFF_CHECK_TIME 1s

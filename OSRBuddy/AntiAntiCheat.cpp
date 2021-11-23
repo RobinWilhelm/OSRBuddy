@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "AntiAntiCheat.h"
 #include <windows.h>
 #include <vector>

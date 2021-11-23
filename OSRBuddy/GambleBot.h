@@ -1,14 +1,14 @@
 #pragma once
 #include "BuddyFeatureBase.h"
-#include <vector>
-#include <string>		  
+	  
 #include "SDK/ObjectDefine.h"	// INVEN_DISPLAY_INFO
 #include "OSRAPI.h"
-#include "EnchantBot.h"
 #include "BuddyTimer.h"
-
-
 #include "OsrItemInfo.h"
+#include "PersistingTools.h"
+
+#include <vector>
+#include <string>	
 
 #ifdef RELEASE_SETHIA
 #define GAMBLE_TIME_BASE 2000ms           // minimum time between to complete gamble actions (add/remove fix) 
@@ -155,6 +155,6 @@ private:
 	FixSelection			m_suffix_selection;
 	FixSelection			m_prefix_selection;		
 
-	EnchantStatistics		m_statisticsWeapon;
+	ItemLabStatistics		m_statisticsWeapon;
 };
 

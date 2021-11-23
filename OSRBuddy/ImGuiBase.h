@@ -1,8 +1,7 @@
 #pragma once
-#include <Windows.h>
 #include "imgui/imgui.h"
-#include "imgui/imgui_addition.h"
 
+#include <Windows.h>
 
 struct IDirect3DDevice9;
 
@@ -35,6 +34,7 @@ protected:
 	void LoadStandardTheme();
 	void LoadClassicSteamTheme();
 	void LoadCorporateGreyTheme();
+	void LoadRayTeakTheme(); 
 
 protected:
 	ImGuiStyle m_standard_style;
@@ -42,4 +42,5 @@ protected:
 	HWND m_hWindow;
 	bool m_initialised;
 	bool m_blockInput;
+	ImFontConfig m_tahoma;
 };

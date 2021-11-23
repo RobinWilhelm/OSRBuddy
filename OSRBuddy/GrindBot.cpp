@@ -1,14 +1,18 @@
-﻿#include "GrindBot.h"
+﻿#include "osrb_pch.h"
+#include "GrindBot.h"
+
 #include "OSRAPI.h"
-#include "SDK/AtumApplication.h"
 #include "OSRBuddy.h"
-#include <string> 
 #include "KitBot.h"
 #include "Miscellaneous.h"
 #include "InventoryManager.h"
 #include "D3D9Renderer.h"
-#include <cmath>
 #include "Utility.h"
+
+#include "SDK/AtumApplication.h"
+
+#include <cmath>
+#include <string> 
 
 #define TARGET_LOCK_THRESHOLD    45.0f
 
@@ -301,6 +305,11 @@ void GrindBot::RenderImGui()
             ImGui::SetNextWindowSize(ImVec2(300.0f, 200.0f));
             if (ImGui::BeginPopup("GrindBotStatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
             {  
+                ImGui::BeginMenuBar();
+                {
+                    ImGui::Text("Killed monsters");
+                }
+                ImGui::EndMenuBar();
                 ImGui::BeginColumns("MonsterStatisticColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
                 {
                     for (auto& monsterinfo : m_mobs)

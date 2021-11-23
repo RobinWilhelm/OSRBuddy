@@ -1,7 +1,10 @@
+#include "osrb_pch.h"
 #include "IOPacketManager.h"
-#include "SDK/AtumProtocol.h"	
+	
 #include "OSRAPI.h"
 #include "OSRBuddyDefine.h"
+
+#include "SDK/AtumProtocol.h"
 
 #ifdef OSRBUDDY_DEBUG
 #define DEBUG_INCREMENT(x) (x)++

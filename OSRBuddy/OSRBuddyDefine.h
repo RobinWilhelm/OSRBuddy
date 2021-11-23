@@ -1,8 +1,10 @@
 #pragma once
+#include "GambleFixes.h"
+
 #include <string>
 #include <utility>
 #include <vector>
-#include "GambleFixes.h"
+
     
 #define TO_ENUM(enumtype, number) (static_cast<enumtype>(number))
 #define TO_INT(enumnum) (static_cast<int>(enumnum))
@@ -20,7 +22,7 @@
 #define COST_ENCHANTCARD_COMMON 200000
 #define COST_ENCHANTCARD_SPEED (2000 * COST_WARPOINT)
 #define COST_ENCHANTCARD_ENERGYSHIELD (2000 * COST_WARPOINT) 
-#define COST_ENCHANT_SINGLE 1400
+#define COST_ENCHANT_SINGLE 2800
 
 const std::vector<uint32_t> g_Enchant_probabilities{ 10000, 10000, 10000, 10000, 10000, 9000, 8000, 6000, 4000, 2000, 1000, 500, 100 };
       

@@ -1,5 +1,5 @@
+#include "osrb_pch.h"
 #include "BuddyFeatureBase.h"
-#include "imgui/imgui_addition.h"
 
 void BuddyFeatureBase::Enable(bool enable)
 {

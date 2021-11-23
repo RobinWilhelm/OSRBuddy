@@ -1,8 +1,9 @@
 #pragma once
 #include "Utility.h"
+#include "OSRBuddyDefine.h"
+
 #include <exception>
 #include <vector>
-#include "OSRBuddyDefine.h"
 
 #define OFFSET_ATUMAPPLICATION	(0x47D230)	//			
 #define OFFSET_DATABASE			OFFSET_ATUMAPPLICATION - 0x20

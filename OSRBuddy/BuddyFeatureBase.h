@@ -1,32 +1,17 @@
 #pragma once
-#include "Content.h"
 #include "IPacketWatcher.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_dx9.h"
-#include "imgui/imgui_impl_win32.h"
+#include "Content.h"
+#include "OSRBuddy.h"
 
 #include <Windows.h>
 #include <string>
    	 
-class OSRBuddyMain;
 class OldSchoolRivalsAPI;
 struct IDirect3DDevice9;
 class D3D9Renderer;
+class BuddyFeatureBase;
+		
 
-enum class FeatureType : int
-{
-	KitBuffBot = 0,
-	TestItemUse,
-	GambleBot,
-	EnchantBot,
-	FactoryBot,
-	AntiRandomness,
-	GrindBot,
-	DebugInfo,
-	Miscellaneous,
-	InventoryManager,
-};
-			 
 class BuddyFeatureBase : public IPacketWatcher
 {
 	friend class OSRBuddyMain;
@@ -72,4 +57,6 @@ protected:
 private:
 	bool m_enabled;
 };
+
+
 

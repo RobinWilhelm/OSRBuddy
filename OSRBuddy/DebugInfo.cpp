@@ -1,7 +1,5 @@
+#include "osrb_pch.h"
 #include "DebugInfo.h"
-#include "imgui/imgui.h"
-#include "OSRAPI.h"
-#include "OSRBuddy.h"
 
 DebugInfo::DebugInfo(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {

@@ -4,6 +4,7 @@
 #include "OSRBuddyDefine.h"
 #include "OSRAPI.h"
 
+#include "PersistingTools.h"
 #include "OsrItemInfo.h"
 #include "BuddyTimer.h"
 
@@ -100,38 +101,7 @@ enum class EnchantAction
 	Use_OkButton,
 };
  
-struct EnchantStatistics
-{
-	uint32_t m_enchantStats[8][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };	 // total_tries, fails
 
-	uint32_t	m_used_enchprots_e1;
-	uint32_t	m_used_enchprots_e5;
-
-	uint32_t	m_used_chancecards_3;
-	uint32_t	m_used_chancecards_5;
-	uint32_t	m_used_chancecards_8;
-
-	uint32_t	m_used_enchantcards;
-	uint32_t	m_used_speedcards;
-	uint32_t	m_used_energyshieldcard;
-
-	uint32_t	m_used_prefixwipes;
-	uint32_t	m_used_prefixcards;
-	uint32_t	m_used_suffixwipes;
-	uint32_t	m_used_suffixcards;
-
-	uint32_t	m_cost_enchprots_e1;
-	uint32_t	m_cost_enchprots_e5;
-
-	uint32_t	m_cost_chancecards_3;
-	uint32_t	m_cost_chancecards_5;
-	uint32_t	m_cost_chancecards_8;
-
-	uint32_t	m_cost_enchantcards;
-	uint32_t	m_cost_speedcards;
-	uint32_t	m_cost_energyshieldcard;
-	uint32_t	m_cost_total;
-};
 
 struct EnchantCardsAmount
 {
@@ -248,8 +218,8 @@ private:
 	bool					m_using_speedcard;
 	bool					m_using_energyshieldcard;
 
-	EnchantStatistics       m_statisticsSession;
-	EnchantStatistics		m_statisticsWeapon;	 	
+	ItemLabStatistics       m_statisticsSession;
+	ItemLabStatistics		m_statisticsWeapon;	 	
 
 	// for buffering
 	std::string				m_cost_total_string;

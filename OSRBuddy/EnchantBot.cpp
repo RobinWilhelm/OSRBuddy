@@ -1,11 +1,7 @@
+#include "osrb_pch.h"
 #include "EnchantBot.h"
-#include "OSRBuddy.h"
-#include "OSRImGuiMenu.h" 
-#include "Utility.h"
 #include "OsrItemInfo.h"
-#include "OSRAPI.h"
 #include "Utility.h"
-
 
 EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
@@ -35,7 +31,7 @@ EnchantBot::EnchantBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 
 	m_enchantTargetKind = EnchantItemKind::Weapon_advanced;
 
-	ZeroMemory(&m_statisticsSession, sizeof(EnchantStatistics));
+	ZeroMemory(&m_statisticsSession, sizeof(ItemLabStatistics));
 }
 
 EnchantBot::~EnchantBot()

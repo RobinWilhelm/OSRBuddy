@@ -1,3 +1,4 @@
+#include "osrb_pch.h"
 #include "FactoryBot2.h"
 
 FactoryBot2::FactoryBot2(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
