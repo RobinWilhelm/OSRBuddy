@@ -10,199 +10,204 @@
 #include <algorithm>
 #include <queue>
 
-enum class KitType : unsigned short
-{	 
-	NONE = 0,
-	SHIELD,
-	ENERGY,
-	SKILLPOINT,
-	FUEL,
-};
 
-enum class KitCategory : unsigned short
-{
-	S_TYPE = 0,
-	A_TYPE,
-	B_TYPE,
-	C_TYPE,
-};
  
 class CSkillInfo;	 
 
-struct PlayerSkillInfo
+namespace Features
 {
-	SkillType type;
-	CSkillInfo* skillinfo;
-	std::string clean_name;
-	bool final;			 
-	bool autobuff;
-	std::chrono::milliseconds last_send;
-
-	inline bool IsWaiting() {
-		return skillinfo->m_dwState == SKILL_STATE_WAITING || skillinfo->m_dwState == SKILL_STATE_PREPARE;
-	}
-};
-
-			   
-class KitBuffBot : public BuddyFeatureBase
-{
-public:	 
-	enum class Mode
+	enum class KitType : unsigned short
 	{
-		Rage,
-		Humanized,
-		Sleepy,
+		NONE = 0,
+		SHIELD,
+		ENERGY,
+		SKILLPOINT,
+		FUEL,
 	};
 
-	struct KitSettings
+	enum class KitCategory : unsigned short
 	{
-		KitSettings& operator=(const KitSettings& other)
-		{
-			kitmode = other.kitmode;
-			use_shield_type_s = other.use_shield_type_s;
-			use_shield_type_a = other.use_shield_type_a;
-			use_shield_type_b = other.use_shield_type_b;
-			use_shield_type_c = other.use_shield_type_c;
-			use_energy_type_s = other.use_energy_type_s;
-			use_energy_type_a = other.use_energy_type_a;
-			use_energy_type_b = other.use_energy_type_b;
-			use_energy_type_c = other.use_energy_type_c;
-			use_fuel = other.use_fuel;
+		S_TYPE = 0,
+		A_TYPE,
+		B_TYPE,
+		C_TYPE,
+	};
 
-			field_healings_active = other.field_healings_active; 
-			field_repair_active = other.field_repair_active; 
-			target_healings_active = other.target_healings_active;						
-			target_repair_active = other.target_repair_active;	 
-			target_heal_prio_myself = other.target_heal_prio_myself;
+	struct PlayerSkillInfo
+	{
+		SkillType type;
+		CSkillInfo* skillinfo;
+		std::string clean_name;
+		bool final;
+		bool autobuff;
+		std::chrono::milliseconds last_send;
 
-			use_spkit_type_a = other.use_spkit_type_a;
-			use_spkit_type_b = other.use_spkit_type_b;
-			use_spkit_type_c = other.use_spkit_type_c;
-
-			spkit_type_a_minvalue = other.spkit_type_a_minvalue;
-			spkit_type_b_minvalue = other.spkit_type_b_minvalue;
-			spkit_type_c_minvalue = other.spkit_type_c_minvalue;
-			return *this;
+		inline bool IsWaiting() {
+			return skillinfo->m_dwState == SKILL_STATE_WAITING || skillinfo->m_dwState == SKILL_STATE_PREPARE;
 		}
-
-		Mode kitmode;
-		bool use_shield_type_s;
-		bool use_shield_type_a;
-		bool use_shield_type_b;
-		bool use_shield_type_c;
-		bool use_energy_type_s;
-		bool use_energy_type_a;
-		bool use_energy_type_b;
-		bool use_energy_type_c;
-		bool use_fuel;
-
-		bool field_healings_active;
-		bool field_repair_active;
-		bool target_healings_active;
-		bool target_repair_active;
-		bool target_heal_prio_myself; 
-
-		bool use_spkit_type_a;
-		bool use_spkit_type_b;
-		bool use_spkit_type_c;
-							 
-		int spkit_type_a_minvalue;
-		int spkit_type_b_minvalue;
-		int spkit_type_c_minvalue;
 	};
 
-public:
-	KitBuffBot(OSRBuddyMain* buddy); 
 
-	// Returns true when the kit usage request has been sent to the server, false when not.
-	// The reason for false could be that requiered kits are not in inventory or the server has not answered the last request yet
-	bool TryUseKit(KitType type, KitCategory category);
-	bool KitTimerReady(KitType kittype);
+	class KitBuffBot : public BuddyFeatureBase
+	{
+	public:
+		enum class Mode
+		{
+			Rage,
+			Humanized,
+			Sleepy,
+		};
 
-	KitType	GetKitTypeFromItem(CItemInfo* item);
+		struct KitSettings
+		{
+			KitSettings& operator=(const KitSettings& other)
+			{
+				kitmode = other.kitmode;
+				use_shield_type_s = other.use_shield_type_s;
+				use_shield_type_a = other.use_shield_type_a;
+				use_shield_type_b = other.use_shield_type_b;
+				use_shield_type_c = other.use_shield_type_c;
+				use_energy_type_s = other.use_energy_type_s;
+				use_energy_type_a = other.use_energy_type_a;
+				use_energy_type_b = other.use_energy_type_b;
+				use_energy_type_c = other.use_energy_type_c;
+				use_fuel = other.use_fuel;
 
-	void SetSettings(KitSettings& settings);
+				field_healings_active = other.field_healings_active;
+				field_repair_active = other.field_repair_active;
+				target_healings_active = other.target_healings_active;
+				target_repair_active = other.target_repair_active;
+				target_heal_prio_myself = other.target_heal_prio_myself;
 
-	// Returns true when the skill has been registerd as autobuff. Returns false when the skill was not found.
-	bool AddAutoBuff(SkillType skill);
-	void RemoveAutoBuff(SkillType skill);
-	void ClearAutoBuff();			  
+				use_spkit_type_a = other.use_spkit_type_a;
+				use_spkit_type_b = other.use_spkit_type_b;
+				use_spkit_type_c = other.use_spkit_type_c;
 
-	bool IsAutoBuff(SkillType skill);
-	SkillType ResolveSkillItemName(const char* itemname);
+				spkit_type_a_minvalue = other.spkit_type_a_minvalue;
+				spkit_type_b_minvalue = other.spkit_type_b_minvalue;
+				spkit_type_c_minvalue = other.spkit_type_c_minvalue;
+				return *this;
+			}
 
-	// returns true when the skill usage has been sent to the server. This does not mean the skill has been successfully used.
-	// returns false when the skill is not available or the server has not answered the last request yet
-	bool TryUseSkill(SkillType skill);	
-	bool TryUseSkill(PlayerSkillInfo* skillinfo);
+			Mode kitmode;
+			bool use_shield_type_s;
+			bool use_shield_type_a;
+			bool use_shield_type_b;
+			bool use_shield_type_c;
+			bool use_energy_type_s;
+			bool use_energy_type_a;
+			bool use_energy_type_b;
+			bool use_energy_type_c;
+			bool use_fuel;
 
-	bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, ClientIndex_t target);
-	bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, UID32_t characterUID);
+			bool field_healings_active;
+			bool field_repair_active;
+			bool target_healings_active;
+			bool target_repair_active;
+			bool target_heal_prio_myself;
 
-	// returns true if skill is already toggled on, false when not
-	bool ToggleSKill(SkillType toggleskill, bool on);
-	
-	PlayerSkillInfo* FindPlayerSkill(SkillType skill) const;
-	PlayerSkillInfo* FindPlayerSkill(int itemnum) const;
-	bool AutoBuffCheckTimerReady();
-	bool AutoHealCheckTimerReady();
+			bool use_spkit_type_a;
+			bool use_spkit_type_b;
+			bool use_spkit_type_c;
 
-protected:
-	// Geerbt über IBuddyFeature
-	virtual void Tick() override;
-	virtual void RenderImGui() override;
-	virtual std::string GetName() const override;
-	virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
-	virtual bool OnWritePacket(unsigned short msgtype, byte* packet) override;
-	virtual FeatureType GetType() const override;
+			int spkit_type_a_minvalue;
+			int spkit_type_b_minvalue;
+			int spkit_type_c_minvalue;
+		};
 
-private:
-	void TickAutoKit();
-	void TickAutoBuff();
-	void TickAutoHeals();
+	public:
+		KitBuffBot(OSRBuddyMain* buddy);
 
-	void GrabPlayerSkills();
-	void OnUseSkillAnswer(int itemnum);
-	void OnUseEnergyError(MSG_ERROR* error);
-	void OnUseSkillError(MSG_ERROR* error);
+		// Returns true when the kit usage request has been sent to the server, false when not.
+		// The reason for false could be that requiered kits are not in inventory or the server has not answered the last request yet
+		bool TryUseKit(KitType type, KitCategory category);
+		bool KitTimerReady(KitType kittype);
 
-	bool ShouldUseRepairField();	// shield
-	bool ShouldUseHealingField();	// energy
+		KitType	GetKitTypeFromItem(CItemInfo* item);
 
-	UID32_t GetBestRepairTarget();	// shield
-	UID32_t GetBestHealTarget();	// energy
-	
+		void SetSettings(KitSettings& settings);
 
-private:   
-	KitSettings m_settings;
+		// Returns true when the skill has been registerd as autobuff. Returns false when the skill was not found.
+		bool AddAutoBuff(SkillType skill);
+		void RemoveAutoBuff(SkillType skill);
+		void ClearAutoBuff();
 
-	bool m_awaiting_server_ok_shield;
-	bool m_awaiting_server_ok_energy;
-	bool m_awaiting_server_ok_skill;	
-	bool m_awaiting_server_ok_fuel;   
+		bool IsAutoBuff(SkillType skill);
+		SkillType ResolveSkillItemName(const char* itemname);
 
-	std::vector<PlayerSkillInfo*> m_playerskills;
-	std::chrono::milliseconds m_last_autobuff_check;
-	std::chrono::milliseconds m_last_autoheal_check;
+		// returns true when the skill usage has been sent to the server. This does not mean the skill has been successfully used.
+		// returns false when the skill is not available or the server has not answered the last request yet
+		bool TryUseSkill(SkillType skill);
+		bool TryUseSkill(PlayerSkillInfo* skillinfo);
 
-	std::chrono::milliseconds m_shieldkit_firstuse_delay;
-	std::chrono::milliseconds m_energykit_firstuse_delay;
-	std::chrono::milliseconds m_skillpkit_firstuse_delay;
+		bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, ClientIndex_t target);
+		bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, UID32_t characterUID);
 
-	std::chrono::milliseconds m_shieldkit_reattack_time;
-	std::chrono::milliseconds m_energykit_reattack_time;
-	std::chrono::milliseconds m_skillpkit_reattack_time;
-	std::chrono::milliseconds m_fuelkit_reattack_time;
+		// returns true if skill is already toggled on, false when not
+		bool ToggleSKill(SkillType toggleskill, bool on);
 
-	std::chrono::milliseconds m_shieldkit_last_use;
-	std::chrono::milliseconds m_energykit_last_use;
-	std::chrono::milliseconds m_skillkit_last_use;	   
-	std::chrono::milliseconds m_fuelkit_last_use;			   
+		PlayerSkillInfo* FindPlayerSkill(SkillType skill) const;
+		PlayerSkillInfo* FindPlayerSkill(int itemnum) const;
+		bool AutoBuffCheckTimerReady();
+		bool AutoHealCheckTimerReady();
 
-	std::chrono::milliseconds m_shieldkit_last_send;
-	std::chrono::milliseconds m_energykit_last_send;
-	std::chrono::milliseconds m_skillkit_last_send;
-	std::chrono::milliseconds m_fuelkit_last_send;
+	protected:
+		// Geerbt über IBuddyFeature
+		virtual void Tick() override;
+		virtual void RenderImGui() override;
+		virtual std::string GetName() const override;
+		virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
+		virtual bool OnWritePacket(unsigned short msgtype, byte* packet) override;
+		virtual FeatureType GetType() const override;
 
-	std::chrono::milliseconds m_mgear_targetheal_last_send;
-};
+	private:
+		void TickAutoKit();
+		void TickAutoBuff();
+		void TickAutoHeals();
+
+		void GrabPlayerSkills();
+		void OnUseSkillAnswer(int itemnum);
+		void OnUseEnergyError(MSG_ERROR* error);
+		void OnUseSkillError(MSG_ERROR* error);
+
+		bool ShouldUseRepairField();	// shield
+		bool ShouldUseHealingField();	// energy
+
+		UID32_t GetBestRepairTarget();	// shield
+		UID32_t GetBestHealTarget();	// energy
+
+
+	private:
+		KitSettings m_settings;
+
+		bool m_awaiting_server_ok_shield;
+		bool m_awaiting_server_ok_energy;
+		bool m_awaiting_server_ok_skill;
+		bool m_awaiting_server_ok_fuel;
+
+		std::vector<PlayerSkillInfo*> m_playerskills;
+		std::chrono::milliseconds m_last_autobuff_check;
+		std::chrono::milliseconds m_last_autoheal_check;
+
+		std::chrono::milliseconds m_shieldkit_firstuse_delay;
+		std::chrono::milliseconds m_energykit_firstuse_delay;
+		std::chrono::milliseconds m_skillpkit_firstuse_delay;
+
+		std::chrono::milliseconds m_shieldkit_reattack_time;
+		std::chrono::milliseconds m_energykit_reattack_time;
+		std::chrono::milliseconds m_skillpkit_reattack_time;
+		std::chrono::milliseconds m_fuelkit_reattack_time;
+
+		std::chrono::milliseconds m_shieldkit_last_use;
+		std::chrono::milliseconds m_energykit_last_use;
+		std::chrono::milliseconds m_skillkit_last_use;
+		std::chrono::milliseconds m_fuelkit_last_use;
+
+		std::chrono::milliseconds m_shieldkit_last_send;
+		std::chrono::milliseconds m_energykit_last_send;
+		std::chrono::milliseconds m_skillkit_last_send;
+		std::chrono::milliseconds m_fuelkit_last_send;
+
+		std::chrono::milliseconds m_mgear_targetheal_last_send;
+	};
+}

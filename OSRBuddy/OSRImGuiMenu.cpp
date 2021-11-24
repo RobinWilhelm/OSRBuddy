@@ -13,7 +13,7 @@
 
 void OSRImGuiMenu::Render()
 {      
-    ImGui::SetNextWindowSize(ImVec2(700, 500));                   
+    ImGui::SetNextWindowSize(ImVec2(700, 510));                   
 #ifdef RELEASE_SETHIA
     const std::string windowname = "OSRBuddy - customized for Sethia";      
 #else
@@ -21,11 +21,10 @@ void OSRImGuiMenu::Render()
 #endif // RELEASE_SETHIA   
     
     ImGui::Begin(windowname.c_str(), &m_isOpen, ImGuiWindowFlags_NoResize);
-    {
+    {         
         if (ImGui::Button("Unload")) {
             m_osrbuddy->InitiateAppShutdown();
         }
-
         ImGui::BeginTabBar("Features", ImGuiTabBarFlags_::ImGuiTabBarFlags_None);
         {
             if (ImGui::BeginTabItem("Settings"))

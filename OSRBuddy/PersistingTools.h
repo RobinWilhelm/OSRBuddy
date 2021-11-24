@@ -61,19 +61,14 @@ private:
 	std::string m_fullpath;
 };
 
-using ItemLabPersistingPtr = std::unique_ptr<IPersistData<ItemLabStatistics>>;
+using LaboratoryStatsPersistingPtr = std::unique_ptr<IPersistData<ItemLabStatistics>>;
 
 class PersistingTools
 {
 public:
 	PersistingTools();
-	/*
-	void SetItem(UID64_t item);
-	void CloseStream();
-	void SaveItemLabStatistics(const ItemLabStatistics& stats);
-	void PersistingTools::ReadItemLabStatistics(ItemLabStatistics& stats);	
-	*/
-	ItemLabPersistingPtr GetLabStatisticPersistence(UID64_t item_uid) const;
+
+	LaboratoryStatsPersistingPtr GetLabStatisticPersistence(UID64_t item_uid) const;
 
 private:
 	std::string m_executable_dir;

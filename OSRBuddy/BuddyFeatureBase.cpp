@@ -1,6 +1,7 @@
 #include "osrb_pch.h"
 #include "BuddyFeatureBase.h"
 
+
 void BuddyFeatureBase::Enable(bool enable)
 {
 	if (m_enabled == enable) {
@@ -17,7 +18,7 @@ void BuddyFeatureBase::Enable(bool enable)
 		m_enabled = true;
 		OnEnable();
 	}
-}	 
+}
 
 bool BuddyFeatureBase::DrawEnableCheckBox()
 {

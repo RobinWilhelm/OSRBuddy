@@ -1,15 +1,18 @@
 #pragma once
 
-enum class FeatureType : int
+namespace Features
 {
-	KitBuffBot = 0,
-	TestItemUse,
-	GambleBot,
-	EnchantBot,
-	FactoryBot,
-	AntiRandomness,
-	GrindBot,
-	DebugInfo,
-	Miscellaneous,
-	InventoryManager,
-};
+	enum class FeatureType : int
+	{
+		KitBuffBot = 0,
+		TestItemUse,
+		GambleBot,
+		EnchantBot,
+		FactoryBot,
+		AntiRandomness,
+		GrindBot,
+		DebugInfo,
+		Miscellaneous,
+		InventoryManager,
+	};
+}

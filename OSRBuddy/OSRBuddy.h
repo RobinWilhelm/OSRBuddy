@@ -31,7 +31,7 @@ using CWinSocketWriteType = int(__thiscall*)(CWinSocket * ecx, LPCSTR pPacket, i
 using GetCursorPosType = BOOL(__stdcall*)(LPPOINT lpPoint);
 using SetCursorPosType = BOOL(__stdcall*)(int x, int y);
 
-using FeatureKeyValue = std::pair<FeatureType, BuddyFeatureBase*>;
+using FeatureKeyValue = std::pair<Features::FeatureType, BuddyFeatureBase*>;
 using FeatureContainer = std::vector<BuddyFeatureBase*>;
 
 enum class NotifyType
@@ -51,7 +51,7 @@ public:
 	// Geerbt über D3DInternalBase
 	virtual bool Start() override;
 	ImGuiBase* GetMenu();
-	BuddyFeatureBase* GetFeatureByType(FeatureType type) const;
+	BuddyFeatureBase* GetFeatureByType(Features::FeatureType type) const;
 	const FeatureContainer& GetAllFeatures() const;
 	void RegisterFeature(BuddyFeatureBase* feature);
 	void ReleaseFeatures();

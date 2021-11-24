@@ -30,132 +30,134 @@
 
 class CItemInfo;
 
-enum class GambleBotState
+namespace Features
 {
-	NOT_IN_LABORATORY = 0,
-	STANDBY,
-	GAMBLING,
-};
+	enum class GambleBotState
+	{
+		NOT_IN_LABORATORY = 0,
+		STANDBY,
+		GAMBLING,
+	};
 
-enum class GambleItem
-{
-	SOURCE_ITEM,
-	SG_ADV_PREFIX,
-	SG_ADV_SUFFIX,
-	SG_STD_PREFIX,
-	SG_STD_SUFFIX,
-	INIT_PREFIX,
-	INIT_SUFFIX
-};
+	enum class GambleItem
+	{
+		SOURCE_ITEM,
+		SG_ADV_PREFIX,
+		SG_ADV_SUFFIX,
+		SG_STD_PREFIX,
+		SG_STD_SUFFIX,
+		INIT_PREFIX,
+		INIT_SUFFIX
+	};
 
-enum class GambleAction
-{
-	NONE,
-	ADD_PREFIX,
-	ADD_SUFFIX,
-	ADD_PREFIX_AND_SUFFIX,
-	REMOVE_PREFIX,
-	REMOVE_SUFFIX,
-	REMOVE_PREFIX_AND_SUFFIX,
-};
+	enum class GambleAction
+	{
+		NONE,
+		ADD_PREFIX,
+		ADD_SUFFIX,
+		ADD_PREFIX_AND_SUFFIX,
+		REMOVE_PREFIX,
+		REMOVE_SUFFIX,
+		REMOVE_PREFIX_AND_SUFFIX,
+	};
 
-enum class FixCategory
-{
-	None,
-	Good,
-	Best,
-};
+	enum class FixCategory
+	{
+		None,
+		Good,
+		Best,
+	};
 
-struct FixSelection
-{
-	bool AllNonGreen;
-	FixCategory	Pierce;
-	FixCategory	ProbDamage;
-	FixCategory	ProbReattack;
-	FixCategory	ReattackDamage;
-	FixCategory	Any;
-};
+	struct FixSelection
+	{
+		bool AllNonGreen;
+		FixCategory	Pierce;
+		FixCategory	ProbDamage;
+		FixCategory	ProbReattack;
+		FixCategory	ReattackDamage;
+		FixCategory	Any;
+	};
 
 
-class GambleBot :
-	public BuddyFeatureBase
-{
-public:
-	GambleBot(OSRBuddyMain* buddy);
-	~GambleBot();
+	class GambleBot :
+		public BuddyFeatureBase
+	{
+	public:
+		GambleBot(OSRBuddyMain* buddy);
+		~GambleBot();
 
-	// Geerbt über BuddyFeatureBase
-	virtual void Tick() override;
-	virtual void RenderImGui() override;
-	virtual std::string GetName() const override;
-	virtual FeatureType GetType() const override;
-	virtual void OnEnable() override;
+		// Geerbt über BuddyFeatureBase
+		virtual void Tick() override;
+		virtual void RenderImGui() override;
+		virtual std::string GetName() const override;
+		virtual FeatureType GetType() const override;
+		virtual void OnEnable() override;
 
-private:
-	//bool PrepareNextGamble();
-	bool TryDoGambleAction();
-	GambleAction DetermineNextAction();
-	void AddNeededSourceItems(GambleAction action);
-	void Reset();
+	private:
+		//bool PrepareNextGamble();
+		bool TryDoGambleAction();
+		GambleAction DetermineNextAction();
+		void AddNeededSourceItems(GambleAction action);
+		void Reset();
 
-	void DrawSettings();
-	void DrawColoredGambleItemAmount(int amount);
+		void DrawSettings();
+		void DrawColoredGambleItemAmount(int amount);
 
-	void SetGambleBotState(GambleBotState state);
-	GambleBotState GetGambleBotState();
+		void SetGambleBotState(GambleBotState state);
+		GambleBotState GetGambleBotState();
 
-	void SetGambleItem(UID64_t uid);
-	void ResetGambleItem();
+		void SetGambleItem(UID64_t uid);
+		void ResetGambleItem();
 
-	bool TryTargetItemToInventory();			
-	bool CheckRarePrefix(CItemInfo* weapon);
-	bool CheckRareSuffix(CItemInfo* weapon);
-	const char* GetGambleActionString(GambleAction);
-	void UpdateTotalGambleItemAmount();
-	int GetTotalInventoryAmount(GambleItem gambleItem);
-	bool TrySimulateButtonClick(LabButtonCode button); 
-	CItemInfo* FindGambleItemFromInventory(GambleItem gambleitem);
+		bool TryTargetItemToInventory();
+		bool CheckRarePrefix(CItemInfo* weapon);
+		bool CheckRareSuffix(CItemInfo* weapon);
+		const char* GetGambleActionString(GambleAction);
+		void UpdateTotalGambleItemAmount();
+		int GetTotalInventoryAmount(GambleItem gambleItem);
+		bool TrySimulateButtonClick(LabButtonCode button);
+		CItemInfo* FindGambleItemFromInventory(GambleItem gambleitem);
 
-private:
-	GambleBotState			m_state;
-	bool					m_auto_gamble;
-	
-	UID64_t					m_current_gambleitem_uid; // if this is 0 -> we dont have a valid gamble item	
-	OsrItemInfo				m_gamble_item;
-	bool					m_is_advanced_weapon;
-	bool					m_select_new_weapon;
+	private:
+		GambleBotState			m_state;
+		bool					m_auto_gamble;
 
-	bool					m_do_prefix_gamble;
-	bool					m_do_suffix_gamble;
-	bool					m_do_prefix_gamble_temp;
-	bool					m_do_suffix_gamble_temp;
+		UID64_t					m_current_gambleitem_uid; // if this is 0 -> we dont have a valid gamble item	
+		OsrItemInfo				m_gamble_item;
+		bool					m_is_advanced_weapon;
+		bool					m_select_new_weapon;
 
-	bool					m_persist_prefix_whipe;
-	bool					m_persist_suffix_whipe;
-	bool					m_persist_prefix_card;
-	bool					m_persist_suffix_card;
+		bool					m_do_prefix_gamble;
+		bool					m_do_suffix_gamble;
+		bool					m_do_prefix_gamble_temp;
+		bool					m_do_suffix_gamble_temp;
 
-	GambleAction			m_next_gamble_action;
-	std::queue<GambleItem>	m_needed_source_items;
-	bool					m_waiting_for_answer;
+		bool					m_persist_prefix_whipe;
+		bool					m_persist_suffix_whipe;
+		bool					m_persist_prefix_card;
+		bool					m_persist_suffix_card;
 
-	BuddyTimer				m_gamble_timer;		// time between two complete gambles	
-	BuddyTimer				m_action_timer;		// time between two button clicks and item movement  
+		GambleAction			m_next_gamble_action;
+		std::queue<GambleItem>	m_needed_source_items;
+		bool					m_waiting_for_answer;
 
-	float					m_gamble_check_time;			
-	float					m_internal_action_check_time;	 	
-	   
-	int						m_amount_SG_ADV_Prefix;
-	int						m_amount_SG_ADV_Suffix;
-	int						m_amount_SG_STD_Prefix;
-	int						m_amount_SG_STD_Suffix;
-	int						m_amount_removal_Prefix;
-	int						m_amount_removal_Suffix;	   
-											
-	FixSelection			m_suffix_selection;
-	FixSelection			m_prefix_selection;		
+		BuddyTimer				m_gamble_timer;		// time between two complete gambles	
+		BuddyTimer				m_action_timer;		// time between two button clicks and item movement  
 
-	ItemLabPersistingPtr	m_item_persisting;
-	ItemLabStatistics		m_statisticsWeapon;
-};
+		float					m_gamble_check_time;
+		float					m_internal_action_check_time;
 
+		uint32_t				m_amount_SG_ADV_Prefix;
+		uint32_t				m_amount_SG_ADV_Suffix;
+		uint32_t				m_amount_SG_STD_Prefix;
+		uint32_t				m_amount_SG_STD_Suffix;
+		uint32_t				m_amount_removal_Prefix;
+		uint32_t				m_amount_removal_Suffix;
+
+		FixSelection			m_suffix_selection;
+		FixSelection			m_prefix_selection;
+
+		LaboratoryStatsPersistingPtr	m_item_persisting;
+		ItemLabStatistics		m_statisticsWeapon;
+	};
+}

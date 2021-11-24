@@ -194,31 +194,31 @@ bool OSRBuddyMain::Start()
         m_persistingTools = std::make_unique<PersistingTools>();
                  
 #ifdef FEATURE_KITBOT
-        RegisterFeature(new KitBuffBot(this));
+        RegisterFeature(new Features::KitBuffBot(this));
 #endif
 #ifdef FEATURE_ENCHANTBOT
-        RegisterFeature(new EnchantBot(this));
+        RegisterFeature(new Features::EnchantBot(this));
 #endif
 #ifdef FEATURE_GAMBLEBOT
-        RegisterFeature(new GambleBot(this));
+        RegisterFeature(new Features::GambleBot(this));
 #endif
 #ifdef FEATURE_GRINDBOT
-        RegisterFeature(new GrindBot(this));
+        RegisterFeature(new Features::GrindBot(this));
 #endif
 #ifdef FEATURE_INVENTORYMANAGER             
-        RegisterFeature(new InventoryManager(this));
+        RegisterFeature(new Features::InventoryManager(this));
 #endif
 #ifdef FEATURE_MISCELLANEOUS
-        RegisterFeature(new Miscellaneous(this));
+        RegisterFeature(new Features::Miscellaneous(this));
 #endif
 #ifdef FEATURE_FACTORYBOT
-        RegisterFeature(new FactoryBot(this));
+        RegisterFeature(new Features::FactoryBot(this));
 #endif
 #ifdef FEATURE_TEST
-        RegisterFeature(new TestItemUse(this));
+        RegisterFeature(new Features::TestItemUse(this));
 #endif
 #ifdef FEATURE_DEBUGINFO
-        RegisterFeature(new DebugInfo(this));
+        RegisterFeature(new Features::DebugInfo(this));
 #endif
     
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
@@ -615,7 +615,7 @@ ImGuiBase* OSRBuddyMain::GetMenu()
     return m_imguimenu.get();
 }
 
-BuddyFeatureBase* OSRBuddyMain::GetFeatureByType(FeatureType type) const
+BuddyFeatureBase* OSRBuddyMain::GetFeatureByType(Features::FeatureType type) const
 {
     for (auto& elem : m_features) 
     {

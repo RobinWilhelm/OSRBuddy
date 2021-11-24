@@ -184,9 +184,6 @@
     <ClInclude Include="TestItemUse.h">
       <Filter>Features</Filter>
     </ClInclude>
-    <ClInclude Include="BuddyFeatureBase.h">
-      <Filter>Features</Filter>
-    </ClInclude>
     <ClInclude Include="VMTHook.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -394,11 +391,14 @@
     <ClInclude Include="osrb_pch.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="BuddyFeatureBase.h">
+      <Filter>Base</Filter>
+    </ClInclude>
     <ClInclude Include="Features.h">
-      <Filter>Features</Filter>
+      <Filter>Base</Filter>
     </ClInclude>
     <ClInclude Include="FeatureTypes.h">
-      <Filter>Features</Filter>
+      <Filter>Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -462,9 +462,6 @@
     <ClCompile Include="EnchantBot.cpp">
       <Filter>Features</Filter>
     </ClCompile>
-    <ClCompile Include="BuddyFeatureBase.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
     <ClCompile Include="PatternManager.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -514,6 +511,9 @@
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="osrb_pch.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="BuddyFeatureBase.cpp">
       <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
