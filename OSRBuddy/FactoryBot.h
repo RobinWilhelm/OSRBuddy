@@ -47,6 +47,7 @@ namespace Features
 		MixItemList				m_mixitems;				// all current elements in the itemlist	and recipelist
 		uint32_t				m_item_list_selected;	// the selected item in the itemlist
 		uint32_t				m_recipe_list_selected;	// the selected recipe from the recipelist
+		bool					m_no_recipes_found;
 
 		std::string				m_selected_recipe_text;
 	};

@@ -9,6 +9,31 @@ namespace Features
 	{	 		
 		m_state = FactoryBot2State::DISABLED;
 		m_buddy->GetPersistingTools()->GetAllRecipes(m_mixitems);
+		if (m_mixitems.size() > 0)
+		{
+			m_no_recipes_found = false;
+		}
+		else
+		{  			
+			MixItem dummyitem;
+			dummyitem.itemname = "No recipes available.";
+			
+			Recipe dummyrecipe;
+			dummyrecipe.chance = 0;
+			
+			Ingredient dummyingredient;
+			dummyingredient.itemname = "Nothing";
+			dummyingredient.amount = 1337;
+
+			dummyrecipe.ingredients.push_back(dummyingredient);
+			dummyitem.recipes.push_back(dummyrecipe);
+
+			m_mixitems.push_back(dummyitem);
+
+			m_no_recipes_found = true;
+		}
+
+
 		SetSelectItem(0);
 		m_action_timer = BuddyTimer(FACTORYBOT_ACTION_TIME_BASE, FACTORYBOT_ACTION_VARIANCE);
 	}
@@ -126,15 +151,12 @@ namespace Features
 							ImGui::PopStyleColor();
 						}
 						ImGui::ListBoxFooter();
-					}
-					  
+					}					  
 				}
-				ImGui::EndChild();
-								
+				ImGui::EndChild(); 								
 			}
 			ImGui::NextColumn();
-			{
-				
+			{	   				
 				ImGui::BeginChild("SelectionInformationColumn");
 				{
 					ImGui::Text("Selection Information:");
@@ -242,7 +264,7 @@ namespace Features
 						break;
 					}
 					
-					if(ImGui::Button("Craft"))
+					if(ImGui::Button("Craft") && !m_no_recipes_found)
 					{
 						SetState(FactoryBot2State::CRAFT);
 					}
@@ -259,7 +281,10 @@ namespace Features
 
 	void FactoryBot::SetState(FactoryBot2State state)
 	{
-		m_state = state;
+		if (!m_no_recipes_found)
+		{
+			m_state = state;
+		}
 	}
 
 	uint32_t FactoryBot::GetInventoryItemAmount(uint32_t itemnum)
