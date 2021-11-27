@@ -16,8 +16,10 @@ void OSRImGuiMenu::Render()
     ImGui::SetNextWindowSize(ImVec2(700, 510));                   
 #ifdef RELEASE_SETHIA
     const std::string windowname = "OSRBuddy - customized for Sethia";      
-#else
-    const std::string windowname = "OSRBuddy";
+#elif RELEASE
+    const std::string windowname = "OSRBuddy Release";
+#elif RELEASE_DEBUG
+    const std::string windowname = "OSRBuddy Debug";
 #endif // RELEASE_SETHIA   
     
     ImGui::Begin(windowname.c_str(), &m_isOpen, ImGuiWindowFlags_NoResize);

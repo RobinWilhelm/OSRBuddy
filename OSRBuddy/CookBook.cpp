@@ -34,14 +34,14 @@ CookBook::CookBook()
 
 	vanillaIceCream.ingreds.push_back(cream);
 
-	m_recipies.insert(std::pair<int, Recipe>(vanillaIceCream.itemid, vanillaIceCream));
+	m_mixitems.insert(std::pair<int, Recipe>(vanillaIceCream.itemid, vanillaIceCream));
 }
 std::map<int, Recipe> CookBook::GetRecipies()
 {
-	return m_recipies;
+	return m_mixitems;
 }
 
 Recipe CookBook::getRecipie(int id)
 {
-	return m_recipies.at(id);
+	return m_mixitems.at(id);
 }

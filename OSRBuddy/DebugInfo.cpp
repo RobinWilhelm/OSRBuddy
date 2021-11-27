@@ -6,6 +6,7 @@ namespace Features
 	DebugInfo::DebugInfo(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	{
 		m_pdl_timer = BuddyTimer(std::chrono::milliseconds(1000 / AVG_PDL_UPDATES_PER_SECOND));
+		ZeroMemory(&m_pdl_current, sizeof(PacketDebugLog));
 	}
 
 	DebugInfo::~DebugInfo()

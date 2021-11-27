@@ -10,21 +10,7 @@ AceColouredString::AceColouredString()
 
 AceColouredString::AceColouredString(std::string text, ImColor defaultcol)
 {
-	m_original_text = text;
-	m_text = text;
-	if (m_original_text[0] == '\\')  // check if name has a colorcode in its name
-	{
-		m_ace_color = TranslateAceCharToColor(m_original_text[1]);
-		m_text.erase(m_text.begin(), m_text.begin() + 2);
-		if (m_original_text[m_original_text.length() -2] == '\\')
-		{
-			m_text.erase(m_text.end() - 2, m_text.end());
-		}
-	}
-	else
-	{
-		m_ace_color = defaultcol;
-	}
+	SetString(text, defaultcol);
 }
 
 ImColor AceColouredString::GetColor() const
@@ -82,5 +68,24 @@ ImColor AceColouredString::TranslateAceCharToColor(char color)
 		return ImColor(0xFF, 0x00, 0xFF);
 	default:    // white
 		return ImColor(0xFF, 0xFF, 0xFF);
+	}
+}
+
+void AceColouredString::SetString(const std::string& text, ImColor defaultcol)
+{
+	m_original_text = text;
+	m_text = text;
+	if (m_original_text[0] == '\\')  // check if name has a colorcode in its name
+	{
+		m_ace_color = TranslateAceCharToColor(m_original_text[1]);
+		m_text.erase(m_text.begin(), m_text.begin() + 2);
+		if (m_original_text[m_original_text.length() - 2] == '\\')
+		{
+			m_text.erase(m_text.end() - 2, m_text.end());
+		}
+	}
+	else
+	{
+		m_ace_color = defaultcol;
 	}
 }

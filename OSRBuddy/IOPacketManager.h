@@ -48,6 +48,11 @@ public:
 private:
 	struct PacketState
 	{
+		PacketState()
+		{
+			waiting = false;
+		}
+
 		bool waiting;
 		std::chrono::system_clock::time_point last_send;
 	};

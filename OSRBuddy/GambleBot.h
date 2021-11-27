@@ -6,6 +6,7 @@
 #include "BuddyTimer.h"
 #include "OsrItemInfo.h"
 #include "PersistingTools.h"
+#include "Structs.h"
 
 #include <vector>
 #include <string>	

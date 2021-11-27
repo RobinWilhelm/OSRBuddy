@@ -3,6 +3,7 @@
 #include "SDK/ObjectDefine.h"	// INVEN_DISPLAY_INFO
 #include "OSRBuddyDefine.h"
 #include "OSRAPI.h"
+#include "Structs.h"
 
 #include "PersistingTools.h"
 #include "OsrItemInfo.h"
@@ -164,8 +165,8 @@ namespace Features
 		void RenderStatisticsPopup();
 		void RenderSuccessPercentage(int enchstep, int total_tries, int fails);
 
-		void ResetEnchantList(ListVector& enchantlist);
-		void InsertEnchantList(ListVector& enchantlist, EnchantCard enchanttype);
+		void ResetEnchantList(ImGui::ListVector& enchantlist);
+		void InsertEnchantList(ImGui::ListVector& enchantlist, EnchantCard enchanttype);
 		void RemoveEnchantEntry(uint32_t enchantindex);
 		void RebuildWantedEnchantDisplayList();
 		void RebuildCurrentEnchantDisplayList();
@@ -207,8 +208,8 @@ namespace Features
 		EnchantAction			m_next_action;
 		bool					m_waiting_for_answer;
 
-		ListVector				m_currentEnchantDisplayList;
-		ListVector				m_wantedEnchantDisplayList;
+		ImGui::ListVector		m_currentEnchantDisplayList;
+		ImGui::ListVector		m_wantedEnchantDisplayList;
 		EnchantInfoList			m_wantedEnchantInfo;
 
 		int						m_wanted_enchants_sel_idx;

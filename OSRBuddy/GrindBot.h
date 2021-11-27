@@ -29,11 +29,11 @@ namespace Features
 	struct GrindMonsterInfo
 	{
 		std::string clean_name;
-		bool shoot;
-		bool priority;
-		uint32_t killed;
-		bool goldy;
-		uint32_t count;
+		bool shoot = false;
+		bool priority = false;
+		uint32_t killed = 0;
+		bool goldy = false;
+		uint32_t count = 0;
 		std::string count_text;
 	};
 
@@ -112,7 +112,10 @@ namespace Features
 		std::chrono::milliseconds m_aimtime_current;
 		std::chrono::milliseconds m_aimtime_final;
 
-		char m_toggle_hotkey;
+
+		uint32_t m_vkc_toggle;	// virtual key code to toggle on/off
+		std::string m_vkc_description; 
+		bool m_wait_for_hotkey; // next key press is the new toggle hotkey
 
 		MapIndex_t m_grinding_map;
 		bool m_awaiting_siege_toggle_ok;

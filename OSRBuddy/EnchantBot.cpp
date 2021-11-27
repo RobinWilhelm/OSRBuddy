@@ -845,7 +845,7 @@ namespace Features
 	}
 
 
-	void EnchantBot::ResetEnchantList(ListVector& enchantlist)
+	void EnchantBot::ResetEnchantList(ImGui::ListVector& enchantlist)
 	{
 		enchantlist.clear();
 		InsertEnchantList(enchantlist, EnchantCard::None);	// dummy enchant
@@ -857,7 +857,7 @@ namespace Features
 		}
 	}
 	
-	void EnchantBot::InsertEnchantList(ListVector& enchantlist, EnchantCard enchanttype)
+	void EnchantBot::InsertEnchantList(ImGui::ListVector& enchantlist, EnchantCard enchanttype)
 	{
 		// remove dummy entrys if we are adding the first enchant
 		if (enchantlist.size() == 1 && enchantlist[0] == GetEnchantItemText(EnchantCard::None)) 
@@ -1185,7 +1185,7 @@ namespace Features
 				OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send));
 				m_waiting_for_answer = true;
 
-				auto prevEnchantInfo = m_wantedEnchantInfo.at(m_previous_enchantnum);
+				const auto& prevEnchantInfo = m_wantedEnchantInfo.at(m_previous_enchantnum);
 				AddLastEnchantToStatistic(prevEnchantInfo);
 			
 				if (m_statistics_popup_open)
@@ -1575,7 +1575,7 @@ namespace Features
 		switch (enchantinfo.enchant)
 		{
 		case EnchantCard::None:
-			std::exception("EnchantBot Error");
+			//std::exception("EnchantBot Error");
 			break;
 		case EnchantCard::Speed:
 			m_statisticsSession.m_used_speedcards++;

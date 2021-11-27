@@ -15,12 +15,12 @@ namespace detail
 		{
 			_base = base;
 			_length = len;
-			if (!VirtualProtect(base, len, flags, (PDWORD)&_old))
+			if (!VirtualProtect(base, len, flags, reinterpret_cast<PDWORD>(&_old)))
 				throw std::runtime_error("Failed to protect region.");
 		}
 		~protect_guard()
 		{
-			VirtualProtect(_base, _length, _old, (PDWORD)&_old);
+			VirtualProtect(_base, _length, _old, reinterpret_cast<PDWORD>(&_old));
 		}
 
 	private:

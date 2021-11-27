@@ -24,6 +24,8 @@ public:
         return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
     }
 
+    static std::string VirtualKeyCodeToString(uint32_t virtualKey);
+
     static std::string GetTimeString(std::chrono::milliseconds ms);
 
     static int GetRandInt32(int min, int max);

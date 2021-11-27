@@ -137,7 +137,7 @@ namespace Features
 					else {
 						SetGambleBotState(GambleBotState::STANDBY);
 					}	  
-
+					m_item_persisting->Save(m_statisticsWeapon);
 					m_waiting_for_answer = false;
 				}
 			}

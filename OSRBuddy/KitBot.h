@@ -35,12 +35,12 @@ namespace Features
 
 	struct PlayerSkillInfo
 	{
-		SkillType type;
-		CSkillInfo* skillinfo;
+		SkillType type = SkillType::Unknown;
+		CSkillInfo* skillinfo = nullptr;
 		std::string clean_name;
-		bool final;
-		bool autobuff;
-		std::chrono::milliseconds last_send;
+		bool final = false;
+		bool autobuff = false;
+		std::chrono::milliseconds last_send = 0s;
 
 		inline bool IsWaiting() {
 			return skillinfo->m_dwState == SKILL_STATE_WAITING || skillinfo->m_dwState == SKILL_STATE_PREPARE;

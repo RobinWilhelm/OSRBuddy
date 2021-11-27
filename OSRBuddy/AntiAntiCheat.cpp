@@ -13,20 +13,24 @@ void AntiAntiCheat::ManualFreeLibraryAndExitThread(LPVOID imageBase, SIZE_T imag
 {
     // orig from https://www.unknowncheats.me/forum/general-programming-and-reversing/304753-simple-function-cleanly-unload-manually-mapped-cheats.html
 
-    void* exitThread = GetProcAddress(GetModuleHandle("Kernel32.dll"), "ExitThread");
-    void* virtualFree = GetProcAddress(GetModuleHandle("Kernel32.dll"), "VirtualFree");
-
-    __asm
+    auto kernelmodule = GetModuleHandle("Kernel32.dll");
+    if (kernelmodule)
     {
-        mov esi, imageSize
-        mov edi, imageBase
-        push exitCode
-        push MEM_RELEASE
-        push esi
-        push edi
-        push exitThread
-        mov esi, virtualFree
-        jmp esi
+        void* exitThread = GetProcAddress(kernelmodule, "ExitThread");
+        void* virtualFree = GetProcAddress(kernelmodule, "VirtualFree");   
+
+        __asm
+        {
+            mov esi, imageSize
+            mov edi, imageBase
+            push exitCode
+            push MEM_RELEASE
+            push esi
+            push edi
+            push exitThread
+            mov esi, virtualFree
+            jmp esi
+        }
     }
 } 
 

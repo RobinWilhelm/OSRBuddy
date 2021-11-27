@@ -13,6 +13,7 @@ struct Recipe
 	std::vector<Ingredient> ingreds;
 	int itemid;
 	bool stackable;
+	std::string itemname;
 };
 
 class CookBook
@@ -22,5 +23,5 @@ public:
 	std::map<int, Recipe> GetRecipies();
 	Recipe getRecipie(int id);
 private:
-	std::map<int, Recipe> m_recipies;
+	std::map<int, Recipe> m_mixitems;
 };

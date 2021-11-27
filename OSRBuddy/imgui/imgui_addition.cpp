@@ -11,7 +11,7 @@
 //https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#arrays
 static auto vectorlist_getter = [](void* vec, int idx, const char** out_text)
 {
-    auto& vector = *static_cast<ListVector*>(vec);
+    auto& vector = *static_cast<ImGui::ListVector*>(vec);
     if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
     *out_text = vector.at(idx).c_str();
     return true;

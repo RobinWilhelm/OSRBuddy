@@ -6,6 +6,7 @@
 
 D3D9Font::D3D9Font(IDirect3DDevice9* device, std::string name, int size, bool bold, bool italic)
 {
+	m_initialised = false;
 	HRESULT res = D3DXCreateFont(device, size, 0, (bold) ? FW_BOLD : FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, name.c_str(), &m_d3dfont);
 
 	if (res == S_OK) {

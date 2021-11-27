@@ -13,6 +13,7 @@ class OldSchoolRivalsAPI
 	OldSchoolRivalsAPI() 
 	{ 
 		m_atumapplication = nullptr;
+		m_packetmanager = nullptr;
 	};
 	OldSchoolRivalsAPI(const OldSchoolRivalsAPI& other) = delete;
 	OldSchoolRivalsAPI& operator=(const OldSchoolRivalsAPI& other) = delete;

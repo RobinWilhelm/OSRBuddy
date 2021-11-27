@@ -202,6 +202,9 @@ bool OSRBuddyMain::Start()
 #ifdef FEATURE_GAMBLEBOT
         RegisterFeature(new Features::GambleBot(this));
 #endif
+#ifdef FEATURE_FACTORYBOT
+        RegisterFeature(new Features::FactoryBot(this));
+#endif
 #ifdef FEATURE_GRINDBOT
         RegisterFeature(new Features::GrindBot(this));
 #endif
@@ -210,9 +213,6 @@ bool OSRBuddyMain::Start()
 #endif
 #ifdef FEATURE_MISCELLANEOUS
         RegisterFeature(new Features::Miscellaneous(this));
-#endif
-#ifdef FEATURE_FACTORYBOT
-        RegisterFeature(new Features::FactoryBot(this));
 #endif
 #ifdef FEATURE_TEST
         RegisterFeature(new Features::TestItemUse(this));

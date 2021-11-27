@@ -573,7 +573,6 @@ BUILDINGNPC OldSchoolRivalsAPI::GetCurrentBuilding()
 
 CINFBase* OldSchoolRivalsAPI::FindBuildingShop(int buildingkind)
 {
-#ifndef _DEBUG	  // structure of std::map is different in debugmode which leads to crash 
 	CINFCityBase* citybase = m_atumapplication->m_pInterface->m_pCityBase;
 	if (!citybase) {
 		return nullptr;
@@ -583,8 +582,7 @@ CINFBase* OldSchoolRivalsAPI::FindBuildingShop(int buildingkind)
 	if (it != citybase->m_mapCityShop.end())
 	{
 		return it->second;
-	}					
-#endif
+	}	
 	return nullptr;
 }
 

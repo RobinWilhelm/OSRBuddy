@@ -30,6 +30,7 @@ namespace Features
 		m_open_mineralcapsule = true;
 		m_open_wpcapsule = true;
 		m_open_soccer_ball_capsule = true;
+		m_open_halloween_staff_box = true;
 		m_delete_items = false;
 		m_delete_items_maxlevel = 20;
 		m_delete_weapons = true;
@@ -44,6 +45,8 @@ namespace Features
 		m_open_capsules = true;
 		m_awaiting_sell_ok = false;
 		m_item_selection_dirty = true;
+		m_selected_item_count = 0;
+		m_selling_items = false;
 
 		m_open_vanillaicecream_capsule = false;
 #ifdef HALLOWEEN_EVENT
@@ -109,6 +112,7 @@ namespace Features
 				ImGui::Checkbox("Warpoint Capsules", &m_open_wpcapsule);
 				ImGui::Checkbox("Soccer Ball Capsule", &m_open_soccer_ball_capsule);
 				ImGui::Checkbox("Halloween Capsule", &m_open_halloween_capsule);
+				ImGui::Checkbox("Halloween Staff Box", &m_open_halloween_staff_box);
 			}
 			ImGui::EndChild();
 		}
@@ -315,6 +319,9 @@ namespace Features
 				return;
 			}
 
+			if (m_open_halloween_staff_box && TryOpenCapsule(ItemNumber::Halloween_Staff_Box)) {
+				return;
+			}
 
 			if (m_open_wpcapsule)
 			{

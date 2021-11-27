@@ -6,13 +6,16 @@
 #include <string>    
 #include <OSRBuddyDefine.h>
 
-static ImVector<ImRect> s_GroupPanelLabelStack;
-static ImVector<bool> s_disabled;
 
-using ListVector = std::vector<std::string>;
 
 namespace ImGui 
 {
+    static ImVector<ImRect> s_GroupPanelLabelStack;
+    static ImVector<bool> s_disabled;
+
+
+    using ListVector = std::vector<std::string>;
+
 
     void BeginDisabledMode(bool disabled);
     void EndDisabledMode();

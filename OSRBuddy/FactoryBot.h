@@ -1,27 +1,17 @@
 #pragma once
-#include "BuddyFeatureBase.h"	
-#include "CookBook.h"
-#include "OSRBuddyDefine.h"
-#include "BuddyTimer.h"
-
-#ifdef RELEASE_SETHIA
-#define FACTORYBOT_TIME_BASE 2000ms           // minimum time between to complete gamble actions (add/remove fix) 
-#define FACTORYBOT_TIME_VARIANCE 500ms
+#include "BuddyFeatureBase.h"
+#include "imgui/imgui_addition.h"
+#include "AceColouredString.h"
+#include "Structs.h"			  
 
 #define FACTORYBOT_ACTION_TIME_BASE 300ms	// button clicks and item movement
 #define FACTORYBOT_ACTION_VARIANCE 500ms	
-#else  	
-#define FACTORYBOT_TIME_BASE 2000ms           // minimum time between to complete gamble actions (add/remove fix) 
-#define FACTORYBOT_TIME_VARIANCE 500ms
-
-#define FACTORYBOT_ACTION_TIME_BASE 300ms	// button clicks and item movement
-#define FACTORYBOT_ACTION_VARIANCE 500ms	  
-#endif // RELEASE_SETHIA
 
 namespace Features
 {
-	enum class FactoryBotState {
-		NOT_IN_FACTORY = 0,
+	enum class FactoryBot2State 
+	{
+		DISABLED = 0,
 		STANDBY,
 		CRAFT
 	};
@@ -32,52 +22,32 @@ namespace Features
 		FactoryBot(OSRBuddyMain* buddy);
 		~FactoryBot();
 
-		// Geerbt über BuddyFeatureBase
+		// Inherited via BuddyFeatureBase
+		virtual FeatureType GetType() const override;
+		virtual std::string GetName() const override;
 		virtual void Tick() override;
 		virtual void RenderImGui() override;
-		virtual std::string GetName() const override;
-		virtual FeatureType GetType() const override;
-		virtual void OnEnable() override;
+
+		void SetState(FactoryBot2State state);
+		uint32_t GetInventoryItemAmount(uint32_t itemnum);
+		
+		void SetSelectItem(uint32_t list_idx);
+		const MixItem& GetSelectedItem();				// returns currently selected item in the list
+		const Recipe& GetSelectedRecipe();
+
+		bool TrySimulateButtonClick(LabButtonCode button);
 
 	private:
-		FactoryBotState GetFactoryBotState();
-		void SetFactoryBotState(FactoryBotState);
-		void SetRecipe(int id);
-		bool DoCrafting(int walk);
-		void DoStackedCrafting();
-		bool TrySimulateOkButton(LabButtonCode code);
+		FactoryBot2State		m_state;
+		bool					m_auto_craft;
+		bool					m_waiting_for_server;
+		uint32_t				m_ingredient_walker;
+		BuddyTimer				m_action_timer;
 
-		void CalculateFreeInventorySpace();
-		void CalculateMaxCraftableFromRessources();
-		void UpdateTotalGambleItemAmount();
-		int  GetTotalInventoryAmount(int id);
-		void SetMaxAmount();
+		MixItemList				m_mixitems;				// all current elements in the itemlist	and recipelist
+		uint32_t				m_item_list_selected;	// the selected item in the itemlist
+		uint32_t				m_recipe_list_selected;	// the selected recipe from the recipelist
 
-	private:
-
-		FactoryBotState m_state;
-		int m_wanted_amount;
-		int m_selected_amount;
-		int m_free_invent_space;
-		int m_max_from_ressources;
-		int m_max_amount;
-		bool m_open_instant;
-
-		BuddyTimer m_craft_timer;
-		BuddyTimer m_action_timer;
-		bool	m_waiting_for_answer;
-
-		bool m_selected_recipie;
-		bool m_stackable;
-
-		int m_sizeholder;
-		int m_walker;
-		int m_crafted;
-
-		CookBook m_cook_book;
-		Recipe m_chosen_recipie;
-		std::vector<Ingredient> m_ingredients_for_recipie;
-		std::map<int, int> m_ressources_in_inventory;
-
+		std::string				m_selected_recipe_text;
 	};
 }

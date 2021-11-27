@@ -12,14 +12,19 @@
 PersistingTools::PersistingTools()
 {
     char* cwd = _getcwd(0, 0); // **** microsoft specific ****
+    if (!cwd)
+    {
+        cwd = "C:";
+    }
+
     m_executable_dir = std::string(cwd);
     std::free(cwd);
 
-    std::string osrpart = "\\OSRBuddy";
+    std::string osrpart = "\\" + std::string(FOLDERNAME_OSRBUDDY);
     m_osrbuddy_dir = m_executable_dir.append(osrpart);
 	CreateDirectory(m_osrbuddy_dir.c_str(), NULL);
 
-    m_labitems_dir = m_osrbuddy_dir.append("\\Weapons");
+    m_labitems_dir = m_osrbuddy_dir + "\\" + std::string(FOLDERNAME_WEAPONS);
     CreateDirectory(m_labitems_dir.c_str(), NULL);
 }
 
@@ -32,15 +37,53 @@ LaboratoryStatsPersistingPtr PersistingTools::GetLabStatisticPersistence(UID64_t
     struct stat buffer;
     if (stat(fullpath.c_str(), &buffer) != 0)
     {
-        ItemLabStatistics stats;
-        ZeroMemory(&stats, sizeof(ItemLabStatistics));
+        Features::ItemLabStatistics stats;
+        ZeroMemory(&stats, sizeof(Features::ItemLabStatistics));
         ptr->Save(stats);
     }
 
     return std::unique_ptr<ItemLabStatisticsJsonPersistence>(ptr);
 }
 
-void ItemLabStatisticsJsonPersistence::Read(ItemLabStatistics& data) const
+void PersistingTools::GetAllRecipes(Features::MixItemList& mixitems)
+{
+    nlohmann::json jsonobject = nlohmann::json();
+    std::fstream file;
+    file.open(m_osrbuddy_dir + "\\" + std::string(FILENAME_RECIPES), ios::in);
+    if (file.good() && file.is_open())
+    {
+        file >> jsonobject;
+    }
+
+    Features::MixItem mixitem;
+
+    for (const auto& json_mi : jsonobject["mixItems"])
+    {
+        mixitem.itemnum     = TO_UINT(json_mi["itemDetail"]["ItemNum"]);
+        mixitem.itemname    = json_mi["itemDetail"]["Name"];
+
+        Features::Recipe recipe;
+        for (const auto& json_recipe : json_mi["mixing"])
+        {
+            recipe.chance   = TO_UINT(json_recipe["Chance"]);
+            recipe.cost     = TO_UINT(json_recipe["Cost"]);
+
+            Features::Ingredient ingredient;
+            for (const auto& json_ingredient : json_recipe["Items"])
+            {
+                ingredient.itemnumber   = TO_UINT(json_ingredient["Num"]);
+                ingredient.amount       = TO_UINT(json_ingredient["Count"]);
+                ingredient.itemname     = json_ingredient["Name"];
+                recipe.ingredients.push_back(ingredient);
+            }
+
+            mixitem.recipes.push_back(recipe);
+        }
+        mixitems.push_back(mixitem);
+    }
+}
+
+void ItemLabStatisticsJsonPersistence::Read(Features::ItemLabStatistics& data) const
 {
     nlohmann::json jsonobject = nlohmann::json();
     std::fstream file;
@@ -94,7 +137,7 @@ void ItemLabStatisticsJsonPersistence::Read(ItemLabStatistics& data) const
     }
 }
 
-void ItemLabStatisticsJsonPersistence::Save(const ItemLabStatistics& data) const
+void ItemLabStatisticsJsonPersistence::Save(const Features::ItemLabStatistics& data) const
 {
     nlohmann::json jsonobject = nlohmann::json();
     for (int i = 0; i < 8; i++)

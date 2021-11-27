@@ -1,24 +1,15 @@
 #include "osrb_pch.h"
 #include "FactoryBot.h"
-#include "CookBook.h"
-#include "OSRAPI.h"
+#include "Utility.h"
+#include "PersistingTools.h"
 
 namespace Features
 {
 	FactoryBot::FactoryBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
-	{
-		m_state = FactoryBotState::STANDBY;
-		m_wanted_amount = 0;
-		m_free_invent_space = 0;
-		m_max_from_ressources = 0;
-		m_max_amount = 0;
-		m_stackable = false;
-		m_open_instant = false;
-		m_waiting_for_answer = false;
-		m_walker = 0;
-		m_crafted = 0;
-		m_cook_book = CookBook();
-		m_craft_timer = BuddyTimer(FACTORYBOT_TIME_BASE, FACTORYBOT_TIME_VARIANCE);
+	{	 		
+		m_state = FactoryBot2State::DISABLED;
+		m_buddy->GetPersistingTools()->GetAllRecipes(m_mixitems);
+		SetSelectItem(0);
 		m_action_timer = BuddyTimer(FACTORYBOT_ACTION_TIME_BASE, FACTORYBOT_ACTION_VARIANCE);
 	}
 
@@ -26,134 +17,282 @@ namespace Features
 	{
 	}
 
+	FeatureType FactoryBot::GetType() const
+	{
+		return FeatureType::FactoryBot;
+	}
+
+	std::string FactoryBot::GetName() const
+	{
+		return "FactoryBot";
+	}
+
 	void FactoryBot::Tick()
 	{
 		if (!IsEnabled()) {
 			return;
 		}
-		bool character_in_factory = (OSR_API->GetCurrentBuildingKind() == BUILDINGKIND_FACTORY);
 
-		if (m_state != FactoryBotState::NOT_IN_FACTORY && !character_in_factory)
+		bool character_in_laboratory = (OSR_API->GetCurrentBuildingKind() == BUILDINGKIND_FACTORY);
+		if (!character_in_laboratory && m_state != FactoryBot2State::DISABLED)
 		{
-			SetFactoryBotState(FactoryBotState::NOT_IN_FACTORY);
+			SetState(FactoryBot2State::DISABLED);
 		}
 
-		switch (GetFactoryBotState())
+		switch (m_state)
 		{
-		case FactoryBotState::NOT_IN_FACTORY:
-			if (character_in_factory) {
-				SetFactoryBotState(FactoryBotState::STANDBY);
+		case Features::FactoryBot2State::DISABLED:
+			if (character_in_laboratory)
+			{
+				SetState(FactoryBot2State::STANDBY);
 			}
 			break;
-
-		case FactoryBotState::STANDBY:
-			m_selected_amount = m_wanted_amount;
-			CalculateFreeInventorySpace();
-			SetMaxAmount();
-			SetRecipe(7036910);
-		case FactoryBotState::CRAFT:
-			if (m_waiting_for_answer) {
-				if (TrySimulateOkButton(LabButtonCode::Ok))
+		case Features::FactoryBot2State::STANDBY:
+			break;
+		case Features::FactoryBot2State::CRAFT:
+			if (m_waiting_for_server)
+			{
+				if (TrySimulateButtonClick(LabButtonCode::Ok))
 				{
-					m_waiting_for_answer = false;
-					m_craft_timer.Reset();
-				}
+					m_waiting_for_server = false;
+					if (!m_auto_craft)
+					{
+						SetState(FactoryBot2State::STANDBY);
+					}
+				}	 				
 			}
 			else
 			{
-				if (m_crafted <= m_selected_amount) {
-					if (DoCrafting(m_walker))
-					{
-						if (m_walker == m_sizeholder) {
-							m_walker = 0;
-							m_crafted += 1;
-							m_waiting_for_answer = true;
-						}
-						else {
-							m_walker++;
-						}
-					}
-				}
-				else
+				if (m_action_timer.IsReady())
 				{
-					SetFactoryBotState(FactoryBotState::STANDBY);
-					break;
+					if (m_ingredient_walker < GetSelectedRecipe().ingredients.size())
+					{
+						const auto& nextingredient = GetSelectedRecipe().ingredients[m_ingredient_walker];
+						CItemInfo* nextitem = OSR_API->FindItemInInventoryByItemNum(nextingredient.itemnumber);
+						if (!nextitem || nextitem->CurrentCount < nextingredient.amount)
+						{
+							SetState(FactoryBot2State::STANDBY);
+							return;
+						}
+
+						OSR_API->InvenToSourceItem(nextitem, nextingredient.amount, true);
+						m_action_timer.Reset();
+						m_ingredient_walker++;
+					}
+					else
+					{
+						TrySimulateButtonClick(LabButtonCode::Send);
+						m_ingredient_walker = 0;
+						m_waiting_for_server = true;
+					}
 				}
 			}
 			break;
+		default:
+			break;
 		}
-	}
 
+	}
 
 	void FactoryBot::RenderImGui()
 	{
-		if (!DrawEnableCheckBox()) {
-			//return;
-		}
+		DrawEnableCheckBox();
 		ImGui::NewLine();
-		ImGui::BeginDisabledMode(m_state == FactoryBotState::NOT_IN_FACTORY || !IsEnabled());
-		{
-			ImGui::BeginGroup();
-			{
-				ImGui::SliderInt("Wanted Amount", &m_wanted_amount, 0, m_max_amount);
-				if (ImGui::Button("Craft"))
-				{
-					if (m_state == FactoryBotState::STANDBY && m_craft_timer.IsReady()) {
-						SetFactoryBotState(FactoryBotState::CRAFT);
+		ImGui::BeginDisabledMode(m_state == FactoryBot2State::DISABLED || !IsEnabled());
+		{				
+			ImGui::BeginColumns("FactoryBot2Columns", 3, ImGuiColumnsFlags_NoResize);
+			{ 
+				ImGui::SetColumnWidth(0, 175);
+				ImGui::SetColumnWidth(1, 350);
+				
+				ImGui::BeginChild("ItemSelectionColumn");
+				{	  					
+					// render mixitems list
+					ImGui::Text("Items:");
+					ImGui::Separator();
+					
+					if (ImGui::ListBoxHeader("##mixitemslist", ImVec2(160, 350)))
+					{
+						for (uint32_t i = 0; i < m_mixitems.size(); i++)
+						{
+							bool selected_idx = (i == m_item_list_selected);
+							std::string name = Utility::string_format("%s##%d", m_mixitems[i].itemname.GetCleanText(), m_mixitems[i].itemnum);
+
+							ImGui::PushStyleColor(ImGuiCol_Text, m_mixitems[i].itemname.GetColor().Value);
+							if (ImGui::Selectable(name.c_str(), &selected_idx, ImGuiSelectableFlags_None) && m_state != FactoryBot2State::CRAFT)
+							{
+								SetSelectItem(i);
+							}
+							ImGui::PopStyleColor();
+						}
+						ImGui::ListBoxFooter();
 					}
+					  
 				}
+				ImGui::EndChild();
+								
 			}
-			ImGui::EndGroup();
+			ImGui::NextColumn();
+			{
+				
+				ImGui::BeginChild("SelectionInformationColumn");
+				{
+					ImGui::Text("Selection Information:");
+					ImGui::Separator();
+
+					ImGui::BeginGroup();
+					//ImGui::BeginChild("RecipeIngredientsList", ImVec2(250, 0));
+					{
+						ImGui::Text("Target item:");
+						ImGui::SameLine();
+						GetSelectedItem().itemname.RenderImGui();
+
+						/*
+						ImGui::Text("Stackable:");
+						ImGui::SameLine();
+						ImGui::Text(GetSelectedItem().stackable ? "Yes" : "No"); 
+						ImGui::NewLine(); 											 				
+						*/
+
+						if (ImGui::BeginComboLeftSidedText("Select recipe:", m_selected_recipe_text.c_str(), ImGuiComboFlags_None))
+						{
+							if (m_mixitems.size() > 0)
+							{ 	
+								for (uint32_t i = 0; i < GetSelectedItem().recipes.size(); i++)
+								{
+									bool selected_idx = (i == m_recipe_list_selected);
+									std::string id = Utility::string_format("Recipe %d: Chance %d%%", i + 1, GetSelectedRecipe().chance); 							
+									if (ImGui::Selectable(id.c_str(), &selected_idx) && m_state != FactoryBot2State::CRAFT)
+									{
+										m_selected_recipe_text = id;
+										m_recipe_list_selected = i;
+										m_ingredient_walker = 0;
+									}
+								}
+							}
+							ImGui::EndCombo();
+						}
+						ImGui::Text("Cost:");
+						ImGui::SameLine();
+						ImGui::Text(std::to_string(GetSelectedRecipe().cost).c_str());
+					}
+					//ImGui::EndChild();
+					ImGui::EndGroup();
+					ImGui::NewLine();
+					ImGui::BeginGroup();
+					//ImGui::BeginChild("RecipeIngredientsList", ImVec2(0, 0));
+					{
+						// render ingredients list
+						ImGui::BeginColumns("Ingredientcolumns", 3, ImGuiColumnsFlags_NoResize);
+						{
+							ImGui::SetColumnWidth(0, 200);
+							ImGui::SetColumnWidth(1, 60);
+							ImGui::Text("Ingredient");
+							ImGui::NextColumn();
+							ImGui::Text("Needed");
+							ImGui::NextColumn();
+							ImGui::Text("Inventory");
+							ImGui::SeparatorEx(ImGuiSeparatorFlags_SpanAllColumns | ImGuiSeparatorFlags_Horizontal);
+							ImGui::NextColumn();
+
+							for (uint32_t i = 0; i < GetSelectedRecipe().ingredients.size(); i++)
+							{
+								GetSelectedRecipe().ingredients[i].itemname.RenderImGui();
+								ImGui::NextColumn();
+
+								std::string amount = std::to_string(GetSelectedRecipe().ingredients[i].amount);
+								ImGui::Text(amount.c_str());
+								ImGui::NextColumn();
+
+								std::string inventory = std::to_string(GetInventoryItemAmount(GetSelectedRecipe().ingredients[i].itemnumber));
+								ImGui::Text(inventory.c_str());
+								ImGui::NextColumn();
+							}
+						}
+						ImGui::EndColumns();
+					}
+					//ImGui::EndChild();
+					ImGui::EndGroup();
+				}
+				ImGui::EndChild();
+				
+			}
+			ImGui::NextColumn();
+			{
+				
+				ImGui::BeginChild("ControlColumn");
+				{
+					ImGui::Text("Control:");
+					ImGui::Separator();
+
+					ImGui::Text("State:");
+					ImGui::SameLine();
+					switch (m_state)
+					{
+					case Features::FactoryBot2State::DISABLED:
+						ImGui::Text("Disabled");
+						break;
+					case Features::FactoryBot2State::STANDBY:
+						ImGui::Text("Standby");
+						break;
+					case Features::FactoryBot2State::CRAFT:
+						ImGui::Text("Crafting");
+						break;
+					default:
+						break;
+					}
+					
+					if(ImGui::Button("Craft"))
+					{
+						SetState(FactoryBot2State::CRAFT);
+					}
+					ImGui::SameLine();
+					ImGui::Checkbox("Auto", &m_auto_craft);
+				}
+				ImGui::EndChild();
+				
+			}
+			ImGui::EndColumns();
 		}
 		ImGui::EndDisabledMode();
 	}
 
-
-	void FactoryBot::SetRecipe(int id) {
-		m_ingredients_for_recipie.clear();
-		m_chosen_recipie = m_cook_book.getRecipie(id);
-		m_ingredients_for_recipie = m_chosen_recipie.ingreds;
-		m_sizeholder = m_ingredients_for_recipie.size();
-		m_stackable = m_chosen_recipie.stackable;
-		CalculateMaxCraftableFromRessources();
+	void FactoryBot::SetState(FactoryBot2State state)
+	{
+		m_state = state;
 	}
 
-	bool FactoryBot::DoCrafting(int walk)
+	uint32_t FactoryBot::GetInventoryItemAmount(uint32_t itemnum)
 	{
-		if (!m_action_timer.IsReady()) {
-			return false;
-		}
-		else {
-			m_action_timer.Reset();
-		}
-
-		CItemInfo* item = nullptr;
-
-		if (walk < m_sizeholder) {
-			item = OSR_API->FindItemInInventoryByItemNum(m_ingredients_for_recipie.at(walk).itemnumber);
-			if (!item)
-			{
-				SetFactoryBotState(FactoryBotState::STANDBY);
-				return false;
-			}
-			OSR_API->InvenToSourceItem(item, m_ingredients_for_recipie.at(walk).amount, true);
-			m_action_timer.Reset();
-			return true;
-		}
-
-		else
+		auto item = OSR_API->FindItemInInventoryByItemNum(itemnum);
+		if (item)
 		{
-			OSR_API->OnButtonClick(TO_INT(LabButtonCode::Send), true);
-			return true;
+			return item->CurrentCount;
 		}
-		return false;
+		return 0;
 	}
 
-	void FactoryBot::DoStackedCrafting()
+	void FactoryBot::SetSelectItem(uint32_t list_idx)
 	{
+		m_item_list_selected = list_idx;
+		m_recipe_list_selected = 0;
+
+		// prefill recipe combo
+		m_selected_recipe_text = Utility::string_format("Recipe %d: Chance %d%%", 1, GetSelectedRecipe().chance);
+		m_ingredient_walker = 0;
 	}
 
-	bool FactoryBot::TrySimulateOkButton(LabButtonCode button)
+	const MixItem& FactoryBot::GetSelectedItem()
+	{
+		return m_mixitems[m_item_list_selected];
+	}
+
+	const Recipe& FactoryBot::GetSelectedRecipe()
+	{
+		return GetSelectedItem().recipes[m_recipe_list_selected];
+	}
+
+	bool FactoryBot::TrySimulateButtonClick(LabButtonCode button)
 	{
 		if (m_action_timer.IsReady())
 		{
@@ -161,75 +300,9 @@ namespace Features
 			m_action_timer.Reset();
 			return true;
 		}
-		else {
+		else 
+		{
 			return false;
 		}
-	}
-
-	void FactoryBot::CalculateFreeInventorySpace()
-	{
-		int maxInvent = OSR_API->GetMaxInventorySize();
-		int inventoryTaken = OSR_API->GetCurrentInventorySize();
-		m_free_invent_space = maxInvent - inventoryTaken - 1;
-	}
-
-	void FactoryBot::CalculateMaxCraftableFromRessources()
-	{
-		UpdateTotalGambleItemAmount();
-		int hold;
-		for (const auto& ingred : m_ingredients_for_recipie) {
-			hold = TO_INT(std::floor(m_ressources_in_inventory.at(ingred.itemnumber) / ingred.amount));
-			if ((m_max_from_ressources == 0 && hold > 0) || hold < m_max_from_ressources)
-			{
-				m_max_from_ressources = hold;
-			}
-		}
-	}
-
-	void FactoryBot::UpdateTotalGambleItemAmount()
-	{
-		m_ressources_in_inventory.clear();
-		for (const auto& ingred : m_ingredients_for_recipie)
-		{
-			m_ressources_in_inventory.insert(std::pair<int, int>(ingred.itemnumber, GetTotalInventoryAmount(ingred.itemnumber)));
-		}
-	}
-
-	int FactoryBot::GetTotalInventoryAmount(int id)
-	{
-		CItemInfo* gambleitem = OSR_API->FindItemInInventoryByItemNum(id);
-
-		return gambleitem->CurrentCount;
-	}
-
-	void FactoryBot::SetMaxAmount()
-	{
-		(m_free_invent_space > m_max_from_ressources) ? m_max_amount = m_max_from_ressources : m_max_amount = m_free_invent_space;
-	}
-
-
-	std::string FactoryBot::GetName() const
-	{
-		return "Eiskrem Machine Alpha";
-	}
-
-	FeatureType FactoryBot::GetType() const
-	{
-		return FeatureType::FactoryBot;
-	}
-
-	void FactoryBot::OnEnable()
-	{
-
-	}
-
-	FactoryBotState FactoryBot::GetFactoryBotState()
-	{
-		return m_state;
-	}
-
-	void FactoryBot::SetFactoryBotState(FactoryBotState state)
-	{
-		m_state = state;
 	}
 }

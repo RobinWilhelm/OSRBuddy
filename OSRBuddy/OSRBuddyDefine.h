@@ -112,6 +112,7 @@ enum class SkillType
 
 enum class SkillType : int
 {
+    Unknown,
     Turnaround,
     Back_Move_Mach,
     Defense_Up,
@@ -163,8 +164,7 @@ enum class SkillType : int
     Invisible,
     Deploy_Chaffs,
     Multitarget_Mode,
-    Ground_Bombing_Mode,
-    Unknown,
+    Ground_Bombing_Mode,      
 };
 
 enum class GearType
@@ -287,7 +287,7 @@ enum class ItemNumber : int
     Square_Watermelon_Gift = 7023970,
     Fantasy_Globe_Mineral_Capsule = 7023480,
     Halloween_Capsule = 1700300,
-
+    Halloween_Staff_Box = 1800210,
 
     WP_Capsule_3 = 7030448,
     WP_Capsule_10 = 7030447,

@@ -26,5 +26,7 @@
 #include "BuddyAPI.h"
 #include "Console.h"
 #include "BuddyTimer.h"
+#include "OSRBuddy.h"
+#include "OSRAPI.h"
 
 #include "SDK/AtumApplication.h"

@@ -17,6 +17,7 @@ ImGuiBase::ImGuiBase()
     m_initialised   = false;
     m_isOpen        = false;
     m_blockInput    = false;
+    m_hWindow       = 0;
 }
 
 ImGuiBase::~ImGuiBase()

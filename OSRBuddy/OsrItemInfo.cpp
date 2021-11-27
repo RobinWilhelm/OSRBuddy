@@ -7,6 +7,8 @@
 
 OsrItemInfo::OsrItemInfo()
 {
+	m_UID = 0;
+	m_item_info = nullptr;
 }
 
 OsrItemInfo::OsrItemInfo(UID64_t uid)

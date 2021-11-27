@@ -58,9 +58,15 @@ namespace Features
         m_currentBS = 0;
         m_nextBS = 0;
         m_selected = false;
+        m_enable_bs_hotswap = false;
+        m_select_swapbs = false;
+        m_swapped = false;
 
+        m_invenmanager = nullptr;
         m_update_mobs_timer = BuddyTimer(UPDATE_GRINDMOBS_TIME);
-        m_toggle_hotkey = 'u';
+        m_vkc_toggle = VK_CONTROL;
+        m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
+        m_wait_for_hotkey = false;
     }   
 
     void GrindBot::Tick()
@@ -200,7 +206,18 @@ namespace Features
 
                     ImGui::Text("Start / Stop hotkey:");
                     ImGui::SameLine();
-                    ImGui::InputTextEx("###togglegrind", 0, &m_toggle_hotkey, 2, ImVec2(15, 0), ImGuiInputTextFlags_None, 0, 0);
+                    if (!m_wait_for_hotkey)
+                    {
+                        ImGui::Text(m_vkc_description.c_str());
+                        ImGui::SameLine();
+                        if (ImGui::Button("Select New")) {
+                            m_wait_for_hotkey = true;
+                        }
+                    }
+                    else
+                    {
+                        ImGui::Text("Waiting for keypress...");
+                    }
 
                     const char* items[] = { "Gear distance", "Crosshair distance" };
                     ImGui::ComboEx("Target Mode:", reinterpret_cast<int*>(&m_target_mode), items, 2, -1, true, 150);
@@ -282,7 +299,8 @@ namespace Features
                                          
                     ImGui::NewLine();
                     ImGui::Checkbox("Activate BS HotSwap", &m_enable_bs_hotswap);
-                    if (m_enable_bs_hotswap) {
+                    if (m_enable_bs_hotswap)
+                    {
                         if (ImGui::Button("Select New"))
                         {
                             m_select_swapbs = true;
@@ -430,11 +448,20 @@ namespace Features
     { 
         switch (msg)
         {
-        case WM_CHAR:
-            if(wParam == m_toggle_hotkey /* && !m_buddy->GetMenu()->IsOpen()*/)
+        case WM_KEYUP:
+            if (m_wait_for_hotkey)
             {
-                ToggleGrinding();
-                return 1;
+                m_vkc_toggle = TO_UINT(wParam);
+                m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
+                m_wait_for_hotkey = false;
+            }
+            else
+            {
+                if (TO_UINT(wParam) == m_vkc_toggle /* && !m_buddy->GetMenu()->IsOpen()*/)
+                {
+                    ToggleGrinding();
+                    return 1;
+                }
             }
         }
         return 0;
@@ -881,7 +908,7 @@ namespace Features
             m_kitbot->Enable(true);
         }
 
-        m_miscfeatures = static_cast<Miscellaneous*>(m_buddy->GetFeatureByType(FeatureType::Miscellaneous));
+        m_miscfeatures = dynamic_cast<Miscellaneous*>(m_buddy->GetFeatureByType(FeatureType::Miscellaneous));
         if (m_miscfeatures)
         {
             m_miscfeatures->Enable(true);
@@ -889,7 +916,7 @@ namespace Features
             m_miscfeatures->ActivateAutoFlip(true);
         }
 
-        m_invenmanager = static_cast<InventoryManager*>(m_buddy->GetFeatureByType(FeatureType::InventoryManager));
+        m_invenmanager = dynamic_cast<InventoryManager*>(m_buddy->GetFeatureByType(FeatureType::InventoryManager));
         if (m_invenmanager)
         {
             m_invenmanager->Enable(true);
