@@ -61,12 +61,14 @@ void PersistingTools::GetAllRecipes(Features::MixItemList& mixitems)
     {
         mixitem.itemnum     = TO_UINT(json_mi["itemDetail"]["ItemNum"]);
         mixitem.itemname    = json_mi["itemDetail"]["Name"];
+        mixitem.recipes.clear();
 
         Features::Recipe recipe;
         for (const auto& json_recipe : json_mi["mixing"])
         {
             recipe.chance   = TO_UINT(json_recipe["Chance"]);
             recipe.cost     = TO_UINT(json_recipe["Cost"]);
+            recipe.ingredients.clear();
 
             Features::Ingredient ingredient;
             for (const auto& json_ingredient : json_recipe["Items"])

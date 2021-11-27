@@ -7,34 +7,7 @@ namespace Features
 {
 	FactoryBot::FactoryBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	{	 		
-		m_state = FactoryBot2State::DISABLED;
-		m_buddy->GetPersistingTools()->GetAllRecipes(m_mixitems);
-		if (m_mixitems.size() > 0)
-		{
-			m_no_recipes_found = false;
-		}
-		else
-		{  			
-			MixItem dummyitem;
-			dummyitem.itemname = "No recipes available.";
-			
-			Recipe dummyrecipe;
-			dummyrecipe.chance = 0;
-			
-			Ingredient dummyingredient;
-			dummyingredient.itemname = "Nothing";
-			dummyingredient.amount = 1337;
-
-			dummyrecipe.ingredients.push_back(dummyingredient);
-			dummyitem.recipes.push_back(dummyrecipe);
-
-			m_mixitems.push_back(dummyitem);
-
-			m_no_recipes_found = true;
-		}
-
-
-		SetSelectItem(0);
+		LoadRecipes();
 		m_action_timer = BuddyTimer(FACTORYBOT_ACTION_TIME_BASE, FACTORYBOT_ACTION_VARIANCE);
 	}
 
@@ -136,7 +109,10 @@ namespace Features
 					ImGui::Text("Items:");
 					ImGui::Separator();
 					
-					if (ImGui::ListBoxHeader("##mixitemslist", ImVec2(160, 350)))
+					if (ImGui::Button("Reload Recipes")) {
+						LoadRecipes();
+					}
+					if (ImGui::ListBoxHeader("##mixitemslist", ImVec2(160, 320)))
 					{
 						for (uint32_t i = 0; i < m_mixitems.size(); i++)
 						{
@@ -295,6 +271,37 @@ namespace Features
 			return item->CurrentCount;
 		}
 		return 0;
+	}
+
+	void FactoryBot::LoadRecipes()
+	{
+		m_mixitems.clear();
+		m_state = FactoryBot2State::DISABLED;
+		m_buddy->GetPersistingTools()->GetAllRecipes(m_mixitems);
+		if (m_mixitems.size() > 0)
+		{
+			m_no_recipes_found = false;
+		}
+		else
+		{
+			MixItem dummyitem;
+			dummyitem.itemname = "No recipes available.";
+
+			Recipe dummyrecipe;
+			dummyrecipe.chance = 0;
+
+			Ingredient dummyingredient;
+			dummyingredient.itemname = "Nothing";
+			dummyingredient.amount = 1337;
+
+			dummyrecipe.ingredients.push_back(dummyingredient);
+			dummyitem.recipes.push_back(dummyrecipe);
+
+			m_mixitems.push_back(dummyitem);
+
+			m_no_recipes_found = true;
+		}
+		SetSelectItem(0);
 	}
 
 	void FactoryBot::SetSelectItem(uint32_t list_idx)

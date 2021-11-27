@@ -30,6 +30,7 @@ namespace Features
 
 		void SetState(FactoryBot2State state);
 		uint32_t GetInventoryItemAmount(uint32_t itemnum);
+		void LoadRecipes();
 		
 		void SetSelectItem(uint32_t list_idx);
 		const MixItem& GetSelectedItem();				// returns currently selected item in the list
