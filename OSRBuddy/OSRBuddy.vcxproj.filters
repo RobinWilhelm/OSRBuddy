@@ -343,9 +343,6 @@
     <ClInclude Include="BuddyTimer.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="CookBook.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Content.h">
       <Filter>Base</Filter>
     </ClInclude>
@@ -487,9 +484,6 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="BuddyTimer.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="CookBook.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="FactoryBot.cpp">

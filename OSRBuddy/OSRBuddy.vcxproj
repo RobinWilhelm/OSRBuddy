@@ -216,7 +216,6 @@
     <ClInclude Include="BuddyAPI.h" />
     <ClInclude Include="BuddyTimer.h" />
     <ClInclude Include="Content.h" />
-    <ClInclude Include="CookBook.h" />
     <ClInclude Include="D3D9Font.h" />
     <ClInclude Include="D3D9Renderer.h" />
     <ClInclude Include="FactoryBot.h" />
@@ -349,7 +348,6 @@
     <ClCompile Include="AntiAntiCheat.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
     <ClCompile Include="BuddyTimer.cpp" />
-    <ClCompile Include="CookBook.cpp" />
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
     <ClCompile Include="FactoryBot.cpp" />
