@@ -209,7 +209,14 @@ namespace Features
 			(m_delete_radars && item->Kind == ITEMKIND_RADAR) ||
 			(m_delete_engines && item->Kind == ITEMKIND_SUPPORT))
 		{
-			// skip all coloured items (boss / unique / oldschool items)
+			if(COMPARE_BIT_FLAG(item->ItemInfo->ItemAttribute, ITEM_ATTR_LEGEND_ITEM) 
+				|| COMPARE_BIT_FLAG(item->ItemInfo->ItemAttribute, ITEM_ATTR_UNIQUE_ITEM)
+				|| COMPARE_BIT_FLAG(item->ItemInfo->ItemAttribute, ITEM_ATTR_QUEST_ITEM))
+			{
+				return false;
+			}
+
+			// double check all coloured items (boss / unique / oldschool items)
 			if (item->ItemInfo->ItemName[0] == '\\') {
 				return false;
 			}

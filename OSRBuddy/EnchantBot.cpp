@@ -646,7 +646,7 @@ namespace Features
 
 	void EnchantBot::RenderStatisticsPopup()
 	{
-		ImGui::SetNextWindowSize(ImVec2(550.0f, 390.0f));
+		ImGui::SetNextWindowSize(ImVec2(550.0f, 420.0f));
 		if (ImGui::BeginPopup("StatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
 		{ 
 			m_statistics_popup_open = true;

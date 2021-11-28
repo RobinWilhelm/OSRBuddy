@@ -11,18 +11,18 @@
 
 struct PacketDebugLog
 {
-	unsigned int total_sent;
-	unsigned int use_energy_sent;
-	unsigned int use_item_sent;
-	unsigned int use_skill_sent;
-	unsigned int cancel_skill_sent;
-	unsigned int throw_away_item_sent;
-	unsigned int sell_item_sent;
-	unsigned int use_randombox_sent;
-	unsigned int change_window_postion_sent;
+	uint32_t total_sent;
+	uint32_t use_energy_sent;
+	uint32_t use_item_sent;
+	uint32_t use_skill_sent;
+	uint32_t cancel_skill_sent;
+	uint32_t throw_away_item_sent;
+	uint32_t sell_item_sent;
+	uint32_t use_randombox_sent;
+	uint32_t change_window_postion_sent;
 
-	unsigned int errors_recieved;
-	unsigned int total_recieved;
+	uint32_t errors_recieved;
+	uint32_t total_recieved;
 };
 
 class IOPacketManager : public IPacketWatcher

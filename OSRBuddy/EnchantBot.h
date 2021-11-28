@@ -8,6 +8,7 @@
 #include "PersistingTools.h"
 #include "OsrItemInfo.h"
 #include "BuddyTimer.h"
+#include "imgui/imgui_addition.h"
 
 #ifdef RELEASE_SETHIA
 #define ENCHANT_TIME_BASE 2200ms		
@@ -190,13 +191,14 @@ namespace Features
 		static std::string GetEnchantItemText(EnchantProtect enchantprotect);
 
 		void SetOptimizedEnchantSettings(bool optimized);
+
 	private:
 		EnchantBotState			m_state;
 		bool					m_auto_enchant;
 		bool					m_optimiseEnchanting;
 		bool					m_withLuckyCard;
 
-		INVEN_DISPLAY_INFO* m_lastSelectedItem;
+		INVEN_DISPLAY_INFO*		m_lastSelectedItem;
 		UID64_t					m_currentEnchantItemUID;
 		bool					m_selectNewEnchantItem;
 		EnchantItemKind			m_enchantTargetKind;

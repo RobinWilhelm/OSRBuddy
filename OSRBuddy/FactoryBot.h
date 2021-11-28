@@ -29,7 +29,6 @@ namespace Features
 		virtual void RenderImGui() override;
 
 		void SetState(FactoryBot2State state);
-		uint32_t GetInventoryItemAmount(uint32_t itemnum);
 		void LoadRecipes();
 		
 		void SetSelectItem(uint32_t list_idx);

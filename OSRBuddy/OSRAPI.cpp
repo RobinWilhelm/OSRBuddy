@@ -122,42 +122,42 @@ bool OldSchoolRivalsAPI::IsShuttleDead()
     return UNIT_STATE_DEAD(m_atumapplication->m_pShuttleChild->m_dwState) ? true : false;  // kekw
 }
 
-int OldSchoolRivalsAPI::GetCurrentEnergy()
+FLOAT OldSchoolRivalsAPI::GetCurrentEnergy()
 {
 	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextHP);
 }
 
-int OldSchoolRivalsAPI::GetCurrentShield()
+FLOAT OldSchoolRivalsAPI::GetCurrentShield()
 {
 	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextDP);
 }
 
-int OldSchoolRivalsAPI::GetMaxEnergy()
+SHORT OldSchoolRivalsAPI::GetMaxEnergy()
 {
 	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.HP;
 }
 
-int OldSchoolRivalsAPI::GetMaxShield()
+SHORT OldSchoolRivalsAPI::GetMaxShield()
 {
 	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.DP;
 }
 
-int OldSchoolRivalsAPI::GetCurrentSkillp()
+FLOAT OldSchoolRivalsAPI::GetCurrentSkillp()
 {
 	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextSP);
 }
 
-int OldSchoolRivalsAPI::GetCurrentFuel()
+FLOAT OldSchoolRivalsAPI::GetCurrentFuel()
 {
 	return TO_INT(m_atumapplication->m_pShuttleChild->m_fNextEP);
 }
 
-int OldSchoolRivalsAPI::GetMaxSkillp()
+SHORT OldSchoolRivalsAPI::GetMaxSkillp()
 {
 	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.SP;
 }
 
-int OldSchoolRivalsAPI::GetMaxFuel()
+SHORT OldSchoolRivalsAPI::GetMaxFuel()
 {
 	return m_atumapplication->m_pShuttleChild->m_myShuttleInfo.EP;
 }
@@ -561,9 +561,9 @@ bool OldSchoolRivalsAPI::IsInBuilding()
 	return m_atumapplication->m_pInterface->m_pCityBase->m_nCurrentEnterBuildingIndex != -1;
 }
 
-int OldSchoolRivalsAPI::GetCurrentBuildingKind()
+BYTE OldSchoolRivalsAPI::GetCurrentBuildingKind()
 {
-	return m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC ? m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC->buildingInfo.BuildingKind : -1;
+	return m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC ? m_atumapplication->m_pInterface->m_pCityBase->m_pCurrentBuildingNPC->buildingInfo.BuildingKind : BUILDINGKIND_NO_BUILDING;
 }
 
 BUILDINGNPC OldSchoolRivalsAPI::GetCurrentBuilding()
@@ -743,6 +743,33 @@ CItemInfo* OldSchoolRivalsAPI::FindItemInInventoryByUniqueNumber(UID64_t hyUniqu
 	return nullptr;
 }
 
+uint32_t OldSchoolRivalsAPI::GetInventoryItemCount(INT itemnum)
+{
+	CStoreData* storedata = m_atumapplication->m_pShuttleChild->m_pStoreData;
+	if (!storedata) {
+		return 0;
+	}
+
+	uint32_t item_counter = 0;
+	CMapItemInventoryIterator it = storedata->m_mapItemUniqueNumber.begin();
+	while (it != storedata->m_mapItemUniqueNumber.end())
+	{
+		if (it->second->ItemNum == itemnum)
+		{
+			if (IS_COUNTABLE_ITEM(it->second->Kind) || IS_SPECIAL_COUNTABLE_ITEM(it->second->Kind))
+			{
+				return it->second->CurrentCount;
+			}
+			else
+			{
+				item_counter++;
+			}
+		}
+		it++;
+	}
+	return item_counter;
+}
+
 void OldSchoolRivalsAPI::UpdateItemCount(UID64_t nUniqueNumber, INT nCount)
 {
 	static 	UpdateItemCountType updateItemCountFn = reinterpret_cast<UpdateItemCountType>(PatternManager::Get(OffsetIdentifier::CStoreData__UpdateItemCount).address);
@@ -831,16 +858,16 @@ bool OldSchoolRivalsAPI::HasPremium()
 	return m_atumapplication->m_PremiumCardInfo.nCardItemNum1 > 0;
 }
 
-int OldSchoolRivalsAPI::GetMaxInventorySize()
+uint32_t OldSchoolRivalsAPI::GetMaxInventorySize()
 {
-	int invspace = SIZE_MAX_ITEM_GENERAL + min(m_atumapplication->m_pShuttleChild->m_myShuttleInfo.RacingPoint & 0xFF, SIZE_MAX_ADDABLE_INVENTORY_COUNT);
+	uint32_t invspace = SIZE_MAX_ITEM_GENERAL + min(m_atumapplication->m_pShuttleChild->m_myShuttleInfo.RacingPoint & 0xFF, SIZE_MAX_ADDABLE_INVENTORY_COUNT);
 	if (HasPremium()) {
 		invspace += COUNT_IN_MEMBERSHIP_ADDED_INVENTORY;
 	}
 	return invspace;
 }
 
-int OldSchoolRivalsAPI::GetCurrentInventorySize()
+uint32_t OldSchoolRivalsAPI::GetCurrentInventorySize()
 {
 	return m_atumapplication->m_pShuttleChild->m_pStoreData->m_mapItemUniqueNumber.size();
 }

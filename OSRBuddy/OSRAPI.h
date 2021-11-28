@@ -32,21 +32,21 @@ public:
 	HWND GetMainWindow();
 	IDirect3DDevice9* GetD3D9Device();
 
-	float GetElapsedTime(); // in seconds
+	FLOAT GetElapsedTime(); // in seconds
 
 	bool IsShuttleDead();
-	int GetCurrentEnergy();
-	int GetCurrentShield();			
-	int GetCurrentSkillp();	 
-	int GetCurrentFuel();
-	int GetMaxEnergy();
-	int GetMaxShield();
-	int GetMaxSkillp();
-	int GetMaxFuel();			   
+	FLOAT GetCurrentEnergy();
+	FLOAT GetCurrentShield();
+	FLOAT GetCurrentSkillp();
+	FLOAT GetCurrentFuel();
+	SHORT GetMaxEnergy();
+	SHORT GetMaxShield();
+	SHORT GetMaxSkillp();
+	SHORT GetMaxFuel();			   
 
 	CItemInfo* GetRadarItemInfo();
-	int GetPrimaryWeaponAmmo();
-	int GetSecondaryWeaponAmmo(); 
+	INT GetPrimaryWeaponAmmo();
+	INT GetSecondaryWeaponAmmo();
 	void UsePrimaryWeapon(bool use);
 	void UseSecondaryWeapon(bool use);
 	// with include_paramfactor = true, range boost like siege mode or goggles will be considered
@@ -72,7 +72,7 @@ public:
 
 	// CINFCityBase
 	bool IsInBuilding();
-	int GetCurrentBuildingKind();
+	BYTE GetCurrentBuildingKind();
 	BUILDINGNPC GetCurrentBuilding();
 	CINFBase* FindBuildingShop(int buildingkind);
 
@@ -99,6 +99,8 @@ public:
 	CItemInfo* FindItemInInventoryByItemNum(INT itemnum, bool find_lowest_time = false);
 	CItemInfo* FindItemInInventoryByItemNum(ItemNumber itemnum, bool find_lowest_time = false);
 	CItemInfo* FindItemInInventoryByUniqueNumber(UID64_t hyUniqueNumber);
+	// returns the count for countable items or the the sum of all noncountable items 
+	uint32_t GetInventoryItemCount(INT itemnum);
 	// WARNING: this only updates the client side!!!! 
 	void UpdateItemCount(UID64_t nUniqueNumber, INT nCount);  
 					
@@ -118,8 +120,8 @@ public:
 	int WritePacket(byte* packet, int length);
 
 	bool HasPremium();
-	int GetMaxInventorySize();
-	int GetCurrentInventorySize();
+	uint32_t GetMaxInventorySize();
+	uint32_t GetCurrentInventorySize();
 	bool IsInventoryFull();	 
 	bool IsLanded();
 	GearType UnitKindToGearType(USHORT unitkind);

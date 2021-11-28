@@ -202,7 +202,7 @@ namespace Features
 								ImGui::Text(amount.c_str());
 								ImGui::NextColumn();
 
-								std::string inventory = std::to_string(GetInventoryItemAmount(GetSelectedRecipe().ingredients[i].itemnumber));
+								std::string inventory = std::to_string(OSR_API->GetInventoryItemCount(GetSelectedRecipe().ingredients[i].itemnumber));
 								ImGui::Text(inventory.c_str());
 								ImGui::NextColumn();
 							}
@@ -261,16 +261,6 @@ namespace Features
 		{
 			m_state = state;
 		}
-	}
-
-	uint32_t FactoryBot::GetInventoryItemAmount(uint32_t itemnum)
-	{
-		auto item = OSR_API->FindItemInInventoryByItemNum(itemnum);
-		if (item)
-		{
-			return item->CurrentCount;
-		}
-		return 0;
 	}
 
 	void FactoryBot::LoadRecipes()

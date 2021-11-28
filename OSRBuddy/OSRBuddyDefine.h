@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 
+#define BUILDINGKIND_NO_BUILDING   (BYTE)255
     
 #define TO_ENUM(enumtype, x) (static_cast<enumtype>(x))
 #define TO_INT(x) (static_cast<int>(x))
