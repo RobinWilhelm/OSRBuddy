@@ -52,12 +52,18 @@ namespace Features
 		std::vector<Ingredient> ingredients;
 	};
 
+	struct RecipeInformation
+	{
+		Recipe recipe;
+		uint32_t craftable;
+	};
+
 	struct MixItem
 	{
 		INT itemnum = 0;
 		//bool stackable;
 		AceColouredString itemname;
-		std::vector<Recipe> recipes;
+		std::vector<RecipeInformation> recipes;
 	};
 
 	using MixItemList = std::vector<MixItem>;

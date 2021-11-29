@@ -106,6 +106,7 @@ public:
 					
 	// CAtumDatabase
 	RARE_ITEM_INFO* GetServerRareItemInfo(int nCodeNum);
+	ITEM* GetServerItemInfo(int nItemNum);
 
 	//CSceneData
 	CUnitData* FindUnitDataByClientIndex(ClientIndex_t nIndex);
@@ -150,6 +151,8 @@ public:
 	bool TrySendSellItem(CItemInfo* item, int count);
 	bool TryDeleteItem(CItemInfo* item, int count);
 
+	bool IsCountableItem(ITEM* item);
+	bool CanInsertItemToInventory(INT itemnum);
 
 private:
 	// collision stuff

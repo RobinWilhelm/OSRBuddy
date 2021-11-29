@@ -28,6 +28,7 @@ enum class OffsetIdentifier
 	CINFInvenExtend__SendChangeWearWindowPos,
 	CINFInven__SetSelectItem,
 	CStoreData__UpdateItemCount,
+	CAtumDatabase__GetServerItemInfo,
 };
 		
 
@@ -59,7 +60,7 @@ public:
 		m_patterninfos.push_back({ OffsetIdentifier::CINFInvenExtend__SendChangeWearWindowPos, "85 D2 74 75 8A 42 3C 84 C0 74 28 3C 01 74 24 3C 02 74 20 3C 03 74 1C", -0x39, nullptr, 6 });
 		m_patterninfos.push_back({ OffsetIdentifier::CINFInven__SetSelectItem, "85 FF 74 51 83 BE 4C 07 00 00 00 75 7C 85 FF 74 44 8B 8E EC 00 00 00", -0x9, nullptr,7 });
 		m_patterninfos.push_back({ OffsetIdentifier::CStoreData__UpdateItemCount, "53 8B 5D 0C 56 57 8B 7D 08 51 8D 4C 24 20", -0x12, nullptr,6 });
-
+		m_patterninfos.push_back({ OffsetIdentifier::CAtumDatabase__GetServerItemInfo, "8D 44 24 24 50 8D 44 24 18 50 8D 4B 14 E8", -0x26, nullptr,8 });
 
 		uintptr_t ace_modulebase = (uintptr_t)GetModuleHandle("ACEonline.atm");
 		if (!ace_modulebase) {

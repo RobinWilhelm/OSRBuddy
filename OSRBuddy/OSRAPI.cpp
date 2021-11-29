@@ -28,6 +28,7 @@ using DeleteSelectItemType = void(__thiscall*)(CINFInvenExtend * ecx, int count)
 using SendChangeWearWindowPosType = void(__thiscall*)(CINFInvenExtend* ecx, int nWindowPosition);
 using SetSelectItemType = void(__thiscall*)(CINFInven* ecx, INVEN_DISPLAY_INFO* pDisplayInfo);
 using UpdateItemCountType = void(__thiscall*)(CStoreData* ecx, UID64_t nUniqueNumber, INT nCount);
+using GetServerItemInfoType = ITEM * (__thiscall*)(CAtumDatabase* ecx, int nItemNum);
 
 
 OldSchoolRivalsAPI* OldSchoolRivalsAPI::instance  = nullptr;
@@ -791,6 +792,17 @@ RARE_ITEM_INFO* OldSchoolRivalsAPI::GetServerRareItemInfo(int nCodeNum)
 	return rif;
 }
 
+ITEM* OldSchoolRivalsAPI::GetServerItemInfo(int nItemNum)
+{
+	static GetServerItemInfoType getServerRareItemInfoFn = reinterpret_cast<GetServerItemInfoType>(PatternManager::Get(OffsetIdentifier::CAtumDatabase__GetServerItemInfo).address);
+	CAtumDatabase* database = m_atumapplication->m_pDatabase;
+	ITEM* item = nullptr;
+	if (getServerRareItemInfoFn && database) {
+		item = getServerRareItemInfoFn(database, nItemNum);
+	}
+	return item;
+}
+
 CUnitData* OldSchoolRivalsAPI::FindUnitDataByClientIndex(ClientIndex_t nIndex)
 {
 	if (m_atumapplication->m_pShuttleChild == NULL)
@@ -1113,6 +1125,29 @@ bool OldSchoolRivalsAPI::TryDeleteItem(CItemInfo* item, int count)
 	}
 
 	DeleteItem(item, count);
+	return true;
+}
+
+bool OldSchoolRivalsAPI::IsCountableItem(ITEM* item)
+{
+	if (item && (IS_COUNTABLE_ITEM(item->Kind) || IS_SPECIAL_COUNTABLE_ITEM(item->Kind)))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool OldSchoolRivalsAPI::CanInsertItemToInventory(INT itemnum)
+{
+	if (GetMaxInventorySize() - GetCurrentInventorySize() <= 0)
+	{
+		// only insert if item is countable	and item is in inventory already
+		CItemInfo* iteminfo = FindItemInInventoryByItemNum(itemnum);
+		if (!iteminfo || !IsCountableItem(iteminfo->ItemInfo))
+		{
+			return false;
+		}
+	}
 	return true;
 }
 

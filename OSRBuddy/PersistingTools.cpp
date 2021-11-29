@@ -77,8 +77,7 @@ void PersistingTools::GetAllRecipes(Features::MixItemList& mixitems)
                 ingredient.itemname     = json_ingredient["Name"];
                 recipe.ingredients.push_back(ingredient);
             }
-
-            mixitem.recipes.push_back(recipe);
+            mixitem.recipes.push_back(Features::RecipeInformation{ recipe, 0 });
         }
         mixitems.push_back(mixitem);
     }

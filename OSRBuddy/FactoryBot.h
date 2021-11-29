@@ -9,7 +9,7 @@
 
 namespace Features
 {
-	enum class FactoryBot2State 
+	enum class FactoryBotState 
 	{
 		DISABLED = 0,
 		STANDBY,
@@ -27,18 +27,22 @@ namespace Features
 		virtual std::string GetName() const override;
 		virtual void Tick() override;
 		virtual void RenderImGui() override;
+		virtual void OnEnable() override;
 
-		void SetState(FactoryBot2State state);
+		void SetState(FactoryBotState state);
 		void LoadRecipes();
 		
 		void SetSelectItem(uint32_t list_idx);
-		const MixItem& GetSelectedItem();				// returns currently selected item in the list
-		const Recipe& GetSelectedRecipe();
+		MixItem& GetSelectedItem();				// returns currently selected item in the list
+		RecipeInformation& GetSelectedRecipeInfo();
 
 		bool TrySimulateButtonClick(LabButtonCode button);
+		uint32_t CalculateMaxCraftableAmount(const Recipe& recipe);
+		bool CanCraftItem(const MixItem& item, uint32_t recipeIdx = -1);
+		void UpdateCraftableStatusAllRecipes();
 
 	private:
-		FactoryBot2State		m_state;
+		FactoryBotState			m_state;
 		bool					m_auto_craft;
 		bool					m_waiting_for_server;
 		uint32_t				m_ingredient_walker;
