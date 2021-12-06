@@ -8,20 +8,24 @@
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_win32.h"   
 
+#include "Utility.h"
 
 #define FEATURE_ACTIVE_TEXTCOL ImColor(0x00, 0xFF, 0x00)
 
 void OSRImGuiMenu::Render()
 {      
     ImGui::SetNextWindowSize(ImVec2(700, 510));                   
+
 #ifdef RELEASE_SETHIA
-    const std::string windowname = "OSRBuddy - customized for Sethia";      
+    std::string releasetype = "customized for Sethia";
 #elif RELEASE
-    const std::string windowname = "OSRBuddy Release";
+    std::string releasetype = "Release" ;
 #elif RELEASE_DEBUG
-    const std::string windowname = "OSRBuddy Debug";
+    std::string releasetype = "Debug";
 #endif // RELEASE_SETHIA   
-    
+
+    const std::string windowname = Utility::string_format("OSRBuddy - %s \tLast built: %s %s", releasetype.c_str(), __DATE__, __TIME__);
+
     ImGui::Begin(windowname.c_str(), &m_isOpen, ImGuiWindowFlags_NoResize);
     {         
         if (ImGui::Button("Unload")) {

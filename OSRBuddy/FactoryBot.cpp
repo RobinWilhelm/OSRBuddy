@@ -9,9 +9,21 @@
 namespace Features
 {
 	FactoryBot::FactoryBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
-	{	 		
+	{
+#ifndef FACTORYBOT_USE_PEDIA_SEARCH
+		// fallback to the recipe file
 		LoadRecipes();
+#endif // !FACTORYBOT_USE_PEDIA_SEARCH
 		m_action_timer = BuddyTimer(FACTORYBOT_ACTION_TIME_BASE, FACTORYBOT_ACTION_VARIANCE);
+
+		// add dummy item if neccessary
+		if (m_mixitems.size() == 0)
+		{
+			m_no_recipes_found = true;
+			//AddDummyItem();
+			//SetSelectItem(0);
+		}
+		m_ongoing_request = false;
 	}
 
 	FactoryBot::~FactoryBot()
@@ -59,12 +71,12 @@ namespace Features
 
 					auto& currentRecipeInfo = GetSelectedRecipeInfo();
 					currentRecipeInfo.craftable = CalculateMaxCraftableAmount(currentRecipeInfo.recipe);
-					
+
 					if (!m_auto_craft || !CanCraftItem(GetSelectedItem(), m_recipe_list_selected))
 					{
 						SetState(FactoryBotState::STANDBY);
 					}
-				}	 				
+				}
 			}
 			else
 			{
@@ -72,7 +84,7 @@ namespace Features
 				{
 					auto& currentRecipeInfo = GetSelectedRecipeInfo();
 					if (m_ingredient_walker < currentRecipeInfo.recipe.ingredients.size())
-					{																 						
+					{
 						const auto& nextingredient = currentRecipeInfo.recipe.ingredients[m_ingredient_walker];
 						CItemInfo* nextitem = OSR_API->FindItemInInventoryByItemNum(nextingredient.itemnumber);
 						if (!nextitem || nextitem->CurrentCount < nextingredient.amount)
@@ -105,28 +117,42 @@ namespace Features
 		DrawEnableCheckBox();
 		ImGui::NewLine();
 		ImGui::BeginDisabledMode(m_state == FactoryBotState::DISABLED || !IsEnabled());
-		{				
-			ImGui::BeginColumns("FactoryBot2Columns", 3, ImGuiColumnsFlags_NoResize);
-			{ 
-				ImGui::SetColumnWidth(0, 175);
-				ImGui::SetColumnWidth(1, 350);
-				
+		{
+			ImGui::BeginColumns("FactoryBot2Columns", 2, ImGuiColumnsFlags_NoResize);
+			{
+				ImGui::SetColumnWidth(0, 250);
+
 				ImGui::BeginChild("ItemSelectionColumn");
-				{	  					
+				{
 					// render mixitems list
 					ImGui::Text("Items:");
 					ImGui::Separator();
-					
+#ifdef FACTORYBOT_USE_PEDIA_SEARCH
+					static char textbuf[40];
+					ImGui::InputText("##pediasearchtext", textbuf, 40);
+					ImGui::SameLine();
+					ImGui::BeginDisabledMode(m_ongoing_request);
+					{
+						if (ImGui::Button("Search"))
+						{
+							ClearRecipes();
+							m_buddy->GetPediaApi()->ItemDetailRequestAsync(std::string(textbuf, 40), std::bind(&FactoryBot::ItemSearchCallback, this, std::placeholders::_1, std::placeholders::_2));
+							m_ongoing_request = true;
+						}
+					}
+					ImGui::EndDisabledMode();
+#else				 					
 					if (ImGui::Button("Reload Recipes")) {
 						LoadRecipes();
-					}
-					if (ImGui::ListBoxHeader("##mixitemslist", ImVec2(160, 320)))
+					} 										
+#endif
+					if (ImGui::ListBoxHeader("##mixitemslist", ImVec2(240, 320)))
 					{
 						for (uint32_t i = 0; i < m_mixitems.size(); i++)
 						{
 							bool selected_idx = (i == m_item_list_selected);
-							std::string name = Utility::string_format("%s##%d", m_mixitems[i].itemname.GetCleanText(), m_mixitems[i].itemnum);
-
+							std::string name = Utility::string_format("%s", m_mixitems[i].itemname.GetCleanText().c_str());
+							//std::string name = Utility::string_format("%s##%d", m_mixitems[i].itemname.GetCleanText(), m_mixitems[i].itemnum);
 							ImGui::PushStyleColor(ImGuiCol_Text, m_mixitems[i].itemname.GetColor().Value);
 							if (ImGui::Selectable(name.c_str(), &selected_idx, ImGuiSelectableFlags_None) && m_state != FactoryBotState::CRAFT)
 							{
@@ -135,15 +161,15 @@ namespace Features
 							ImGui::PopStyleColor();
 						}
 						ImGui::ListBoxFooter();
-					}					  
+					}
 				}
-				ImGui::EndChild(); 								
+				ImGui::EndChild();
 			}
 			ImGui::NextColumn();
-			{	   				
+			{
 				ImGui::BeginChild("SelectionInformationColumn");
 				{
-					ImGui::Text("Selection Information:");
+					ImGui::Text("Recipe Information:");
 					ImGui::Separator();
 
 					ImGui::BeginGroup();
@@ -151,20 +177,31 @@ namespace Features
 					{
 						ImGui::Text("Target item:");
 						ImGui::SameLine();
-						GetSelectedItem().itemname.RenderImGui();
+						if (!m_no_recipes_found)
+						{
+							GetSelectedItem().itemname.RenderImGui();
+						}
+						else
+						{
+							ImGui::Text("...");
+						}
+
 						ImGui::NewLine();
 						/*
 						ImGui::Text("Stackable:");
 						ImGui::SameLine();
-						ImGui::Text(GetSelectedItem().stackable ? "Yes" : "No"); 
-						ImGui::NewLine(); 											 				
+						ImGui::Text(GetSelectedItem().stackable ? "Yes" : "No");
+						ImGui::NewLine();
 						*/
 						ImGui::Text("Select recipe:");
-						ImGui::PushStyleColor(ImGuiCol_Text, (GetSelectedRecipeInfo().craftable > 0) ? RECIPE_CRAFTABLE_TEXTCOL.Value : RECIPE_NOT_CRAFTABLE_TEXTCOL.Value);
+						if (!m_no_recipes_found)
+						{
+							ImGui::PushStyleColor(ImGuiCol_Text, (GetSelectedRecipeInfo().craftable > 0) ? RECIPE_CRAFTABLE_TEXTCOL.Value : RECIPE_NOT_CRAFTABLE_TEXTCOL.Value);
+						}  		
 						if (ImGui::BeginComboLeftSidedText("##SelectRecipeCombo", m_selected_recipe_text.c_str(), ImGuiComboFlags_None))
 						{
-							if (m_mixitems.size() > 0)
-							{ 	
+							if (!m_no_recipes_found)
+							{
 								const auto& allRecipes = GetSelectedItem().recipes;
 								for (uint32_t i = 0; i < allRecipes.size(); i++)
 								{
@@ -178,72 +215,113 @@ namespace Features
 										m_selected_recipe_text = id;
 										m_recipe_list_selected = i;
 										m_ingredient_walker = 0;
-									}  								
+									}
 									ImGui::PopStyleColor();
 								}
 							}
 							ImGui::EndCombo();
 						}
-						ImGui::PopStyleColor();
-
+						if (!m_no_recipes_found)
+						{
+							ImGui::PopStyleColor();
+						}
 						ImGui::Text("Chance:");
 						ImGui::SameLine();
-						ImGui::Text((std::to_string(GetSelectedRecipeInfo().recipe.chance) + "%%").c_str());
-					}
-					//ImGui::EndChild();
-					ImGui::EndGroup();
-					ImGui::NewLine();
-					ImGui::BeginGroup();
-					//ImGui::BeginChild("RecipeIngredientsList", ImVec2(0, 0));
-					{
-						// render ingredients list
-						ImGui::BeginColumns("Ingredientcolumns", 3, ImGuiColumnsFlags_NoResize);
+						if (!m_no_recipes_found)
 						{
-							ImGui::SetColumnWidth(0, 180);
-							ImGui::SetColumnWidth(1, 70);
-							ImGui::Text("Ingredient");
-							ImGui::NextColumn();
-							ImGui::Text("Needed");
-							ImGui::NextColumn();
-							ImGui::Text("Inventory");
-							ImGui::SeparatorEx(ImGuiSeparatorFlags_SpanAllColumns | ImGuiSeparatorFlags_Horizontal);
-							ImGui::NextColumn();
-
-							ImGui::Text("SPI");
-							ImGui::NextColumn();
-
-							ImGui::Text(std::to_string(GetSelectedRecipeInfo().recipe.cost).c_str());
-							ImGui::NextColumn();
-
-							ImGui::Text(std::to_string(OSR_API->GetInventorySPI()).c_str());
-							ImGui::NextColumn();
-
-
-							for (uint32_t i = 0; i < GetSelectedRecipeInfo().recipe.ingredients.size(); i++)
-							{
-								GetSelectedRecipeInfo().recipe.ingredients[i].itemname.RenderImGui();
-								ImGui::NextColumn();
-
-								std::string amount = std::to_string(GetSelectedRecipeInfo().recipe.ingredients[i].amount);
-								ImGui::Text(amount.c_str());
-								ImGui::NextColumn();
-
-								std::string inventory = std::to_string(OSR_API->GetInventoryItemCount(GetSelectedRecipeInfo().recipe.ingredients[i].itemnumber));
-								ImGui::Text(inventory.c_str());
-								ImGui::NextColumn();
-							}
+							ImGui::Text((std::to_string(GetSelectedRecipeInfo().recipe.chance) + "%%").c_str());
 						}
-						ImGui::EndColumns();
 					}
 					//ImGui::EndChild();
-					ImGui::EndGroup();
+					ImGui::EndGroup();	 	
+
+					ImGui::NewLine();
+					if (!m_no_recipes_found)
+					{
+						ImGui::BeginGroup();
+						//ImGui::BeginChild("RecipeIngredientsList", ImVec2(0, 0));
+						{
+							// render ingredients list
+							ImGui::BeginColumns("Ingredientcolumns", 3, ImGuiColumnsFlags_NoResize);
+							{
+								ImGui::SetColumnWidth(0, 250);
+								ImGui::SetColumnWidth(1, 80);
+								ImGui::SetColumnWidth(1, 80);
+								ImGui::Text("Ingredient");
+								ImGui::NextColumn();
+								ImGui::Text("Needed");
+								ImGui::NextColumn();
+								ImGui::Text("Inventory");
+								ImGui::SeparatorEx(ImGuiSeparatorFlags_SpanAllColumns | ImGuiSeparatorFlags_Horizontal);
+								ImGui::NextColumn();
+
+								ImGui::Text("SPI");
+								ImGui::NextColumn();
+								ImGui::Text(std::to_string(GetSelectedRecipeInfo().recipe.cost).c_str());
+
+								ImGui::NextColumn();
+
+								ImGui::Text(std::to_string(OSR_API->GetInventorySPI()).c_str());
+								ImGui::NextColumn();
+
+
+								for (uint32_t i = 0; i < GetSelectedRecipeInfo().recipe.ingredients.size(); i++)
+								{
+									GetSelectedRecipeInfo().recipe.ingredients[i].itemname.RenderImGui();
+									ImGui::NextColumn();
+
+									std::string amount = std::to_string(GetSelectedRecipeInfo().recipe.ingredients[i].amount);
+									ImGui::Text(amount.c_str());
+									ImGui::NextColumn();
+
+									std::string inventory = std::to_string(OSR_API->GetInventoryItemCount(GetSelectedRecipeInfo().recipe.ingredients[i].itemnumber));
+									ImGui::Text(inventory.c_str());
+									ImGui::NextColumn();
+								}
+							}
+							ImGui::EndColumns();
+						}
+						//ImGui::EndChild();
+						ImGui::EndGroup();
+					}
+
+					ImGui::NewLine();
+
+					ImGui::Text("Control:");
+					ImGui::Separator();
+
+					ImGui::Text("Status:");
+					ImGui::SameLine();
+					switch (m_state)
+					{
+					case Features::FactoryBotState::DISABLED:
+						ImGui::Text("Disabled");
+						break;
+					case Features::FactoryBotState::STANDBY:
+						ImGui::Text("Standby");
+						break;
+					case Features::FactoryBotState::CRAFT:
+						ImGui::Text("Crafting");
+						break;
+					default:
+						break;
+					}
+
+					if (ImGui::Button("Mix Items") && !m_no_recipes_found)
+					{
+						SetState(FactoryBotState::CRAFT);
+					}
+					ImGui::SameLine();
+					ImGui::Checkbox("Auto", &m_auto_craft);
+
 				}
 				ImGui::EndChild();
-				
+
 			}
+			/*
 			ImGui::NextColumn();
 			{
-				
+
 				ImGui::BeginChild("ControlColumn");
 				{
 					ImGui::Text("Control:");
@@ -265,17 +343,16 @@ namespace Features
 					default:
 						break;
 					}
-					
-					if(ImGui::Button("Craft") && !m_no_recipes_found)
+					ImGui::Checkbox("Auto", &m_auto_craft);
+					if (ImGui::Button("Craft") && !m_no_recipes_found)
 					{
 						SetState(FactoryBotState::CRAFT);
 					}
-					ImGui::SameLine();
-					ImGui::Checkbox("Auto", &m_auto_craft);
 				}
 				ImGui::EndChild();
-				
+
 			}
+			*/
 			ImGui::EndColumns();
 		}
 		ImGui::EndDisabledMode();
@@ -291,15 +368,12 @@ namespace Features
 	{
 		switch (state)
 		{
-		case Features::FactoryBotState::DISABLED:  
+		case Features::FactoryBotState::DISABLED:
 			Enable(false);
-			m_state = state;	 		
+			m_state = state;
 			break;
 		case Features::FactoryBotState::STANDBY:
-			if (!m_no_recipes_found)
-			{  				
-				m_state = state;
-			}
+			m_state = state;
 			break;
 		case Features::FactoryBotState::CRAFT:
 			if (CanCraftItem(GetSelectedItem(), m_recipe_list_selected))
@@ -324,24 +398,17 @@ namespace Features
 		}
 		else
 		{
+
 			m_no_recipes_found = true;
-
-			MixItem dummyitem;
-			dummyitem.itemname = "No recipes available.";
-
-			Recipe dummyrecipe;
-			dummyrecipe.chance = 0;
-
-			Ingredient dummyingredient;
-			dummyingredient.itemname = "Nothing";
-			dummyingredient.amount = 1337;
-
-			dummyrecipe.ingredients.push_back(dummyingredient);
-			dummyitem.recipes.push_back(RecipeInformation{ dummyrecipe, false });
-
-			m_mixitems.push_back(dummyitem);
+			AddDummyItem();
 		}
 		SetSelectItem(0);
+	}
+
+	void FactoryBot::ClearRecipes()
+	{
+		m_no_recipes_found = true;
+		m_mixitems.clear();
 	}
 
 	void FactoryBot::SetSelectItem(uint32_t list_idx)
@@ -350,7 +417,15 @@ namespace Features
 		m_recipe_list_selected = 0;
 
 		// prefill recipe combo
-		m_selected_recipe_text = Utility::string_format("Recipe %d: Craftable: %d", 1, GetSelectedRecipeInfo().craftable);
+		if (!m_no_recipes_found)
+		{
+			m_selected_recipe_text = Utility::string_format("Recipe %d: Craftable: %d", 1, GetSelectedRecipeInfo().craftable);
+		}
+		else
+		{
+			m_selected_recipe_text = Utility::string_format("Recipe %d: Craftable: %d", 0, 0);
+		}
+
 		m_ingredient_walker = 0;
 	}
 
@@ -372,7 +447,7 @@ namespace Features
 			m_action_timer.Reset();
 			return true;
 		}
-		else 
+		else
 		{
 			return false;
 		}
@@ -403,7 +478,11 @@ namespace Features
 			}
 		}
 
-		checkMaxCraftable(OSR_API->GetInventorySPI() / recipe.cost);
+		if (recipe.cost > 0)
+		{
+			checkMaxCraftable(OSR_API->GetInventorySPI() / recipe.cost);
+		}
+
 		return max_craftable_amount;
 	}
 
@@ -416,7 +495,7 @@ namespace Features
 
 		if (recipeIdx != -1)
 		{
-			const auto& recipe = item.recipes.at(recipeIdx);  		
+			const auto& recipe = item.recipes.at(recipeIdx);
 			if (!recipe.craftable)
 			{
 				return false;
@@ -444,5 +523,87 @@ namespace Features
 				recipeinfo.craftable = CalculateMaxCraftableAmount(recipeinfo.recipe);
 			}
 		}
+	}
+
+	void FactoryBot::ItemSearchCallback(bool success, std::vector<nlohmann::json>& results)
+	{
+		for (auto& itemdetails : results)
+		{
+			Features::MixItem mixitem;
+			const auto& json_mi = itemdetails["pedia"];
+
+			if (json_mi.find("mixing") != json_mi.end())
+			{
+				mixitem.itemnum = TO_INT(json_mi["itemDetail"]["ItemNum"]);
+				mixitem.itemname = json_mi["itemDetail"]["Name"];
+				mixitem.recipes.clear();
+
+				Features::Recipe recipe;
+				
+				for (const auto& json_recipe : json_mi["mixing"])
+				{
+					recipe.chance = TO_UINT(json_recipe["Chance"]);
+					recipe.cost = TO_UINT(json_recipe["Cost"]);
+					recipe.ingredients.clear();
+
+					bool has_null = false;
+					Features::Ingredient ingredient;
+					for (const auto& json_ingredient : json_recipe["Items"])
+					{
+						if (json_ingredient["Name"].is_null())
+						{
+							has_null = true;
+							break;
+						}
+						ingredient.itemname = json_ingredient["Name"];
+						ingredient.itemnumber = TO_INT(json_ingredient["Num"]);
+						ingredient.amount = TO_UINT(json_ingredient["Count"]);
+						recipe.ingredients.push_back(ingredient);						
+					}
+
+					if (recipe.ingredients.size() > 0 && !has_null)
+					{
+						mixitem.recipes.push_back(Features::RecipeInformation{ recipe, 0 });
+					}
+				}
+				if (mixitem.recipes.size() > 0)
+				{
+					m_mixitems.push_back(mixitem);
+				}
+			}
+
+		}
+
+		if (m_mixitems.size() > 0)
+		{
+			UpdateCraftableStatusAllRecipes();
+			SetSelectItem(0);
+			m_no_recipes_found = false;
+		}
+		else
+		{
+			m_no_recipes_found = true;
+		}
+		m_ongoing_request = false;
+	}
+
+	void FactoryBot::AddDummyItem()
+	{
+		m_no_recipes_found = true;
+
+		MixItem dummyitem;
+		dummyitem.itemname = "No recipes available.";
+
+		Recipe dummyrecipe;
+		dummyrecipe.chance = 0;
+
+		Ingredient dummyingredient;
+		dummyingredient.itemname = "Nothing";
+		dummyingredient.amount = 1337;
+
+		dummyrecipe.ingredients.push_back(dummyingredient);
+		dummyitem.recipes.push_back(RecipeInformation{ dummyrecipe, false });
+
+		m_mixitems.push_back(dummyitem);
 	}
 }

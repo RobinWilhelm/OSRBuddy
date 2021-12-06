@@ -3,11 +3,6 @@
 #include <windows.h>
 #include <vector>
 #include <algorithm>
-#include <Ntstatus.h>
-
-
-
-
 
 void AntiAntiCheat::ManualFreeLibraryAndExitThread(LPVOID imageBase, SIZE_T imageSize, DWORD exitCode)
 {
@@ -177,7 +172,7 @@ bool AntiAntiCheat::PatchDebugFlag()
         PNtQueryInformationProcess fnNtQueryInforamtionProcess = (PNtQueryInformationProcess)GetProcAddress(hNtDll, "NtQueryInformationProcess");
         if (fnNtQueryInforamtionProcess)
         {
-            if (STATUS_SUCCESS == fnNtQueryInforamtionProcess(GetCurrentProcess(), 0/*ProcessBasicInformation*/, &pbi, sizeof(PROCESS_BASIC_INFORMATION), &returnlength))
+            if (0 == fnNtQueryInforamtionProcess(GetCurrentProcess(), 0/*ProcessBasicInformation*/, &pbi, sizeof(PROCESS_BASIC_INFORMATION), &returnlength))
             {
                 initialized = true;
             }

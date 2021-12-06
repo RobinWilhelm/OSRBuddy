@@ -397,6 +397,12 @@
     <ClInclude Include="Structs.h">
       <Filter>Features</Filter>
     </ClInclude>
+    <ClInclude Include="Httplib.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="OSRPediaApi.h">
+      <Filter>Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -507,6 +513,9 @@
     <ClCompile Include="BuddyFeatureBase.cpp">
       <Filter>Base</Filter>
     </ClCompile>
+    <ClCompile Include="OSRPediaApi.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDK\d3dx9math.inl">
@@ -515,6 +524,7 @@
     <None Include="SDK\d3dxmath.inl">
       <Filter>SDK</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="imgui\LICENSE.txt">

@@ -79,9 +79,14 @@ void AceColouredString::SetString(const std::string& text, ImColor defaultcol)
 	{
 		m_ace_color = TranslateAceCharToColor(m_original_text[1]);
 		m_text.erase(m_text.begin(), m_text.begin() + 2);
+
 		if (m_original_text[m_original_text.length() - 2] == '\\')
 		{
 			m_text.erase(m_text.end() - 2, m_text.end());
+		}
+		else if (m_original_text[m_original_text.length() - 3] == '\\')
+		{
+			m_text.erase(m_text.end() - 3, m_text.end());
 		}
 	}
 	else

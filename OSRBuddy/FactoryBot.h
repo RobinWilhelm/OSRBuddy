@@ -2,10 +2,15 @@
 #include "BuddyFeatureBase.h"
 #include "imgui/imgui_addition.h"
 #include "AceColouredString.h"
-#include "Structs.h"			  
+#include "Structs.h"		
+
+#include "Httplib.h"
 
 #define FACTORYBOT_ACTION_TIME_BASE 300ms	// button clicks and item movement
 #define FACTORYBOT_ACTION_VARIANCE 500ms	
+
+#define FACTORYBOT_USE_PEDIA_SEARCH
+
 
 namespace Features
 {
@@ -31,6 +36,7 @@ namespace Features
 
 		void SetState(FactoryBotState state);
 		void LoadRecipes();
+		void ClearRecipes();
 		
 		void SetSelectItem(uint32_t list_idx);
 		MixItem& GetSelectedItem();				// returns currently selected item in the list
@@ -40,6 +46,11 @@ namespace Features
 		uint32_t CalculateMaxCraftableAmount(const Recipe& recipe);
 		bool CanCraftItem(const MixItem& item, uint32_t recipeIdx = -1);
 		void UpdateCraftableStatusAllRecipes();
+		
+		void ItemSearchCallback(bool success, std::vector<nlohmann::json>& results);
+
+	private:
+		void AddDummyItem();
 
 	private:
 		FactoryBotState			m_state;
@@ -54,5 +65,8 @@ namespace Features
 		bool					m_no_recipes_found;
 
 		std::string				m_selected_recipe_text;
+
+		char					m_pedia_search_string[40];
+		std::atomic<bool>		m_ongoing_request;
 	};
 }

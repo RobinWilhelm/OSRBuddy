@@ -123,6 +123,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake />
   </ItemDefinitionGroup>
@@ -150,6 +152,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake />
   </ItemDefinitionGroup>
@@ -177,6 +181,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake />
   </ItemDefinitionGroup>
@@ -203,6 +209,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake />
   </ItemDefinitionGroup>
@@ -222,6 +230,7 @@
     <ClInclude Include="FeatureTypes.h" />
     <ClInclude Include="GambleFixes.h" />
     <ClInclude Include="Features.h" />
+    <ClInclude Include="Httplib.h" />
     <ClInclude Include="ImComboBox.h" />
     <ClInclude Include="imgui\fa_solid_900.h" />
     <ClInclude Include="imgui\font_awesome_5.h" />
@@ -259,6 +268,7 @@
     <ClInclude Include="MarsenneTwister.h" />
     <ClInclude Include="OSRBuddyDefine.h" />
     <ClInclude Include="KitBot.h" />
+    <ClInclude Include="OSRPediaApi.h" />
     <ClInclude Include="PatternManager.h" />
     <ClInclude Include="OSRAPI.h" />
     <ClInclude Include="OSRBuddy.h" />
@@ -388,6 +398,7 @@
     <ClCompile Include="OSRAPI.cpp" />
     <ClCompile Include="OSRBuddy.cpp" />
     <ClCompile Include="OSRImGuiMenu.cpp" />
+    <ClCompile Include="OSRPediaApi.cpp" />
     <ClCompile Include="PatternManager.cpp" />
     <ClCompile Include="PersistingTools.cpp" />
     <ClCompile Include="TestItemUse.cpp" />
@@ -401,6 +412,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="SDK\d3dx9math.inl" />
     <None Include="SDK\d3dxmath.inl" />
   </ItemGroup>
@@ -409,5 +421,12 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\zeroc.openssl.v142.1.1.1\build\native\zeroc.openssl.v142.targets" Condition="Exists('..\packages\zeroc.openssl.v142.1.1.1\build\native\zeroc.openssl.v142.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\zeroc.openssl.v142.1.1.1\build\native\zeroc.openssl.v142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zeroc.openssl.v142.1.1.1\build\native\zeroc.openssl.v142.targets'))" />
+  </Target>
 </Project>

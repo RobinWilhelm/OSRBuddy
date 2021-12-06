@@ -47,8 +47,8 @@ namespace Features
 
 	struct Recipe
 	{
-		uint16_t chance = 0;
-		uint16_t cost = 0;
+		uint32_t chance = 0;
+		uint32_t cost = 0;
 		std::vector<Ingredient> ingredients;
 	};
 

@@ -3,6 +3,8 @@
 #include "D3DInternalBase.h"
 #include "FeatureTypes.h"
 
+#include "OSRPediaApi.h"
+
 #include <vector>
 #include <chrono>
 
@@ -77,6 +79,7 @@ public:
 
 	PersistingTools* GetPersistingTools()	{ return m_persistingTools.get(); };
 	IOPacketManager* GetPacketManager()		{ return m_packetmanager.get(); };
+	const OSRPediaApi* GetPediaApi()		{ return m_pedia_api.get(); };
 
 private:
 	void static MessageBoxThreadFunction(std::string message, std::string header, NotifyType type, std::function<void(int)> callback = nullptr);
@@ -155,4 +158,6 @@ private:
 	bool m_block_mouse;
 
 	std::unique_ptr<IOPacketManager> m_packetmanager;
+
+	std::unique_ptr<OSRPediaApi> m_pedia_api;
 };

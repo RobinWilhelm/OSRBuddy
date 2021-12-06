@@ -8,7 +8,7 @@
 #ifndef _SOCKET_HEADER_H_
 #define _SOCKET_HEADER_H_
 
-//#include <winsock2.h>
+#include <winsock2.h>
 #include <Mmsystem.h>
 
 #pragma comment(lib, "Ws2_32.lib")

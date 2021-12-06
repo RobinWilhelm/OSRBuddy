@@ -177,6 +177,8 @@ bool OSRBuddyMain::Start()
             throw exception("Structures outdated");
         }
 
+        m_pedia_api = std::make_unique<OSRPediaApi>();
+
         if (!IsWindow(OSR_API->GetMainWindow()))  {
             throw exception("Structures outdated");
         }
