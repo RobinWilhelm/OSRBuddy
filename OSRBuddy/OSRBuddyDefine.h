@@ -738,7 +738,7 @@ enum class MonsterUnitKind : unsigned int
 
     Scout_Guard_Ani = 2030100,
 
-    // bosses
+    // useless bosses (not complete list)
     ESP_Crystal = 2050500,
     ESP_Crystal_2 = 2053100,
     Gigantic_God_Heart = 2039100,
@@ -748,5 +748,49 @@ enum class MonsterUnitKind : unsigned int
     Shrine_Laboratory_2 = 2051100,
     Symbol_of_Vatallus = 2083700,
     Crazy_Orbituary = 2097900,
+    Unfinished_Ordin_2 = 2035300,
+
+    
+    // the USEFULL bosses (should be complete)
+    // pandea bosses
     Black_Widow = 2065700,
+    Echelon = 2063700,
+    Guardian_of_Vatallus = 2063500,
+
+    // EP2 bosses
+    Unfinished_Ordin = 2035300,
+    Messenger = 2004900,
+    Energy_Core = 2053700,
+    Mountain_Sage = 2035700,
+    Mountain_Sage_2 = 2004400,
+    Mountain_Sage_3 = 2020200,
+    Pathos = 2033500,
+    Pathos_2 = 2035400,
+    Prog_Military_Base = 2011500,
+    Nipar_Bridge = 2047400,
+    Shirne = 2013200,
+    Shirne_2 = 2035500, // probably not used
+    Hornian_Queen = 2035600,
+    Hornian_Queen_2 = 2003200,
+    Hornian_King = 2015100,
+    Hornian_King_2 = 2015300,
+    Hornian_King_3 = 2035800,
+    Quetzalcoatl = 2051200,
+    Gryphon = 2049800,
+    Rock_Emperor = 2050400,
+    Rock_Emperor_2 = 2053000, // no boss items
+    Egma_Schill = 2010600,
+    Skadi = 2038900,
+    Ordin = 2004700,
+    Gigantic_God = 2039000,
+    Bishop_Blue = 2040200,
+    Bishop_Black = 2040300,
+    Bishop_Red = 2040400,
+    Sekhmete = 2041300,
+
+    // OSR specific bosses
+    Murena = 2062600,
+    Skarish = 2004600,
+    Fx_01 = 2088100,
+    InvasionLeadSpider = 2113500,
 };

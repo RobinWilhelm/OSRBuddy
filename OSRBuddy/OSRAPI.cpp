@@ -918,6 +918,53 @@ int OldSchoolRivalsAPI::GetInventorySPI()
 
 bool OldSchoolRivalsAPI::IsGoodBossMonster(CMonsterData* monster)
 {
+	if (monster && monster->m_pMonsterInfo)
+	{
+		switch (TO_ENUM(MonsterUnitKind, monster->m_pMonsterInfo->MonsterUnitKind))
+		{  		
+		case MonsterUnitKind::Black_Widow:
+		case MonsterUnitKind::Echelon:
+		case MonsterUnitKind::Guardian_of_Vatallus:
+		case MonsterUnitKind::Unfinished_Ordin:
+		case MonsterUnitKind::Messenger:
+		case MonsterUnitKind::Energy_Core:
+		case MonsterUnitKind::Mountain_Sage:
+		case MonsterUnitKind::Mountain_Sage_2:
+		case MonsterUnitKind::Mountain_Sage_3:
+		case MonsterUnitKind::Pathos:
+		case MonsterUnitKind::Pathos_2:
+		case MonsterUnitKind::Prog_Military_Base:
+		case MonsterUnitKind::Nipar_Bridge:
+		case MonsterUnitKind::Shirne:
+		case MonsterUnitKind::Shirne_2:
+		case MonsterUnitKind::Hornian_Queen:
+		case MonsterUnitKind::Hornian_Queen_2:
+		case MonsterUnitKind::Hornian_King:
+		case MonsterUnitKind::Hornian_King_2:
+		case MonsterUnitKind::Hornian_King_3:
+		case MonsterUnitKind::Quetzalcoatl:
+		case MonsterUnitKind::Gryphon:
+		case MonsterUnitKind::Rock_Emperor:
+		case MonsterUnitKind::Rock_Emperor_2:
+		case MonsterUnitKind::Egma_Schill:
+		case MonsterUnitKind::Skadi:
+		case MonsterUnitKind::Ordin:
+		case MonsterUnitKind::Gigantic_God:
+		case MonsterUnitKind::Bishop_Blue:
+		case MonsterUnitKind::Bishop_Black:
+		case MonsterUnitKind::Bishop_Red:
+		case MonsterUnitKind::Sekhmete:
+		case MonsterUnitKind::Murena:
+		case MonsterUnitKind::Skarish:
+		case MonsterUnitKind::Fx_01:
+		case MonsterUnitKind::InvasionLeadSpider:
+			return true;
+		}
+	}
+	return false;
+
+	// sadly the game is too inconsitent to get the bosses like this:
+	/* 	
 	if (COMPARE_MPOPTION_BIT(monster->m_pMonsterInfo->MPOption, MPOPTION_BIT_BOSS_MONSTER)
 		|| monster->m_pMonsterInfo->MonsterUnitKind == static_cast<int>(MonsterUnitKind::Black_Widow)) // black widow is not marked as a boss
 	{
@@ -940,6 +987,7 @@ bool OldSchoolRivalsAPI::IsGoodBossMonster(CMonsterData* monster)
 	}
 
 	return false;
+	*/
 }
 
 bool OldSchoolRivalsAPI::PlayerIsInSellBuilding()

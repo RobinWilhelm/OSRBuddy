@@ -226,6 +226,7 @@
     <ClInclude Include="Content.h" />
     <ClInclude Include="D3D9Font.h" />
     <ClInclude Include="D3D9Renderer.h" />
+    <ClInclude Include="ESP.h" />
     <ClInclude Include="FactoryBot.h" />
     <ClInclude Include="FeatureTypes.h" />
     <ClInclude Include="GambleFixes.h" />
@@ -360,6 +361,7 @@
     <ClCompile Include="BuddyTimer.cpp" />
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
+    <ClCompile Include="ESP.cpp" />
     <ClCompile Include="FactoryBot.cpp" />
     <ClCompile Include="ImComboBox.cpp" />
     <ClCompile Include="InventoryManager.cpp" />

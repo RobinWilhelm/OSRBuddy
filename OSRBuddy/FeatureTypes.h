@@ -14,6 +14,6 @@ namespace Features
 		DebugInfo,
 		Miscellaneous,
 		InventoryManager,
-		FactoryBot2
+		ESP
 	};
 }

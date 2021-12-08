@@ -223,6 +223,42 @@ namespace Features
 						ImGui::Separator();
 
 						ImGui::NewLine();
+
+						ImGui::BeginColumns("GambleItemsColumns", 3, ImGuiColumnsFlags_NoResize);
+						{
+							ImGui::Text("");
+						}
+						ImGui::NextColumn();
+						{
+							ImGui::Text("Prefix:");
+						}
+						ImGui::NextColumn();
+						{
+							ImGui::Text("Suffix:");
+							ImGui::SeparatorEx(ImGuiSeparatorFlags_SpanAllColumns | ImGuiSeparatorFlags_Horizontal);
+						}
+						ImGui::NextColumn();
+						{							
+							ImGui::Text("Standard:");
+							ImGui::Text("Advanced:");
+							ImGui::Text("Removals:");
+						}
+						ImGui::NextColumn();
+						{
+							
+							DrawColoredGambleItemAmount(m_amount_SG_STD_Prefix);
+							DrawColoredGambleItemAmount(m_amount_SG_ADV_Prefix);
+							DrawColoredGambleItemAmount(m_amount_removal_Prefix);
+						}
+						ImGui::NextColumn();
+						{
+
+							DrawColoredGambleItemAmount(m_amount_SG_STD_Suffix);
+							DrawColoredGambleItemAmount(m_amount_SG_ADV_Suffix);
+							DrawColoredGambleItemAmount(m_amount_removal_Suffix);
+						}
+						ImGui::EndColumns();
+						/*
 						ImGui::BeginColumns("GambleItemsColumns", 3, ImGuiColumnsFlags_NoResize);
 						{
 							ImGui::SetColumnWidth(0, 75);
@@ -252,7 +288,8 @@ namespace Features
 							DrawColoredGambleItemAmount(m_amount_SG_STD_Suffix);
 							DrawColoredGambleItemAmount(m_amount_removal_Suffix);
 						}
-						ImGui::EndColumns();  
+						ImGui::EndColumns(); 
+						*/
 					}
 					ImGui::EndGroup();
 					ImGui::NewLine();

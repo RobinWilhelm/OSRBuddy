@@ -20,6 +20,9 @@
     <Filter Include="Features">
       <UniqueIdentifier>{27731048-97d5-4f44-bb28-48e74610b178}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Implementation">
+      <UniqueIdentifier>{feccf817-ea24-4ee0-a71c-6d532cb4b43d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imgui.h">
@@ -178,12 +181,6 @@
     <ClInclude Include="OSRBuddy.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="KitBot.h">
-      <Filter>Features</Filter>
-    </ClInclude>
-    <ClInclude Include="TestItemUse.h">
-      <Filter>Features</Filter>
-    </ClInclude>
     <ClInclude Include="VMTHook.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -211,9 +208,6 @@
     <ClInclude Include="SDK\INFInvenExtend.h">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="GambleBot.h">
-      <Filter>Features</Filter>
-    </ClInclude>
     <ClInclude Include="AntiAntiCheat.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -222,9 +216,6 @@
     </ClInclude>
     <ClInclude Include="imgui\imgui_addition.h">
       <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="EnchantBot.h">
-      <Filter>Features</Filter>
     </ClInclude>
     <ClInclude Include="BuddyAPI.h">
       <Filter>Base</Filter>
@@ -277,9 +268,6 @@
     <ClInclude Include="SDK\ClientParty.h">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="DebugInfo.h">
-      <Filter>Features</Filter>
-    </ClInclude>
     <ClInclude Include="AtumError.h">
       <Filter>SDK</Filter>
     </ClInclude>
@@ -310,9 +298,6 @@
     <ClInclude Include="SDK\INFGameMainWisperChat.h">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="Miscellaneous.h">
-      <Filter>Features</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\INFImage.h">
       <Filter>SDK</Filter>
     </ClInclude>
@@ -321,9 +306,6 @@
     </ClInclude>
     <ClInclude Include="PersistingTools.h">
       <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="GrindBot.h">
-      <Filter>Features</Filter>
     </ClInclude>
     <ClInclude Include="MathHelper.h">
       <Filter>Utility</Filter>
@@ -346,14 +328,8 @@
     <ClInclude Include="Content.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="FactoryBot.h">
-      <Filter>Features</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\INFSkill.h">
       <Filter>SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="InventoryManager.h">
-      <Filter>Features</Filter>
     </ClInclude>
     <ClInclude Include="AceColouredString.h">
       <Filter>Utility</Filter>
@@ -388,12 +364,6 @@
     <ClInclude Include="BuddyFeatureBase.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Features.h">
-      <Filter>Base</Filter>
-    </ClInclude>
-    <ClInclude Include="FeatureTypes.h">
-      <Filter>Base</Filter>
-    </ClInclude>
     <ClInclude Include="Structs.h">
       <Filter>Features</Filter>
     </ClInclude>
@@ -402,6 +372,42 @@
     </ClInclude>
     <ClInclude Include="OSRPediaApi.h">
       <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugInfo.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="EnchantBot.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="ESP.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="FactoryBot.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="GambleBot.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="GrindBot.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryManager.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="KitBot.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Miscellaneous.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="TestItemUse.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Features.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="FeatureTypes.h">
+      <Filter>Features</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -441,20 +447,11 @@
     <ClCompile Include="OSRAPI.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="KitBot.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
-    <ClCompile Include="TestItemUse.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
     <ClCompile Include="Utility.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Console.cpp">
       <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="GambleBot.cpp">
-      <Filter>Features</Filter>
     </ClCompile>
     <ClCompile Include="AntiAntiCheat.cpp">
       <Filter>Utility</Filter>
@@ -462,26 +459,14 @@
     <ClCompile Include="imgui\imgui_addition.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="EnchantBot.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
     <ClCompile Include="PatternManager.cpp">
       <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugInfo.cpp">
-      <Filter>Features</Filter>
     </ClCompile>
     <ClCompile Include="OsrItemInfo.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Miscellaneous.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
     <ClCompile Include="PersistingTools.cpp">
       <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="GrindBot.cpp">
-      <Filter>Features</Filter>
     </ClCompile>
     <ClCompile Include="D3D9Renderer.cpp">
       <Filter>Utility</Filter>
@@ -491,12 +476,6 @@
     </ClCompile>
     <ClCompile Include="BuddyTimer.cpp">
       <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="FactoryBot.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
-    <ClCompile Include="InventoryManager.cpp">
-      <Filter>Features</Filter>
     </ClCompile>
     <ClCompile Include="AceColouredString.cpp">
       <Filter>Utility</Filter>
@@ -515,6 +494,36 @@
     </ClCompile>
     <ClCompile Include="OSRPediaApi.cpp">
       <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugInfo.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="EnchantBot.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="ESP.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="FactoryBot.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="GambleBot.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="GrindBot.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="InventoryManager.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="KitBot.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Miscellaneous.cpp">
+      <Filter>Features\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="TestItemUse.cpp">
+      <Filter>Features\Implementation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

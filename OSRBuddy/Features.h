@@ -8,5 +8,6 @@
 #include "DebugInfo.h"
 #include "Miscellaneous.h"
 #include "InventoryManager.h"
+#include "ESP.h"
 
 #include "FeatureTypes.h"

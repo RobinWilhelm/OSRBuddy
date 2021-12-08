@@ -216,6 +216,10 @@ bool OSRBuddyMain::Start()
 #ifdef FEATURE_MISCELLANEOUS
         RegisterFeature(new Features::Miscellaneous(this));
 #endif
+#ifdef FEATURE_ESP
+        RegisterFeature(new Features::ESP(this));
+#endif
+
 #ifdef FEATURE_TEST
         RegisterFeature(new Features::TestItemUse(this));
 #endif

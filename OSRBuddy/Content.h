@@ -19,6 +19,7 @@
 #ifdef RELEASE_DEBUG		
 	//#define FEATURE_TEST
 	#define OSRBUDDY_DEBUG
+	#define	FEATURE_ESP
 #endif
 
 #ifdef OSRBUDDY_DEBUG
