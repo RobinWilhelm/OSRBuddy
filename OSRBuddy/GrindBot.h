@@ -4,6 +4,7 @@
 
 #include "MathHelper.h" 
 #include "BuddyTimer.h"
+#include "AceColouredString.h"
 
 #include <chrono>
 #include <map>
@@ -28,6 +29,7 @@ namespace Features
 
 	struct GrindMonsterInfo
 	{
+		AceColouredString name;
 		std::string clean_name;
 		bool shoot = false;
 		bool priority = false;
@@ -96,6 +98,11 @@ namespace Features
 
 		bool IsValidPrimaryWeapon(ITEM_BASE* item);
 		bool Swap();
+
+
+#pragma optimize( "", off )
+		void DEBUG_CHRISTMAS_EVENT_CRASH(CMonsterData* monster);
+#pragma optimize( "", on ) 
 
 	private:
 		CMonsterData* m_target;

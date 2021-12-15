@@ -145,6 +145,7 @@ namespace Features
 
 		// returns true if skill is already toggled on, false when not
 		bool ToggleSKill(SkillType toggleskill, bool on);
+		bool IsSkillActive(SkillType skill);
 
 		PlayerSkillInfo* FindPlayerSkill(SkillType skill) const;
 		PlayerSkillInfo* FindPlayerSkill(int itemnum) const;

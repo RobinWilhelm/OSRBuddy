@@ -36,6 +36,8 @@ namespace Features
 
 		ZeroMemory(&m_statisticsSession, sizeof(ItemLabStatistics));
 		ZeroMemory(&m_statisticsWeapon, sizeof(ItemLabStatistics));
+
+		m_er_log_active = false;
 	}
 
 	EnchantBot::~EnchantBot()
@@ -81,6 +83,26 @@ namespace Features
 				CItemInfo* targetitem = OSR_API->FindItemFromTarget(m_currentEnchantItemUID);
 				if (targetitem && TryTargetItemToInventory())
 				{ 
+#ifdef ENCHANTBOT_ENCHANTRESULT_LOGGER
+					if (m_er_log_active)
+					{
+						nlohmann::json er;
+						uint32_t enchant_to = m_previous_enchantnum + 1;
+						bool success = (m_enchant_item.GetItemInfo()->m_nEnchantNumber == m_previous_enchantnum + 1);
+						er["try_enchant_to"] = enchant_to;
+						er["success"] = success;
+						m_er_log_json["EnchantResults"].push_back(er);
+						m_er_persisting->Save(m_er_log_json);
+
+						float prob = g_Enchant_probabilities[enchant_to - 1] / 10000.0f;
+						if (!success)
+						{
+							prob = 1 - prob;
+						}
+						m_total_entropy += (-1) * log2f(prob);
+					}
+#endif // ENCHANTBOT_ENCHANTRESULT_LOGGER
+
 					// Update item
 					m_enchant_item.Update(m_currentEnchantItemUID);
 					UpdateEnchantStats();
@@ -501,7 +523,24 @@ namespace Features
 					RenderStatisticsPopup();
 					if (ImGui::Button("Show Statistics")) {
 						ImGui::OpenPopup("StatisticsPopup");
-					} 
+					}
+#ifdef ENCHANTBOT_ENCHANTRESULT_LOGGER
+					if (!m_er_log_active)
+					{
+						if (ImGui::Button("Start ER Log"))
+						{
+							StartEnchantResultLog();
+						}
+					}
+					else
+					{
+						if (ImGui::Button("Stop ER Log"))
+						{
+							StopEnchantResultLog();
+						}
+					}
+					ImGui::Text(std::to_string(m_total_entropy).c_str());
+#endif
 				}
 				ImGui::EndChild();
 				ImGui::NewLine();
@@ -1674,6 +1713,19 @@ namespace Features
 				m_wantedEnchantInfo[index].protect = EnchantProtect::E5;
 			}
 		}
+	}
+
+	void EnchantBot::StartEnchantResultLog()
+	{
+		m_er_persisting = m_buddy->GetPersistingTools()->GetEnchantResultPeristence();
+		m_er_persisting->Clear();
+		m_total_entropy = 0.0f;
+		m_er_log_active = true;
+	}
+
+	void EnchantBot::StopEnchantResultLog()
+	{
+		m_er_log_active = false;
 	}
 
 	FeatureType EnchantBot::GetType() const

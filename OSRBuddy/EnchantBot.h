@@ -17,18 +17,16 @@
 #define ENCHANT_ACTION_TIME_BASE 400ms	// button clicks and item movement
 #define ENCHANT_ACTION_TIME_VARIANCE 500ms	
 #else
-#define ENCHANT_TIME_BASE 2000ms		
+#define ENCHANT_TIME_BASE 1500ms		
 #define ENCHANT_TIME_VARIANCE 1000ms
 
-#define ENCHANT_ACTION_TIME_BASE 300ms	// button clicks and item movement
-#define ENCHANT_ACTION_TIME_VARIANCE 500ms	
+#define ENCHANT_ACTION_TIME_BASE 200ms	// button clicks and item movement
+#define ENCHANT_ACTION_TIME_VARIANCE 300ms	
 #endif // RELEASE_SETHIA
 						 
 #define COLOR_ENCHANTITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green
 #define COLOR_ENCHANTITEM_LT_100 (ImColor(0xFF, 0xBB, 0x33).Value) // orange
 #define COLOR_ENCHANTITEM_EQ_0	(ImColor(0xFF, 0x00, 0x00).Value) // red
-
-
 
 class CItemInfo;
 
@@ -192,6 +190,9 @@ namespace Features
 
 		void SetOptimizedEnchantSettings(bool optimized);
 
+		void StartEnchantResultLog();
+		void StopEnchantResultLog();
+
 	private:
 		EnchantBotState			m_state;
 		bool					m_auto_enchant;
@@ -243,5 +244,11 @@ namespace Features
 		// for buffering strings that change semi often
 		EnchantCostBuffer		m_cost_session;
 		EnchantCostBuffer		m_cost_weapon;
+
+		// log enchant result for randomness breaker
+		bool					m_er_log_active;
+		nlohmann::json			m_er_log_json;
+		EnchantResultPersistingPtr	m_er_persisting;
+		float					m_total_entropy;
 	};
 }

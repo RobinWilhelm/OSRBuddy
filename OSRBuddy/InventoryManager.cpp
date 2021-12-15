@@ -30,14 +30,43 @@ namespace Features
 		m_open_mineralcapsule = true;
 		m_open_wpcapsule = true;
 		m_open_soccer_ball_capsule = true;
-		m_open_halloween_staff_box = true;
 		m_delete_items = false;
 		m_delete_items_maxlevel = 20;
-		m_delete_weapons = true;
+		m_delete_weapons = false;
 		m_delete_engines = false;
-		m_delete_radars = true;
+		m_delete_radars = false;
 		m_delete_marks = true;
-		m_delete_cpus = true;
+		m_delete_cpus = false;
+#ifdef HALLOWEEN_EVENT
+		m_open_halloween_capsule = true;
+#else
+		m_open_halloween_capsule = false;
+#endif
+#ifdef CHRISTMAS_EVENT
+		m_delete_christmas_event_items = true;
+		m_open_blue_gift = true;
+		m_open_red_gift = true;
+		m_open_lost_snowman_article = true;
+		m_open_mystery_capsule = true;
+		m_open_xmas_box = true;
+		m_open_christmas_gift = true;
+		m_open_christmas_gift_x = true;
+		m_open_christmas_gift_m = true;
+		m_open_christmas_gift_a = true;
+		m_open_christmas_gift_s = true;
+#else
+		m_delete_christmas_event_items = false;
+		m_open_blue_gift = false;
+		m_open_red_gift = false;
+		m_open_lost_snowman_article = false;
+		m_open_mystery_capsule = false;
+		m_open_xmas_box = false;
+		m_open_christmas_gift = false;
+		m_open_christmas_gift_x = false;
+		m_open_christmas_gift_m = false;
+		m_open_christmas_gift_a = false;
+		m_open_christmas_gift_s = false;
+#endif // CHRISTMAS_EVENT
 		m_awaiting_delete_ok = false;
 		m_in_sell_building = false;
 		m_sold_item = 0;
@@ -47,13 +76,8 @@ namespace Features
 		m_item_selection_dirty = true;
 		m_selected_item_count = 0;
 		m_selling_items = false;
-
 		m_open_vanillaicecream_capsule = false;
-#ifdef HALLOWEEN_EVENT
-		m_open_halloween_capsule = true;
-#else
-		m_open_halloween_capsule = false;
-#endif
+
 		m_inventory_action_timer = BuddyTimer(400ms);
 	}
 
@@ -94,6 +118,7 @@ namespace Features
 		ImGui::NewLine();
 		ImGui::BeginColumns("IMColumns", 2, ImGuiColumnsFlags_NoResize);
 		{
+			ImGui::SetColumnWidth(0, 400);
 			ImGui::BeginChild("IMColumn1", ImVec2(), false);
 			{
 				//ImGui::Separator();
@@ -104,15 +129,39 @@ namespace Features
 				ImGui::Separator();
 				ImGui::Checkbox("Auto open capsules", &m_open_capsules);
 				ImGui::NewLine();
-				ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
-				ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
-				ImGui::Checkbox("Fantasy Globe Mineral Capsule", &m_open_fantasyglobemineralcapsule);
-				ImGui::Checkbox("Vanilla Ice Cream", &m_open_vanillaicecream_capsule);
-				ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
-				ImGui::Checkbox("Warpoint Capsules", &m_open_wpcapsule);
-				ImGui::Checkbox("Soccer Ball Capsule", &m_open_soccer_ball_capsule);
-				ImGui::Checkbox("Halloween Capsule", &m_open_halloween_capsule);
-				ImGui::Checkbox("Halloween Staff Box", &m_open_halloween_staff_box);
+
+				ImGui::BeginColumns("CapsuleOpeningColumns", 2, ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_NoBorder);
+				{		
+					ImGui::Checkbox("Watermelon Gifts", &m_open_watermelongift);
+					ImGui::Checkbox("SPI Capsules", &m_open_spicapsule);
+					ImGui::Checkbox("FG Mineral Capsule", &m_open_fantasyglobemineralcapsule);
+					ImGui::Checkbox("Vanilla Ice Cream", &m_open_vanillaicecream_capsule);
+					ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
+					ImGui::Checkbox("Warpoint Capsules", &m_open_wpcapsule);
+					ImGui::Checkbox("Mystery Capsule", &m_open_mystery_capsule);
+				}
+				ImGui::NextColumn();
+				{
+#ifdef SUMMER_EVENT
+					ImGui::Checkbox("Soccer Ball Capsule", &m_open_soccer_ball_capsule);
+#endif
+#ifdef HALLOWEEN_EVENT
+					ImGui::Checkbox("Halloween Capsule", &m_open_halloween_capsule);
+					ImGui::Checkbox("Halloween Staff Box", &m_open_halloween_staff_box);
+#endif
+#ifdef CHRISTMAS_EVENT
+					ImGui::Checkbox("Blue gift", &m_open_blue_gift);
+					ImGui::Checkbox("Red gift", &m_open_red_gift);
+					ImGui::Checkbox("Lost Snowman Article", &m_open_lost_snowman_article);
+					ImGui::Checkbox("Xmas Box", &m_open_xmas_box);
+					ImGui::Checkbox("Christmas gift", &m_open_christmas_gift);
+					ImGui::Checkbox("Christmas gift X", &m_open_christmas_gift_x);
+					ImGui::Checkbox("Christmas gift M", &m_open_christmas_gift_m);
+					ImGui::Checkbox("Christmas gift A", &m_open_christmas_gift_a);
+					ImGui::Checkbox("Christmas gift S", &m_open_christmas_gift_s);	 
+#endif
+				}
+				ImGui::EndColumns();
 			}
 			ImGui::EndChild();
 		}
@@ -147,6 +196,14 @@ namespace Features
 					if (ImGui::Checkbox("Marks", &m_delete_marks)) {
 						m_item_selection_dirty = true;
 					}
+#ifdef CHRISTMAS_EVENT
+					if (ImGui::Checkbox("Christmas Event items", &m_delete_christmas_event_items)) {
+						m_item_selection_dirty = true;
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Christmas Wreath (1); Random mark capsule; Santa_golden_Telescope; Light_as_a_Snowflake; Working_Speed_of_Santa; Power_of_a_Reindeer; Blizzard; Hot_Chocolate");
+					}
+#endif
 				}
 				ImGui::EndColumns();
 				ImGui::NewLine();
@@ -207,7 +264,8 @@ namespace Features
 			(m_delete_marks && item->Kind == ITEMKIND_MARK) ||
 			(m_delete_cpus && item->Kind == ITEMKIND_COMPUTER) ||
 			(m_delete_radars && item->Kind == ITEMKIND_RADAR) ||
-			(m_delete_engines && item->Kind == ITEMKIND_SUPPORT))
+			(m_delete_engines && item->Kind == ITEMKIND_SUPPORT) ||
+			(m_delete_christmas_event_items && IsUselessChristmasEventItem(item)))
 		{
 			if(COMPARE_BIT_FLAG(item->ItemInfo->ItemAttribute, ITEM_ATTR_LEGEND_ITEM) 
 				|| COMPARE_BIT_FLAG(item->ItemInfo->ItemAttribute, ITEM_ATTR_UNIQUE_ITEM)
@@ -330,6 +388,46 @@ namespace Features
 				return;
 			}
 
+			if (m_open_blue_gift && TryOpenCapsule(ItemNumber::Blue_gift)) {
+				return;
+			}
+
+			if (m_open_red_gift && TryOpenCapsule(ItemNumber::Red_gift)) {
+				return;
+			}
+
+			if (m_open_lost_snowman_article && TryOpenCapsule(ItemNumber::Lost_Snowman_Article)) {
+				return;
+			}
+
+			if (m_open_xmas_box && TryOpenCapsule(ItemNumber::Xmas_Box)) {
+				return;
+			}
+
+			if (m_open_mystery_capsule && TryOpenCapsule(ItemNumber::Mystery_capsule)) {
+				return;
+			}
+
+			if (m_open_christmas_gift && TryOpenCapsule(ItemNumber::Christmas_gift)) {
+				return;
+			}
+
+			if (m_open_christmas_gift_x && TryOpenCapsule(ItemNumber::Christmas_gift_X)) {
+				return;
+			}
+
+			if (m_open_christmas_gift_m && TryOpenCapsule(ItemNumber::Christmas_gift_M)) {
+				return;
+			}
+
+			if (m_open_christmas_gift_a && TryOpenCapsule(ItemNumber::Christmas_gift_A)) {
+				return;
+			}
+
+			if (m_open_christmas_gift_s && TryOpenCapsule(ItemNumber::Christmas_gift_S)) {
+				return;
+			}
+
 			if (m_open_wpcapsule)
 			{
 				if (TryOpenCapsule(ItemNumber::WP_Capsule_10000)) {
@@ -384,7 +482,8 @@ namespace Features
 			if (iteminfo)
 			{
 				// delete item
-				OSR_API->DeleteItem(iteminfo, iteminfo->CurrentCount);
+				OSR_API->DeleteItem(iteminfo, 1);
+				m_item_selection_dirty = true;
 				m_inventory_action_timer.Reset(ITEM_DELETE_REATTACK, ITEM_DELETE_REATTACK_VARIANCE);
 				return true;
 			}
@@ -421,5 +520,22 @@ namespace Features
 				}
 			}
 		}
+	}
+
+	bool InventoryManager::IsUselessChristmasEventItem(CItemInfo* item)
+	{
+		switch (TO_ENUM(ItemNumber,item->ItemNum))
+		{
+		case ItemNumber::Christmas_Wreath_1:
+		case ItemNumber::Random_mark_capsule:
+		case ItemNumber::Santa_golden_Telescope:
+		case ItemNumber::Light_as_a_Snowflake:
+		case ItemNumber::Working_Speed_of_Santa:
+		case ItemNumber::Power_of_a_Reindeer:
+		case ItemNumber::Blizzard:
+		case ItemNumber::Hot_Chocolate:
+			return true;
+		}
+		return false;
 	}
 }

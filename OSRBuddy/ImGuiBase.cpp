@@ -61,6 +61,7 @@ bool ImGuiBase::Init(IDirect3DDevice9* device)
     // because otherwise ImGui will call free() while freeing resources which will lead into a crash
     // since tahoma is defined as readonly and wasn't allocated with malloc()
     m_tahoma.FontDataOwnedByAtlas = false;
+    m_tahoma.SizePixels = 15.0f;
     io->Fonts->AddFontFromMemoryTTF((void*)font_tahoma, sizeof(font_tahoma), 15.f, &m_tahoma);
 
     // Initialize notify

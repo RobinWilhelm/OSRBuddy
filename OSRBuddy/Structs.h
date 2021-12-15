@@ -38,6 +38,14 @@ namespace Features
 		uint32_t m_cost_total = 0;
 	};
 
+	struct EnchantResult
+	{
+		uint8_t try_enchant_to;
+		bool success;
+	};
+
+
+
 	struct Ingredient
 	{
 		INT itemnumber = 0;

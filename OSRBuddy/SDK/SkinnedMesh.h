@@ -32,10 +32,6 @@ enum METHOD {
 
 struct SMeshContainer
 {
-
-
-
-
     ID3DXMesh* pMesh;	//    D3DXMESHDATA            MeshData;
 //	LPD3DXMESH pMeshes[5];
 

@@ -50,9 +50,11 @@ public:
 	void UsePrimaryWeapon(bool use);
 	void UseSecondaryWeapon(bool use);
 	// with include_paramfactor = true, range boost like siege mode or goggles will be considered
-	float GetRadarRangePrimary(bool include_paramfactors = false); 
+	float GetRadarRangePrimary(float paramfactors = 1.0f); 
+	float GetRadarRangePrimaryParamfactors();
 	// with include_paramfactor = true, range boost like siege mode or goggles will be considered
-	float GetRadarRangeSecondary(bool include_paramfactors = false);
+	float GetRadarRangeSecondary(float paramfactors = 1.0f);
+	float GetRadarRangeSecondaryParamfactors();
 
 	D3DXVECTOR3 GetShuttlePosition();
 

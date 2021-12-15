@@ -430,6 +430,15 @@ namespace Features
         }
     }
 
+    bool KitBuffBot::IsSkillActive(SkillType skill)
+    {
+        PlayerSkillInfo* pskill = FindPlayerSkill(skill);
+        if (!pskill || pskill->IsWaiting()) {
+            return false;
+        }
+        return (pskill->skillinfo->m_dwState == SKILL_STATE_USING);
+    }
+
     bool KitBuffBot::TryUseSkill(PlayerSkillInfo* skillinfo)
     {
         if (!skillinfo || !skillinfo->skillinfo || skillinfo->IsWaiting()) {

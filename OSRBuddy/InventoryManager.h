@@ -30,6 +30,8 @@ namespace Features
 		bool TickItemDelete();
 		void TickItemSell();
 
+		bool IsUselessChristmasEventItem(CItemInfo* item);
+
 	private:
 		BuddyTimer m_inventory_action_timer;
 		bool m_clean_inventory;
@@ -44,8 +46,20 @@ namespace Features
 		bool m_open_wpcapsule;
 		bool m_open_soccer_ball_capsule;
 		bool m_open_vanillaicecream_capsule;
+		// halloween
 		bool m_open_halloween_capsule;
 		bool m_open_halloween_staff_box;
+		//christmas
+		bool m_open_blue_gift;
+		bool m_open_red_gift;
+		bool m_open_lost_snowman_article;
+		bool m_open_xmas_box;
+		bool m_open_mystery_capsule;
+		bool m_open_christmas_gift;
+		bool m_open_christmas_gift_x;
+		bool m_open_christmas_gift_m;
+		bool m_open_christmas_gift_a;
+		bool m_open_christmas_gift_s;
 
 		bool m_delete_items;
 		bool m_delete_weapons;
@@ -53,6 +67,8 @@ namespace Features
 		bool m_delete_radars;
 		bool m_delete_marks;
 		bool m_delete_cpus;
+		bool m_delete_christmas_event_items;
+
 		int m_delete_items_maxlevel;
 
 		uint32_t m_selected_item_count;

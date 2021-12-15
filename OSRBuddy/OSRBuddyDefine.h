@@ -179,8 +179,10 @@ enum class GearType
 
 enum class MapIndex
 {
+    Unknown = 0,
     WatermelonIsland = 9002,
     InvasionWorld = 9050, 
+    XMAS_Event_Map_ANI = 9007,
 };
 
 
@@ -303,6 +305,27 @@ enum class ItemNumber : int
     SPI_capsule = 7004740,
     Mineral_Capsule = 7015000,
     Soccer_Ball_Capsule = 7029520,
+    Blue_gift = 7007920,
+    Red_gift = 7007930,
+    Lost_Snowman_Article = 7025740,
+    Xmas_Box = 9040050,
+    Mystery_capsule = 7002190,
+    Christmas_Wreath_1 = 1720000,
+    Random_mark_capsule = 7010730,
+    Christmas_gift = 7004730,
+    Christmas_gift_X = 7007940,
+    Christmas_gift_M = 7007950,
+    Christmas_gift_A = 7007960,
+    Christmas_gift_S = 7007970,
+
+    Santa_golden_Telescope = 1720010,
+    Light_as_a_Snowflake = 1720009,
+    Working_Speed_of_Santa = 1720008,
+    Power_of_a_Reindeer = 1720007,
+    Blizzard = 1720006,
+    Hot_Chocolate = 1720005,
+
+
 
     //Gambles
     Prefix_Std_Weapon_Super_Gamble_Card = 7001180,		// from snowmen
@@ -714,7 +737,7 @@ enum class ItemNumber : int
     BG_Fire_Shot_1 = 7800011,           
 };
 
-enum class MonsterUnitKind : unsigned int
+enum class MonsterUnitKind : int32_t
 {
     // watermelon map
     Watermelon_Z = 2090600,
@@ -735,6 +758,12 @@ enum class MonsterUnitKind : unsigned int
     Mutant_Pumpkin = 2090900,
     Halloween_Bat = 2100900,
 
+    //christmas event
+    Snowman_white = 2052400,
+    Snowman_blue = 2117900,
+    Crazy_Snowman = 2060600,
+    Little_Crazy_Boy = 2060700,
+    Santa_Cat = 2101000,
 
     Scout_Guard_Ani = 2030100,
 

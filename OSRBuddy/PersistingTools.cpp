@@ -45,6 +45,23 @@ LaboratoryStatsPersistingPtr PersistingTools::GetLabStatisticPersistence(UID64_t
     return std::unique_ptr<ItemLabStatisticsJsonPersistence>(ptr);
 }
 
+EnchantResultPersistingPtr PersistingTools::GetEnchantResultPeristence() const
+{
+    std::string fullpath = m_osrbuddy_dir + "\\" + FILENAME_ENCHANT_RESULTS;
+    auto ptr = new GenericJsonPersistence(fullpath);
+
+    // check if file already exists, if not -> create it with empty values
+    struct stat buffer;
+    if (stat(fullpath.c_str(), &buffer) != 0)
+    {
+        nlohmann::json object;
+        object["EnchantResults"] = nlohmann::json::array();
+        ptr->Save(object);
+    }
+
+    return std::unique_ptr<GenericJsonPersistence>(ptr);
+}
+
 void PersistingTools::GetAllRecipes(Features::MixItemList& mixitems)
 {
     nlohmann::json jsonobject = nlohmann::json();
@@ -82,6 +99,8 @@ void PersistingTools::GetAllRecipes(Features::MixItemList& mixitems)
         mixitems.push_back(mixitem);
     }
 }
+
+
 
 void ItemLabStatisticsJsonPersistence::Read(Features::ItemLabStatistics& data) const
 {
@@ -167,4 +186,32 @@ void ItemLabStatisticsJsonPersistence::Save(const Features::ItemLabStatistics& d
         file << std::setw(4) << jsonobject << std::endl;
         file.close();
     }
+}
+
+void GenericJsonPersistence::Read(nlohmann::json& data) const
+{
+    std::fstream file;
+    file.open(m_fullpath, ios::in);
+    if (file.good() && file.is_open())
+    {
+        file >> data;
+    }
+}
+
+void GenericJsonPersistence::Save(const nlohmann::json& data) const
+{
+    std::fstream file;
+    file.open(m_fullpath, ios::out);
+    if (file.good() && file.is_open())
+    {
+        file << data << std::endl;
+        file.close();
+    }
+}
+
+void GenericJsonPersistence::Clear()
+{
+    std::fstream file;
+    file.open(m_fullpath, std::ofstream::out | std::ofstream::trunc);
+    file.close();
 }

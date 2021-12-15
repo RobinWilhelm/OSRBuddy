@@ -77,13 +77,7 @@ namespace Features
             return;
         }  
 
-        UpdateGrindMobInfo();
-
-
-        if (OSR_API->IsShuttleDead()) {
-            return;
-        }
-
+        UpdateGrindMobInfo();    
         GetNewTarget();
  
         switch (m_current_state)
@@ -107,6 +101,12 @@ namespace Features
 
         case GrindBot::State::SIEGEING:
             UpdateGrindingTime();
+            if (OSR_API->IsShuttleDead() || !OSR_API->IsLanded())// turn of grind when gear is not landed anymore
+            {
+                ToggleGrinding();
+                return;
+            }
+
             // check for overheat and valid target first
             if (OSR_API->GetPrimaryWeapon()->m_bOverHeat) 
             {
@@ -165,6 +165,11 @@ namespace Features
 
         case GrindBot::State::OVERHEATED: 
             UpdateGrindingTime();
+            if (OSR_API->IsShuttleDead() || !OSR_API->IsLanded())// turn of grind when gear is not landed anymore
+            {
+                ToggleGrinding();
+                return;
+            }
             if (m_enable_bs_hotswap && m_selected) {
                 if (!m_swapped) 
                 {
@@ -352,7 +357,8 @@ namespace Features
                         {
                             if (monsterinfo.second.killed > 0)
                             {
-                                ImGui::Text(monsterinfo.second.clean_name.c_str());
+                                //ImGui::Text(monsterinfo.second.clean_name.c_str());
+                                monsterinfo.second.name.RenderImGui();
                                 ImGui::NextColumn();
                                 ImGui::Text(std::to_string(monsterinfo.second.killed).c_str());
                                 ImGui::NextColumn();
@@ -391,10 +397,12 @@ namespace Features
                         }
                         ImGui::NextColumn();
                         for (auto& monsterinfo : m_mobs)
-                        {
-                            ImGui::Checkbox(monsterinfo.second.clean_name.c_str(), &monsterinfo.second.shoot);
+                        {                             
+                            ImGui::Checkbox(("###" + monsterinfo.second.name.GetOriginalText()).c_str(), &monsterinfo.second.shoot);
+                            ImGui::SameLine();
+                            monsterinfo.second.name.RenderImGui();
                             ImGui::NextColumn();
-                            ImGui::Checkbox(("###" + monsterinfo.second.clean_name).c_str(), &monsterinfo.second.priority);
+                            ImGui::Checkbox(("###" "_Prio_"+ monsterinfo.second.name.GetOriginalText()).c_str(), &monsterinfo.second.priority);
                             ImGui::NextColumn();
                             ImGui::Text(monsterinfo.second.count_text.c_str());
                             ImGui::NextColumn();
@@ -661,9 +669,12 @@ namespace Features
         switch (m_current_state)
         {
         case GrindBot::State::WAITING:
-            m_buddy->EnableMouseEmulation(true);
-            ChangeState(GrindBot::State::SIEGEING);   
-            m_grinding_start = std::chrono::system_clock::now();
+            if (OSR_API->IsLanded()) // only allow grinding when gear is on ground
+            {
+                m_buddy->EnableMouseEmulation(true);
+                ChangeState(GrindBot::State::SIEGEING);
+                m_grinding_start = std::chrono::system_clock::now();
+            }
             break;
         case GrindBot::State::SIEGEING:
         case GrindBot::State::OVERHEATED:
@@ -718,8 +729,9 @@ namespace Features
                     if (monsterinfo == m_mobs.end())
                     {
                         GrindMonsterInfo gmi;
-                        gmi.clean_name = std::string(monster.second->m_pMonsterInfo->MonsterName);
-                        if (gmi.clean_name.find("Scout Guard") != string::npos) {
+                        gmi.name = std::string(monster.second->m_pMonsterInfo->MonsterName);
+                        //gmi.clean_name = std::string(monster.second->m_pMonsterInfo->MonsterName);
+                        if (std::string(monster.second->m_pMonsterInfo->MonsterName).find("Scout Guard") != string::npos) {
                             continue;
                         }
 
@@ -727,15 +739,18 @@ namespace Features
                         gmi.priority = false;
                         gmi.goldy = false;
                         gmi.killed = 0;
+
+                        DEBUG_CHRISTMAS_EVENT_CRASH(monster.second);
+
                         if(CanShootAtTarget(monster.second))
                             gmi.count = 1;
                         else
                             gmi.count = 0;
 
-                        if (gmi.clean_name[0] == '\\')
+                        if (monster.second->m_pMonsterInfo->MonsterName[0] == '\\' && monster.second->m_pMonsterInfo->MonsterName[1] != 'w')
                         {
-                            gmi.clean_name.erase(gmi.clean_name.begin(), gmi.clean_name.begin() + 2);
-                            gmi.clean_name.erase(gmi.clean_name.end() - 2, gmi.clean_name.end());
+                            //gmi.clean_name.erase(gmi.clean_name.begin(), gmi.clean_name.begin() + 2);
+                            //gmi.clean_name.erase(gmi.clean_name.end() - 2, gmi.clean_name.end());
                             gmi.goldy = true;
 
                             if (m_shoot_all_goldies) 
@@ -827,7 +842,13 @@ namespace Features
         }
         return false;
     }
-
+#pragma optimize( "", off )
+    void GrindBot::DEBUG_CHRISTMAS_EVENT_CRASH(CMonsterData* monster)
+    {
+        std::string monstername = monster->m_pMonsterInfo->MonsterName;
+        int i = 123;
+    }
+#pragma optimize( "", on ) 
        
     FeatureType GrindBot::GetType() const
     {
@@ -848,28 +869,40 @@ namespace Features
     #ifdef SUMMER_EVENT
         // sommer event special, always add these monster to the list
         GrindMonsterInfo gmi;
-        gmi.clean_name = "Dropped Ball";
+        gmi.name = "Dropped Ball";
         gmi.goldy = true;
         gmi.killed = 0;
         gmi.priority = true;
         gmi.shoot = true;
         m_mobs.insert({ TO_INT(MonsterUnitKind::Dropped_Ball) , gmi});
-        gmi.clean_name = "Flying Ball";  
+        gmi.name = "Flying Ball";
         m_mobs.insert({ TO_INT(MonsterUnitKind::Flying_Ball) , gmi });
     #endif
           
         // halloween event special, always add these monster to the list
     #ifdef HALLOWEEN_EVENT
         GrindMonsterInfo gmi;
-        gmi.clean_name = "Halloween Bat";
+        gmi.name = "Halloween Bat";
         gmi.goldy = true;
         gmi.killed = 0;
         gmi.priority = true;
         gmi.shoot = true;
         m_mobs.insert({ TO_INT(MonsterUnitKind::Halloween_Bat) , gmi});
-        gmi.clean_name = "Mutant Pumpkin";
+        gmi.name = "Mutant Pumpkin";
         m_mobs.insert({ TO_INT(MonsterUnitKind::Mutant_Pumpkin) , gmi });
     #endif
+
+#ifdef CHRISTMAS_EVENT
+        GrindMonsterInfo gmi;
+        gmi.name = "Santa Cat";
+        gmi.goldy = true;
+        gmi.killed = 0;
+        gmi.priority = true;
+        gmi.shoot = true;
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Santa_Cat) , gmi });
+        gmi.name = "\\cSnowman\\c";
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Snowman_blue) , gmi });
+#endif
 
         m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;    
                                    
@@ -1048,16 +1081,13 @@ namespace Features
     {
         if (m_get_new_target && m_shoot_new_target_delay <= 0ms)
         {
-            CMonsterData* new_target = nullptr;
-            // try to find a close target first, to prevent getting rammed
-            //if (m_anti_ram) {
-            //    new_target = FindNewTarget(250, m_front_only);
-            //}
-
-            if (!new_target) {
-                new_target = FindNewTarget(OSR_API->GetRadarRangePrimary() * 1.3f /*siege mode range boost (we need the max range here, not the current range)*/, m_visible_only);
+            float radar_paramfactors = OSR_API->GetRadarRangePrimaryParamfactors();
+            if (!m_kitbot->IsSkillActive(SkillType::Siege_Mode))
+            {                                                                           
+                radar_paramfactors += 0.3f; //get the range with the siege mode active, even if it is not active right now
             }
-
+            CMonsterData* new_target = FindNewTarget(OSR_API->GetRadarRangePrimary(radar_paramfactors), m_visible_only);
+           
             if (new_target)
             {
                 ChangeTarget(new_target);

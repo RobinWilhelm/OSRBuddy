@@ -198,32 +198,34 @@ void OldSchoolRivalsAPI::UseSecondaryWeapon(bool use)
 	m_atumapplication->m_pShuttleChild->m_bRButtonState = use;
 }
 
-float OldSchoolRivalsAPI::GetRadarRangePrimary(bool include_paramfactors)
+float OldSchoolRivalsAPI::GetRadarRangePrimary(float paramfactors)
 {
 	CItemInfo* radar = GetRadarItemInfo();
 	if (!radar) {
 		return 0.0f;
 	}	 
 	float range = radar->m_pItemInfo->AbilityMin;
-	if (include_paramfactors) {
-		range *= (1.0f + m_atumapplication->m_pShuttleChild->m_paramFactor.pfm_ATTACK_RANGE_01);
-	}
-
-	return range;
+	return (range *= paramfactors);
 }
 
-float OldSchoolRivalsAPI::GetRadarRangeSecondary(bool include_paramfactors)
+float OldSchoolRivalsAPI::GetRadarRangePrimaryParamfactors()
+{
+	return 1.0f + m_atumapplication->m_pShuttleChild->m_paramFactor.pfm_ATTACK_RANGE_01;
+}
+
+float OldSchoolRivalsAPI::GetRadarRangeSecondary(float paramfactors)
 {
 	CItemInfo* radar = GetRadarItemInfo();
 	if (!radar) {
 		return 0.0f;
 	}
 	float range = radar->m_pItemInfo->AbilityMax;
-	if (include_paramfactors) {
-		range *= (1.0f + m_atumapplication->m_pShuttleChild->m_paramFactor.pfm_ATTACK_RANGE_02);
-	}
+	return (range *= paramfactors);
+}
 
-	return range;
+float OldSchoolRivalsAPI::GetRadarRangeSecondaryParamfactors()
+{
+	return 1.0f + m_atumapplication->m_pShuttleChild->m_paramFactor.pfm_ATTACK_RANGE_02;
 }
 
 D3DXVECTOR3 OldSchoolRivalsAPI::GetShuttlePosition()
@@ -407,8 +409,11 @@ COLLISION_RESULT OldSchoolRivalsAPI::CheckCollMeshRangeObject(CObjRender* objren
 						}
 					}
 
-					//pObjectMonster->m_pObjMesh->SetWorldMatrix(pObjectMonster->m_mMatrix);   
-					pObjectMonster->m_pObjMesh->m_mWorld = pObjectMonster->m_mMatrix;
+					//pObjectMonster->m_pObjMesh->SetWorldMatrix(pObjectMonster->m_mMatrix);  
+					if (pObjectMonster->m_pObjMesh)
+					{
+						pObjectMonster->m_pObjMesh->m_mWorld = pObjectMonster->m_mMatrix;
+					}
 
 					//checkcollResult = pObjectMonster->m_pObjMesh->CheckCollision(mat, vPos, DEFAULT_COLLISION_DISTANCE, TRUE, FALSE);
 					checkcollResult = CheckCollision(pObjectMonster->m_pObjMesh, mat, vPos, DEFAULT_COLLISION_DISTANCE, TRUE, FALSE);
@@ -447,6 +452,9 @@ COLLISION_RESULT OldSchoolRivalsAPI::CheckCollision(CSkinnedMesh* skinnedmesh, D
 	}
 	return collResult;
 }
+#ifdef CHRISTMAS_EVENT
+#pragma optimize( "", off )
+#endif //  CHRISTMAS_EVENT
 
 COLLISION_RESULT OldSchoolRivalsAPI::CheckCollDist(CSkinnedMesh* skinnedmesh, SFrame* pframeCur, D3DXMATRIX mat, D3DXVECTOR3 vPos, float fCheckDistance, BOOL bWithNormal)
 {
@@ -507,7 +515,9 @@ COLLISION_RESULT OldSchoolRivalsAPI::CheckCollDist(CSkinnedMesh* skinnedmesh, SF
 	}
 	return collResult;
 }
-	   
+#ifdef CHRISTMAS_EVENT
+#pragma optimize( "", on ) 
+#endif
 GearType OldSchoolRivalsAPI::GetPlayerGearType()
 {
 	if (IS_BT(m_atumapplication->m_pShuttleChild->m_myShuttleInfo.UnitKind)) {
@@ -531,11 +541,13 @@ GearType OldSchoolRivalsAPI::GetPlayerGearType()
 
 MapIndex OldSchoolRivalsAPI::GetCurrentMap()
 {
-	switch (m_atumapplication->m_pShuttleChild->m_myShuttleInfo.MapChannelIndex.MapIndex)
+	switch (GetCurrentMapChannelIndex().MapIndex)
 	{
 		case 9002: return MapIndex::WatermelonIsland;
 		case 9050: return MapIndex::InvasionWorld;
-			// lazy
+		case 9007: return MapIndex::XMAS_Event_Map_ANI;
+		default:
+			return MapIndex::Unknown;
 	}
 
 	return MapIndex();
@@ -607,7 +619,6 @@ void OldSchoolRivalsAPI::InvenToSourceItem(CItemInfo* pItemInfo, int nCount, boo
 
 CItemInfo* OldSchoolRivalsAPI::FindItemFromTarget(UID64_t UniqueNumber)
 {
-#ifndef _DEBUG	  // structure of std::map is different in debugmode which leads to crash 
 	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
 	if (!citylab) {
 		return nullptr;
@@ -622,13 +633,11 @@ CItemInfo* OldSchoolRivalsAPI::FindItemFromTarget(UID64_t UniqueNumber)
 		}
 		it++;
 	}
-#endif
 	return nullptr;
 }
 
 CItemInfo* OldSchoolRivalsAPI::FindItemFromSource(UID64_t UniqueNumber)
 {
-#ifndef _DEBUG	  // structure of std::map is different in debugmode which leads to crash 
 	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
 	if (!citylab) {
 		return nullptr;
@@ -643,7 +652,6 @@ CItemInfo* OldSchoolRivalsAPI::FindItemFromSource(UID64_t UniqueNumber)
 		}
 		it++;
 	}
-#endif // ! _DEBUG
 	return nullptr;
 }
 
@@ -1229,6 +1237,9 @@ HRESULT OldSchoolRivalsAPI::UpdateFrames(CSkinnedMesh* skinnedmesh, SFrame* pfra
 	return S_OK;
 }
 
+#ifdef CHRISTMAS_EVENT
+#pragma optimize( "", off )
+#endif //  CHRISTMAS_EVENT
 COLLISION_RESULT OldSchoolRivalsAPI::CheckCollDistDetail(CSkinnedMesh* skinnedmesh, SMeshContainer* pmcMesh, D3DXMATRIX mat, BOOL bWithNormal)
 {
 	//	FLOG( "CSkinnedMesh::CheckCollDistDetail(SMeshContainer *pmcMesh,D3DXMATRIX mat)" );
@@ -1360,6 +1371,9 @@ COLLISION_RESULT OldSchoolRivalsAPI::CheckCollDistDetail(CSkinnedMesh* skinnedme
 
 	return collResult;// 어쩌구 구조체 충돌 없다.;
 }
+#ifdef CHRISTMAS_EVENT
+#pragma optimize( "", on )
+#endif //  CHRISTMAS_EVENT
 
 COLLISION_RESULT OldSchoolRivalsAPI::CheckCollMeshWaterObject(CObjRender* objrender, D3DXMATRIX mat, D3DXVECTOR3 vPos)
 {
