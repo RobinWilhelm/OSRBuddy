@@ -20,11 +20,10 @@
 [Rr]elease_Debug/
 [Rr]eleases/
 [Rr]elease_Sethia/
-[Rr]_Debug
-[Rr]_External
-[Rr]_Sethia
-[Rr]_Full
-
+[Rr]_Full/
+[Rr]_Debug/
+[Rr]_External/
+[Rr]_Sethia/
 x64/
 x86/
 [Aa][Rr][Mm]/

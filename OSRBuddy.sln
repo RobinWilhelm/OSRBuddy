@@ -7,20 +7,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OSRBuddy", "OSRBuddy\OSRBud
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x86 = Debug|x86
-		Rel_Debug|x86 = Rel_Debug|x86
-		Release_Sethia|x86 = Release_Sethia|x86
-		Release|x86 = Release|x86
+		R_Debug|x86 = R_Debug|x86
+		R_External|x86 = R_External|x86
+		R_Full|x86 = R_Full|x86
+		R_Sethia|x86 = R_Sethia|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Debug|x86.ActiveCfg = Debug|Win32
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Debug|x86.Build.0 = Debug|Win32
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Rel_Debug|x86.ActiveCfg = Release_Debug|Win32
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Rel_Debug|x86.Build.0 = Release_Debug|Win32
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Release_Sethia|x86.ActiveCfg = Release_Sethia|Win32
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Release_Sethia|x86.Build.0 = Release_Sethia|Win32
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Release|x86.ActiveCfg = Release|Win32
-		{CA7D2187-3104-40F6-B279-C2178C007AF7}.Release|x86.Build.0 = Release|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_Debug|x86.ActiveCfg = R_Debug|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_Debug|x86.Build.0 = R_Debug|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_External|x86.ActiveCfg = R_External|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_External|x86.Build.0 = R_External|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_Full|x86.ActiveCfg = R_Full|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_Full|x86.Build.0 = R_Full|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_Sethia|x86.ActiveCfg = R_Sethia|Win32
+		{CA7D2187-3104-40F6-B279-C2178C007AF7}.R_Sethia|x86.Build.0 = R_Sethia|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
