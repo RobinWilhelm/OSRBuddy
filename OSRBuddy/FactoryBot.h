@@ -4,7 +4,6 @@
 #include "AceColouredString.h"
 #include "Structs.h"		
 
-#include "Httplib.h"
 
 #define FACTORYBOT_ACTION_TIME_BASE 300ms	// button clicks and item movement
 #define FACTORYBOT_ACTION_VARIANCE 500ms	

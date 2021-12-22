@@ -25,17 +25,17 @@ namespace Features
 		uint32_t m_used_suffixwipes = 0;
 		uint32_t m_used_suffixcards = 0;
 
-		uint32_t m_cost_enchprots_e1 = 0;
-		uint32_t m_cost_enchprots_e5 = 0;
+		uint64_t m_cost_enchprots_e1 = 0;
+		uint64_t m_cost_enchprots_e5 = 0;
 
-		uint32_t m_cost_chancecards_3 = 0;
-		uint32_t m_cost_chancecards_5 = 0;
-		uint32_t m_cost_chancecards_8 = 0;
+		uint64_t m_cost_chancecards_3 = 0;
+		uint64_t m_cost_chancecards_5 = 0;
+		uint64_t m_cost_chancecards_8 = 0;
 
-		uint32_t m_cost_enchantcards = 0;
-		uint32_t m_cost_speedcards = 0;
-		uint32_t m_cost_energyshieldcard = 0;
-		uint32_t m_cost_total = 0;
+		uint64_t m_cost_enchantcards = 0;
+		uint64_t m_cost_speedcards = 0;
+		uint64_t m_cost_energyshieldcard = 0;
+		uint64_t m_cost_total = 0;
 	};
 
 	struct EnchantResult

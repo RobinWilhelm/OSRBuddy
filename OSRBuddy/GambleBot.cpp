@@ -9,6 +9,7 @@
 #include "Utility.h"
 
 #include "PersistingTools.h"
+#include <algorithm>
 
 
 #include <algorithm> // std::find

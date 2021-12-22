@@ -226,6 +226,10 @@ bool OSRBuddyMain::Start()
 #ifdef FEATURE_DEBUGINFO
         RegisterFeature(new Features::DebugInfo(this));
 #endif
+#ifdef FEATURE_ANTIRAND
+        RegisterFeature(new Features::AntiMTRandBot(this));
+#endif
+
     
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
             throw exception("D3D9 Hooks failed to initialise");

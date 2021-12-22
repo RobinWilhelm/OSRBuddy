@@ -46,6 +46,7 @@ namespace Features
 		bool m_open_wpcapsule;
 		bool m_open_soccer_ball_capsule;
 		bool m_open_vanillaicecream_capsule;
+		bool m_open_sp_mineral_caps;
 		// halloween
 		bool m_open_halloween_capsule;
 		bool m_open_halloween_staff_box;

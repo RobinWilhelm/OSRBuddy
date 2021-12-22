@@ -76,6 +76,7 @@ namespace Features
 		void ChangeState(GrindBot::State newState);
 		void ChangeTarget(CMonsterData* newTarget);
 		void GetNewTarget();
+		void Reset();
 
 	private:
 		float GetTargetDistance(CAtumData* m_target);
@@ -100,9 +101,6 @@ namespace Features
 		bool Swap();
 
 
-#pragma optimize( "", off )
-		void DEBUG_CHRISTMAS_EVENT_CRASH(CMonsterData* monster);
-#pragma optimize( "", on ) 
 
 	private:
 		CMonsterData* m_target;

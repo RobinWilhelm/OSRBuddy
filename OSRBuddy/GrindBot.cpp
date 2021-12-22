@@ -11,6 +11,7 @@
 
 #include "SDK/AtumApplication.h"
 
+#include <algorithm>
 #include <cmath>
 #include <string> 
 
@@ -29,8 +30,8 @@ namespace Features
         m_mobs.clear(); 
 
         m_shoot_all_goldies = true;
-        m_visible_only = true;
-        m_keep_shooting = true;
+        m_visible_only = false;
+        m_keep_shooting = false;
         m_target_delay_min = MIN_NEW_TARGET_DELAY_TIME.count();
         m_target_delay_max = MAX_NEW_TARGET_DELAY_TIME.count();
         m_target_mode = TargetMode::CrosshairDistance;
@@ -42,7 +43,7 @@ namespace Features
 
         m_aimtime_current = 0ms;
         m_aimtime_final = 0ms;
-        m_anti_ram = true;
+        m_anti_ram = false;
 
         m_awaiting_siege_toggle_ok = false;
         m_grinding_map = 0;
@@ -121,11 +122,11 @@ namespace Features
             // re-think this
             if (!m_target)
             {
+                OSR_API->UsePrimaryWeapon(false);
+                OSR_API->UseSecondaryWeapon(false);
                 m_no_target_time += std::chrono::duration_cast<std::chrono::milliseconds>(m_buddy->GetTickTime());
                 if (m_no_target_time >= NO_TARGET_SIEGE_DISABLE_TIME) 
                 {
-                    OSR_API->UsePrimaryWeapon(false);
-                    OSR_API->UseSecondaryWeapon(false);
                     m_kitbot->ToggleSKill(SkillType::Siege_Mode, false);
                 }
             } 
@@ -151,7 +152,7 @@ namespace Features
             {
                 OSR_API->UsePrimaryWeapon(true);
                 // only use secondary if in radar range          
-                OSR_API->UseSecondaryWeapon(GetTargetDistance(m_target) <= OSR_API->GetRadarRangeSecondary(true));        
+                OSR_API->UseSecondaryWeapon(GetTargetDistance(m_target) <= OSR_API->GetRadarRangeSecondary(OSR_API->GetRadarRangeSecondaryParamfactors()));        
             } 
             else
             {
@@ -209,13 +210,22 @@ namespace Features
                     ImGui::Text("Settings");
                     ImGui::Separator();               
 
+                    if (ImGui::Button("Reset"))
+                    {
+                        Reset();
+                    }
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("Reset mob statistic and map");
+                    }
+
                     ImGui::Text("Start / Stop hotkey:");
                     ImGui::SameLine();
                     if (!m_wait_for_hotkey)
                     {
-                        ImGui::Text(m_vkc_description.c_str());
+                        ImGui::Text(m_vkc_description.c_str());           
                         ImGui::SameLine();
-                        if (ImGui::Button("Select New")) {
+                        if (ImGui::Button("Select New")) 
+                        {
                             m_wait_for_hotkey = true;
                         }
                     }
@@ -740,8 +750,6 @@ namespace Features
                         gmi.goldy = false;
                         gmi.killed = 0;
 
-                        DEBUG_CHRISTMAS_EVENT_CRASH(monster.second);
-
                         if(CanShootAtTarget(monster.second))
                             gmi.count = 1;
                         else
@@ -842,13 +850,6 @@ namespace Features
         }
         return false;
     }
-#pragma optimize( "", off )
-    void GrindBot::DEBUG_CHRISTMAS_EVENT_CRASH(CMonsterData* monster)
-    {
-        std::string monstername = monster->m_pMonsterInfo->MonsterName;
-        int i = 123;
-    }
-#pragma optimize( "", on ) 
        
     FeatureType GrindBot::GetType() const
     {
@@ -863,53 +864,11 @@ namespace Features
             return;
         }
 
-        m_total_mobs_killed = 0;
-        m_mobs.clear();
+        Reset();
 
-    #ifdef SUMMER_EVENT
-        // sommer event special, always add these monster to the list
-        GrindMonsterInfo gmi;
-        gmi.name = "Dropped Ball";
-        gmi.goldy = true;
-        gmi.killed = 0;
-        gmi.priority = true;
-        gmi.shoot = true;
-        m_mobs.insert({ TO_INT(MonsterUnitKind::Dropped_Ball) , gmi});
-        gmi.name = "Flying Ball";
-        m_mobs.insert({ TO_INT(MonsterUnitKind::Flying_Ball) , gmi });
-    #endif
-          
-        // halloween event special, always add these monster to the list
-    #ifdef HALLOWEEN_EVENT
-        GrindMonsterInfo gmi;
-        gmi.name = "Halloween Bat";
-        gmi.goldy = true;
-        gmi.killed = 0;
-        gmi.priority = true;
-        gmi.shoot = true;
-        m_mobs.insert({ TO_INT(MonsterUnitKind::Halloween_Bat) , gmi});
-        gmi.name = "Mutant Pumpkin";
-        m_mobs.insert({ TO_INT(MonsterUnitKind::Mutant_Pumpkin) , gmi });
-    #endif
 
-#ifdef CHRISTMAS_EVENT
-        GrindMonsterInfo gmi;
-        gmi.name = "Santa Cat";
-        gmi.goldy = true;
-        gmi.killed = 0;
-        gmi.priority = true;
-        gmi.shoot = true;
-        m_mobs.insert({ TO_INT(MonsterUnitKind::Santa_Cat) , gmi });
-        gmi.name = "\\cSnowman\\c";
-        m_mobs.insert({ TO_INT(MonsterUnitKind::Snowman_blue) , gmi });
-#endif
 
-        m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;    
-                                   
-        // reset grinding timer
-        m_grinding_time = 0ms;
-        m_grinding_time_total = 0ms;
-        m_grind_time_string = Utility::GetTimeString(m_grinding_time);
+  
 
         m_kitbot = static_cast<KitBuffBot*>(m_buddy->GetFeatureByType(FeatureType::KitBuffBot));
         if (m_kitbot)
@@ -929,7 +888,7 @@ namespace Features
             //kitbot_settings.spkit_type_c_minvalue = TO_INT(OSR_API->GetMaxSkillp() * 0.6f);
 
             kitbot_settings.use_spkit_type_b = true;
-            kitbot_settings.spkit_type_b_minvalue = TO_INT(OSR_API->GetMaxSkillp()* 0.2f);
+            kitbot_settings.spkit_type_b_minvalue = std::max(TO_INT(OSR_API->GetMaxSkillp()* 0.2f), 55);
 
             m_kitbot->SetSettings(kitbot_settings);
         
@@ -1094,5 +1053,56 @@ namespace Features
                 m_get_new_target = false;
             }
         }
+    }
+
+    void GrindBot::Reset()
+    {
+        ChangeState(State::WAITING);
+        m_total_mobs_killed = 0;
+        m_mobs.clear();
+        m_grinding_map = OSR_API->GetCurrentMapChannelIndex().MapIndex;
+
+        // reset grinding timer
+        m_grinding_time = 0ms;
+        m_grinding_time_total = 0ms;
+        m_grind_time_string = Utility::GetTimeString(m_grinding_time);      
+
+#ifdef SUMMER_EVENT
+        // sommer event special, always add these monster to the list
+        GrindMonsterInfo gmi;
+        gmi.name = "Dropped Ball";
+        gmi.goldy = true;
+        gmi.killed = 0;
+        gmi.priority = true;
+        gmi.shoot = true;
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Dropped_Ball) , gmi });
+        gmi.name = "Flying Ball";
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Flying_Ball) , gmi });
+#endif
+
+        // halloween event special, always add these monster to the list
+#ifdef HALLOWEEN_EVENT
+        GrindMonsterInfo gmi;
+        gmi.name = "Halloween Bat";
+        gmi.goldy = true;
+        gmi.killed = 0;
+        gmi.priority = true;
+        gmi.shoot = true;
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Halloween_Bat) , gmi });
+        gmi.name = "Mutant Pumpkin";
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Mutant_Pumpkin) , gmi });
+#endif
+
+#ifdef CHRISTMAS_EVENT
+        GrindMonsterInfo gmi;
+        gmi.name = "Santa Cat";
+        gmi.goldy = true;
+        gmi.killed = 0;
+        gmi.priority = true;
+        gmi.shoot = true;
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Santa_Cat) , gmi });
+        gmi.name = "\\cSnowman\\c";
+        m_mobs.insert({ TO_INT(MonsterUnitKind::Snowman_blue) , gmi });
+#endif
     }
 }

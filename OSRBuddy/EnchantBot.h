@@ -147,6 +147,13 @@ namespace Features
 		virtual FeatureType GetType() const override;
 		virtual void OnEnable() override;
 
+		void StartEnchantResultLog();
+		void StopEnchantResultLog();
+		void SaveEnchantResultLog();
+		bool IsEnchantResultLogActive() { return m_er_log_active; };
+		float GetEnchantResultEntropy() { return m_total_entropy; };
+		const std::vector<EnchantResult>& GetEnchantResults() { return m_er_log; };
+
 	private:
 		EnchantBotState GetEnchantBotState();
 		void SetEnchantBotState(EnchantBotState);
@@ -190,8 +197,6 @@ namespace Features
 
 		void SetOptimizedEnchantSettings(bool optimized);
 
-		void StartEnchantResultLog();
-		void StopEnchantResultLog();
 
 	private:
 		EnchantBotState			m_state;
@@ -247,8 +252,7 @@ namespace Features
 
 		// log enchant result for randomness breaker
 		bool					m_er_log_active;
-		nlohmann::json			m_er_log_json;
-		EnchantResultPersistingPtr	m_er_persisting;
+		std::vector<EnchantResult> m_er_log;
 		float					m_total_entropy;
 	};
 }

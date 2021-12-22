@@ -636,6 +636,25 @@ CItemInfo* OldSchoolRivalsAPI::FindItemFromTarget(UID64_t UniqueNumber)
 	return nullptr;
 }
 
+CItemInfo* OldSchoolRivalsAPI::FindItemFromTarget(INT itemnum)
+{
+	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
+	if (!citylab) {
+		return nullptr;
+	}
+
+	vector<CItemInfo*>::iterator it = citylab->m_vecTarget.begin();
+	while (it != citylab->m_vecTarget.end())
+	{
+		if (itemnum == (*it)->ItemNum)
+		{
+			return (*it);
+		}
+		it++;
+	}
+	return nullptr;
+}
+
 CItemInfo* OldSchoolRivalsAPI::FindItemFromSource(UID64_t UniqueNumber)
 {
 	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
@@ -647,6 +666,25 @@ CItemInfo* OldSchoolRivalsAPI::FindItemFromSource(UID64_t UniqueNumber)
 	while (it != citylab->m_vecSource.end())
 	{
 		if (UniqueNumber == (*it)->UniqueNumber)
+		{
+			return (*it);
+		}
+		it++;
+	}
+	return nullptr;
+}
+
+CItemInfo* OldSchoolRivalsAPI::FindItemFromSource(INT itemnum)
+{
+	CINFCityLab* citylab = static_cast<CINFCityLab*>(FindBuildingShop(BUILDINGKIND_LABORATORY));
+	if (!citylab) {
+		return nullptr;
+	}
+
+	vector<CItemInfo*>::iterator it = citylab->m_vecSource.begin();
+	while (it != citylab->m_vecSource.end())
+	{
+		if (itemnum == (*it)->ItemNum)
 		{
 			return (*it);
 		}

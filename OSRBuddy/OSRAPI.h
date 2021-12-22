@@ -82,7 +82,9 @@ public:
 	void OnButtonClick(int button, bool factory = false);
 	void InvenToSourceItem(CItemInfo* pItemInfo, int nCount, bool factory = false, bool useMacroSource = false /*true if you want to move the item to Inetpubs macrogamblebot*/);
 	CItemInfo* FindItemFromTarget(UID64_t UniqueNumber);
-	CItemInfo* FindItemFromSource(UID64_t UniqueNumber);
+	CItemInfo* FindItemFromTarget(INT itemnum);
+	CItemInfo* FindItemFromSource(UID64_t UniqueNumber);  	
+	CItemInfo* FindItemFromSource(INT itemnum);
 
 	//CINFGameMain
 	INVEN_DISPLAY_INFO* GetSelectedItem();

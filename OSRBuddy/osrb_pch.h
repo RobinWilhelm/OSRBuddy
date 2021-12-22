@@ -26,7 +26,7 @@
 #include "imgui/imgui_notify.h"
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
-#include "Httplib.h"
+#include "Httplib/Httplib.h"
 #pragma comment(lib, "ws2_32.lib")
 
 #include "nlohmann/json.hpp"

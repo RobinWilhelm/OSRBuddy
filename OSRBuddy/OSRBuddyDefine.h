@@ -291,6 +291,7 @@ enum class ItemNumber : int
     Fantasy_Globe_Mineral_Capsule = 7023480,
     Halloween_Capsule = 1700300,
     Halloween_Staff_Box = 1800210,
+    Sp_Mineral_Caps = 9040170,
 
     WP_Capsule_3 = 7030448,
     WP_Capsule_10 = 7030447,

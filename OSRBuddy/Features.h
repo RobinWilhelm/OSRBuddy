@@ -9,5 +9,6 @@
 #include "Miscellaneous.h"
 #include "InventoryManager.h"
 #include "ESP.h"
+#include "AntiMTRand.h"
 
 #include "FeatureTypes.h"

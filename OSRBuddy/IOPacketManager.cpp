@@ -144,7 +144,16 @@ bool IOPacketManager::OnReadPacket(unsigned short msgtype, byte* packet)
 			}
 		}
 		break;
-
+	case T_FC_ITEM_USE_ENCHANT_OK:
+		{
+			MSG_FC_ITEM_USE_ENCHANT_OK* msg = reinterpret_cast<MSG_FC_ITEM_USE_ENCHANT_OK*>(packet);
+			auto item = OSR_API->FindItemFromTarget(msg->EnchantItemNum);
+			if (item && item->UniqueNumber == m_enchant_item_sent)
+			{
+				m_enchant_item_sent = 0;
+			}
+		}
+		break;
 	case T_ERROR:
 		{
 			DEBUG_INCREMENT(m_debug_info.errors_recieved);
@@ -258,6 +267,13 @@ bool IOPacketManager::OnWritePacket(unsigned short msgtype, byte* packet)
 			MSG_FC_ITEM_CHANGE_WINDOW_POSITION* msg = (MSG_FC_ITEM_CHANGE_WINDOW_POSITION*)packet;
 			m_change_window_position_sent = msg->ToItemUniqueNumber;
 			DEBUG_INCREMENT(m_debug_info.change_window_postion_sent);
+		}
+		break;
+	case T_FC_ITEM_USE_ENCHANT:
+		{
+			MSG_FC_ITEM_USE_ENCHANT* msg = reinterpret_cast<MSG_FC_ITEM_USE_ENCHANT*>(packet);
+			m_enchant_item_sent = msg->TargetItemUniqueNumber;
+			DEBUG_INCREMENT(m_debug_info.enchant_item_sent);
 		}
 		break;
 	}

@@ -42,6 +42,7 @@ TrampolineHook<FuncType>::TrampolineHook(byte* funcAddr, byte* destination, unsi
 	m_destination = destination;
 	m_source = funcAddr;
 	m_length = trampLength;
+	m_gateway = 0;
 	Init();
 }
 

@@ -222,10 +222,7 @@
   <ItemGroup>
     <ClInclude Include="AceColouredString.h" />
     <ClInclude Include="AntiAntiCheat.h" />
-    <ClInclude Include="AtumDateTime.h" />
-    <ClInclude Include="AtumError.h" />
-    <ClInclude Include="AtumProtocol.h" />
-    <ClInclude Include="AtumTypedef.h" />
+    <ClInclude Include="AntiMTRand.h" />
     <ClInclude Include="BuddyAPI.h" />
     <ClInclude Include="BuddyTimer.h" />
     <ClInclude Include="Content.h" />
@@ -236,7 +233,8 @@
     <ClInclude Include="FeatureTypes.h" />
     <ClInclude Include="GambleFixes.h" />
     <ClInclude Include="Features.h" />
-    <ClInclude Include="Httplib.h" />
+    <ClInclude Include="HotkeyManager.h" />
+    <ClInclude Include="Httplib\Httplib.h" />
     <ClInclude Include="ImComboBox.h" />
     <ClInclude Include="imgui\fa_solid_900.h" />
     <ClInclude Include="imgui\font_awesome_5.h" />
@@ -248,6 +246,9 @@
     <ClInclude Include="IPacketWatcher.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Miscellaneous.h" />
+    <ClInclude Include="MTRand.h" />
+    <ClInclude Include="MTRandSimulator.h" />
+    <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="osrb_pch.h" />
     <ClInclude Include="OsrItemInfo.h" />
     <ClInclude Include="Console.h" />
@@ -271,7 +272,6 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="MarsenneTwister.h" />
     <ClInclude Include="OSRBuddyDefine.h" />
     <ClInclude Include="KitBot.h" />
     <ClInclude Include="OSRPediaApi.h" />
@@ -280,6 +280,7 @@
     <ClInclude Include="OSRBuddy.h" />
     <ClInclude Include="OSRImGuiMenu.h" />
     <ClInclude Include="PersistingTools.h" />
+    <ClInclude Include="RandomBreakHelper.h" />
     <ClInclude Include="SDK\AppEffectData.h" />
     <ClInclude Include="SDK\AtumApplication.h" />
     <ClInclude Include="SDK\AtumData.h" />
@@ -362,16 +363,29 @@
   <ItemGroup>
     <ClCompile Include="AceColouredString.cpp" />
     <ClCompile Include="AntiAntiCheat.cpp" />
+    <ClCompile Include="AntiMTRand.cpp" />
     <ClCompile Include="BuddyFeatureBase.cpp" />
     <ClCompile Include="BuddyTimer.cpp" />
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
     <ClCompile Include="ESP.cpp" />
     <ClCompile Include="FactoryBot.cpp" />
+    <ClCompile Include="HotkeyManager.cpp" />
     <ClCompile Include="ImComboBox.cpp" />
     <ClCompile Include="InventoryManager.cpp" />
     <ClCompile Include="IOPacketManager.cpp" />
     <ClCompile Include="Miscellaneous.cpp" />
+    <ClCompile Include="MTRand.cpp">
+      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='R_Sethia|Win32'">false</SDLCheck>
+      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='R_Full|Win32'">false</SDLCheck>
+      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='R_Debug|Win32'">false</SDLCheck>
+      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='R_External|Win32'">false</SDLCheck>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='R_Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='R_Sethia|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='R_Full|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='R_External|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="MTRandSimulator.cpp" />
     <ClCompile Include="osrb_pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='R_Sethia|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='R_Debug|Win32'">Create</PrecompiledHeader>
@@ -408,6 +422,7 @@
     <ClCompile Include="OSRPediaApi.cpp" />
     <ClCompile Include="PatternManager.cpp" />
     <ClCompile Include="PersistingTools.cpp" />
+    <ClCompile Include="RandomBreakHelper.cpp" />
     <ClCompile Include="TestItemUse.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="DebugInfo.cpp" />

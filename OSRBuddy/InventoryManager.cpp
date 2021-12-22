@@ -30,6 +30,8 @@ namespace Features
 		m_open_mineralcapsule = true;
 		m_open_wpcapsule = true;
 		m_open_soccer_ball_capsule = true;
+		m_open_sp_mineral_caps = false;
+
 		m_delete_items = false;
 		m_delete_items_maxlevel = 20;
 		m_delete_weapons = false;
@@ -139,6 +141,7 @@ namespace Features
 					ImGui::Checkbox("Mineral Capsules", &m_open_mineralcapsule);
 					ImGui::Checkbox("Warpoint Capsules", &m_open_wpcapsule);
 					ImGui::Checkbox("Mystery Capsule", &m_open_mystery_capsule);
+					ImGui::Checkbox("SP Mineral Caps", &m_open_sp_mineral_caps);
 				}
 				ImGui::NextColumn();
 				{
@@ -361,6 +364,9 @@ namespace Features
 		if (m_open_capsules && !OSR_API->IsInventoryFull())
 		{
 			if (m_open_mineralcapsule && TryOpenCapsule(ItemNumber::Mineral_Capsule)) {
+				return;
+			}
+			if (m_open_sp_mineral_caps && TryOpenCapsule(ItemNumber::Sp_Mineral_Caps)) {
 				return;
 			}
 

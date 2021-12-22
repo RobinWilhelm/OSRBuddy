@@ -4,7 +4,7 @@
 #include <functional>
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
-#include "Httplib.h"
+#include "Httplib/Httplib.h"
 #pragma comment(lib, "ws2_32.lib")
 
 class OSRPediaApi

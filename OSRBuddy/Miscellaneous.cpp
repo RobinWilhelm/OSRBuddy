@@ -21,10 +21,26 @@ namespace Features
 	{
 		m_whisperwarner_active = false;
 		m_whisperwarner_snooze_enabled = true;
+		m_whisper_popup_open = false;
+
+		m_autocharms_active = false;
+		m_combo_items.clear();
+
+		m_use_ammobox = false;
+		m_use_stealthcard = false;
+		m_use_rabbit = false;
+
+		m_awaiting_server_ok_ammobox = false;
+		m_awaiting_server_ok_rabbit = false;
+		m_awaiting_server_ok_stealthcard = false;
+
+		m_autoflip = false;
+		m_bosswarner = false;
+		m_boss_popup_open = false;
+
 
 		m_bosscheck_timer = BuddyTimer(BOSS_CHECK_REATTACK);
 		m_autoitems_timer = BuddyTimer(AUTO_ITEM_REATTACK);
-		m_bosswarner = false;
 		m_update_charms_timer = BuddyTimer(UPDATE_CHARM_COMBO_REATTACK);
 		m_selected_combo_item = ImGui::ComboItem();
 	}

@@ -34,4 +34,6 @@ namespace ImGui
     bool ComboEx(const char* label, int* current_item, void* data, int items_count, int popup_max_height_in_items = -1, bool leftSideText = true, float max_width = 0);
 
     bool BeginComboLeftSidedText(const char* label, const char* preview_value, ImGuiComboFlags flags);
+
+
 }

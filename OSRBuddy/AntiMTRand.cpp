@@ -1,20 +1,25 @@
+#include "osrb_pch.h"
 #include "AntiMTRand.h"
-#include "MarsenneTwister.h"
+#include "MTRandSimulator.h"
 #include <string>
+#include "EnchantBot.h"
 
-#define IS_BETWEEN(value, minval, maxval) (value >= minval && value <= maxval)
-#define MAX_RAND100_VALUE		99				// int, 0 ~ 99
-#define MAX_RAND1000_VALUE		999				// int, 0 ~ 999
-#define MAX_RAND10K_VALUE		9999			// int, 0 ~ 9999
-#define MAX_RAND100K_VALUE		99999			// int, 0 ~ 99999
-#define MAX_RAND1000K_VALUE		999999			// int, 0 ~ 999999
-#define MAX_RAND256_VALUE		255				// int, 0 ~ 255
+#define COLOR_GREEN (ImColor(0x00, 0xFF, 0x00).Value) // green
+#define COLOR_RED	(ImColor(0xFF, 0x00, 0x00).Value) // red
 
-const std::vector<uint32_t> AntiMTRandBot::m_enchant_probabilities = { 10000, 10000, 10000, 10000, 10000, 9000, 8000, 6600, 4000, 2000, 1000, 500, 100 };
+using namespace Features;
 
 AntiMTRandBot::AntiMTRandBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
-
+	m_seed = 4160871962;
+	m_sequence_search_start = 0;
+	m_sequence_search_end = 100000;
+	m_mtrandsim = std::make_unique<MTRandSimulator>(m_seed);
+	m_randomhelper = std::make_unique<RandomBreakHelper>();
+	m_mtrandsim->GenerateRandomSequence(1000000);
+	m_in_seq = false;
+	m_current_entropy = 0.0f;
+	m_current_enchant_target = 0;
 }
 
 AntiMTRandBot::~AntiMTRandBot()
@@ -27,140 +32,150 @@ void AntiMTRandBot::Tick()
 
 }
 
-void AntiMTRandBot::Render(IDirect3DDevice9* device)
-{
-
-}
-
 void AntiMTRandBot::RenderImGui()
 {
-	ImGui::InputInt("Input Seed", reinterpret_cast<int*>(&m_seed));
-	ImGui::InputInt("Test Sequence Length", reinterpret_cast<int*>(&m_sequence_length));
-	if (ImGui::Button("Generate New Test Sequence")) {
-		GenerateNewTestSequence();
-	}
+	DrawEnableCheckBox();
 
-	if (ImGui::Button("Search Sequence Offset. This may take a few seconds!")) 
-	{ 		
-		uint32_t sequence_off = 0;
+	ImGui::NewLine();
 
-		if (SearchSequenceOffset(&sequence_off))
-		{
-			m_sequence_offset = sequence_off;
-			m_ready = true;
-		}
-	}
-	if (m_ready)
+	ImGui::Text("Current Seed (Restart: 20.12.2021 - 20:03:08");
+	ImGui::Text(std::to_string(m_seed).c_str());
+	ImGui::InputInt("Search Start", reinterpret_cast<int*>(&m_sequence_search_start));
+	ImGui::InputInt("Search End", reinterpret_cast<int*>(&m_sequence_search_end));
+	if (!m_logging_active)
 	{
-		if (ImGui::Button("Next")) {
-			GetRandInt32(m_sequence_offset, 0, MAX_RAND10K_VALUE);
+		if (ImGui::Button("Start Logging"))
+		{
+			m_logging_active = true;
+			m_enchant_logs.clear();
+			m_current_entropy = 0.0f;
+			m_seq_search_result.found = false;
 		}
-
-		uint32_t sequence_offset_buffer = m_sequence_offset;
-		std::string next_value_text = "Predicted Value: " + std::to_string(GetRandInt32(sequence_offset_buffer, 0, MAX_RAND10K_VALUE));
-		ImGui::Text(next_value_text.c_str());
 	}
-}
-
-bool AntiMTRandBot::OnReadPacket(unsigned short msgtype, char* packet)
-{
-	return false;
-}
-
-const char* AntiMTRandBot::GetName() const
-{
-	return "Anti Randomness V0.1";
-}
-
-std::vector<uint32_t> AntiMTRandBot::GetEnchantProbabilities()
-{
-	return m_enchant_probabilities;
-}
-
-
-void AntiMTRandBot::GenerateNewTestSequence()
-{
-	m_mtrand.reset();
-	m_rand_sequence.clear();
-	m_mtrand = std::make_unique<MTRand>(m_seed);
-	m_rand_sequence.reserve(m_sequence_length);
-
-	for (uint32_t i = 0; i < m_sequence_length; i++) {
-		m_rand_sequence.push_back(m_mtrand->randInt());
+	else
+	{
+		if (ImGui::Button("Stop Logging"))
+		{
+			m_logging_active = false;
+		}
 	}
+
+	ImGui::Text("Log entries:");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(m_enchant_logs.size()).c_str());
+
+	ImGui::Text("Current log entries entropy:");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(m_current_entropy).c_str());
+
+	if (ImGui::Button("Search"))
+	{
+		m_seq_search_result = m_randomhelper->SearchEnchantResultSequence(m_mtrandsim.get(), m_enchant_logs, m_sequence_search_start);	
+		if (m_seq_search_result.found)
+		{
+			m_in_seq = true;
+		}
+	}
+
+	if (m_in_seq)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GREEN);
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_RED);
+	}
+
+	if (m_seq_search_result.found)
+	{
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(m_seq_search_result.sequence_end).c_str());
+		uint32_t offset = m_seq_search_result.sequence_end;
+		for(int i = 0; i < 10; i++)
+		{
+			ImGui::Text(std::to_string(m_mtrandsim->GetRandInt32(offset, 0, MAX_RAND10K_VALUE)).c_str());
+		}
+	}
+
+	ImGui::PopStyleColor();
 }
 
-bool AntiMTRandBot::GetRandInt32(std::vector<uint32_t> rand_sequence, uint32_t& sequence_offset, uint32_t min_value, uint32_t max_value, uint32_t* randNr)
+
+std::string AntiMTRandBot::GetName() const
 {
-	if (min_value >= max_value) {
+	return "AntiRand";
+}
+
+FeatureType Features::AntiMTRandBot::GetType() const
+{
+	return FeatureType::AntiRandomness;
+}
+
+bool Features::AntiMTRandBot::OnReadPacket(unsigned short msgtype, byte* packet)
+{
+	if (!IsEnabled() || !m_logging_active)
+	{
 		return false;
 	}
 
-	UINT nGap = max_value - min_value;
-
-	// Find which bits are used in n
-	// Optimized by Magnus Jonsson (magnus@smartelectronix.com)
-	unsigned long used = nGap;
-	used |= used >> 1;
-	used |= used >> 2;
-	used |= used >> 4;
-	used |= used >> 8;
-	used |= used >> 16;
-
-	// Draw numbers until one is found in [0,n]
-	unsigned long i;
-	do
+	switch (msgtype)
 	{
-		if (sequence_offset >= rand_sequence.size()) {
-			return false;
+	case T_FC_ITEM_USE_ENCHANT_OK:
+		MSG_FC_ITEM_USE_ENCHANT_OK* msg = reinterpret_cast<MSG_FC_ITEM_USE_ENCHANT_OK*>(packet);
+		CINFCityLab* citylab = static_cast<CINFCityLab*>(OSR_API->FindBuildingShop(BUILDINGKIND_LABORATORY));
+		if (!citylab) {
+			return nullptr;
 		}
 
-		i = rand_sequence[sequence_offset] & used;  // toss unused bits to shorten search
-		sequence_offset++;
-	} while (i > nGap);
+		for (auto& item : citylab->m_vecTarget)
+		{
+			if (IS_ENCHANT_TARGET_ITEMKIND(item->Kind) && item->UniqueNumber == m_current_enchant_target)
+			{
+				OnEnchant(item, msg->bSuccessFlag);
+			}
+		}
+		break;
+	}
 
-
-	(*randNr) = min_value + i;
-	return true;
+	return false;
 }
 
-bool AntiMTRandBot::SearchSequenceOffset(std::vector<uint32_t> rand_sequence, uint32_t rand_sequence_length, std::vector<EnchantResult> test_sequence, std::uint32_t* sequence_offset, bool beginonly = false)
+bool Features::AntiMTRandBot::OnWritePacket(unsigned short msgtype, byte* packet)
 {
-	uint32_t test_sequence_index = 0;
-	for (uint32_t offset = 0; offset <= (rand_sequence.size() - test_sequence.size()); offset++)
+	if (!IsEnabled() || !m_logging_active)
 	{
-		uint32_t cumulOffset = (*sequence_offset) + offset;
-		bool in_sequence = false;
+		return false;
+	}
 
-		do
-		{
-			uint32_t randNr;
-			if (!GetRandInt32(rand_sequence, cumulOffset, 0, MAX_RAND10K_VALUE, &randNr)) {
-				break;
-			}
-			uint32_t prob = m_enchant_probabilities[test_sequence[test_sequence_index].try_enchant_to - 1];
-
-			if (test_sequence[test_sequence_index].success == (randNr <= prob))
-			{
-				test_sequence_index++;
-				if (test_sequence_index == test_sequence.size()) {
-					(*sequence_offset) = cumulOffset;
-					return true;
-				}
-			}
-			else
-			{
-				test_sequence_index = 0;
-				if (beginonly) {
-					return false;
-				}
-			}
-
-		} while (cumulOffset < (rand_sequence.size() - test_sequence.size()) || test_sequence_index > 0);
-
-		if (beginonly) {
-			break;
-		}
+	switch (msgtype)
+	{
+	case T_FC_ITEM_USE_ENCHANT:
+	{
+		MSG_FC_ITEM_USE_ENCHANT* msg = reinterpret_cast<MSG_FC_ITEM_USE_ENCHANT*>(packet);
+		m_current_enchant_target = msg->TargetItemUniqueNumber;
+	}
+	break;
 	}
 	return false;
+}
+
+void Features::AntiMTRandBot::OnEnchant(CItemInfo* item, bool success)
+{
+	EnchantResult er;
+	er.success = success;
+	er.try_enchant_to = item->m_nEnchantNumber + 1; // game has not updated this number yet
+
+	m_enchant_logs.push_back(er);
+	float prob = RandomBreakHelper::GetEnchantProb(er.try_enchant_to) / 10000.0f;
+	m_current_entropy += (-1) * log2f(success ? prob : 1 - prob);
+
+	if (m_seq_search_result.found)
+	{
+		uint32_t randnum = m_mtrandsim->GetRandInt32(m_seq_search_result.sequence_end, 0, MAX_RAND10K_VALUE);
+
+		if (success != (randnum <= RandomBreakHelper::GetEnchantProb(er.try_enchant_to)))
+		{
+			m_in_seq = false;
+		}
+	}
 }

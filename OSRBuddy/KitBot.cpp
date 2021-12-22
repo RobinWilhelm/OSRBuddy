@@ -29,21 +29,41 @@ namespace Features
     {       
         ZeroMemory(&m_settings, sizeof(KitBuffBot::KitSettings));
 
-        m_settings.kitmode = KitBuffBot::Mode::Humanized;
-        m_shieldkit_reattack_time = 0ms;
-        m_energykit_reattack_time = 0ms;
-        m_skillpkit_reattack_time = 0ms;
+        m_settings.kitmode              = KitBuffBot::Mode::Humanized;
+        m_shieldkit_reattack_time       = 0ms;
+        m_energykit_reattack_time       = 0ms;
+        m_skillpkit_reattack_time       = 0ms;
+        m_fuelkit_reattack_time         = 0ms;
 
-        m_shieldkit_last_use = 0ms;
-        m_energykit_last_use = 0ms;
-        m_skillkit_last_use = 0ms;
+        m_shieldkit_last_use            = 0ms;
+        m_energykit_last_use            = 0ms;
+        m_skillkit_last_use             = 0ms;
+        m_fuelkit_last_use              = 0ms;
+
+        m_shieldkit_firstuse_delay      = 0ms;
+        m_energykit_firstuse_delay      = 0ms;
+        m_skillpkit_firstuse_delay      = 0ms;
 
         m_shieldkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
         m_energykit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
         m_skillkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+        m_fuelkit_last_use = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
         GrabPlayerSkills();
 
-        m_mgear_targetheal_last_send = 0ms;
+        m_shieldkit_last_send           = 0ms;
+        m_energykit_last_send           = 0ms;
+        m_skillkit_last_send            = 0ms;
+        m_fuelkit_last_send             = 0ms;
+
+        m_mgear_targetheal_last_send    = 0ms;
+
+        m_awaiting_server_ok_shield     = false;
+        m_awaiting_server_ok_energy     = false;
+        m_awaiting_server_ok_skill      = false;
+        m_awaiting_server_ok_fuel       = false;
+
+        m_last_autobuff_check           = 0ms;
+        m_last_autoheal_check           = 0ms;
     }
 
     bool KitBuffBot::TryUseKit(KitType type, KitCategory category)
@@ -1503,7 +1523,6 @@ namespace Features
     {
         // Update the players skills
         m_playerskills.clear();
-        ClearAutoBuff();
         for (auto& skillinfo : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pSkill->m_mapSkill)
         {
             PlayerSkillInfo* skill = new PlayerSkillInfo();   

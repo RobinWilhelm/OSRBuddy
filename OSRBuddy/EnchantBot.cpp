@@ -83,17 +83,11 @@ namespace Features
 				CItemInfo* targetitem = OSR_API->FindItemFromTarget(m_currentEnchantItemUID);
 				if (targetitem && TryTargetItemToInventory())
 				{ 
-#ifdef ENCHANTBOT_ENCHANTRESULT_LOGGER
 					if (m_er_log_active)
-					{
-						nlohmann::json er;
-						uint32_t enchant_to = m_previous_enchantnum + 1;
+					{							
+						uint8_t enchant_to = m_previous_enchantnum + 1;
 						bool success = (m_enchant_item.GetItemInfo()->m_nEnchantNumber == m_previous_enchantnum + 1);
-						er["try_enchant_to"] = enchant_to;
-						er["success"] = success;
-						m_er_log_json["EnchantResults"].push_back(er);
-						m_er_persisting->Save(m_er_log_json);
-
+						m_er_log.push_back(EnchantResult{ enchant_to, success });
 						float prob = g_Enchant_probabilities[enchant_to - 1] / 10000.0f;
 						if (!success)
 						{
@@ -101,7 +95,6 @@ namespace Features
 						}
 						m_total_entropy += (-1) * log2f(prob);
 					}
-#endif // ENCHANTBOT_ENCHANTRESULT_LOGGER
 
 					// Update item
 					m_enchant_item.Update(m_currentEnchantItemUID);
@@ -524,23 +517,6 @@ namespace Features
 					if (ImGui::Button("Show Statistics")) {
 						ImGui::OpenPopup("StatisticsPopup");
 					}
-#ifdef ENCHANTBOT_ENCHANTRESULT_LOGGER
-					if (!m_er_log_active)
-					{
-						if (ImGui::Button("Start ER Log"))
-						{
-							StartEnchantResultLog();
-						}
-					}
-					else
-					{
-						if (ImGui::Button("Stop ER Log"))
-						{
-							StopEnchantResultLog();
-						}
-					}
-					ImGui::Text(std::to_string(m_total_entropy).c_str());
-#endif
 				}
 				ImGui::EndChild();
 				ImGui::NewLine();
@@ -685,7 +661,7 @@ namespace Features
 
 	void EnchantBot::RenderStatisticsPopup()
 	{
-		ImGui::SetNextWindowSize(ImVec2(550.0f, 420.0f));
+		ImGui::SetNextWindowSize(ImVec2(550.0f, 430.0f));
 		if (ImGui::BeginPopup("StatisticsPopup"/*, &m_popup_statistics_open*/, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar))
 		{ 
 			m_statistics_popup_open = true;
@@ -1717,8 +1693,7 @@ namespace Features
 
 	void EnchantBot::StartEnchantResultLog()
 	{
-		m_er_persisting = m_buddy->GetPersistingTools()->GetEnchantResultPeristence();
-		m_er_persisting->Clear();
+		m_er_log.clear();
 		m_total_entropy = 0.0f;
 		m_er_log_active = true;
 	}
@@ -1726,6 +1701,23 @@ namespace Features
 	void EnchantBot::StopEnchantResultLog()
 	{
 		m_er_log_active = false;
+	}
+
+	void EnchantBot::SaveEnchantResultLog()
+	{
+		auto er_persisting = m_buddy->GetPersistingTools()->GetEnchantResultPeristence();
+		er_persisting->Clear();	 		
+		nlohmann::json er_log_json;
+
+		for (const auto& result : m_er_log)
+		{
+			nlohmann::json er;
+			er["try_enchant_to"] = result.try_enchant_to;
+			er["success"] = result.success;
+			er_log_json["EnchantResults"].push_back(er);
+			er_log_json["Entropy"] = m_total_entropy;
+			er_persisting->Save(er_log_json);
+		}
 	}
 
 	FeatureType EnchantBot::GetType() const

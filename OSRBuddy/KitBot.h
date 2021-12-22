@@ -37,7 +37,7 @@ namespace Features
 	{
 		SkillType type = SkillType::Unknown;
 		CSkillInfo* skillinfo = nullptr;
-		std::string clean_name;
+		std::string clean_name = "Unknown";
 		bool final = false;
 		bool autobuff = false;
 		std::chrono::milliseconds last_send = 0s;

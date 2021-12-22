@@ -1,5 +1,6 @@
 ﻿#include "osrb_pch.h"
 #include "imgui_addition.h"
+#include "..\HotkeyManager.h"
 
 #define COLOR_FANCYCHECKBOX_CHECKED     (ImColor(0x5c, 0x80, 0xd6)) 
 #define COLOR_FANCYCHECKBOX_UNCHECKED   (ImColor(0x2d, 0x37, 0x4f)) 
@@ -362,6 +363,21 @@ bool ImGui::BeginComboLeftSidedText(const char* label, const char* preview_value
     }
     return true;
 }
+
+/*
+bool ImGui::DrawHotkey(const char* label, Hotkey hk)
+{
+    auto& hkmanager = HotkeyManager::GetInstance();
+    ImGui::Text(label);
+    ImGui::SameLine();
+    ImGui::Text(hkmanager.GetHotkeyText(hk).c_str());
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+    {
+        hkmanager.SetHotkeyChange(hk);
+    }
+    return hkmanager.WasHotkeyPressed(hk);
+}
+*/
 
 static bool Items_ArrayGetter(void* data, int idx, const char** out_text)
 {
