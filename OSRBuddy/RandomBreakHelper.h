@@ -39,7 +39,8 @@ class RandomBreakHelper
 public:
 	RandomBreakHelper();
 	
-	SequenceSearchResult SearchEnchantResultSequence(MTRandSimulator* randsimul, const std::vector<Features::EnchantResult>& er, uint32_t sequence_start = 0, bool beginonly = false);
+	SequenceSearchResult SearchEnchantResultSequence(MTRandSimulator* randsimul, const std::vector<Features::EnchantResult>& er);
+	SequenceSearchResult SearchEnchantResultSequence(MTRandSimulator* randsimul, const std::vector<Features::EnchantResult>& er, uint32_t sequence_start = 0, uint32_t sequence_length = 0);
 	bool SimulateEnchant(MTRandSimulator* randsimul, uint32_t enchant_to);
 
 	time_t MakeTime(uint32_t year, uint32_t month, uint32_t day, uint32_t hour, uint32_t minute, uint32_t second);

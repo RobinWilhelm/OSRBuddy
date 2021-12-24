@@ -208,7 +208,11 @@
 	// Better than uint32(x) in case x is floating point in [0,1]
 	// Based on code by Lawrence Kirby (fred@genesis.demon.co.uk)
 
-	/*static*/ uint32 differ = 1;  // guarantee time-based seeds will change
+	//static uint32 differ = 0;  // guarantee time-based seeds will change
+
+	uint32 differ = 1;
+	// 1 is the big magic number to make it work
+	// the prng actually gets seeded two time in the server process
 
 	uint32 h1 = 0;
 	unsigned char* p = (unsigned char*)&t;

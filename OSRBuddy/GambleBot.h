@@ -18,11 +18,11 @@
 #define GAMBLE_ACTION_TIME_BASE 400ms	// button clicks and item movement
 #define GAMBLE_ACTION_VARIANCE 600ms	
 #else
-#define GAMBLE_TIME_BASE 1500ms           // minimum time between to complete gamble actions (add/remove fix) 
+#define GAMBLE_TIME_BASE 1000ms           // minimum time between to complete gamble actions (add/remove fix) 
 #define GAMBLE_TIME_VARIANCE 1000ms
 
-#define GAMBLE_ACTION_TIME_BASE 200ms	// button clicks and item movement
-#define GAMBLE_ACTION_VARIANCE 300ms	
+#define GAMBLE_ACTION_TIME_BASE 400ms	// button clicks and item movement
+#define GAMBLE_ACTION_VARIANCE 400ms	
 #endif // RELEASE_SETHIA
 
 #define COLOR_GAMBLEITEM_GT_100 (ImColor(0x00, 0xFF, 0x00).Value) // green

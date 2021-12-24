@@ -1,8 +1,15 @@
 #include "osrb_pch.h"
 #include "AntiMTRand.h"
 #include "MTRandSimulator.h"
+
+#include "nlohmann/json.hpp"
+#include "PersistingTools.h"
+#include "Utility.h"
+
+#include "SDK/AtumError.h"
+
 #include <string>
-#include "EnchantBot.h"
+
 
 #define COLOR_GREEN (ImColor(0x00, 0xFF, 0x00).Value) // green
 #define COLOR_RED	(ImColor(0xFF, 0x00, 0x00).Value) // red
@@ -13,13 +20,15 @@ AntiMTRandBot::AntiMTRandBot(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 {
 	m_seed = 4160871962;
 	m_sequence_search_start = 0;
-	m_sequence_search_end = 100000;
+	m_sequence_search_length = 100000;
 	m_mtrandsim = std::make_unique<MTRandSimulator>(m_seed);
 	m_randomhelper = std::make_unique<RandomBreakHelper>();
-	m_mtrandsim->GenerateRandomSequence(1000000);
+	m_mtrandsim->GenerateRandomSequence(ANTIMTRAND_GENERATED_SEQUENCE_LENGTH);
 	m_in_seq = false;
 	m_current_entropy = 0.0f;
 	m_current_enchant_target = 0;
+	m_next_numbers.clear();
+	m_recommended_entropy_buffer = Utility::string_format("%.2f bit", log2(m_sequence_search_length));
 }
 
 AntiMTRandBot::~AntiMTRandBot()
@@ -37,67 +46,83 @@ void AntiMTRandBot::RenderImGui()
 	DrawEnableCheckBox();
 
 	ImGui::NewLine();
-
-	ImGui::Text("Current Seed (Restart: 20.12.2021 - 20:03:08");
-	ImGui::Text(std::to_string(m_seed).c_str());
-	ImGui::InputInt("Search Start", reinterpret_cast<int*>(&m_sequence_search_start));
-	ImGui::InputInt("Search End", reinterpret_cast<int*>(&m_sequence_search_end));
-	if (!m_logging_active)
+	ImGui::BeginColumns("AntiMTRandColumns", 2, ImGuiColumnsFlags_NoResize);
 	{
-		if (ImGui::Button("Start Logging"))
+
+		ImGui::Text("Current Seed (Restart: 20.12.2021 - 20:03:08");
+		ImGui::Text(std::to_string(m_seed).c_str());
+		ImGui::NewLine();
+		ImGui::InputInt("Search Start", reinterpret_cast<int*>(&m_sequence_search_start));
+		if (ImGui::InputInt("Length", reinterpret_cast<int*>(&m_sequence_search_length)))
 		{
-			m_logging_active = true;
-			m_enchant_logs.clear();
-			m_current_entropy = 0.0f;
-			m_seq_search_result.found = false;
+			m_recommended_entropy_buffer = Utility::string_format("%.2f bit", log2(m_sequence_search_length));
+		}
+		if (!m_logging_active)
+		{
+			if (ImGui::Button("Start Logging"))
+			{
+				m_logging_active = true;
+				m_enchant_logs.clear();
+				m_current_entropy = 0.0f;
+				m_current_entropy_buffer = Utility::string_format("%.2f bit", m_current_entropy);
+				m_seq_search_result.found = false;
+			}
+		}
+		else
+		{
+			if (ImGui::Button("Stop Logging"))
+			{
+				m_logging_active = false;
+			}
+		}
+
+		if (ImGui::Button("Save Log"))
+		{
+			SaveEnchantLog();
+		}
+
+
+		ImGui::Text("Log entries:");
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(m_enchant_logs.size()).c_str());
+
+		ImGui::Text("Current log entries information:");
+		ImGui::SameLine();
+		ImGui::Text(m_current_entropy_buffer.c_str());
+
+		ImGui::Text("Minimum recommended information:");
+		ImGui::SameLine();
+		ImGui::Text(m_recommended_entropy_buffer.c_str());
+
+
+		if (ImGui::Button("Search"))
+		{
+			m_seq_search_result = m_randomhelper->SearchEnchantResultSequence(m_mtrandsim.get(), m_enchant_logs, m_sequence_search_start, m_sequence_search_length);
+			if (m_seq_search_result.found)
+			{
+				m_in_seq = true;
+				CreateNextRandomNumbersForDisplay(ANTIMTRAND_NEXT_NUMBER_COUNT);
+			}
+		}
+		if (m_in_seq)
+		{
+			ImGui::Text(std::to_string(m_seq_search_result.sequence_end).c_str());
 		}
 	}
-	else
+	ImGui::NextColumn();
 	{
-		if (ImGui::Button("Stop Logging"))
-		{
-			m_logging_active = false;
-		}
-	}
-
-	ImGui::Text("Log entries:");
-	ImGui::SameLine();
-	ImGui::Text(std::to_string(m_enchant_logs.size()).c_str());
-
-	ImGui::Text("Current log entries entropy:");
-	ImGui::SameLine();
-	ImGui::Text(std::to_string(m_current_entropy).c_str());
-
-	if (ImGui::Button("Search"))
-	{
-		m_seq_search_result = m_randomhelper->SearchEnchantResultSequence(m_mtrandsim.get(), m_enchant_logs, m_sequence_search_start);	
+		ImGui::Text("Next numbers:");  	
+		ImGui::PushStyleColor(ImGuiCol_Text, m_in_seq ? COLOR_GREEN : COLOR_RED);	
 		if (m_seq_search_result.found)
 		{
-			m_in_seq = true;
+			// display the next numbers in the random sequence
+			for (auto number : m_next_numbers)
+			{
+				ImGui::Text(std::to_string(number).c_str());
+			}
 		}
+		ImGui::PopStyleColor();
 	}
-
-	if (m_in_seq)
-	{
-		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GREEN);
-	}
-	else
-	{
-		ImGui::PushStyleColor(ImGuiCol_Text, COLOR_RED);
-	}
-
-	if (m_seq_search_result.found)
-	{
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_seq_search_result.sequence_end).c_str());
-		uint32_t offset = m_seq_search_result.sequence_end;
-		for(int i = 0; i < 10; i++)
-		{
-			ImGui::Text(std::to_string(m_mtrandsim->GetRandInt32(offset, 0, MAX_RAND10K_VALUE)).c_str());
-		}
-	}
-
-	ImGui::PopStyleColor();
 }
 
 
@@ -121,6 +146,7 @@ bool Features::AntiMTRandBot::OnReadPacket(unsigned short msgtype, byte* packet)
 	switch (msgtype)
 	{
 	case T_FC_ITEM_USE_ENCHANT_OK:
+	{
 		MSG_FC_ITEM_USE_ENCHANT_OK* msg = reinterpret_cast<MSG_FC_ITEM_USE_ENCHANT_OK*>(packet);
 		CINFCityLab* citylab = static_cast<CINFCityLab*>(OSR_API->FindBuildingShop(BUILDINGKIND_LABORATORY));
 		if (!citylab) {
@@ -135,6 +161,13 @@ bool Features::AntiMTRandBot::OnReadPacket(unsigned short msgtype, byte* packet)
 			}
 		}
 		break;
+	}  		
+	case T_FC_ITEM_MIX_ITEMS_RESULT:
+	{
+		MSG_FC_ITEM_MIX_ITEMS_RESULT* msg = reinterpret_cast<MSG_FC_ITEM_MIX_ITEMS_RESULT*>(packet);  	
+		OnItemMix(msg->Err != ERR_NO_ERROR);
+		break;
+	}
 	}
 
 	return false;
@@ -168,6 +201,7 @@ void Features::AntiMTRandBot::OnEnchant(CItemInfo* item, bool success)
 	m_enchant_logs.push_back(er);
 	float prob = RandomBreakHelper::GetEnchantProb(er.try_enchant_to) / 10000.0f;
 	m_current_entropy += (-1) * log2f(success ? prob : 1 - prob);
+	m_current_entropy_buffer = Utility::string_format("%.2f bit", m_current_entropy);
 
 	if (m_seq_search_result.found)
 	{
@@ -177,5 +211,45 @@ void Features::AntiMTRandBot::OnEnchant(CItemInfo* item, bool success)
 		{
 			m_in_seq = false;
 		}
+		CreateNextRandomNumbersForDisplay(ANTIMTRAND_NEXT_NUMBER_COUNT);
+	}
+}
+
+void Features::AntiMTRandBot::OnItemMix(bool success)
+{
+	if (m_seq_search_result.found)
+	{  		
+		// dont care about result here, just pull one number to advance the prng state just like the server
+		m_mtrandsim->GetRandInt32(m_seq_search_result.sequence_end, 0, MAX_RAND10K_VALUE); 
+		
+		CreateNextRandomNumbersForDisplay(ANTIMTRAND_NEXT_NUMBER_COUNT);
+	}
+}
+
+void Features::AntiMTRandBot::SaveEnchantLog()
+{
+	auto er_persisting = m_buddy->GetPersistingTools()->GetEnchantResultPeristence();
+	er_persisting->Clear();
+	nlohmann::json er_log_json;
+
+	for (const auto& result : m_enchant_logs)
+	{
+		nlohmann::json er;
+		er["try_enchant_to"] = result.try_enchant_to;
+		er["success"] = result.success;
+		er_log_json["EnchantResults"].push_back(er);
+		er_log_json["Entropy"] = m_current_entropy;
+		er_persisting->Save(er_log_json);
+	}
+}
+
+void Features::AntiMTRandBot::CreateNextRandomNumbersForDisplay(uint32_t count)
+{
+	m_next_numbers.clear();
+	uint32_t offset = m_seq_search_result.sequence_end;
+	for (int i = 0; i < count; i++)
+	{
+		uint32_t randnum = m_mtrandsim->GetRandInt32(offset, 0, MAX_RAND10K_VALUE);
+		m_next_numbers.push_back(randnum);
 	}
 }

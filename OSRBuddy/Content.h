@@ -39,5 +39,5 @@
 #define BUDDY_EXPORTS
 #endif
 
-#define OSRBUDDY_DEBUG
-#define FEATURE_ANTIRAND
+//#define OSRBUDDY_DEBUG
+//#define FEATURE_ANTIRAND  

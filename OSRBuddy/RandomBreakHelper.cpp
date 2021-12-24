@@ -17,14 +17,21 @@ RandomBreakHelper::RandomBreakHelper()
    
 }
 
-SequenceSearchResult RandomBreakHelper::SearchEnchantResultSequence(MTRandSimulator* randsimul, const std::vector<Features::EnchantResult>& er, uint32_t sequence_start, bool beginonly)
+SequenceSearchResult RandomBreakHelper::SearchEnchantResultSequence(MTRandSimulator* randsimul, const std::vector<Features::EnchantResult>& er)
+{
+    return SearchEnchantResultSequence(randsimul, er, 0, 0);
+}
+
+SequenceSearchResult RandomBreakHelper::SearchEnchantResultSequence(MTRandSimulator* randsimul, const std::vector<Features::EnchantResult>& er, uint32_t sequence_start, uint32_t sequence_length)
 {
     SequenceSearchResult result;
     result.found = false;
     result.sequence_start = 0;
     result.sequence_end = 0;
 
-    for (uint32_t offset = sequence_start; offset <= (randsimul->RandomSequenceLength() - er.size()); offset++)
+    uint32_t length = (sequence_length > 0) ? sequence_start + sequence_length : (randsimul->RandomSequenceLength() - (er.size() * 2));
+
+    for (uint32_t offset = sequence_start; offset <=  length; offset++)
     {
         uint32_t test_sequence_index = 0;
         randsimul->SetSequenceOffset(offset);
@@ -35,12 +42,8 @@ SequenceSearchResult RandomBreakHelper::SearchEnchantResultSequence(MTRandSimula
             uint32_t random_number = randsimul->GetRandInt32(0, MAX_RAND10K_VALUE);
             uint32_t needed_prob = GetEnchantProb(enchresult.try_enchant_to);
             if (enchresult.success != (random_number <= needed_prob))
-            {           
-                in_seq = false;
-                if (beginonly)
-                {
-                    return result;
-                }
+            {
+                in_seq = false;     
                 break;
             }
         }
