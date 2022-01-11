@@ -40,4 +40,4 @@
 #endif
 
 //#define OSRBUDDY_DEBUG
-//#define FEATURE_ANTIRAND  
+#define FEATURE_ANTIRAND  
