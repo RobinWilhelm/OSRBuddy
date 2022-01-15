@@ -46,6 +46,8 @@ public:
 	uint32_t RandomSequenceLength() const { return m_random_sequence.size(); };
 	uint32_t GetSeed() { return m_seed; };
 
+	void Reset();
+
 private:
 	uint32_t m_seed;
 	std::unique_ptr<MTRand> m_mtrand;

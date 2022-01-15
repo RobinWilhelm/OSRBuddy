@@ -17,7 +17,7 @@ MTRandSimulator::MTRandSimulator(uint32_t seed)
 }
 
 void MTRandSimulator::GenerateRandomSequence(uint32_t length)
-{
+{       
     m_random_sequence.reserve(length);
     for (uint32_t i = 0; i < length; i++)
     {
@@ -66,4 +66,12 @@ uint32_t MTRandSimulator::GetRandInt32(uint32_t& seq_offset, uint32_t min_value,
     seq_offset = m_sequence_offset;
     m_sequence_offset = seq_offset_buffer;
     return randnum;
+}
+
+void MTRandSimulator::Reset()
+{
+    m_random_sequence.clear();
+    m_mtrand.reset();
+    m_mtrand = std::make_unique<MTRand>(m_seed);
+    m_sequence_offset = 0;
 }

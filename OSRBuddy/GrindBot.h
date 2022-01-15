@@ -79,11 +79,11 @@ namespace Features
 		void Reset();
 
 	private:
-		float GetTargetDistance(CAtumData* m_target);
+		float GetTargetDistance(CAtumData* target);
 		bool CanShootAtTarget(CUnitData* target);
 		bool IsValidTargetMonster(CMonsterData* m_target);
 		CMonsterData* FindNewTarget(float max_distance, bool front_only = false);
-		void AimAtTarget(CMonsterData* m_target);
+		void AimAtTarget(CMonsterData* target);
 		void ToggleGrinding();
 
 		void Reset_NewTargetDelayTime();

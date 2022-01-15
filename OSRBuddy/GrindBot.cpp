@@ -485,13 +485,13 @@ namespace Features
         return 0;
     }
 
-    float GrindBot::GetTargetDistance(CAtumData* m_target)
+    float GrindBot::GetTargetDistance(CAtumData* target)
     {
-        if (!m_target) {
+        if (!target) {
             return 0.0f;
         }
 
-        D3DXVECTOR3 delta = m_target->m_vPos - OSR_API->GetAtumApplication()->m_pShuttleChild->m_vPos;
+        D3DXVECTOR3 delta = target->m_vPos - OSR_API->GetAtumApplication()->m_pShuttleChild->m_vPos;
         return D3DXVec3Length(&delta);  
     }
 
@@ -614,16 +614,16 @@ namespace Features
         return  (newtarget_antiram) ? newtarget_antiram : ((newtarget_prio) ? newtarget_prio : newtarget);
     }
 
-    void GrindBot::AimAtTarget(CMonsterData* m_target)
+    void GrindBot::AimAtTarget(CMonsterData* targetmonster)
     {
-        if (m_target)
+        if (targetmonster)
         {
             POINT curPos;
             m_buddy->GetCursorPosition(&curPos);
 
             POINT targetPos;
-            targetPos.x = m_target->m_nObjScreenX;
-            targetPos.y = m_target->m_nObjScreenY;
+            targetPos.x = targetmonster->m_nObjScreenX;
+            targetPos.y = targetmonster->m_nObjScreenY;
 
             ClientToScreen(OSR_API->GetAtumApplication()->m_hWnd, &targetPos);
            
@@ -636,7 +636,7 @@ namespace Features
                 D3DXVECTOR3 mousepos = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMousePos;
                 D3DXVECTOR3 mousedir = OSR_API->GetAtumApplication()->m_pShuttleChild->m_vMouseDir;
  
-                D3DXVECTOR3 target = m_target->m_vPos - mousepos;
+                D3DXVECTOR3 target = targetmonster->m_vPos - mousepos;
                 D3DXVec3Normalize(&target, &target);
 
                 D3DXVECTOR3 source = mousedir;
