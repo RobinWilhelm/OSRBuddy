@@ -1,11 +1,10 @@
 #pragma once
 
-//#define OSRBUDDY_DEBUG
 //#define OSRBUDDY_MANUALMAP
 
 //#define SUMMER_EVENT
 //#define HALLOWEEN_EVENT
-#define CHRISTMAS_EVENT
+//#define CHRISTMAS_EVENT
 
 
 #ifdef 	RELEASE_EXTERNAL
@@ -33,11 +32,11 @@
 	#define OSRBUDDY_DEBUG
 	#define	FEATURE_ESP
 	#define FEATURE_TEST
+	#define FEATURE_DEBUGINFO
 #endif
 
 #ifdef OSRBUDDY_MANUALMAP
 #define BUDDY_EXPORTS
 #endif
 
-//#define OSRBUDDY_DEBUG
 #define FEATURE_ANTIRAND  

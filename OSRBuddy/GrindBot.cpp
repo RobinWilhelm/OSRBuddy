@@ -251,21 +251,24 @@ namespace Features
                         if (ImGui::IsItemHovered()) {
                             ImGui::SetTooltip("Will shoot an prioritise boss mobs, even if they are not in the monster selection list yet.");
                         }
+
+                    }
+                    ImGui::NextColumn();
+                    {
                         ImGui::Checkbox("Visible only", &m_visible_only);
                         if (ImGui::IsItemHovered()) {
                             ImGui::SetTooltip("Will shoot only visible mobs in front of the player.");
                         }
-                    }
-                    ImGui::NextColumn();
-                    {
                         ImGui::Checkbox("Keep shooting", &m_keep_shooting);
                         if (ImGui::IsItemHovered()) {
                             ImGui::SetTooltip("Will continue to shoot while aiming at the next target.");
                         }
+                        /*
                         ImGui::Checkbox("Anti ram", &m_anti_ram);
                         if (ImGui::IsItemHovered()) {
                             ImGui::SetTooltip("Will prioritise close targets (250m).");
                         }
+                        */
                     }
                     ImGui::EndColumns();
                     ImGui::NewLine();

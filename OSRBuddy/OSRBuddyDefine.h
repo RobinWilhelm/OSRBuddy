@@ -326,7 +326,8 @@ enum class ItemNumber : int
     Blizzard = 1720006,
     Hot_Chocolate = 1720005,
 
-
+    // pvp
+    Search_Eye = 7004680,
 
     //Gambles
     Prefix_Std_Weapon_Super_Gamble_Card = 7001180,		// from snowmen

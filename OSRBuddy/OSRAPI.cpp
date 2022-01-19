@@ -48,10 +48,13 @@ bool OldSchoolRivalsAPI::CreateAndCheckConsistence(IOPacketManager* packetmanage
 		return false;
 	}
 		  	
+
 	// ANI only h3h3
+#ifndef RELEASE_DEBUG
 	if (!COMPARE_INFLUENCE(atumapplication->m_pShuttleChild->m_myShuttleInfo.InfluenceType, INFLUENCE_TYPE_ANI)) {
 		return false;
 	}
+#endif
 		  
 	// Create game API and return  
 	OldSchoolRivalsAPI::instance = new OldSchoolRivalsAPI();

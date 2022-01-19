@@ -92,8 +92,6 @@ public:
 	//end 2009. 11. 23 by jskim 리소스 로딩 구조 변경
 							  	
 	
-
-protected:
 	int						m_nUnitNum;				// ex> 12030100 ( 12 : degree, 03 : amor, 01 : unitKind )
 	int						m_nPilotNum;			// 2005-07-13 by ispark	파일롯트 넘버
 	BOOL					m_bCharacter;			// 2005-07-13 by ispark (Unit : FALSE, Character : TRUE)

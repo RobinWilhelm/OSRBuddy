@@ -5,13 +5,14 @@
 
 #include "OSRAPI.h"
 #include "OSRBuddy.h"
+#include "IOPacketManager.h"
 
 #include "SDK/AtumApplication.h"
 
 #define WHISPER_WARNING_TIME 10s
 #define WHISPER_SNOOZE_TIME 2min		  
    
-#define AUTO_ITEM_REATTACK 1s
+#define AUTO_ITEM_REATTACK 400ms
 #define BOSS_CHECK_REATTACK 1s
 #define UPDATE_CHARM_COMBO_REATTACK 250ms
 
@@ -43,6 +44,9 @@ namespace Features
 		m_autoitems_timer = BuddyTimer(AUTO_ITEM_REATTACK);
 		m_update_charms_timer = BuddyTimer(UPDATE_CHARM_COMBO_REATTACK);
 		m_selected_combo_item = ImGui::ComboItem();
+
+		m_searcheye_timer = BuddyTimer(3s);
+		m_gm_timer = BuddyTimer(3s);
 	}
 
 	Miscellaneous::~Miscellaneous()
@@ -68,6 +72,7 @@ namespace Features
 		TickAutoFlip();
 		TickWhisperWarner();
 		TickBossWarner();
+		TickGMWarner();
 
 		if (m_autoitems_timer.IsReady())
 		{
@@ -75,6 +80,7 @@ namespace Features
 			TickAutoAmmo();
 			TickAutoRabbit();
 			TickAutoCharm();
+			TickVisibility();
 			m_autoitems_timer.Reset();
 		}
 	}
@@ -110,6 +116,14 @@ namespace Features
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip("Automatic use of rabbit necklaces.");
 				}
+				ImGui::Checkbox("Auto Search Eyes (experimental)", &m_use_searcheye);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Automatic use of search eyes.");
+				}
+				ImGui::Checkbox("Force Visiblity (experimental)", &m_force_visibility);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Forces all enemy players and staff members to be visible to you.");
+				}
 			}
 
 			ImGui::EndChild();
@@ -127,6 +141,15 @@ namespace Features
 				}
 				ImGui::Checkbox("Snooze enabled", &m_whisperwarner_snooze_enabled);
 				ImGui::Checkbox("Close all features when getting whispered.", &m_whisperwarner_closeall);
+
+				ImGui::NewLine();
+				ImGui::Separator();
+				ImGui::Text("GM Warner (experimental)");
+				ImGui::Separator();
+				ImGui::Checkbox("Active###GMwarner", &m_gmwarner_active);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Will notify the user whenever there is a GM in the local area");
+				}
 
 				ImGui::NewLine();
 				ImGui::Separator();
@@ -374,6 +397,70 @@ namespace Features
 				m_autocharms_active = false;
 				m_selected_combo_item = ImGui::ComboItem();
 			}
+		}
+	}
+
+	void Miscellaneous::TickVisibility()
+	{	
+		auto scenedata = OSR_API->GetSceneData();
+		if (scenedata)
+		{
+			CItemInfo* searcheyes = nullptr;
+			auto it = scenedata->m_mapEnemyList.begin();
+			while (it != scenedata->m_mapEnemyList.end())
+			{
+				CEnemyData* enemy = it->second;
+				if (enemy->m_nAlphaValue == 0)
+				{
+					if (m_use_searcheye && m_searcheye_timer.IsReady() && !m_buddy->GetPacketManager()->UseItemWaitingOk(TO_INT(ItemNumber::Search_Eye)))
+					{
+						// do NOT use search eyes to detect a GM
+						if (!COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_OPERATION | RACE_GAMEMASTER))
+						{
+							if (!searcheyes)
+							{
+								searcheyes = OSR_API->FindItemInInventoryByItemNum(ItemNumber::Search_Eye);
+							}
+							if (searcheyes && searcheyes->CurrentCount > 0)
+							{
+								OSR_API->SendUseItem(searcheyes);
+								m_searcheye_timer.Reset();
+							}
+						}
+					}
+
+					if (m_force_visibility)
+					{
+						enemy->m_bySkillStateFlag = CL_SKILL_NONE;
+						enemy->m_nAlphaValue = 135; // set alpha value to that of invisible teammates
+					}
+				}
+				it++;
+			}
+		}  		
+	}
+
+	void Miscellaneous::TickGMWarner()
+	{
+		if (m_gmwarner_active && m_gm_timer.IsReady())
+		{
+			auto scenedata = OSR_API->GetSceneData();
+			if (scenedata)
+			{
+				auto it = scenedata->m_mapEnemyList.begin();
+				while (it != scenedata->m_mapEnemyList.end())
+				{
+					CEnemyData* enemy = it->second;
+					if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_OPERATION | RACE_GAMEMASTER))
+					{
+						m_buddy->NotifySound(NotifyType::Warning);
+						m_gm_timer.Reset();
+						return;
+					}						
+					it++;
+				}
+			}
+			m_gm_timer.Reset();
 		}
 	}
 }

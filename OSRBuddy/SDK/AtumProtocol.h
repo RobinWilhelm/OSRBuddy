@@ -3819,7 +3819,9 @@ typedef struct
 	INT		RI_WingOut;			// POS_WINGOUT의 ItemNum, 날개의 바깥쪽, 장전(2형무기 - 로켓계열 or 미사일계열)
 	INT		RI_Center;			// POS_CENTER의 ItemNum, 중앙 (방어계열 - 아머) 고려
 // 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - 필요 없음
-//	INT		RI_ArmorColorCode;	// 2005-12-08 by cmkwon, 아머의 색상칼라
+
+	// re added colorcode 
+	INT		RI_ArmorColorCode;	// 2005-12-08 by cmkwon, 아머의 색상칼라   
 	INT		RI_Rear;			// POS_REAR의 ItemNum, 후미 (엔진계열)
 
 	// 2010-06-15 by shcho&hslee 펫시스템

@@ -42,11 +42,14 @@ namespace Features
 		void TickAutoAmmo();
 		void TickAutoRabbit();
 		void TickAutoCharm();
+		void TickVisibility();
+		void TickGMWarner();
 
 	private:
 		bool m_whisperwarner_active;
 		bool m_whisperwarner_closeall;
 
+		bool m_gmwarner_active;
 		bool m_autocharms_active;
 
 		std::vector<ImGui::ComboItem> m_combo_items;
@@ -55,6 +58,7 @@ namespace Features
 		bool m_use_ammobox;
 		bool m_use_stealthcard;
 		bool m_use_rabbit;
+		bool m_use_searcheye;
 
 		bool m_awaiting_server_ok_ammobox;
 		bool m_awaiting_server_ok_rabbit;
@@ -65,12 +69,15 @@ namespace Features
 		std::atomic<bool> m_whisper_popup_open;
 
 		BuddyTimer m_whisper_timer;
+		BuddyTimer m_gm_timer;
 		BuddyTimer m_bosscheck_timer;
 		BuddyTimer m_autoitems_timer;
 		BuddyTimer m_update_charms_timer;
+		BuddyTimer m_searcheye_timer;
 
 		bool m_autoflip;
 		bool m_bosswarner;
 		bool m_boss_popup_open;
+		bool m_force_visibility;
 	};
 }

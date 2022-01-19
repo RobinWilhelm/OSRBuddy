@@ -52,68 +52,183 @@ namespace Features
 
 	void DebugInfo::RenderImGui()
 	{
-		ImGui::NewLine();
-		ImGui::BeginChild("PacketInfo", ImVec2(), false);
+		ImGui::BeginTabBar("DebugInfos", ImGuiTabBarFlags_::ImGuiTabBarFlags_None);
 		{
-			ImGui::BeginColumns("PacketInfoColumns", 3, ImGuiColumnsFlags_NoResize);
+			if (ImGui::BeginTabItem("Network"))
 			{
-				ImGui::Text("Packet type sent");
 				ImGui::NewLine();
-				ImGui::Text("T_FC_SKILL_USE_SKILL");
-				ImGui::Text("T_FC_SKILL_CANCEL_SKILL");
-				ImGui::Text("T_FC_ITEM_USE_ITEM");
-				ImGui::Text("T_FC_ITEM_USE_ENERGY");
-				ImGui::Text("T_FC_ITEM_THROW_AWAY_ITEM");
-				ImGui::Text("T_FC_SHOP_SELL_ITEM");
-				ImGui::Text("T_FC_ITEM_USE_RANDOMBOX");
-				ImGui::Text("T_FC_ITEM_CHANGE_WINDOW_POSITION");
-				ImGui::Text("All sent:");
-				ImGui::NewLine();
-				ImGui::Text("Packet type recieved");
-				ImGui::NewLine();
-				ImGui::Text("T_ERROR");
-				ImGui::Text("All recieved:");
+				ImGui::BeginChild("PacketInfo", ImVec2(), false);
+				{
+					ImGui::BeginColumns("PacketInfoColumns", 3, ImGuiColumnsFlags_NoResize);
+					{
+						ImGui::Text("Packet type sent");
+						ImGui::NewLine();
+						ImGui::Text("T_FC_SKILL_USE_SKILL");
+						ImGui::Text("T_FC_SKILL_CANCEL_SKILL");
+						ImGui::Text("T_FC_ITEM_USE_ITEM");
+						ImGui::Text("T_FC_ITEM_USE_ENERGY");
+						ImGui::Text("T_FC_ITEM_THROW_AWAY_ITEM");
+						ImGui::Text("T_FC_SHOP_SELL_ITEM");
+						ImGui::Text("T_FC_ITEM_USE_RANDOMBOX");
+						ImGui::Text("T_FC_ITEM_CHANGE_WINDOW_POSITION");
+						ImGui::Text("All sent:");
+						ImGui::NewLine();
+						ImGui::Text("Packet type recieved");
+						ImGui::NewLine();
+						ImGui::Text("T_ERROR");
+						ImGui::Text("All recieved:");
+					}
+					ImGui::NextColumn();
+					{
+						ImGui::Text("Total count sent");
+						ImGui::NewLine();
+						ImGui::Text(std::to_string(m_pdl_current.use_skill_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.cancel_skill_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.use_item_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.use_energy_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.throw_away_item_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.sell_item_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.use_randombox_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.change_window_postion_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.total_sent).c_str());
+						ImGui::NewLine();
+						ImGui::Text("Total count recieved");
+						ImGui::NewLine();
+						ImGui::Text(std::to_string(m_pdl_current.errors_recieved).c_str());
+						ImGui::Text(std::to_string(m_pdl_current.total_recieved).c_str());
+					}
+					ImGui::NextColumn();
+					{
+						ImGui::Text("Last second sent");
+						ImGui::NewLine();
+						ImGui::Text(std::to_string(m_pdl_last_second.use_skill_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.cancel_skill_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.use_item_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.use_energy_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.throw_away_item_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.sell_item_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.use_randombox_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.change_window_postion_sent).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.total_sent).c_str());
+						ImGui::NewLine();
+						ImGui::Text("Last second recieved");
+						ImGui::NewLine();
+						ImGui::Text(std::to_string(m_pdl_last_second.errors_recieved).c_str());
+						ImGui::Text(std::to_string(m_pdl_last_second.total_recieved).c_str());
+					}
+					ImGui::EndColumns();
+				}
+				ImGui::EndChild();
+				ImGui::EndTabItem();
 			}
-			ImGui::NextColumn();
+			if (ImGui::BeginTabItem("Players"))
 			{
-				ImGui::Text("Total count sent");
 				ImGui::NewLine();
-				ImGui::Text(std::to_string(m_pdl_current.use_skill_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.cancel_skill_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.use_item_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.use_energy_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.throw_away_item_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.sell_item_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.use_randombox_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.change_window_postion_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.total_sent).c_str());
-				ImGui::NewLine();
-				ImGui::Text("Total count recieved");
-				ImGui::NewLine();
-				ImGui::Text(std::to_string(m_pdl_current.errors_recieved).c_str());
-				ImGui::Text(std::to_string(m_pdl_current.total_recieved).c_str());
+				ImGui::BeginChild("PlayerList", ImVec2(), false);
+				{
+					ImGui::BeginColumns("PlayerListColumns", 3, ImGuiColumnsFlags_NoResize);
+					{
+						ImGui::SetColumnWidth(0, 200);
+						{
+							ImGui::Text("Character Name");
+						}
+						ImGui::NextColumn();
+						{
+							ImGui::Text("Account Type");
+						}
+						ImGui::NextColumn();
+						{
+							ImGui::Text("Lead position");
+							ImGui::SeparatorEx(ImGuiSeparatorFlags_SpanAllColumns | ImGuiSeparatorFlags_Horizontal);
+						}
+						ImGui::NextColumn();
+						auto scenedata = OSR_API->GetSceneData();
+						if (scenedata)
+						{
+							auto it = scenedata->m_mapEnemyList.begin();
+							while (it != scenedata->m_mapEnemyList.end())
+							{
+								CEnemyData* enemy = it->second;
+								{
+									ImGui::Text(enemy->m_infoCharacter.CharacterInfo.CharacterName);
+								}
+								ImGui::NextColumn();
+								{
+									std::string race;
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_DECA))
+									{
+										race += "Player";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_OPERATION))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "Operation";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_GAMEMASTER))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "GM";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_MONITOR))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "Monitor";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_GUEST))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "Guest";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_DEMO))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "Demo";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_BATTALUS))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "Battalus";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_PHILON))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "Philon";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_SHARRINE))
+									{
+										if (!race.empty()) { race += "; "; }
+										race += "Sharrine";
+									}
+									ImGui::Text(race.c_str());
+								}
+								ImGui::NextColumn();
+								{
+									std::string position;
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_INFLUENCE_LEADER))
+									{
+										position = "Leader";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_INFLUENCE_SUBLEADER_1))
+									{
+										position = "Subleader 1";
+									}
+									if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_INFLUENCE_SUBLEADER_2))
+									{
+										position = "Subleader 2";
+									}
+									ImGui::Text(position.c_str());
+								}
+								ImGui::NextColumn();
+								it++;
+							}
+						}				
+					}
+					ImGui::EndColumns();
+				}
+				ImGui::EndChild();
+				ImGui::EndTabItem();
 			}
-			ImGui::NextColumn();
-			{
-				ImGui::Text("Last second sent");
-				ImGui::NewLine();
-				ImGui::Text(std::to_string(m_pdl_last_second.use_skill_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.cancel_skill_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.use_item_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.use_energy_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.throw_away_item_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.sell_item_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.use_randombox_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.change_window_postion_sent).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.total_sent).c_str());
-				ImGui::NewLine();
-				ImGui::Text("Last second recieved");
-				ImGui::NewLine();
-				ImGui::Text(std::to_string(m_pdl_last_second.errors_recieved).c_str());
-				ImGui::Text(std::to_string(m_pdl_last_second.total_recieved).c_str());
-			}
-			ImGui::EndColumns();
-		}
-		ImGui::EndChild();
+		}  	
+		ImGui::EndTabBar();
 	}
 }
