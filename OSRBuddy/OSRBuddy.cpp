@@ -216,21 +216,18 @@ bool OSRBuddyMain::Start()
 #ifdef FEATURE_MISCELLANEOUS
         RegisterFeature(new Features::Miscellaneous(this));
 #endif
+#ifdef FEATURE_ANTIRAND
+        RegisterFeature(new Features::AntiMTRandBot(this));
+#endif
 #ifdef FEATURE_ESP
         RegisterFeature(new Features::ESP(this));
 #endif
-
 #ifdef FEATURE_TEST
         RegisterFeature(new Features::TestItemUse(this));
 #endif
 #ifdef FEATURE_DEBUGINFO
         RegisterFeature(new Features::DebugInfo(this));
-#endif
-#ifdef FEATURE_ANTIRAND
-        RegisterFeature(new Features::AntiMTRandBot(this));
-#endif
-
-    
+#endif         
         if (!InitD3DHooks(RenderHookType::TRAMPOLINE, RenderHookOption::ENDSCENE, OSR_API->GetD3D9Device())) {
             throw exception("D3D9 Hooks failed to initialise");
         }

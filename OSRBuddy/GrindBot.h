@@ -100,8 +100,6 @@ namespace Features
 		bool IsValidPrimaryWeapon(ITEM_BASE* item);
 		bool Swap();
 
-
-
 	private:
 		CMonsterData* m_target;
 		GrindBot::State m_current_state;
@@ -130,6 +128,7 @@ namespace Features
 		bool m_shoot_all_goldies;
 		bool m_prioritise_closer_mobs;
 		bool m_anti_ram;
+		bool m_ignore_zerohpmob;
 		bool m_prio_bossmonster;
 		bool m_enable_bs_hotswap;
 		bool m_select_swapbs;

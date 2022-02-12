@@ -555,6 +555,9 @@
     <ClCompile Include="MTRand.cpp">
       <Filter>Utility\AntiRand</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\AtumParamProtocol.cpp">
+      <Filter>thirdparty\SDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDK\d3dx9math.inl">

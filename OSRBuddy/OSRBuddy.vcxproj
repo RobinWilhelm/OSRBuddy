@@ -423,6 +423,7 @@
     <ClCompile Include="PatternManager.cpp" />
     <ClCompile Include="PersistingTools.cpp" />
     <ClCompile Include="RandomBreakHelper.cpp" />
+    <ClCompile Include="SDK\AtumParamProtocol.cpp" />
     <ClCompile Include="TestItemUse.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="DebugInfo.cpp" />

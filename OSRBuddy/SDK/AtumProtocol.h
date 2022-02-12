@@ -124,6 +124,10 @@
 #define NPC_SERVER_PORT			15104
 //#define NPC_MONITOR_PORT		N/A
 
+const char* GetProtocolTypeString(MessageType_t msgType);
+const char* GetGameLogTypeString(MessageType_t msgType);
+const char* GetItemUpdateTypeString(BYTE i_byItemUpdateTy);				// 2006-10-27 by cmkwon
+const char* GetItemDeleteTypeString(BYTE i_byItemDeleteTy);				// 2008-01-23 by cmkwon, S_F, S_L: 장착/장착해제 게임 로그에 추가 - GetItemDeleteTypeString() 추가
 
 ///////////////////////////////////////////////////////////////////////////////
 // Message Type 0 (대분류)

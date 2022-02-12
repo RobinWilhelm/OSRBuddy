@@ -268,7 +268,8 @@ namespace Features
                         if (ImGui::IsItemHovered()) {
                             ImGui::SetTooltip("Will prioritise close targets (250m).");
                         }
-                        */
+                        */  
+                        ImGui::Checkbox("Ignore 0 HP mobs", &m_ignore_zerohpmob);
                     }
                     ImGui::EndColumns();
                     ImGui::NewLine();
@@ -796,12 +797,13 @@ namespace Features
         if (monster->m_dwState == _FALLING || monster->m_dwState == _FALLEN || monster->m_dwState == _EXPLODING || monster->m_dwState == _EXPLODED || monster->m_dwState == _AUTODESTROYED) {
             return true;
         }
-
-        /*
-        if (monster->m_info.CurrentHP == 0) {
-            return true;
+        if (m_ignore_zerohpmob)
+        {            
+            if (monster->m_info.CurrentHP == 0) 
+            {
+                return true;
+            }          
         }
-        */
         return false;
     }
 
