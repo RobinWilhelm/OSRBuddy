@@ -116,72 +116,72 @@ public:
 
  
 template<class _K, class _Ty, class _Pr = less<_K>, class _A = allocator<_Ty> >
-class mt_map : public map< _K, _Ty, _Pr, _A >, public mt_lock
+class mt_map : public std::map< _K, _Ty, _Pr, _A >, public mt_lock
 {
 public:
 
 };
 
 template<class _K, class _Ty, class _Pr = less<_K>, class _A = allocator<_Ty> >
-class mt_multimap : public multimap< _K, _Ty, _Pr, _A >, public mt_lock
+class mt_multimap : public std::multimap< _K, _Ty, _Pr, _A >, public mt_lock
 {
 public:
 	
 };
 
 template<class _K, class _Pr = less<_K>, class _A = allocator<_K> >
-class mt_set : public set<_K, _Pr, _A>, public mt_lock
+class mt_set : public std::set<_K, _Pr, _A>, public mt_lock
 {
 public:
 	
 };
 
-typedef set<string>				setString;			// 2007-05-04 by cmkwon, 추가함
-typedef mt_set<string>			mtsetString;		// 2007-05-04 by cmkwon, 추가함
+typedef set<std::string>				setString;			// 2007-05-04 by cmkwon, 추가함
+typedef mt_set<std::string>			mtsetString;		// 2007-05-04 by cmkwon, 추가함
 
 
 
 template<class _Ty, class _A = allocator<_Ty> >
-class mt_list : public list<_Ty, _A>, public mt_lock
+class mt_list : public std::list<_Ty, _A>, public mt_lock
 {
 public:
 	
 };
 
 template<class _Ty, class _A = allocator<_Ty> >
-class mt_vector : public vector<_Ty, _A>, public mt_lock
+class mt_vector : public std::vector<_Ty, _A>, public mt_lock
 {
 public:
 
 };
 
 template<class _Ty, class _C = deque<_Ty> >
-class mt_queue : public queue<_Ty, _C>, public mt_lock
+class mt_queue : public std::queue<_Ty, _C>, public mt_lock
 {
 public:
 
 };
 
 template<class _K, class _Ty, class _Pr = less<_K>, class _A = allocator<_Ty> >
-class ez_map : public map< _K, _Ty, _Pr, _A >
+class ez_map : public std::map< _K, _Ty, _Pr, _A >
 {
 public:
 
 };
 
 template<class _K, class _Pr = less<_K>, class _A = allocator<_K> >
-class ez_set : public set<_K, _Pr, _A>
+class ez_set : public std::set<_K, _Pr, _A>
 {
 public:
 	
 };
 
 template<class _Ty, class _A = allocator<_Ty> >
-class ez_list : public list<_Ty, _A>
+class ez_list : public std::list<_Ty, _A>
 {
 
 };
 
 
-typedef vector<string>		vectstring;	// 2007-05-28 by cmkwon
+typedef vector<std::string>		vectstring;	// 2007-05-28 by cmkwon
 #endif

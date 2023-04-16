@@ -37,11 +37,13 @@ public:
 public:
 	
 	std::vector<int> m_saved_times;
-	DWORD m_lasttime;	// 52
+	DWORD m_enchantPressX;	  
+	DWORD m_enchantPressY;
+	DWORD m_someFlag;
 
 	CItemInfo* m_pSelectItem;
 	BOOL				m_bIsEnchantCheck; 
-
+	bool				m_bIsBreakable;
 	BOOL				m_bRestored;
 
 	CINFImage* m_pImgButton[LAB_BUTTON_NUMBER][4];	// 0 : Á¦Á¶(SEND), 1 : cancel, 2 : ok

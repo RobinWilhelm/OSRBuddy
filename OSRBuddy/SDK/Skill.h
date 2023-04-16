@@ -36,8 +36,9 @@ public:
 	virtual ~CSkill();
 
 public:
-	map<int, CSkillInfo*>	m_mapSkill;					// 사용 가능한 모든 스킬 (key:ItemNum, value:skill info)
+
 	map<int, CSkillInfo*>	m_mapEnemySkillInfo;		// 다른 사람이 사용한 스킬(key:ItemNum, value:skill info)
+	map<int, CSkillInfo*>	m_mapSkill;					// 사용 가능한 모든 스킬 (key:ItemNum, value:skill info)
 	vector<CSkillInfo*>		m_vecUsingSkill;			// 나 자신에게 사용한 스킬.
 	vector<CSkillInfo*>		m_vecEnemyUsingSkillForMe;	// 다른 유저가 나한테 쓴 스킬.
 	// 2007-04-19 by bhsohn 서치아이 아이템 추가

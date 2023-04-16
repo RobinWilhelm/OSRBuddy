@@ -26,7 +26,7 @@ typedef struct {
 	CSkillInfo* pItemSkill;
 	CD3DHanFont* pSkillFont;
 	// 2010. 03. 31 by jskim 사용류 아이템 보여주는 아이콘 팁 변경
-	vector<string>	m_strSkillInfo;
+	vector<std::string>	m_strSkillInfo;
 	// 2010. 03. 31 by jskim 사용류 아이템 보여주는 아이콘 팁 변경
 } SkillFontInfo;
 
@@ -39,7 +39,7 @@ typedef struct {
 	// 2008-03-05 by bhsohn 느린 시스템에서 시간제 아이템 시간 계산이 잘못 되는 부분 수정
 	BOOL			bFirstTimeCheck;	// 처음 시간 계산함
 	// 2010. 03. 31 by jskim 사용류 아이템 보여주는 아이콘 팁 변경
-	vector<string>	m_strItemInfo;
+	vector<std::string>	m_strItemInfo;
 	// 2010. 03. 31 by jskim 사용류 아이템 보여주는 아이콘 팁 변경
 } ItemFontInfo;
 

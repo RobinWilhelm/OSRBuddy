@@ -353,7 +353,9 @@ public:
 	void*						m_unknown1;
 	DWORD						m_dwInetAnticheatCheckTime;
 	DWORD						m_dwInetAnticheatCheckTime2;
-	DWORD						m_dwMoveCheckTime;	   		
+	DWORD						m_dwMoveCheckTime;	   	
+
+	DWORD						m_unknown2;
 
 	CD3DHanFont* m_pFontDebug;				// ÅØ½ºÆ® Ç¥½Ã¿ë ÆùÆ®
 	CD3DHanFont* m_pFontCandidate[CHAR_INF_CANDIDATE];				// ÇÑÆùÆ®

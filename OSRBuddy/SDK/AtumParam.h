@@ -96,8 +96,8 @@ typedef int			Prob1000K_t;			// 확률 [0, 1000000)
 #define PROB1000K_MAX_VALUE	999999
 typedef USHORT ChannelIndex_t;
 typedef USHORT MapIndex_t;
-const char* Int2String(int n, string& str);	// convert integer to string
-#define INT2STRING(x)	Int2String(x, string())
+const char* Int2String(int n, std::string& str);	// convert integer to string
+#define INT2STRING(x)	Int2String(x, std::string())
 typedef USHORT	Err_t;
 typedef vector<UINT>		vectUINT;		// 2009-09-17 by cmkwon, B기어 체프 하향 - 
 
@@ -2550,6 +2550,7 @@ struct MEX_ITEM_INFO;
 ///////////////////////////////////////////////////////////////////////////////
 //	ATUM - Item - Parameter Struct 정의
 ///////////////////////////////////////////////////////////////////////////////
+/*
 struct ITEM
 {
 	INT			ItemNum;						// 아이템 고유번호, 장착 아이템일 때 (ITEM_BASE*)
@@ -2628,6 +2629,104 @@ struct ITEM
 	InvokingWearItemDestParamList* pInvokingDestParamByUseList;	// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템	
 	BYTE		IsTenderDropItem;				// 2010-04-09 by cmkwon, 인피2차 추가 수정(단계별 보상 추가) - CFieldIOCP::SetTenderItemList#에서 설정됨 
 };
+
+*/
+
+#pragma pack(push, 1)
+struct ITEM
+{
+	float		ArrParameterValue[SIZE_MAX_DESPARAM_COUNT_IN_ITEM];	// 2009-04-21 by cmkwon, ITEM에 DesParam 필드 개수 8개로 늘리기 -
+	BYTE		Kind;							// 아이템 종류(기관포, 빔, 로켓, 스킬.....), ITEMKIND_XXX
+	char dunno0[3];
+	float		AbilityMin;						// 아이템최소성능
+	BYTE		ReqMinLevel;					// 필요 최저 레벨
+	BYTE		ReqMaxLevel;					// 필요 최저 레벨
+	BYTE		ReqItemKind;					// 필요아이템종류, ITEMKIND_XXX, check: 스킬에만 사용, 20040818, kelovon
+	char dunno1[1];
+	USHORT		Weight;							// 무게
+	char dunno2[2];
+	float		HitRate;						// 명중확률(0~255)	// 2010-07-19 by dhjin, 확률 수식 변경
+	BYTE		Defense;						// 방어력
+	char		ItemName[SIZE_MAX_ITEM_NAME];	// 아이템 이름
+	char dunno3[19];
+	BYTE		SpeedPenalty;					// 스피드페널티, 이동속도에미치는 영향(-:감소)
+	char dunno4[1];
+	USHORT		Range;							// 공격범위, 엔진류인 경우에는 부스터 가동 시 속도, 스킬의 경우 적용 범위
+	BYTE		Position;						// 장착위치
+	BYTE		Scarcity;						// 희귀성, 게임상에 나올 확률, define해서 사용, see below
+	char dunno5[2];
+	INT			ItemNum;						// 아이템 고유번호, 장착 아이템일 때 (ITEM_BASE*)
+	float		Endurance;						// 내구성, 내구도
+	Prob256_t	AbrasionRate;					// 마모율, 내구도가 줄어드는 단위량(0~255)
+	USHORT		Charging;						// 무기류에서는 최대 장탄 수, 에너지는 한번에 적용되는 개수, TANK류는 양
+	char dunno6[2];
+	USHORT		RepeatTime;						// 무기류에서는 남은 총알 수로 사용, 나머지는 개수, 시간형 스킬류에선 남은 시간, 나머지 스킬은 사용 여부
+	USHORT		Material;						// 재질
+	USHORT		ReqMaterial;					// 필요한 재질 수(제작,수리시 필요)
+	float		AbilityMax;						// 아이템최대성능
+	USHORT		ReqRace;						// 필요종족
+	BYTE		ShotNum;						// 점사 수,	점사 시 발사 수를 나타낸다.
+	BYTE		MultiNum;						// 동시 발사 탄 수,	1번 발사에 몇발이 동시에 나가느냐
+	USHORT		MinTradeQuantity;				// 최소 거래 수량, Price는 이 수량에 대한 가격이다
+	char dunno7[2];
+	UINT		Price;							// 최소 거래 수량의 가격
+	char dunno8[6];
+	BYTE		ArrDestParameter[SIZE_MAX_DESPARAM_COUNT_IN_ITEM];	// 2009-04-21 by cmkwon, ITEM에 DesParam 필드 개수 8개로 늘리기 - 
+	char dunno9[2];
+	UINT		ReAttacktime;					// 재 공격시간(ms)
+	INT			Time;							// 지속 시간(스킬류 등)
+	GEAR_STAT	ReqGearStat;					// 필요 기어 스탯
+	USHORT		ReqUnitKind;					// 필요유닛종류
+	char dunno10[2];
+	BYTE		ReqSP;							// SP 소모량(스킬)
+	char dunno11[15];
+	float		RangeAngle;						// 범위각도(0 ~ PI), 화망
+	BYTE		SkillType;						// 스킬형태(시간 및 발동 관련), 지속|클릭|시간|유지
+	char dunno12[3];
+	INT			LinkItem;						// 링크아이템, 아이템과 연관된 아이템(총알)
+	char dunno13[4];
+	char		Description[SIZE_MAX_ITEM_DESCRIPTION];	// 아이템 설명
+	char dunno14[4];
+	BYTE		SkillLevel;						// 레벨
+	char dunno15[3];
+	BYTE		Caliber;						// 구경(총알, 탄두 등)
+	BYTE		OrbitType;						// 미사일, 로켓 등의 궤적
+	char dunno16[2];
+	BitFlag64_t	ItemAttribute;					// 아이템의 속성, ITEM_ATTR_XXX
+	FLOAT		BoosterAngle;					// 부스터시에 유닛의 회전각, 현재는 엔진에만 사용
+	INT			CameraPattern;					// 카메라 패턴
+	INT			SourceIndex;					// 2005-08-22 by cmkwon, 이펙트, 아이콘(빅/스몰) 리소스 데이타
+
+
+	char dunno17[36];
+
+	/*
+	float		FractionResistance;				// 2008-10-06 by dhjin, 피어스율로 일단 사용 // 속성저항력(0~255) // 2010-07-19 by dhjin, 확률 수식 변경
+	BYTE		NaturalFaction;					// 천적계열, 종족(몬스터, 캐릭터) Index (천적)
+	BYTE		Luck;							// 행운
+	UINT		CashPrice;						// 최소 거래 수량의 현금 가격
+
+	BYTE		UpgradeNum;						// 업그레이드 수, 업그레이드의 한계를 나타냄.
+	BYTE		MultiTarget;					// 동시에 잡을 수 있는 타겟의 수
+	USHORT		ExplosionRange;					// 폭발반경(폭발 시 데미지의 영향이 미치는 반경)
+	USHORT		ReactionRange;					// 반응반경(마인 등이 반응하는 반경)
+	USHORT		AttackTime;						// 공격시간, 공격을 하기 위해 필요한 시간
+	INT			SummonMonster;					// 2006-06-08 by cmkwon, 유료화 상점의 탭구분자로 사용한다.(CASH_ITEMKIND_XXXX)
+	INT			NextSkill;						// 다음 단계의 스킬 아이템 넘버(스킬)
+
+	Prob256_t	SkillHitRate;					// 스킬명중확률(0~255)
+	BYTE		SkillTargetType;				// 스킬 타켓 타입, SKILLTARGETTYPE_XXX
+
+	vectINT* pParamOverlapIdxList;			// 2010-01-18 by cmkwon, 아이템 사용시 Parameter 중복 체크 시스템 구현 -
+	BYTE		EnchantCheckDestParam;			// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
+	InvokingDestParamID_t	InvokingDestParamID;	// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
+	InvokingDestParamID_t	InvokingDestParamIDByUse;// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
+	InvokingWearItemDestParamList* pInvokingDestParamList;			// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
+	InvokingWearItemDestParamList* pInvokingDestParamByUseList;	// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
+	BYTE		IsTenderDropItem;				// 2010-04-09 by cmkwon, 인피2차 추가 수정(단계별 보상 추가) - CFieldIOCP::SetTenderItemList#에서 설정됨
+	*/
+};
+#pragma pack(pop)
 typedef vector<ITEM*>			vectItemPtr;		// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - 
 
 
@@ -3041,6 +3140,7 @@ typedef struct _MAPOBJECTINFO
 } MAPOBJECTINFO;
 */
 
+
 // 스킬형태(시간 및 발동 관련)
 #define SKILLTYPE_PERMANENT		0	// 지속형
 #define SKILLTYPE_CLICK			1	// 클릭형
@@ -3117,141 +3217,64 @@ typedef struct _MAPOBJECTINFO
 
 struct ITEM_BASE
 {
-	BYTE		Kind;							// 아이템 종류(기관포, 빔, 로켓, 스킬.....)
-	UID64_t		UniqueNumber;					// 아이템 고유번호
 	INT			ItemNum;						// 아이템 번호
-	ITEM* ItemInfo;						// ITEM에 대한 pointer
+	BYTE		Kind;							// 아이템 종류(기관포, 빔, 로켓, 스킬.....)
+	ITEM*		ItemInfo;						// ITEM에 대한 pointer
+	UID64_t		UniqueNumber;					// 아이템 고유번호 	
 };
 
+#pragma pack(push, 1)
 // 일반 아이템(무기류, 방어류, ...)
 struct ITEM_GENERAL : public ITEM_BASE
 {
-	// store-item-specific fields
-	UID32_t			AccountUniqueNumber;
-	UID32_t			Possess;					// CharacterUniqueNumber or POSSESS_STORE_NUMBER
-	BYTE			ItemStorage;				// 0:캐릭터인벤, 1:창고 // 2005-12-07 by cmkwon, 한계정의 캐릭간 창고 공유를 막는다. ITEM_IN_XXX
+	char dunno0[24];
 	BYTE			Wear;						// 0: 미장착, 1: 장착, 2:장전, WEAR_XXX
+	char dunno1[3];
+
 	INT				CurrentCount;				// 무기: 남은 발수, 에너지: 남은 개수
-// 2009-08-25 by cmkwon, 사용하지 않는 필드 제거(td_Store.ScarcityNumber) - 
-//	LONGLONG		ScarcityNumber;
+	UID32_t			AccountUniqueNumber;
+	char dunno4[4];
+	UID32_t			Possess;					// CharacterUniqueNumber or POSSESS_STORE_NUMBER
 	INT				ItemWindowIndex;			// 게임 화면에서 아이템 창에 들어가는 자리
-	SHORT			NumOfEnchants;				// check: 아직 사용하지 않음! 20031106, kelovon // 적용한 enchant의 수, 0이면 아무것도 적용하지 않음
-	INT				PrefixCodeNum;				// 접두사, 없으면 0
+	ATUM_DATE_TIME	CreatedTime;				// 아이템 생성 시간, 2006-09-29 by cmkwon 추가 함 - 일정 시간 후 자동 삭제되는 아이템
+	char dunno7[4];
 	INT				SuffixCodeNum;				// 접미사, 없으면 0
+	char dunno8[20];
+	INT				PrefixCodeNum;				// 접두사, 없으면 0
+	char dunno9[8];
+	/*
+	// store-item-specific fields
+
+	BYTE			ItemStorage;				// 0:캐릭터인벤, 1:창고 // 2005-12-07 by cmkwon, 한계정의 캐릭간 창고 공유를 막는다. ITEM_IN_XXX
+
+	// 2009-08-25 by cmkwon, 사용하지 않는 필드 제거(td_Store.ScarcityNumber) -
+	//	LONGLONG		ScarcityNumber;
+
+
+
+
 	// derived from 'struct ITEM'
 	float			CurrentEndurance;			// 일반 아이템: 남은 내구도, 에너지류(TIMED_HP_UP): 남은 시간
 
 	INT				ColorCode;				// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - EffectItemNum, 실제로는 무기의 탄두 이펙트 ItemNum을 의미한다, // 튜닝시 아머의 ColorCode
-	INT				ShapeItemNum;			// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - 
+	INT				ShapeItemNum;			// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 -
 	UID64_t			MainSvrItemUID;			// 2009-09-09 ~ 2010 by dhjin, 인피니티 - Main서버 아이템 UID 추가
 
 	INT				UsingTimeStamp;				// 아이템이 사용된 시간 초단위(second)
 	ATUM_DATE_TIME	UsingStartTime;				// 아이템 사용 시작 시간
 	float			DesWeight;					// 중량 인챈트 수치, 2006-01-24 by cmkwon
-	ATUM_DATE_TIME	CreatedTime;				// 아이템 생성 시간, 2006-09-29 by cmkwon 추가 함 - 일정 시간 후 자동 삭제되는 아이템
+
 
 	INT				CoolingTimeStamp;				// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
 	ATUM_DATE_TIME	CoolingStartTime;				// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
+	*/
 
 	inline ITEM_GENERAL()
 	{// 2007-11-27 by cmkwon, 선물하기 로그 수정 - 추가함
 		memset(this, 0x00, sizeof(ITEM_GENERAL));
 	}
-
-#ifdef _ATUM_SERVER
-
-	inline ITEM_GENERAL(ITEM* pItemInfo)
-	{
-		memset(this, 0x00, sizeof(ITEM_GENERAL));
-		if (pItemInfo != NULL)
-		{
-			///////////////////////////////////////////////////////////////////////////////
-			// 기본값 설정
-			Wear = WEAR_NOT_ATTACHED;
-			CurrentCount = (IS_CHARGABLE_ITEM(pItemInfo->Kind) ? pItemInfo->Charging : 1);
-			// 2009-08-25 by cmkwon, 사용하지 않는 필드 제거(td_Store.ScarcityNumber) - 
-			//			ScarcityNumber		= 0;
-			ItemWindowIndex = POS_INVALID_POSITION;
-			NumOfEnchants = 0;
-			ColorCode = 0;
-			UsingTimeStamp = ITEM_NOT_USING;
-			ShapeItemNum = 0;	// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - ShapeItemNum 필드 추가
-
-			UsingStartTime.Reset();
-			CoolingStartTime.Reset();				// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
-
-			*this = *pItemInfo;		// ITEM의 정보 할당			
-			ItemInfo = pItemInfo;		// ItemInfo Pointer 할당
-		}
-	}
-	inline ITEM_GENERAL& operator=(const ITEM& rhs)
-	{
-		this->ItemNum = rhs.ItemNum;
-		this->Kind = rhs.Kind;
-		this->CurrentEndurance = rhs.Endurance;
-		return *this;
-	}
-#ifndef _ATUM_ADMINTOOL		// 2005-11-26 by cmkwon
-	void* operator new(size_t size);
-	void operator delete(void* p);
-#endif // end_#ifndef _ATUM_ADMINTOOL
-#endif // _ATUM_SERVER
-
-	///////////////////////////////////////////////////////////////////////////////
-	// 2007-10-15 by cmkwon, 멤버쉬 유저는 탄창이 두배로 커진다
-	int GetMaxBulletCount(BOOL i_bIsMembershipUser)
-	{
-		if (NULL == ItemInfo)
-		{
-			return 0;
-		}
-
-		if (FALSE == i_bIsMembershipUser)
-		{
-			return ItemInfo->Charging;
-		}
-
-		// 2007-10-15 by cmkwon, 베트남을 제외한, 멤버쉽 유저는 2배
-#if !defined(SERVICE_TYPE_VIETNAMESE_SERVER_1)
-		return 2 * ItemInfo->Charging;
-#endif
-		return ItemInfo->Charging;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////
-	// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - ShapeItemNum 필드 추가
-	INT GetShapeItemNum(void)
-	{
-		if (FALSE == IS_ENABLE_CHANGE_ShapeItemNum(Kind))
-		{
-			return this->ItemInfo->ItemNum;
-		}
-
-		if (0 != ShapeItemNum)
-		{
-			return ShapeItemNum;
-		}
-
-		return this->ItemInfo->ItemNum;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////
-	// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - ShapeItemNum 필드 추가
-	INT GetEffectItemNum(void)
-	{
-		if (FALSE == IS_ENABLE_CHANGE_EffectItemNum(Kind))
-		{// 2009-08-26 by cmkwon, 현재는 무기만 지원
-			return 0;
-		}
-
-		if (0 != ColorCode)
-		{
-			return ColorCode;
-		}
-
-		return this->ItemInfo->ItemNum;
-	}
 };
+#pragma pack(pop)
 
 struct LOG_GUILDSTORE_ITEM_INFO
 {// 2006-09-27 by dhjin, 여단 로그 테이블에서 얻어오는 값 저장 구조체
@@ -3364,16 +3387,16 @@ extern void DbgOut(LPCTSTR pFormat, ...);
 
 struct RARE_ITEM_INFO
 {
-	INT			CodeNum;			// 접두사, 접미사 구분됨
-	char		Name[SIZE_MAX_RARE_FIX_NAME];
 	INT			ReqUseType;			// BitFlag 사용
 	INT			ReqMinLevel;
-	INT			ReqMaxLevel;
+	INT			CodeNum;			// 접두사, 접미사 구분됨
+	char		Name[SIZE_MAX_RARE_FIX_NAME];
 	BYTE		ReqItemKind;		// 필요아이템종류, 레어가 적용되는 아이템 종류, ITEMKIND_XXX
 	GEAR_STAT	ReqGearStat;		// 필요 기어 스탯
-	BYTE		DesParameter[SIZE_DES_PARAM_PER_RARE_ITEM_INFO];
+	INT			ReqMaxLevel;
 	FLOAT		ParameterValue[SIZE_DES_PARAM_PER_RARE_ITEM_INFO];
 	Prob100K_t	Probability;		// 레어 아이템 성공 확률, 범위: 1 ~ 100000
+	BYTE		DesParameter[SIZE_DES_PARAM_PER_RARE_ITEM_INFO];
 };
 typedef vector<RARE_ITEM_INFO*>			vectRARE_ITEM_INFOPtrList;		// 2010-04-20 by cmkwon, 신규 러키 머신 구현 - 
 typedef map<int, RARE_ITEM_INFO*>		mapRARE_ITEM_INFOPtrList;		// 2010-04-20 by cmkwon, 신규 러키 머신 구현 - <CodeNum, RARE_ITEM_INFO*>
@@ -3517,7 +3540,7 @@ struct SERVER_ID
 	inline void SetValue(const char* szIPPort);
 	inline bool CompareValue(char* IP, int port);
 	inline const char* GetString(char* buffer);
-	inline const char* GetString(string& str);
+	inline const char* GetString(std::string& str);
 	inline bool operator==(SERVER_ID& rhs);
 	inline bool operator!=(SERVER_ID& rhs);
 	inline void Reset() { memset(this, 0, sizeof(SERVER_ID)); }
@@ -4395,7 +4418,7 @@ struct SRESOBJ_CHECKSUM
 		return TRUE;
 	}
 };
-typedef map<string, SRESOBJ_CHECKSUM>			mapstring2SRESOBJ_CHECKSUM;		// 2007-05-28 by cmkwon
+typedef map<std::string, SRESOBJ_CHECKSUM>			mapstring2SRESOBJ_CHECKSUM;		// 2007-05-28 by cmkwon
 
 //////////////////////////////////////////////////////////////////////////
 // 2007-07-06 by dhjin, Tutorial

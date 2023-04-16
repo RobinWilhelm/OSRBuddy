@@ -225,6 +225,8 @@ const char* GetItemDeleteTypeString(BYTE i_byItemDeleteTy);				// 2008-01-23 by 
 //#define T0_ERROR					0xFF
 */
 // 기본 업데이트용 프로토콜, 수정 불가
+
+/*
 #define T0_PC_DEFAULT_UPDATE		0x00
 
 // 연결 관련 프로토콜
@@ -361,6 +363,114 @@ const char* GetItemDeleteTypeString(BYTE i_byItemDeleteTy);				// 2008-01-23 by 
 
 // INVALID PROTOCOL
 #define T0_NA						0xFF	// NOT AVAILABLE
+*/
+#define T0_PC_DEFAULT_UPDATE  0xC1
+#define T0_PC_CONNECT  0x71
+#define T0_FN_CONNECT  0x50
+#define T0_FC_CONNECT  0x10
+#define T0_FP_CONNECT  0x78
+#define T0_IP_CONNECT  0x37
+#define T0_FI_CONNECT  0xAC
+#define T0_IC_CONNECT  0xA0
+#define T0_PM_CONNECT  0x5A
+#define T0_FM_CONNECT  0x17
+#define T0_LM_CONNECT  0x47
+#define T0_IM_CONNECT  0x34
+#define T0_NM_CONNECT  0x23
+#define T0_PL_CONNECT  0x4B
+#define T0_IL_CONNECT  0x91
+#define T0_FL_CONNECT  0x48
+#define T0_NL_CONNECT  0x38
+#define T0_MF_TO_AF  0xFF
+#define T0_PP_CONNECT  0x40
+#define T0_FC_ADMIN  0xA3
+#define T0_FC_BATTLE   0x67//0x54
+#define T0_FC_CHARACTER  0x30
+#define T0_FC_CHAT  0xD1
+#define T0_FC_CITY  0x41
+#define T0_FC_CLIENT_REPORT  0x3B
+#define T0_FC_EVENT  0x1B
+#define T0_FC_GUILD  0x43
+#define T0_FC_INFO  0x44
+#define T0_FC_ITEM  0x4D
+#define T0_FC_MONSTER  0x1F
+#define T0_FC_MOVE  0x54
+#define T0_FC_PARTY  0x18
+#define T0_FC_QUEST  0x6B
+#define T0_FC_RACING  0x26
+#define T0_FC_REQUEST  0x65
+#define T0_FC_SHOP  0x74
+#define T0_FC_SKILL  0x53 // 0x60
+#define T0_FC_STORE  0x12
+#define T0_FC_STRING  0xB2
+#define T0_FC_TIMER  0xB1 
+#define T0_FC_TRADE  0xFE
+#define T0_FC_COUNTDOWN  0x70
+#define T0_FC_OBJECT  0x96
+#define T0_FC_AUCTION  0x20
+#define T0_FC_CITYWAR  0xD6
+#define T0_FC_WAR  0xE1
+#define T0_FC_BAZAAR  0x21
+#define T0_FC_ARENA  0x3E
+#define T0_FC_TUTORIAL  0x6A
+#define T0_FC_OUTPOST  0xC2
+#define T0_FC_INFINITY  0xA4
+#define T0_FC_TRIGGER  0x22
+#define T0_FC_COLLECTION  0x14
+#define T0_FC_MARKET  0x15
+#define T0_FI_ADMIN  0xA2
+#define T0_FI_CHARACTER  0x72
+#define T0_FI_CHAT  0x3C
+#define T0_FI_EVENT  0x13
+#define T0_FI_GUILD  0x4C
+#define T0_FI_PARTY  0x92
+#define T0_FI_CITYWAR  0x9B
+#define T0_FI_CASH  0x56
+#define T0_FI_INFO  0x49
+#define T0_FN_BATTLE  0x61
+#define T0_FN_CHARACTER  0x36
+#define T0_FN_EVENT  0x3A
+#define T0_FN_MONSTER  0xB3
+#define T0_FN_MOVE  0x98
+#define T0_FN_SKILL  0x94
+#define T0_FN_CITYWAR  0x5C
+#define T0_FN_NPCSERVER  0x16
+#define T0_FP_EVENT  0x3D
+#define T0_FP_MONITOR  0x90
+#define T0_FP_CASH  0x66
+#define T0_FP_ADMIN  0x1C
+#define T0_FP_GLOG  0x19
+#define T0_IC_ADMIN  0x35
+#define T0_IC_CHAT  0x25
+#define T0_IC_GUILD  0x3F
+#define T0_IC_PARTY  0x95
+#define T0_IC_STRING  0x97
+#define T0_IC_COUNTDOWN  0x5B
+#define T0_IC_CITYWAR  0xE0
+#define T0_IC_VOIP  0x4F
+#define T0_IC_CHATROOM  0x46
+#define T0_IC_INFO  0x68
+#define T0_FL_LOG  0x00
+#define T0_PAUTH_CONNECT  0x93
+#define T0_PM_MONITOR  0x4E
+#define T0_IM_MONITOR  0xC0
+#define T0_LM_MONITOR  0xB0
+#define T0_FM_MONITOR  0x24
+#define T0_NM_MONITOR  0x1E
+#define T0_FC_ANTICHEAT  0x55
+#define T0_PA_ADMIN  0x99
+#define T0_IA_ADMIN  0x31
+#define T0_FA_ADMIN  0x57
+#define T0_NA_ADMIN  0xD5
+#define T0_PRE  0x9A
+#define T0_IM  0xA1
+#define T0_FIELD  0x1A
+#define T0_NPC  0xD0
+#define T0_ATUMVOIP  0x4A
+#define T0_TIMER  0x1D 
+#define T0_DB  0x64
+#define T0_ERROR  0x11
+#define T0_NA  0xC3
 
 ///////////////////////////////////////////////////////////////////////////////
 // Message Type 1 (소분류)
@@ -4972,12 +5082,12 @@ typedef struct
 typedef struct
 {
 	ClientIndex_t	MonsterIndex;
-	INT				CurrentHP;
-	INT				MonsterUnitKind;
-	SHORT			MonsterForm;
 	AVECTOR3		PositionVector;
 	AVECTOR3		TargetVector;
 	BodyCond_t		BodyCondition;
+	INT				CurrentHP;
+	INT				MonsterUnitKind;
+	SHORT			MonsterForm;   	
 	INT				MaxHP;
 } MSG_FC_CHARACTER_GET_MONSTER_INFO_OK;
 

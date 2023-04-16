@@ -95,15 +95,15 @@ public:
 	static ATUM_DATE_TIME GetCurrentDateTime();
 	static const char* GetCurrentDateTimeString(STRNBUF& i_strnbuf);
 
-	static const char* GetDateTimeStringFromSeconds(int i_nSeconds, string& i_szStrBuf);
+	static const char* GetDateTimeStringFromSeconds(int i_nSeconds, std::string& i_szStrBuf);
 
 	///////////////////////////////////////////////////////////////////////////////
 	// 2008-03-18 by cmkwon, 나라별 날짜 형식 수정 - 인자 추가(int i_nLangTy)
-	static const char* GetLocalString_YYYYMMDD(int i_Year, int i_Month, int i_Day, string& io_szStrBuf, int i_nLangTy);	// 2007-10-05 by cmkwon, 연월일을 나라별로 다르게하기 위해
-	static const char* GetLocalString_YYYYMM(int i_Year, int i_Month, string& io_szStrBuf, int i_nLangTy);					// 2007-10-05 by cmkwon, 연월일을 나라별로 다르게하기 위해
-	static const char* GetLocalString_MMDD(int i_Month, int i_Day, string& io_szStrBuf, int i_nLangTy);					// 2007-10-05 by cmkwon, 연월일을 나라별로 다르게하기 위해
+	static const char* GetLocalString_YYYYMMDD(int i_Year, int i_Month, int i_Day, std::string& io_szStrBuf, int i_nLangTy);	// 2007-10-05 by cmkwon, 연월일을 나라별로 다르게하기 위해
+	static const char* GetLocalString_YYYYMM(int i_Year, int i_Month, std::string& io_szStrBuf, int i_nLangTy);					// 2007-10-05 by cmkwon, 연월일을 나라별로 다르게하기 위해
+	static const char* GetLocalString_MMDD(int i_Month, int i_Day, std::string& io_szStrBuf, int i_nLangTy);					// 2007-10-05 by cmkwon, 연월일을 나라별로 다르게하기 위해
 
-	const char* GetLocalDateTimeString(string& o_szStrBuf, int i_nLangTy, BOOL i_bExcludeSecond = FALSE) const;		// 2008-03-18 by cmkwon, 나라별 날짜 형식 수정 - 
+	const char* GetLocalDateTimeString(std::string& o_szStrBuf, int i_nLangTy, BOOL i_bExcludeSecond = FALSE) const;		// 2008-03-18 by cmkwon, 나라별 날짜 형식 수정 - 
 
 	///////////////////////////////////////////////////////////////////////////////
 	// 2008-04-02 by cmkwon, 썸머타임 관련 버그 수정 - 

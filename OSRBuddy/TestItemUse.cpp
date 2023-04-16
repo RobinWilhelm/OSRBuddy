@@ -37,9 +37,21 @@ namespace Features
 
 	void TestItemUse::Tick()
 	{
-
-
 		/*
+		for (auto mapentry : OSR_API->GetAtumApplication()->m_pShuttleChild->m_pStoreData->m_mapItemUniqueNumber)
+		{
+			CItemInfo* iteminfo = mapentry.second;
+		}
+		*/
+
+		CItemInfo* radar = OSR_API->GetRadarItemInfo();
+
+		for (auto& monster : OSR_API->GetSceneData()->m_mapMonsterList)
+		{
+			CMonsterData* monsterinfo = monster.second;
+		}
+
+		 	/*
 		auto scene = osr->GetSceneData();
 		scene->m_fChangeWeatherCheckTime = 0;
 		scene->m_fOrgFogStartValue = WEATHER_SUNNY_FOG_START;				// 안개 시작지점-거리(실제값)
@@ -61,8 +73,10 @@ namespace Features
 
 		CINFCityLab* lab = static_cast<CINFCityLab*>(OSR_API->FindBuildingShop(BUILDINGKIND_LABORATORY));
 		if (lab)
-		{
-			ImGui::InputInt("LastTime: ", (int*)&lab->m_lasttime);
+		{	
+			ImGui::Text("%d", lab->m_enchantPressX); 
+			ImGui::Text("%d", lab->m_enchantPressY);
+			ImGui::Text("%d", lab->m_someFlag);
 			ImGui::NewLine();
 			int counter = 0;
 			for (auto item : lab->m_saved_times)

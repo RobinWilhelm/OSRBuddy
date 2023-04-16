@@ -215,7 +215,7 @@ struct SFrame
     D3DXMATRIXA16 matCombined;
                    
  
-
+    std::vector<D3DXMATRIXA16> instancesMatCombined;
     // animation information
     SPositionKey* m_pPositionKeys;
     UINT m_cPositionKeys;
@@ -225,7 +225,7 @@ struct SFrame
     UINT m_cScaleKeys;
 
     SMatrixKey* m_pMatrixKeys;
-    char pad[8];
+    std::map<DWORD, DWORD> m_mapMatrixKeys;
     UINT m_cMatrixKeys;
 
    

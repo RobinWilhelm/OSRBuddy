@@ -27,7 +27,7 @@ using CalcObjectSourceScreenCoordsType = void(__thiscall*)(CAtumApplication * ec
 using DeleteSelectItemType = void(__thiscall*)(CINFInvenExtend * ecx, int count);
 using SendChangeWearWindowPosType = void(__thiscall*)(CINFInvenExtend* ecx, int nWindowPosition);
 using SetSelectItemType = void(__thiscall*)(CINFInven* ecx, INVEN_DISPLAY_INFO* pDisplayInfo);
-using UpdateItemCountType = void(__thiscall*)(CStoreData* ecx, UID64_t nUniqueNumber, INT nCount);
+using UpdateItemCountType = void(__thiscall*)(CStoreData* ecx, UID64_t nUniqueNumber, INT nCount, DWORD unknown);
 using GetServerItemInfoType = ITEM * (__thiscall*)(CAtumDatabase* ecx, int nItemNum);
 
 
@@ -826,7 +826,7 @@ void OldSchoolRivalsAPI::UpdateItemCount(UID64_t nUniqueNumber, INT nCount)
 	CStoreData* storedata = m_atumapplication->m_pShuttleChild->m_pStoreData;
 	if (updateItemCountFn && storedata)
 	{
-		updateItemCountFn(storedata, nUniqueNumber, nCount);
+		updateItemCountFn(storedata, nUniqueNumber, nCount, 0);
 	}
 }
 

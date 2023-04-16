@@ -258,8 +258,7 @@ public:
 	virtual void Tick();
 
 public:
-	void* m_unknown1;
-	void* m_unknown2;
+	void* m_unknown1[2];
 	//좌, 우 윈도우 위치 계산한 결과값
 	int		m_nLeftWindowY;
 	int		m_nRightWindowY;
@@ -276,8 +275,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////	
 
 public:
-	
-
 	CGameData* m_pGameData;
 
 	CINFAttackDirection* m_pAttackDirection;
@@ -316,6 +313,8 @@ public:
 	CINFGameMainFAQ* m_pInfGameMainFaq;
 	CINFMenuList* m_pMenuList;
 	CINFCouponWindow* m_pCouponWindow;
+	void* dunno0;
+
 	CINFImage* m_pImgButton[GAMEMAIN_BUTTON_NUMBER][BUTTON_STATE_NUMBER];
 	CINFImage* m_pImgMission;
 	CINFImage* m_pHelp[HELP_NUM];
@@ -359,7 +358,7 @@ public:
 	CD3DHanFont* m_pFontToolTip;
 	CD3DHanFont* m_pFontTimeLimit;
 	CD3DHanFont* m_pFontDrawMent;
-	char m_pad01[20];
+	char m_pad01[52];
 
 	// 2010. 04. 28 by hsLee 인피니티 필드 2차 난이도 조절.
 	char				m_szSave_ToolTip[1024];

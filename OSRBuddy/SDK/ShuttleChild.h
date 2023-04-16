@@ -176,8 +176,7 @@ public:
 
 public:
 
-	char m_pad1[8];
-	char m_pad2[8];
+	char m_pad1[16];
 	CGameData* m_pGameData;
 	CStoreData* m_pStoreData;
 	CUnitRender* m_pRender;							// ShuttleÀÇ Rendering Ã³¸®
@@ -429,6 +428,7 @@ public:
 		// 2005-02-15 by jschoi  -  PK Delay Timer
 	CPkNormalTimer* m_pPkNormalTimer;
 	BOOL				m_bCtrlKey;		// CtrlKey »óÅÂ º¯¼ö TRUE : Ctrl Down »óÅÂ, FALSE : Ctrl Up »óÅÂ
+	char dunno0[4];
 
 	BYTE				m_byCityWarTeamType;	// µµ½ÃÁ¡·ÉÀü »óÅÂ º¯¼ö
 	float				m_fTempGravity;			// Áß·Â °ª 
