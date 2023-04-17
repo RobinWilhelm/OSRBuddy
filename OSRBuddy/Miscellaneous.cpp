@@ -46,7 +46,7 @@ namespace Features
 		m_selected_combo_item = ImGui::ComboItem();
 
 		m_searcheye_timer = BuddyTimer(3s);
-		m_gm_timer = BuddyTimer(3s);
+		m_gm_timer = BuddyTimer(1s);
 	}
 
 	Miscellaneous::~Miscellaneous()
@@ -73,6 +73,7 @@ namespace Features
 		TickWhisperWarner();
 		TickBossWarner();
 		TickGMWarner();
+		TickNoOverheat();
 
 		if (m_autoitems_timer.IsReady())
 		{
@@ -124,6 +125,21 @@ namespace Features
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip("Forces all enemy players and staff members to be visible to you.");
 				}
+				ImGui::Checkbox("No Primary Weapon Overheat", &m_no_overheat_primary);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Your primary weapon wont overheat.");
+				}
+				ImGui::Checkbox("No Booster Overheat", &m_no_overheat_booster);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Endless boosting.");
+				}
+
+				ImGui::NewLine();
+				ImGui::Separator();
+
+				CShuttleChild* shuttleChild = OSR_API->GetAtumApplication()->m_pShuttleChild;
+				ImGui::SliderFloat("Primary reattack", &shuttleChild->m_paramFactor.pfm_REATTACKTIME_01, -1, 1, "%.2f");
+				ImGui::SliderFloat("Secondary reattack", &shuttleChild->m_paramFactor.pfm_REATTACKTIME_02, -1, 1, "%.2f");
 			}
 
 			ImGui::EndChild();
@@ -144,15 +160,6 @@ namespace Features
 
 				ImGui::NewLine();
 				ImGui::Separator();
-				ImGui::Text("GM Warner (experimental)");
-				ImGui::Separator();
-				ImGui::Checkbox("Active###GMwarner", &m_gmwarner_active);
-				if (ImGui::IsItemHovered()) {
-					ImGui::SetTooltip("Will notify the user whenever there is a GM in the local area");
-				}
-
-				ImGui::NewLine();
-				ImGui::Separator();
 				ImGui::Text("Auto Charms");
 				ImGui::Separator();
 				ImGui::Checkbox("Active###charms", &m_autocharms_active);
@@ -167,11 +174,50 @@ namespace Features
 						m_update_charms_timer.Reset();
 					}
 				}
+
+				ImGui::NewLine();
+				ImGui::Separator();
+				ImGui::Text("GM Warner (experimental)");
+				ImGui::Separator();
+				ImGui::Checkbox("Active###GMwarner", &m_gmwarner_active);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Will try to detect online Staff members and show them in a list below.\nIMPORTANT: Only works as a formation lead.");
+				}
+				ImGui::Text("Detected Staff Members:");
+				uint64_t fiveMinutesAgo = GetTickCount64() - 1000 * 60 * 5;
+				for (auto gm : m_online_gms)
+				{
+					if(gm.second > fiveMinutesAgo)
+						ImGui::Text("%s", gm.first.c_str());
+				}
+
 				ImGui::SameLine();
 			}
 			ImGui::EndChild();
 		}
 		ImGui::EndColumns();
+	}
+
+	bool Miscellaneous::OnReadPacket(unsigned short msgtype, byte* packet)
+	{
+		switch (msgtype)
+		{
+		case T_IC_PARTY_RECOMMENDATION_MEMBER_OK:	// 추천 인원
+		{
+			MSG_IC_PARTY_RECOMMENDATION_MEMBER_OK* pMsg = (MSG_IC_PARTY_RECOMMENDATION_MEMBER_OK*)packet;
+			SRECOMMENDATION_MEMBER_INFO* pListInfo = (SRECOMMENDATION_MEMBER_INFO*)((char*)pMsg + sizeof(MSG_IC_PARTY_RECOMMENDATION_MEMBER_OK));
+			int i;
+			for (i = 0; i < pMsg->Count; i++)
+			{
+				if (OSR_API->IsStaffMember(pListInfo->CharacterName))
+				{
+					m_online_gms[std::string(pListInfo->CharacterName, strlen(pListInfo->CharacterName))] = GetTickCount64();
+				}
+				pListInfo++;
+			}
+		}
+		}
+		return false;
 	}
 
 	void Miscellaneous::ActivateAutoFlip(bool on)
@@ -401,7 +447,7 @@ namespace Features
 	}
 
 	void Miscellaneous::TickVisibility()
-	{	
+	{
 		auto scenedata = OSR_API->GetSceneData();
 		if (scenedata)
 		{
@@ -437,7 +483,7 @@ namespace Features
 				}
 				it++;
 			}
-		}  		
+		}
 	}
 
 	void Miscellaneous::TickGMWarner()
@@ -453,14 +499,31 @@ namespace Features
 					CEnemyData* enemy = it->second;
 					if (COMPARE_RACE(enemy->m_infoCharacter.CharacterInfo.Race, RACE_OPERATION | RACE_GAMEMASTER))
 					{
-						m_buddy->NotifySound(NotifyType::Warning);
-						m_gm_timer.Reset();
-						return;
-					}						
+						m_online_gms[std::string(enemy->m_infoCharacter.CharacterInfo.CharacterName)] = GetTickCount64();
+					}
 					it++;
 				}
+
+				OSR_API->RqInvitePartyInfo();
 			}
 			m_gm_timer.Reset();
+		}
+	}
+
+	void Miscellaneous::TickNoOverheat()
+	{
+		if (m_no_overheat_primary)
+		{
+			CWeaponItemInfo* weapon = OSR_API->GetAtumApplication()->m_pShuttleChild->m_pPrimaryWeapon;
+			ITEM* weaponItem = weapon->m_pItemInfo->ItemInfo;
+			float overheattime = (weaponItem->Time * (1.0f + (IS_PRIMARY_WEAPON(weaponItem->Kind) ? weapon->m_pCharacterParamFactor->pfm_TIME_01 : weapon->m_pCharacterParamFactor->pfm_TIME_02)) / 1000.0f);
+			weapon->m_fOverHeatCheckTime = overheattime;
+		}
+
+		if (m_no_overheat_booster)
+		{
+			CShuttleChild* shuttle = OSR_API->GetAtumApplication()->m_pShuttleChild;
+			shuttle->m_fCurrentBURN = shuttle->m_fBURN;
 		}
 	}
 }

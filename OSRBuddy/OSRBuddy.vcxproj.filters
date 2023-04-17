@@ -424,6 +424,18 @@
     <ClInclude Include="RandomBreakHelper.h">
       <Filter>Utility\AntiRand</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\INFCommunity.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\INFCommuPartyInvite.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\IMSocket.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\IMSocketManager.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

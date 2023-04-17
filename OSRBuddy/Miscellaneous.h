@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <atomic>
+#include <unordered_map>
 
 class CItemInfo;
 
@@ -23,6 +24,7 @@ namespace Features
 		virtual std::string GetName() const override;
 		virtual void Tick() override;
 		virtual void RenderImGui() override;
+		virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
 
 		void ActivateAutoFlip(bool on);
 		void ActivateAutoAmmo(bool on);
@@ -44,6 +46,7 @@ namespace Features
 		void TickAutoCharm();
 		void TickVisibility();
 		void TickGMWarner();
+		void TickNoOverheat();
 
 	private:
 		bool m_whisperwarner_active;
@@ -79,5 +82,9 @@ namespace Features
 		bool m_bosswarner;
 		bool m_boss_popup_open;
 		bool m_force_visibility;
+		bool m_no_overheat_primary;
+		bool m_no_overheat_booster;
+
+		std::map<std::string, uint64_t> m_online_gms;
 	};
 }

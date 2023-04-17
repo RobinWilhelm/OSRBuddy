@@ -29,6 +29,7 @@ using SendChangeWearWindowPosType = void(__thiscall*)(CINFInvenExtend* ecx, int 
 using SetSelectItemType = void(__thiscall*)(CINFInven* ecx, INVEN_DISPLAY_INFO* pDisplayInfo);
 using UpdateItemCountType = void(__thiscall*)(CStoreData* ecx, UID64_t nUniqueNumber, INT nCount, DWORD unknown);
 using GetServerItemInfoType = ITEM * (__thiscall*)(CAtumDatabase* ecx, int nItemNum);
+using RqInvitePartyInfoType = void(__thiscall*)(CINFCommuPartyInvite* ecx);
 
 
 OldSchoolRivalsAPI* OldSchoolRivalsAPI::instance  = nullptr;
@@ -91,6 +92,15 @@ CFieldWinSocket* OldSchoolRivalsAPI::GetFieldWinSocket(UINT nSocketNotifyType)
 		return m_atumapplication->m_pFieldWinSocket->m_pArenaFieldWinSocket;
 	}  
 	return m_atumapplication->m_pFieldWinSocket->m_pMainFieldWinSocket;
+}
+
+CIMSocket* OldSchoolRivalsAPI::GetIMSocket(UINT nSocketNotifyType)
+{
+	if (WM_IM_ARENA_NOTIFY == nSocketNotifyType)
+	{
+		return m_atumapplication->m_pIMSocket->m_pArenaIMSocket;
+	}
+	return m_atumapplication->m_pIMSocket->m_pMainIMSocket;
 }
 
 CSceneData* OldSchoolRivalsAPI::GetSceneData()
@@ -913,6 +923,16 @@ int OldSchoolRivalsAPI::WritePacket(byte* packet, int length)
 	return 0;
 }
 
+void OldSchoolRivalsAPI::RqInvitePartyInfo()
+{
+	static RqInvitePartyInfoType rqInvitePartyInfoFn = reinterpret_cast<RqInvitePartyInfoType>(PatternManager::Get(OffsetIdentifier::CINFCommuPartyInvite__RqInvitePartyInfo).address);
+	static CINFCommuPartyInvite* partyInvite = m_atumapplication->m_pInterface->m_pGameMain->m_pCommunity->m_pCommuPartyInvite;
+	if (rqInvitePartyInfoFn && partyInvite)
+	{
+		rqInvitePartyInfoFn(partyInvite);
+	}
+}
+
 bool OldSchoolRivalsAPI::HasPremium()
 {
 	return true; // fix this
@@ -1246,6 +1266,32 @@ bool OldSchoolRivalsAPI::CanInsertItemToInventory(INT itemnum)
 		}
 	}
 	return true;
+}
+
+bool OldSchoolRivalsAPI::IsStaffMember(const char* charName)
+{
+	if (!charName) {
+		return false;
+	}
+
+	char lc_charName[SIZE_MAX_CHARACTER_NAME];
+	strcpy_s(lc_charName, SIZE_MAX_CHARACTER_NAME, charName);
+
+	for (auto& c : lc_charName) {
+		c = tolower(c);
+	}
+
+	if (strstr(lc_charName, "romu"))			return true;
+	if (strstr(lc_charName, "inetpub"))			return true;
+	if (strstr(lc_charName, "bergi9"))			return true;
+	if (strstr(lc_charName, "kube"))			return true;
+	if (strstr(lc_charName, "falconflug"))		return true;
+	if (strstr(lc_charName, "rigel"))			return true;
+	if (strstr(lc_charName, "layla_"))			return true;
+	if (strstr(lc_charName, "mangoo_"))			return true;
+	if (strstr(lc_charName, "masteroogway"))	return true;
+
+	return false;
 }
 
 

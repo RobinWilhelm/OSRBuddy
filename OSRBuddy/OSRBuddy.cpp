@@ -74,19 +74,31 @@ BOOL __fastcall OSRBuddyMain::OnRecvdPacket_Hooked(CFieldWinSocket* ecx, void* e
 }
 
 
-BOOL __fastcall OSRBuddyMain::OnReadPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType)
+int __fastcall OSRBuddyMain::OnReadFieldPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType)
 {
     PUSHCPUSTATE
-    g_osrbuddy->OnReadPacket(wParam, nSocketNotifyType); 
+    g_osrbuddy->OnReadFieldPacket(wParam, nSocketNotifyType); 
     POPCPUSTATE
     return g_osrbuddy->m_orig_OnRecvFieldSocketMessage(ecx, wParam, nSocketNotifyType);
+}
+
+int __fastcall OSRBuddyMain::OnReadIMPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType)
+{
+    PUSHCPUSTATE
+    g_osrbuddy->OnReadIMPacket(wParam, nSocketNotifyType);
+    POPCPUSTATE
+    return g_osrbuddy->m_orig_OnRecvIMSocketMessage(ecx, wParam, nSocketNotifyType);
 }
 
 int __fastcall OSRBuddyMain::OnWritePacket_Hooked(CWinSocket* ecx, void* edx, LPCSTR pPacket, int nLength)
 {
     PUSHCPUSTATE
-    g_osrbuddy->OnWritePacket(pPacket, nLength); 
+    bool skip = g_osrbuddy->OnWritePacket(pPacket, nLength); 
     POPCPUSTATE
+
+    if (skip)
+        return 0;
+
     return g_osrbuddy->m_orig_OnWritePacket(ecx, pPacket, nLength);
 }
 
@@ -153,6 +165,9 @@ OSRBuddyMain::OSRBuddyMain()
 
     m_allow_notify_popups = false;
     m_allow_notify_sounds = true;
+
+    m_OnRecvIMSocketMessagehook = nullptr;
+    m_orig_OnRecvIMSocketMessage = nullptr;
 }
 
 OSRBuddyMain::~OSRBuddyMain()
@@ -241,9 +256,13 @@ bool OSRBuddyMain::Start()
         //    throw exception("OnRevdPacketHook failed to initialise");
         //}            
         
-        if (!InitOnReadPacketHook()) {
-            throw exception("ReadPacketHook failed to initialise");
-        }     
+        if (!InitOnReadFieldPacketHook()) {
+            throw exception("ReadFieldPacketHook failed to initialise");
+        } 
+
+        if (!InitOnReadIMPacketHook()) {
+            throw exception("ReadIMPacketHook failed to initialise");
+        }
 
         if(!InitOnWriteHook()) {
             throw exception("WritePacketHook failed to initialise");
@@ -281,7 +300,8 @@ void OSRBuddyMain::ShutdownHooks()
 {    
     ShutdownOnWriteHook();
     //ShutdownOnRecvdPacketHook();
-    ShutdownOnReadPacketHook();
+    ShutdownOnReadFieldPacketHook();
+    ShutdownOnReadIMPacketHook();
     UnhookWindowProcedure();            
     ShutdownTickHook();
     ShutdownD3DHooks(); 
@@ -358,14 +378,14 @@ void OSRBuddyMain::BlockMouseInput(bool on)
     m_block_mouse = on;
 }
 
-bool OSRBuddyMain::InitOnReadPacketHook()
+bool OSRBuddyMain::InitOnReadFieldPacketHook()
 {    
     if (m_OnRecvFieldSocketMessagehook) {
         return false;
     }
 
     PatternInfo pinfo = PatternManager::Get(OffsetIdentifier::CAtumApplication__OnRecvFieldSocketMessage);
-    m_OnRecvFieldSocketMessagehook = std::make_unique<TrampolineHook<CAtumApplicationOnRecvFieldSocketMessageType>>(pinfo.address, (byte*)OSRBuddyMain::OnReadPacket_Hooked, pinfo.trampoline_length);
+    m_OnRecvFieldSocketMessagehook = std::make_unique<TrampolineHook<CAtumApplicationOnRecvFieldSocketMessageType>>(pinfo.address, (byte*)OSRBuddyMain::OnReadFieldPacket_Hooked, pinfo.trampoline_length);
 
     m_orig_OnRecvFieldSocketMessage = m_OnRecvFieldSocketMessagehook->GetOriginal();
     if (!m_OnRecvFieldSocketMessagehook->Hook()) {
@@ -375,13 +395,40 @@ bool OSRBuddyMain::InitOnReadPacketHook()
     return true;
 }
 
-void OSRBuddyMain::ShutdownOnReadPacketHook()
+void OSRBuddyMain::ShutdownOnReadFieldPacketHook()
 {
     if (m_OnRecvFieldSocketMessagehook)
     {
         m_OnRecvFieldSocketMessagehook->Unhook();
         Sleep(100);
         m_OnRecvFieldSocketMessagehook.reset();
+    }
+}
+
+bool OSRBuddyMain::InitOnReadIMPacketHook()
+{
+    if (m_OnRecvIMSocketMessagehook) {
+        return false;
+    }
+
+    PatternInfo pinfo = PatternManager::Get(OffsetIdentifier::CAtumApplication__OnRecvIMSocketMessage);
+    m_OnRecvIMSocketMessagehook = std::make_unique<TrampolineHook<CAtumApplicationOnRecvIMSocketMessageType>>(pinfo.address, (byte*)OSRBuddyMain::OnReadIMPacket_Hooked, pinfo.trampoline_length);
+
+    m_orig_OnRecvIMSocketMessage = m_OnRecvIMSocketMessagehook->GetOriginal();
+    if (!m_OnRecvIMSocketMessagehook->Hook()) {
+        return false;
+    }
+
+    return true;
+}
+
+void OSRBuddyMain::ShutdownOnReadIMPacketHook()
+{
+    if (m_OnRecvIMSocketMessagehook)
+    {
+        m_OnRecvIMSocketMessagehook->Unhook();
+        Sleep(100);
+        m_OnRecvIMSocketMessagehook.reset();
     }
 }
 
@@ -468,7 +515,10 @@ void OSRBuddyMain::ShutdownSetCursorPosHook()
 void OSRBuddyMain::Tick()
 {
    AntiAntiCheat::PatchDebugFlag();
-   
+
+   static OldSchoolRivalsAPI* osr = OSR_API;
+   osr->GetAtumApplication()->m_dwMoveCheckTime = 0;
+
    // update internal elapsed time
    std::chrono::microseconds current = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
    m_tickTime = current - m_lastTick;
@@ -572,7 +622,7 @@ bool OSRBuddyMain::GetCursorPosition(LPPOINT pos)
     }
 }
 
-void OSRBuddyMain::OnReadPacket(DWORD wParam, UINT nSocketNotifyType)
+void OSRBuddyMain::OnReadFieldPacket(DWORD wParam, UINT nSocketNotifyType)
 {       
     MessageType_t nType = 0;       
     CFieldWinSocket* pFieldSocket = OSR_API->GetFieldWinSocket(nSocketNotifyType);   
@@ -597,17 +647,44 @@ void OSRBuddyMain::OnReadPacket(DWORD wParam, UINT nSocketNotifyType)
                 break;
             }
         }   
-    }
-  
+    }    
 }
 
-void OSRBuddyMain::OnWritePacket(LPCSTR pPacket, int nLength)
+void OSRBuddyMain::OnReadIMPacket(DWORD wParam, UINT nSocketNotifyType)
+{
+    MessageType_t nType = 0;
+    CIMSocket* pIMSocket = OSR_API->GetIMSocket(nSocketNotifyType);
+    if (!pIMSocket || pIMSocket->m_queueRecvMessage.empty()) {
+        return;
+    }
+
+    std::queue<char*> packet_buffer = pIMSocket->m_queueRecvMessage;
+    char* packet = NULL;
+
+    while (!packet_buffer.empty())
+    {
+        packet = packet_buffer.front();
+        packet_buffer.pop();
+        nType = *(MessageType_t*)packet;
+
+        m_packetmanager->OnReadPacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)));
+
+        for (auto feature : m_features)
+        {
+            if (static_cast<IPacketWatcher*>(feature)->OnReadPacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)))) {
+                break;
+            }
+        }
+    }
+}
+
+bool OSRBuddyMain::OnWritePacket(LPCSTR pPacket, int nLength)
 {
     MessageType_t nType = 0;
     byte* packet = (byte*)pPacket;
     nType = *(MessageType_t*)packet;
 
-    m_packetmanager->OnWritePacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)));
+    bool skip = m_packetmanager->OnWritePacket(nType, reinterpret_cast<byte*>(packet + sizeof(MessageType_t)));
 
     for (auto feature : m_features)
     {
@@ -615,6 +692,7 @@ void OSRBuddyMain::OnWritePacket(LPCSTR pPacket, int nLength)
             break;
         }
     }
+    return skip;
 }
   
 ImGuiBase* OSRBuddyMain::GetMenu()

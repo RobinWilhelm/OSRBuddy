@@ -68,6 +68,7 @@ namespace Features
 		static OldSchoolRivalsAPI* osr = OSR_API;
 		auto shuttle = osr->GetAtumApplication()->m_pShuttleChild;
 		auto scene = osr->GetAtumApplication()->m_pScene;
+		auto atumapp = osr->GetAtumApplication();
 
 		ImGui::NewLine();
 
@@ -107,16 +108,13 @@ namespace Features
 		if (m_item_reattack > 0)
 			m_item_reattack -= static_cast<int>(osr->GetElapsedTime());
 
-		static std::string test1;
-		test1 = std::to_string(osr->GetAtumApplication()->m_dwInetAnticheatCheckTime);
-
-		static std::string test2;
-		test2 = std::to_string(osr->GetAtumApplication()->m_dwInetAnticheatCheckTime2);
-
-
-		ImGui::Text(test1.c_str());
-		ImGui::Text(test2.c_str());
-
+		ImGui::Text("%d", atumapp->m_nSendMovePacketCount);
+		ImGui::Text("%d", atumapp->m_nCheckSpeedHackCount);
+		ImGui::Text("%d", atumapp->m_unknown1);
+		ImGui::Text("%d", atumapp->m_dwHackCheckTime);
+		ImGui::Text("%d", atumapp->m_dwMoveCheckTime);
+		ImGui::Text("%d", atumapp->m_unknownCheckTime);
+		ImGui::Text("%d", atumapp->m_unknown2);
 
 		ImGui::Checkbox("Active", &m_active_switch);
 		ImGui::InputInt("Item Number", &m_input_itemnumber);

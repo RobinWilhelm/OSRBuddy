@@ -374,7 +374,7 @@ namespace Features
 				return;
 			}
 
-			if (m_open_watermelongift && TryOpenCapsule(ItemNumber::Square_Watermelon_Gift)) {
+			if (m_open_watermelongift && TryOpenCapsule(ItemNumber::Square_Watermelon_Gift_New)) {
 				return;
 			}
 

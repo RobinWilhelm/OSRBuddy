@@ -26,6 +26,7 @@ public:
 	CInterface* GetInterface();	
 	CAtumDatabase* GetDatabase();
 	CFieldWinSocket* GetFieldWinSocket(UINT nSocketNotifyType = 0);	  
+	CIMSocket* GetIMSocket(UINT nSocketNotifyType = 0);
 	CSceneData* GetSceneData();	  
 	CINFGameMainChat* GetINFGameMainChat();
 
@@ -124,6 +125,9 @@ public:
 	// CWinSocket
 	int WritePacket(byte* packet, int length);
 
+	// CINFCommuPartyInvite
+	void RqInvitePartyInfo();
+
 	bool HasPremium();
 	uint32_t GetMaxInventorySize();
 	uint32_t GetCurrentInventorySize();
@@ -157,6 +161,8 @@ public:
 
 	bool IsCountableItem(ITEM* item);
 	bool CanInsertItemToInventory(INT itemnum);
+
+	bool IsStaffMember(const char* charName);
 
 private:
 	// collision stuff

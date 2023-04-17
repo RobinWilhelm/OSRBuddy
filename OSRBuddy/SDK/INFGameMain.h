@@ -29,6 +29,7 @@
 
 #include "INFGameMainChat.h"
 #include "INFSkill.h"
+#include "INFCommunity.h"
 
 
 //#include "INFQuickSlot.h"
@@ -191,7 +192,6 @@ class CINFGameMainQSlot;
 class CINFGameMainUnitInfoBar;
 class CINFGameMainMiniMap;
 class CINFGameMainOutPost;
-class CINFCommunity;
 class CINFWindow;
 class CINFWeaponInfo;
 class CINFTrade;

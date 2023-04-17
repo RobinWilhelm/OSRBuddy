@@ -276,6 +276,12 @@ bool IOPacketManager::OnWritePacket(unsigned short msgtype, byte* packet)
 			DEBUG_INCREMENT(m_debug_info.enchant_item_sent);
 		}
 		break;
+	case T_FC_CHARACTER_GET_REAL_WEAPON_INFO_OK:
+	case T_FC_CHARACTER_GET_REAL_ENGINE_INFO_OK:
+	case T_FC_CHARACTER_MEMORY_HACK_USER:
+		{
+			return true; // skip these packets
+		}
 	}
 
 	DEBUG_INCREMENT(m_debug_info.total_sent);

@@ -35,6 +35,7 @@
 #include "FieldWinSocketManager.h"
 #include "MonsterData.h"
 #include "SceneData.h"
+#include "IMSocketManager.h"
 
 
 
@@ -55,9 +56,9 @@ class CTraceRender;
 class IMEKey;
 class CChat;
 //class CFieldWinSocket;
-class CIMSocket;
+//class CIMSocket;
 // 2007-11-22 by bhsohn ¾Æ·¹³ª ÅëÇÕ¼­¹ö
-class CIMSocketManager;
+//class CIMSocketManager;
 //class CFieldWinSocketManager;
 class CArenaManager;
 
@@ -342,19 +343,15 @@ public:
 	virtual ~CAtumApplication();
 
 public:
-	
+	char dunno0[12];
 	// 2004-11-11 by jschoi ½ºÇÇµåÇÙ °ü·Ã º¯¼ö
 	int							m_nSendMovePacketCount;	// MovePacketÀ» º¸³½ ¼ö
 	int							m_nCheckSpeedHackCount;	// ½ºÇÇµåÇÙ Ã¼Å© Ä«¿îÆ® 1ÃÊ´ç 5°³
-	DWORD						m_dwCheckSpeedHackTime;		// ½ºÇÇµåÇÙ Ã¼Å© Å¸ÀÓ timeGetTime()
-	DWORD						m_dwSpeedHackTimer;
+	DWORD						m_unknown1;
 	DWORD						m_dwHackCheckTime;		// 2005-12-21 by ispark, ÇÙ Ã¼Å© Å¸ÀÓ(1ºÐ´ç)
-
-	void*						m_unknown1;
-	DWORD						m_dwInetAnticheatCheckTime;
-	DWORD						m_dwInetAnticheatCheckTime2;
 	DWORD						m_dwMoveCheckTime;	   	
 
+	DWORD						m_unknownCheckTime;
 	DWORD						m_unknown2;
 
 	CD3DHanFont* m_pFontDebug;				// ÅØ½ºÆ® Ç¥½Ã¿ë ÆùÆ®

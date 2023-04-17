@@ -316,9 +316,13 @@
     <ClInclude Include="SDK\FieldWinSocket.h" />
     <ClInclude Include="SDK\FieldWinSocketManager.h" />
     <ClInclude Include="SDK\IMEKey.h" />
+    <ClInclude Include="SDK\IMSocket.h" />
+    <ClInclude Include="SDK\IMSocketManager.h" />
     <ClInclude Include="SDK\INFBase.h" />
     <ClInclude Include="SDK\INFCityBase.h" />
     <ClInclude Include="SDK\INFCityLab.h" />
+    <ClInclude Include="SDK\INFCommunity.h" />
+    <ClInclude Include="SDK\INFCommuPartyInvite.h" />
     <ClInclude Include="SDK\INFGameMain.h" />
     <ClInclude Include="SDK\INFGameMainChat.h" />
     <ClInclude Include="SDK\INFGameMainWisperChat.h" />

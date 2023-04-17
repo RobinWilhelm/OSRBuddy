@@ -15,7 +15,7 @@
 #define MAX_SPI 2000000000
 
 // price of 1 item in spi
-#define COST_WARPOINT 1250   
+#define COST_WARPOINT 6000   
 #define COST_ENCHANTPROTECT_E1 200000
 #define COST_ENCHANTPROTECT_E5 500000
 #define COST_ENCHANT_CHANCE_3  (3000 * COST_WARPOINT)
@@ -28,6 +28,10 @@
 
 const std::vector<uint32_t> g_Enchant_probabilities{ 10000, 10000, 10000, 10000, 10000, 9000, 8000, 6000, 4000, 2000, 1000, 500, 100 };
       
+enum class StaffType : int
+{
+
+};
 
 enum class LabButtonCode : int
 {
@@ -288,6 +292,7 @@ enum class ItemNumber : int
 
     // Inventory Cleaning
     Square_Watermelon_Gift = 7023970,
+    Square_Watermelon_Gift_New = 7023971,
     Fantasy_Globe_Mineral_Capsule = 7023480,
     Halloween_Capsule = 1700300,
     Halloween_Staff_Box = 1800210,

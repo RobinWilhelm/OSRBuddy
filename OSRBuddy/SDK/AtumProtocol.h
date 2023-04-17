@@ -367,7 +367,7 @@ const char* GetItemDeleteTypeString(BYTE i_byItemDeleteTy);				// 2008-01-23 by 
 #define T0_PC_DEFAULT_UPDATE  0xC1
 #define T0_PC_CONNECT  0x71
 #define T0_FN_CONNECT  0x50
-#define T0_FC_CONNECT  0x10
+#define T0_FC_CONNECT  0x10	// checked
 #define T0_FP_CONNECT  0x78
 #define T0_IP_CONNECT  0x37
 #define T0_FI_CONNECT  0xAC
@@ -384,24 +384,24 @@ const char* GetItemDeleteTypeString(BYTE i_byItemDeleteTy);				// 2008-01-23 by 
 #define T0_MF_TO_AF  0xFF
 #define T0_PP_CONNECT  0x40
 #define T0_FC_ADMIN  0xA3
-#define T0_FC_BATTLE   0x67//0x54
-#define T0_FC_CHARACTER  0x30
+#define T0_FC_BATTLE   0x67 // checked
+#define T0_FC_CHARACTER  0x30 // checked
 #define T0_FC_CHAT  0xD1
 #define T0_FC_CITY  0x41
 #define T0_FC_CLIENT_REPORT  0x3B
 #define T0_FC_EVENT  0x1B
 #define T0_FC_GUILD  0x43
-#define T0_FC_INFO  0x44
-#define T0_FC_ITEM  0x4D
+#define T0_FC_INFO  0x44 // checked
+#define T0_FC_ITEM  0x4D // checked
 #define T0_FC_MONSTER  0x1F
-#define T0_FC_MOVE  0x54
+#define T0_FC_MOVE  0x54 // checked
 #define T0_FC_PARTY  0x18
 #define T0_FC_QUEST  0x6B
 #define T0_FC_RACING  0x26
 #define T0_FC_REQUEST  0x65
 #define T0_FC_SHOP  0x74
-#define T0_FC_SKILL  0x53 // 0x60
-#define T0_FC_STORE  0x12
+#define T0_FC_SKILL  0x53 // checked
+#define T0_FC_STORE  0x12 // checked
 #define T0_FC_STRING  0xB2
 #define T0_FC_TIMER  0xB1 
 #define T0_FC_TRADE  0xFE
@@ -439,11 +439,11 @@ const char* GetItemDeleteTypeString(BYTE i_byItemDeleteTy);				// 2008-01-23 by 
 #define T0_FP_MONITOR  0x90
 #define T0_FP_CASH  0x66
 #define T0_FP_ADMIN  0x1C
-#define T0_FP_GLOG  0x19
+#define T0_FP_GLOG  0x95
 #define T0_IC_ADMIN  0x35
 #define T0_IC_CHAT  0x25
 #define T0_IC_GUILD  0x3F
-#define T0_IC_PARTY  0x95
+#define T0_IC_PARTY  0x19 // checked
 #define T0_IC_STRING  0x97
 #define T0_IC_COUNTDOWN  0x5B
 #define T0_IC_CITYWAR  0xE0
@@ -464,12 +464,12 @@ const char* GetItemDeleteTypeString(BYTE i_byItemDeleteTy);				// 2008-01-23 by 
 #define T0_NA_ADMIN  0xD5
 #define T0_PRE  0x9A
 #define T0_IM  0xA1
-#define T0_FIELD  0x1A
+#define T0_FIELD  0x11 
 #define T0_NPC  0xD0
 #define T0_ATUMVOIP  0x4A
 #define T0_TIMER  0x1D 
 #define T0_DB  0x64
-#define T0_ERROR  0x11
+#define T0_ERROR  0x1A // checked
 #define T0_NA  0xC3
 
 ///////////////////////////////////////////////////////////////////////////////

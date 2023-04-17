@@ -26,6 +26,9 @@ using WinSocketOnRecvdPacketType = BOOL(__thiscall*)(CFieldWinSocket * ecx, LPST
 // CAtumApplication::OnRecvFieldSocketMessage
 using CAtumApplicationOnRecvFieldSocketMessageType = int(__thiscall*)(CAtumapplication * ecx, DWORD wParam, UINT nSocketNotifyType);
 
+// CAtumApplication::OnRecvFieldSocketMessage
+using CAtumApplicationOnRecvIMSocketMessageType = int(__thiscall*)(CAtumapplication* ecx, DWORD wParam, UINT nSocketNotifyType);
+
 // CWinSocket::Write  
 using CWinSocketWriteType = int(__thiscall*)(CWinSocket * ecx, LPCSTR pPacket, int nLength);
 
@@ -94,8 +97,11 @@ private:
 	//bool InitOnRecvdPacketHook();		//not currently used
 	//void ShutdownOnRecvdPacketHook();	//not currently used
 	
-	bool InitOnReadPacketHook();
-	void ShutdownOnReadPacketHook();
+	bool InitOnReadFieldPacketHook();
+	void ShutdownOnReadFieldPacketHook();
+
+	bool InitOnReadIMPacketHook();
+	void ShutdownOnReadIMPacketHook();
 
 	bool InitOnWriteHook();
 	void ShutdownOnWriteHook();
@@ -108,14 +114,16 @@ private:
 // END MOUSE MOVEMENT
 
 	void Tick(); 
-	void OnReadPacket(DWORD wParam, UINT nSocketNotifyType);
-	void OnWritePacket(LPCSTR pPacket, int nLength);
+	void OnReadFieldPacket(DWORD wParam, UINT nSocketNotifyType);
+	void OnReadIMPacket(DWORD wParam, UINT nSocketNotifyType);
+	bool OnWritePacket(LPCSTR pPacket, int nLength);
 
 private: 
 	virtual LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;	 	
 	void static __fastcall Tick_Hooked(CInterface* ecx, void* edx);							 
 	BOOL static __fastcall OnRecvdPacket_Hooked(CFieldWinSocket* ecx, void* edx, LPSTR pPacket, int nLength, BYTE nSeq); //not currently used
-	int static __fastcall OnReadPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType); 		
+	int static __fastcall OnReadFieldPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType); 		
+	int static __fastcall OnReadIMPacket_Hooked(CAtumapplication* ecx, void* edx, DWORD wParam, UINT nSocketNotifyType);
 	int static __fastcall OnWritePacket_Hooked(CWinSocket* ecx, void* edx, LPCSTR pPacket, int nLength);
 
 // START MOUSE MOVEMENT EMULATION
@@ -132,6 +140,9 @@ private:
 	
 	std::unique_ptr<TrampolineHook<CAtumApplicationOnRecvFieldSocketMessageType>> m_OnRecvFieldSocketMessagehook;
 	CAtumApplicationOnRecvFieldSocketMessageType m_orig_OnRecvFieldSocketMessage;
+
+	std::unique_ptr<TrampolineHook<CAtumApplicationOnRecvIMSocketMessageType>> m_OnRecvIMSocketMessagehook;
+	CAtumApplicationOnRecvIMSocketMessageType m_orig_OnRecvIMSocketMessage;
 
 	std::unique_ptr<TrampolineHook<CWinSocketWriteType>> m_OnWritePackethook;
 	CWinSocketWriteType m_orig_OnWritePacket;
