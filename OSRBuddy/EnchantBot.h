@@ -17,7 +17,7 @@
 #define ENCHANT_ACTION_TIME_BASE 400ms	// button clicks and item movement
 #define ENCHANT_ACTION_TIME_VARIANCE 500ms	
 #else
-#define ENCHANT_TIME_BASE 1500ms		
+#define ENCHANT_TIME_BASE 1000ms		
 #define ENCHANT_TIME_VARIANCE 1000ms
 
 #define ENCHANT_ACTION_TIME_BASE 200ms	// button clicks and item movement

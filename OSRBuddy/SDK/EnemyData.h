@@ -91,6 +91,8 @@ typedef struct _ENEMYINFO
 	MEX_OTHER_CHARACTER_INFO CharacterInfo;
 	CHARACTER_RENDER_INFO	 CharacterRenderInfo;			// 장착아이템의 정보
  	MAP_CHANNEL_INDEX		 MapChannelIndex;
+	
+	char dunno0[40];
 	SHORT			HP;
 	float			CurrentHP;
 	SHORT			DP;

@@ -346,9 +346,13 @@
     <ClInclude Include="SDK\StoreData.h" />
     <ClInclude Include="SDK\Structs.h" />
     <ClInclude Include="SDK\UnitData.h" />
+    <ClInclude Include="SDK\Weapon.h" />
     <ClInclude Include="SDK\WeaponItemInfo.h" />
+    <ClInclude Include="SDK\WeaponMissleData.h" />
+    <ClInclude Include="SDK\WeaponRocketData.h" />
     <ClInclude Include="SDK\WinPacket.h" />
     <ClInclude Include="SDK\WinSocket.h" />
+    <ClInclude Include="SDK\WSlowData.h" />
     <ClInclude Include="SocketHeader.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="tahoma.h" />

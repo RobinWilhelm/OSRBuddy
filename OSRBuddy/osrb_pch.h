@@ -12,6 +12,7 @@
 #include <memory>
 #include <functional>
 #include <fstream>
+#include <unordered_map>
 
 #include <Psapi.h>
 #pragma comment( lib, "psapi.lib" )

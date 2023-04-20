@@ -30,7 +30,11 @@ enum class OffsetIdentifier
 	CStoreData__UpdateItemCount,
 	CAtumDatabase__GetServerItemInfo,
 	CINFCommuPartyInvite__RqInvitePartyInfo,
-	CAtumApplication__OnRecvIMSocketMessage
+	CAtumApplication__OnRecvIMSocketMessage, 
+	CWSlowData__SendFieldSocketBattleAttackEvasion,
+	CWeaponMissileData__CheckWeaponCollision,
+	CWeaponRocketData__CheckWeaponCollision,
+	CWeaponMissileData__CheckTargetByBomb
 };
 		
 
@@ -65,7 +69,10 @@ public:
 		m_patterninfos.push_back({ OffsetIdentifier::CAtumDatabase__GetServerItemInfo, "8D 44 24 24 50 8D 44 24 18 50 8D 4B 14 E8", -0x26, nullptr,8 });
 		m_patterninfos.push_back({ OffsetIdentifier::CINFCommuPartyInvite__RqInvitePartyInfo, "8B 41 5C 3B 41 60 74 03 89 41 60 8B 41 68", -0x2E, nullptr,5 });
 		m_patterninfos.push_back({ OffsetIdentifier::CAtumApplication__OnRecvIMSocketMessage, "8B F1 89 B5 EC F1 FF FF 8B 86 DC C1 02 00 85 C0", -0x41, nullptr,6 });
-
+		m_patterninfos.push_back({ OffsetIdentifier::CWSlowData__SendFieldSocketBattleAttackEvasion, "89 84 24 0C 06 00 00 66 8B 84 24 18 06 00 00", -0xD, nullptr,6 });
+		m_patterninfos.push_back({ OffsetIdentifier::CWeaponRocketData__CheckWeaponCollision, "8B F9 89 44 24 18 89 44 24 20 0F B7 82 D8 08 00 00", -0x20, nullptr,6 });
+		m_patterninfos.push_back({ OffsetIdentifier::CWeaponMissileData__CheckWeaponCollision, "89 4C 24 10 89 4C 24 18 8B 0D 28 79 AB 00", -0x1B, nullptr,6 });
+		m_patterninfos.push_back({ OffsetIdentifier::CWeaponMissileData__CheckTargetByBomb, "F3 0F 11 4C 24 24 8B D9 89 5C 24 18", -0x18, nullptr, 6 });
 
 		uintptr_t ace_modulebase = (uintptr_t)GetModuleHandle("ACEonline.atm");
 		if (!ace_modulebase) {

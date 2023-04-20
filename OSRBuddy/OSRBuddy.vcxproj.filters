@@ -436,6 +436,18 @@
     <ClInclude Include="SDK\IMSocketManager.h">
       <Filter>thirdparty\SDK</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\Weapon.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\WeaponMissleData.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\WeaponRocketData.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\WSlowData.h">
+      <Filter>thirdparty\SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

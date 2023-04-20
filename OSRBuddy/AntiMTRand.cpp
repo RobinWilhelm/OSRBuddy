@@ -48,7 +48,7 @@ void AntiMTRandBot::RenderImGui()
 	ImGui::BeginColumns("AntiMTRandColumns", 2, ImGuiColumnsFlags_NoResize);
 	{
 
-		ImGui::Text("Current Seed (Restart: Samstag, 15. Januar 2022 22:21:30)");
+		ImGui::Text("Current Seed (Restart: Dienstag, 20. April 2023 17:12:00)");
 		ImGui::Text(std::to_string(m_seed).c_str());
 		ImGui::NewLine();
 		ImGui::InputInt("Search Start", reinterpret_cast<int*>(&m_sequence_search_start));

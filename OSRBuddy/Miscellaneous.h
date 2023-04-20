@@ -10,9 +10,22 @@
 #include <unordered_map>
 
 class CItemInfo;
+class CWSlowData;
+class CWeaponMissileData;
+class CWeaponRocketData;
 
 namespace Features
 {
+	// CWSlowData::SendFieldSocketBattleAttackEvasion 
+	using SendFieldSocketBattleAttackEvasionType = void(__thiscall*)(CWSlowData* ecx, DWORD nTargetIndex, DWORD nItemIndex, DWORD nClientIndex, DWORD nItemNum);
+
+	// CWeaponRocketData / CWeaponMissileData::SendFieldSocketBattleAttackEvasion 
+	using CheckWeaponCollisionType = void(__thiscall*)(void* ecx, CItemData* pTargetItem);
+
+	// CWeaponMissileData::CheckTargetByBomb 
+	using CheckTargetByBombType = void(__thiscall*)(CWeaponMissileData* ecx);
+
+
 	class Miscellaneous : public BuddyFeatureBase
 	{
 	public:
@@ -32,6 +45,14 @@ namespace Features
 
 		void UpdateCharmsComboBox();
 		bool CheckCharmItemIsAvailable(uint32_t itemnumber);
+
+		bool InitHooks();
+		void ShutdownHooks();
+
+		//void static __fastcall OnSendFieldSocketBattleAttackEvasion_Hooked(CWSlowData* ecx, void* edx, DWORD nTargetIndex, DWORD nItemIndex, DWORD nClientIndex, DWORD nItemNum);
+		void static __fastcall OnMissileCheckWeaponCollision_Hooked(CWeaponMissileData* ecx, void* edx, CItemData* pTargetItem);
+		void static __fastcall OnRocketCheckWeaponCollision_Hooked(CWeaponRocketData* ecx, void* edx, CItemData* pTargetItem);
+		void static __fastcall OnCheckTargetByBomb_Hooked(CWeaponMissileData* ecx, void* edx);
 
 	private:
 		void OnMessageBoxClose(int result);
@@ -84,7 +105,23 @@ namespace Features
 		bool m_force_visibility;
 		bool m_no_overheat_primary;
 		bool m_no_overheat_booster;
+		bool m_enemy_hit_in_roll;
+		//bool m_cant_evade_missles;
 
-		std::map<std::string, uint64_t> m_online_gms;
+		std::map<std::string, uint64_t> m_online_gms; 		
+
+		/*
+		std::unique_ptr<TrampolineHook<SendFieldSocketBattleAttackEvasionType>> m_OnSendFieldSocketBattleAttackEvasionhook;
+		SendFieldSocketBattleAttackEvasionType m_orig_OnSendFieldSocketBattleAttackEvasionMessage;
+		*/
+
+		std::unique_ptr<TrampolineHook<CheckWeaponCollisionType>> m_OnMissleCheckWeaponCollisionhook;
+		CheckWeaponCollisionType m_orig_OnMissleCheckWeaponCollisionMessage;
+
+		std::unique_ptr<TrampolineHook<CheckWeaponCollisionType>> m_OnRocketCheckWeaponCollisionhook;
+		CheckWeaponCollisionType m_orig_OnRocketCheckWeaponCollisionMessage;
+
+		std::unique_ptr<TrampolineHook<CheckTargetByBombType>> m_OnCheckTargetByBombhook;
+		CheckTargetByBombType m_orig_OnCheckTargetByBombMessage;
 	};
 }

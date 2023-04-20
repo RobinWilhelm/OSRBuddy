@@ -1284,12 +1284,12 @@ bool OldSchoolRivalsAPI::IsStaffMember(const char* charName)
 	if (strstr(lc_charName, "romu"))			return true;
 	if (strstr(lc_charName, "inetpub"))			return true;
 	if (strstr(lc_charName, "bergi9"))			return true;
-	if (strstr(lc_charName, "kube"))			return true;
-	if (strstr(lc_charName, "falconflug"))		return true;
-	if (strstr(lc_charName, "rigel"))			return true;
-	if (strstr(lc_charName, "layla_"))			return true;
-	if (strstr(lc_charName, "mangoo_"))			return true;
-	if (strstr(lc_charName, "masteroogway"))	return true;
+	if (strstr(lc_charName, "_kube"))			return true;
+	if (strstr(lc_charName, "_falcon"))			return true;
+	if (strstr(lc_charName, "_rigel"))			return true;
+	if (strstr(lc_charName, "_layla_"))			return true;
+	if (strstr(lc_charName, "_mangoo_"))		return true;
+	if (strstr(lc_charName, "_masteroogway"))	return true;
 
 	return false;
 }

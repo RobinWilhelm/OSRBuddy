@@ -6,8 +6,13 @@
 #include "OSRAPI.h"
 #include "OSRBuddy.h"
 #include "IOPacketManager.h"
+#include "VMTHook.h"
+#include "PatternManager.h"
 
 #include "SDK/AtumApplication.h"
+#include "SDK/WeaponMissleData.h"
+#include "SDK/WeaponRocketData.h"
+
 
 #define WHISPER_WARNING_TIME 10s
 #define WHISPER_SNOOZE_TIME 2min		  
@@ -16,10 +21,16 @@
 #define BOSS_CHECK_REATTACK 1s
 #define UPDATE_CHARM_COMBO_REATTACK 250ms
 
+
 namespace Features
 {
+	static Miscellaneous* g_pMiscellaneous = nullptr;
+	static std::unordered_map<INT, bool> rollingEnemies;
+
 	Miscellaneous::Miscellaneous(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
 	{
+		g_pMiscellaneous = this;
+
 		m_whisperwarner_active = false;
 		m_whisperwarner_snooze_enabled = true;
 		m_whisper_popup_open = false;
@@ -38,6 +49,8 @@ namespace Features
 		m_autoflip = false;
 		m_bosswarner = false;
 		m_boss_popup_open = false;
+		m_enemy_hit_in_roll = false;
+		//m_cant_evade_missles = false;
 
 
 		m_bosscheck_timer = BuddyTimer(BOSS_CHECK_REATTACK);
@@ -47,10 +60,13 @@ namespace Features
 
 		m_searcheye_timer = BuddyTimer(3s);
 		m_gm_timer = BuddyTimer(1s);
+
+		InitHooks();
 	}
 
 	Miscellaneous::~Miscellaneous()
 	{
+		ShutdownHooks();
 	}
 
 	FeatureType Miscellaneous::GetType() const
@@ -133,6 +149,17 @@ namespace Features
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip("Endless boosting.");
 				}
+				/*
+				ImGui::Checkbox("Enemys cant evade missles", &m_cant_evade_missles);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Missles will retarget enemies after they rolled");
+				}
+				*/
+				ImGui::Checkbox("Hit Enemys in Roll", &m_enemy_hit_in_roll);
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Enemy rolls will be useless.");
+				}
+
 
 				ImGui::NewLine();
 				ImGui::Separator();
@@ -267,6 +294,185 @@ namespace Features
 			}
 		}
 		return false;
+	}
+
+	bool Miscellaneous::InitHooks()
+	{
+		/*
+		if (m_OnSendFieldSocketBattleAttackEvasionhook) {
+			return false;
+		}
+
+		PatternInfo pinfo = PatternManager::Get(OffsetIdentifier::CWSlowData__SendFieldSocketBattleAttackEvasion);
+		m_OnSendFieldSocketBattleAttackEvasionhook = std::make_unique<TrampolineHook<SendFieldSocketBattleAttackEvasionType>>(pinfo.address, (byte*)Miscellaneous::OnSendFieldSocketBattleAttackEvasion_Hooked, pinfo.trampoline_length);
+
+		m_orig_OnSendFieldSocketBattleAttackEvasionMessage = m_OnSendFieldSocketBattleAttackEvasionhook->GetOriginal();
+		if (!m_OnSendFieldSocketBattleAttackEvasionhook->Hook()) {
+			return false;
+		}
+		*/
+
+		if (m_OnMissleCheckWeaponCollisionhook) {
+			return false;
+		}
+
+		PatternInfo pinfo = PatternManager::Get(OffsetIdentifier::CWeaponMissileData__CheckWeaponCollision);
+		m_OnMissleCheckWeaponCollisionhook = std::make_unique<TrampolineHook<CheckWeaponCollisionType>>(pinfo.address, (byte*)Miscellaneous::OnMissileCheckWeaponCollision_Hooked, pinfo.trampoline_length);
+
+		m_orig_OnMissleCheckWeaponCollisionMessage = m_OnMissleCheckWeaponCollisionhook->GetOriginal();
+		if (!m_OnMissleCheckWeaponCollisionhook->Hook()) {
+			return false;
+		}
+
+		if (m_OnRocketCheckWeaponCollisionhook) {
+			return false;
+		}
+
+		pinfo = PatternManager::Get(OffsetIdentifier::CWeaponRocketData__CheckWeaponCollision);
+		m_OnRocketCheckWeaponCollisionhook = std::make_unique<TrampolineHook<CheckWeaponCollisionType>>(pinfo.address, (byte*)Miscellaneous::OnRocketCheckWeaponCollision_Hooked, pinfo.trampoline_length);
+
+		m_orig_OnRocketCheckWeaponCollisionMessage = m_OnRocketCheckWeaponCollisionhook->GetOriginal();
+		if (!m_OnRocketCheckWeaponCollisionhook->Hook()) {
+			return false;
+		}
+
+		if (m_OnCheckTargetByBombhook) {
+			return false;
+		}
+
+		pinfo = PatternManager::Get(OffsetIdentifier::CWeaponMissileData__CheckTargetByBomb);
+		m_OnCheckTargetByBombhook = std::make_unique<TrampolineHook<CheckTargetByBombType>>(pinfo.address, (byte*)Miscellaneous::OnCheckTargetByBomb_Hooked, pinfo.trampoline_length);
+
+		m_orig_OnCheckTargetByBombMessage = m_OnCheckTargetByBombhook->GetOriginal();
+		if (!m_OnCheckTargetByBombhook->Hook()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	void Miscellaneous::ShutdownHooks()
+	{
+		/*
+		if (m_OnSendFieldSocketBattleAttackEvasionhook)
+		{
+			m_OnSendFieldSocketBattleAttackEvasionhook->Unhook();
+			Sleep(100);
+			m_OnSendFieldSocketBattleAttackEvasionhook.reset();
+		}
+		*/
+
+		if (m_OnMissleCheckWeaponCollisionhook)
+		{
+			m_OnMissleCheckWeaponCollisionhook->Unhook();
+			Sleep(100);
+			m_OnMissleCheckWeaponCollisionhook.reset();
+		}
+
+		if (m_OnRocketCheckWeaponCollisionhook)
+		{
+			m_OnRocketCheckWeaponCollisionhook->Unhook();
+			Sleep(100);
+			m_OnRocketCheckWeaponCollisionhook.reset();
+		}
+
+		if (m_OnCheckTargetByBombhook)
+		{
+			m_OnCheckTargetByBombhook->Unhook();
+			Sleep(100);
+			m_OnCheckTargetByBombhook.reset();
+		}
+	}
+
+	/*
+	void __fastcall Miscellaneous::OnSendFieldSocketBattleAttackEvasion_Hooked(CWSlowData* ecx, void* edx, DWORD nTargetIndex, DWORD nItemIndex, DWORD nClientIndex, DWORD nItemNum)
+	{
+		PUSHCPUSTATE
+		if (g_pMiscellaneous->IsEnabled() && g_pMiscellaneous->m_cant_evade_missles)
+		{
+			POPCPUSTATE
+			return;
+		}
+		POPCPUSTATE
+		g_pMiscellaneous->m_orig_OnSendFieldSocketBattleAttackEvasionMessage(ecx, nTargetIndex, nItemIndex, nClientIndex, nItemNum);
+	}
+	*/
+
+	void __fastcall Miscellaneous::OnMissileCheckWeaponCollision_Hooked(CWeaponMissileData* ecx, void* edx, CItemData* pTargetItem)
+	{
+		PUSHCPUSTATE
+		CEnemyData* enemy = nullptr;
+		bool enemyRolling = false;
+
+		CSceneData* scene = OSR_API->GetSceneData();
+		if (g_pMiscellaneous->m_enemy_hit_in_roll && ecx->m_nTargetIndex != 0)
+		{
+			auto enemyIt = scene->m_mapEnemyList.find(ecx->m_nTargetIndex);
+			if (enemyIt != scene->m_mapEnemyList.end())
+			{
+				enemy = enemyIt->second;
+				enemyRolling = enemy->m_bRollStart;
+				enemy->m_bRollStart = FALSE;
+			}
+		}
+		POPCPUSTATE
+		g_pMiscellaneous->m_orig_OnMissleCheckWeaponCollisionMessage(ecx, pTargetItem);
+		   	
+		if (enemy){
+			enemy->m_bRollStart = enemyRolling;
+		}
+	}
+
+	void __fastcall Miscellaneous::OnRocketCheckWeaponCollision_Hooked(CWeaponRocketData* ecx, void* edx, CItemData* pTargetItem)
+	{
+		PUSHCPUSTATE
+		CEnemyData* enemy = nullptr;
+		bool enemyRolling = false;
+
+		CSceneData* scene = OSR_API->GetSceneData();
+		if (g_pMiscellaneous->m_enemy_hit_in_roll && ecx->m_nTargetIndex != 0)
+		{
+			auto enemyIt = scene->m_mapEnemyList.find(ecx->m_nTargetIndex);
+			if (enemyIt != scene->m_mapEnemyList.end())
+			{
+				enemy = enemyIt->second;
+				enemyRolling = enemy->m_bRollStart;
+				enemy->m_bRollStart = FALSE;
+			}
+		}
+		POPCPUSTATE
+		g_pMiscellaneous->m_orig_OnRocketCheckWeaponCollisionMessage(ecx, pTargetItem);
+
+		if (enemy) {
+			enemy->m_bRollStart = enemyRolling;
+		}
+	}
+
+	void __fastcall Miscellaneous::OnCheckTargetByBomb_Hooked(CWeaponMissileData* ecx, void* edx)
+	{
+		PUSHCPUSTATE
+		CSceneData* scene = OSR_API->GetSceneData(); 
+		bool buffer = g_pMiscellaneous->m_enemy_hit_in_roll;
+		if (buffer)
+		{
+			for(auto enemy : scene->m_mapEnemyList)
+			{
+				rollingEnemies[enemy.first] = enemy.second->m_bRollStart;
+				enemy.second->m_bRollStart = FALSE;
+			}
+		}
+		POPCPUSTATE
+
+		g_pMiscellaneous->m_orig_OnCheckTargetByBombMessage(ecx);
+
+		PUSHCPUSTATE
+		if (buffer)
+		{
+			for (auto enemy : rollingEnemies) {
+				scene->m_mapEnemyList[enemy.first]->m_bRollStart = enemy.second;
+			}
+		}
+		POPCPUSTATE
 	}
 
 	void Miscellaneous::OnMessageBoxClose(int result)
