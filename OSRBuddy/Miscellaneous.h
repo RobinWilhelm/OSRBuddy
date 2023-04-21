@@ -38,6 +38,7 @@ namespace Features
 		virtual void Tick() override;
 		virtual void RenderImGui() override;
 		virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
+		virtual int WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 		void ActivateAutoFlip(bool on);
 		void ActivateAutoAmmo(bool on);
@@ -123,5 +124,10 @@ namespace Features
 
 		std::unique_ptr<TrampolineHook<CheckTargetByBombType>> m_OnCheckTargetByBombhook;
 		CheckTargetByBombType m_orig_OnCheckTargetByBombMessage;
+
+
+		uint32_t m_vkc_toggle;	// virtual key code to toggle on/off
+		std::string m_vkc_description;
+		bool m_wait_for_hotkey; // next key press is the new toggle hotkey
 	};
 }

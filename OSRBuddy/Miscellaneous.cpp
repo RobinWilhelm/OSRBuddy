@@ -61,6 +61,10 @@ namespace Features
 		m_searcheye_timer = BuddyTimer(3s);
 		m_gm_timer = BuddyTimer(1s);
 
+		m_vkc_toggle = 226; // <
+		m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
+		m_wait_for_hotkey = false;
+
 		InitHooks();
 	}
 
@@ -155,9 +159,28 @@ namespace Features
 					ImGui::SetTooltip("Missles will retarget enemies after they rolled");
 				}
 				*/
+				ImGui::NewLine();
+				ImGui::Separator();
+
 				ImGui::Checkbox("Hit Enemys in Roll", &m_enemy_hit_in_roll);
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip("Enemy rolls will be useless.");
+				}
+
+				ImGui::Text("Start / Stop hotkey:");
+				ImGui::SameLine();
+				if (!m_wait_for_hotkey)
+				{
+					ImGui::Text(m_vkc_description.c_str());
+					ImGui::SameLine();
+					if (ImGui::Button("Select New"))
+					{
+						m_wait_for_hotkey = true;
+					}
+				}
+				else
+				{
+					ImGui::Text("Waiting for keypress...");
 				}
 
 
@@ -245,6 +268,29 @@ namespace Features
 		}
 		}
 		return false;
+	}
+
+	int Miscellaneous::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (msg)
+		{
+		case WM_KEYUP:
+			if (m_wait_for_hotkey)
+			{
+				m_vkc_toggle = TO_UINT(wParam);
+				m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
+				m_wait_for_hotkey = false;
+			}
+			else
+			{
+				if (TO_UINT(wParam) == m_vkc_toggle /* && !m_buddy->GetMenu()->IsOpen()*/)
+				{
+					m_enemy_hit_in_roll = !m_enemy_hit_in_roll;
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 	void Miscellaneous::ActivateAutoFlip(bool on)
