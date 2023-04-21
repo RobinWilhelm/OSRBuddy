@@ -468,8 +468,12 @@ namespace Features
 		PUSHCPUSTATE
 		if (buffer)
 		{
-			for (auto enemy : rollingEnemies) {
-				scene->m_mapEnemyList[enemy.first]->m_bRollStart = enemy.second;
+			for (auto enemy : rollingEnemies) 
+			{
+				auto enemyIt = scene->m_mapEnemyList.find(enemy.first);
+				if (enemyIt != scene->m_mapEnemyList.end()) {
+					scene->m_mapEnemyList[enemy.first]->m_bRollStart = enemy.second;
+				}
 			}
 		}
 		POPCPUSTATE
