@@ -57,7 +57,7 @@ public:
 		m_patterninfos.push_back({ OffsetIdentifier::CINFCharacterInfoExtend__SendUseSkill, "A1 ?? ?? ?? ?? 53 8B 5D 08 56 83 B8 6C C6 02 00 00 57 ?? ?? 8B 43 08" , -0x1A, nullptr, 6 });
 		m_patterninfos.push_back({ OffsetIdentifier::CINFCityLab__InvenToSourceItem, "53 56 57 50 8D 45 F4 64 A3 00 00 00 00 8B F9 8A 4D 10 8B 75 08 84 C9" , -0x21, nullptr, 5 });
 		//m_patterninfos.push_back({ OffsetIdentifier::CAtumDatabase__GetServerRareItemInfo, "53 55 56 57 33 FF 8B F1 39 BC ?? ?? ?? ?? ?? 0F 84 ?? ?? ?? ?? A1 ?? ?? ?? ?? 05 60 C2 02 00 50 FF 15" , -0x14, nullptr, 6 }); no need for now
-		m_patterninfos.push_back({ OffsetIdentifier::Pointer_CD3DApplication, "83 C4 04 50 E8 9B F7 2C 00 C7 87 BC BA 02 00 00 00 00 00 8D 87 30 DB 02 00 83 C4 04 C7 87" , -0x9, nullptr, 0 });
+		m_patterninfos.push_back({ OffsetIdentifier::Pointer_CD3DApplication, "C7 87 70 BA 02 00 20 03 00 00 C7 87 74 BA 02 00 58 02 00 00" , -0x2F, nullptr, 0 });
 		m_patterninfos.push_back({ OffsetIdentifier::CAtumApplication__OnRecvFieldSocketMessage, "56 57 50 8D 45 F4 64 A3 00 00 00 00 8B F9 89 BD 64 F8 FF FF 8B 8F D4 C1 02 00" , -0x35, nullptr, 6 });
 		m_patterninfos.push_back({ OffsetIdentifier::CWinSocket__Write, "8B F9 83 7F 08 FF C7 45 F0 00 00 00 00 0F 84 ?? ?? ?? ?? 83 7F 14 00 0F 84 ?? ?? ?? ?? 68 E4 05 00 00 6A 40" , -0x28, nullptr, 5 });
 		m_patterninfos.push_back({ OffsetIdentifier::CSkillInfo__ChangeSkillState, "8B 45 08 56 48 8B F1 89 74 24 10 57 83 F8 05", -0x1A, nullptr, 6 });

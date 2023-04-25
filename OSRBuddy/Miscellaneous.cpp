@@ -65,6 +65,8 @@ namespace Features
 		m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
 		m_wait_for_hotkey = false;
 
+		m_anti_roll_key_pressed = false;
+
 		InitHooks();
 	}
 
@@ -85,6 +87,9 @@ namespace Features
 
 	void Miscellaneous::Tick()
 	{
+		m_anti_roll_key_pressed = GetAsyncKeyState(g_pMiscellaneous->m_vkc_toggle) & 0x8000;
+
+
 		if (!IsEnabled()) {
 			return;
 		}
@@ -94,6 +99,8 @@ namespace Features
 		TickBossWarner();
 		TickGMWarner();
 		TickNoOverheat();
+
+
 
 		if (m_autoitems_timer.IsReady())
 		{
@@ -161,13 +168,16 @@ namespace Features
 				*/
 				ImGui::NewLine();
 				ImGui::Separator();
-
-				ImGui::Checkbox("Hit Enemys in Roll", &m_enemy_hit_in_roll);
+				ImGui::Text("Anti Roll");
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip("Enemy rolls will be useless.");
 				}
+				ImGui::Separator();
 
-				ImGui::Text("Start / Stop hotkey:");
+				ImGui::Checkbox("Always Enabled", &m_enemy_hit_in_roll);
+				ImGui::SameLine();
+
+				ImGui::Text("Hotkey:");
 				ImGui::SameLine();
 				if (!m_wait_for_hotkey)
 				{
@@ -280,14 +290,6 @@ namespace Features
 				m_vkc_toggle = TO_UINT(wParam);
 				m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
 				m_wait_for_hotkey = false;
-			}
-			else
-			{
-				if (TO_UINT(wParam) == m_vkc_toggle /* && !m_buddy->GetMenu()->IsOpen()*/)
-				{
-					m_enemy_hit_in_roll = !m_enemy_hit_in_roll;
-					return 1;
-				}
 			}
 		}
 		return 0;
@@ -446,12 +448,15 @@ namespace Features
 
 	void __fastcall Miscellaneous::OnMissileCheckWeaponCollision_Hooked(CWeaponMissileData* ecx, void* edx, CItemData* pTargetItem)
 	{
+		if(g_pMiscellaneous->IsEnabled() == false)
+			return g_pMiscellaneous->m_orig_OnMissleCheckWeaponCollisionMessage(ecx, pTargetItem);
+
 		PUSHCPUSTATE
 		CEnemyData* enemy = nullptr;
 		bool enemyRolling = false;
 
 		CSceneData* scene = OSR_API->GetSceneData();
-		if (g_pMiscellaneous->m_enemy_hit_in_roll && ecx->m_nTargetIndex != 0)
+		if ((g_pMiscellaneous->m_enemy_hit_in_roll || g_pMiscellaneous->m_anti_roll_key_pressed) && ecx->m_nTargetIndex != 0)
 		{
 			auto enemyIt = scene->m_mapEnemyList.find(ecx->m_nTargetIndex);
 			if (enemyIt != scene->m_mapEnemyList.end())
@@ -471,12 +476,16 @@ namespace Features
 
 	void __fastcall Miscellaneous::OnRocketCheckWeaponCollision_Hooked(CWeaponRocketData* ecx, void* edx, CItemData* pTargetItem)
 	{
+		if (g_pMiscellaneous->IsEnabled() == false)
+			return g_pMiscellaneous->m_orig_OnRocketCheckWeaponCollisionMessage(ecx, pTargetItem);
+
+
 		PUSHCPUSTATE
 		CEnemyData* enemy = nullptr;
 		bool enemyRolling = false;
 
 		CSceneData* scene = OSR_API->GetSceneData();
-		if (g_pMiscellaneous->m_enemy_hit_in_roll && ecx->m_nTargetIndex != 0)
+		if ((g_pMiscellaneous->m_enemy_hit_in_roll || g_pMiscellaneous->m_anti_roll_key_pressed) && ecx->m_nTargetIndex != 0)
 		{
 			auto enemyIt = scene->m_mapEnemyList.find(ecx->m_nTargetIndex);
 			if (enemyIt != scene->m_mapEnemyList.end())
@@ -496,9 +505,13 @@ namespace Features
 
 	void __fastcall Miscellaneous::OnCheckTargetByBomb_Hooked(CWeaponMissileData* ecx, void* edx)
 	{
+		if (g_pMiscellaneous->IsEnabled() == false)
+			return g_pMiscellaneous->m_orig_OnCheckTargetByBombMessage(ecx);
+
+
 		PUSHCPUSTATE
 		CSceneData* scene = OSR_API->GetSceneData(); 
-		bool buffer = g_pMiscellaneous->m_enemy_hit_in_roll;
+		bool buffer = g_pMiscellaneous->m_enemy_hit_in_roll || g_pMiscellaneous->m_anti_roll_key_pressed;
 		if (buffer)
 		{
 			for(auto enemy : scene->m_mapEnemyList)

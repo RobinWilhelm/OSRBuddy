@@ -129,5 +129,7 @@ namespace Features
 		uint32_t m_vkc_toggle;	// virtual key code to toggle on/off
 		std::string m_vkc_description;
 		bool m_wait_for_hotkey; // next key press is the new toggle hotkey
+
+		bool m_anti_roll_key_pressed;
 	};
 }
