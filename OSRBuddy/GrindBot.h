@@ -147,6 +147,7 @@ namespace Features
 
 
 		BuddyTimer m_update_mobs_timer;
+		BuddyTimer m_update_preview_timer;
 		std::chrono::milliseconds m_no_target_time;
 		std::chrono::milliseconds m_shoot_new_target_delay;
 

@@ -68,6 +68,8 @@ namespace Features
         m_vkc_toggle = VK_CONTROL;
         m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
         m_wait_for_hotkey = false;
+
+        m_update_preview_timer = BuddyTimer(100ms);
     }   
 
     void GrindBot::Tick()
@@ -85,7 +87,12 @@ namespace Features
         {
         case GrindBot::State::WAITING:   
             // show the user what the next targets would be
-            m_get_new_target = true;   
+            if (m_update_preview_timer.IsReady())
+            {
+                m_get_new_target = true;
+                m_update_preview_timer.Reset();
+            }
+
             if (m_select_swapbs)
             {
                 CItemInfo* current = OSR_API->GetPrimaryWeapon()->m_pItemInfo;
@@ -783,6 +790,7 @@ namespace Features
                 for (auto& monsterinfo : m_mobs) {
                     monsterinfo.second.count_text = std::to_string(monsterinfo.second.count);
                 }
+                m_update_mobs_timer.Reset();
             }
         }
     }
