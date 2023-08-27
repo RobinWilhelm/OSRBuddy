@@ -72,6 +72,14 @@ namespace Features
 
 		ImGui::NewLine();
 
+
+		CStoreData* storedata = shuttle->m_pStoreData;
+		if (storedata) 
+		{
+			auto items = storedata->m_mapItemWindowPosition;
+		}
+
+
 		CINFCityLab* lab = static_cast<CINFCityLab*>(OSR_API->FindBuildingShop(BUILDINGKIND_LABORATORY));
 		if (lab)
 		{	
@@ -231,6 +239,28 @@ namespace Features
 				SaveMysterInfoToFile(fd);
 				fclose(fd);
 				MessageBox(0, "Finished", "Save Mistery Info", 0);
+			}
+		}
+
+		if (ImGui::Button("Save Item Info"))
+		{
+			auto database = OSR_API->GetDatabase();
+			if (database)
+			{
+				for (const auto& item : database->m_mapItemInfoTemp)
+				{
+					char buf[40];
+					sprintf_s(buf, "OSRBuddy\\Items\\%d", item.first);
+
+					std::ofstream file;
+					file.open(buf, std::ios::binary);
+
+					if (file.good() && file.is_open())
+					{
+						file.write((char*)item.second, 0x208);
+						file.close();
+					}
+				}
 			}
 		}
 

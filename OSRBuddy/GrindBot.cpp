@@ -69,7 +69,7 @@ namespace Features
         m_vkc_description = Utility::VirtualKeyCodeToString(m_vkc_toggle);
         m_wait_for_hotkey = false;
 
-        m_update_preview_timer = BuddyTimer(100ms);
+        m_update_preview_timer = BuddyTimer(1ms);
     }   
 
     void GrindBot::Tick()
@@ -87,7 +87,7 @@ namespace Features
         {
         case GrindBot::State::WAITING:   
             // show the user what the next targets would be
-            if (m_update_preview_timer.IsReady())
+            //if (m_update_preview_timer.IsReady())
             {
                 m_get_new_target = true;
                 m_update_preview_timer.Reset();

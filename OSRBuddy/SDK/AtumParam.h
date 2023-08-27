@@ -2550,7 +2550,7 @@ struct MEX_ITEM_INFO;
 ///////////////////////////////////////////////////////////////////////////////
 //	ATUM - Item - Parameter Struct 정의
 ///////////////////////////////////////////////////////////////////////////////
-/*
+ /*
 struct ITEM
 {
 	INT			ItemNum;						// 아이템 고유번호, 장착 아이템일 때 (ITEM_BASE*)
@@ -2629,104 +2629,75 @@ struct ITEM
 	InvokingWearItemDestParamList* pInvokingDestParamByUseList;	// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템	
 	BYTE		IsTenderDropItem;				// 2010-04-09 by cmkwon, 인피2차 추가 수정(단계별 보상 추가) - CFieldIOCP::SetTenderItemList#에서 설정됨 
 };
+ */
 
-*/
 
 #pragma pack(push, 1)
 struct ITEM
 {
+	char dunno0[4];
 	float		ArrParameterValue[SIZE_MAX_DESPARAM_COUNT_IN_ITEM];	// 2009-04-21 by cmkwon, ITEM에 DesParam 필드 개수 8개로 늘리기 -
 	BYTE		Kind;							// 아이템 종류(기관포, 빔, 로켓, 스킬.....), ITEMKIND_XXX
-	char dunno0[3];
+	char dunno2[3];
 	float		AbilityMin;						// 아이템최소성능
+	char dunno3[5];
 	BYTE		ReqMinLevel;					// 필요 최저 레벨
-	BYTE		ReqMaxLevel;					// 필요 최저 레벨
+	char dunno18[2];
 	BYTE		ReqItemKind;					// 필요아이템종류, ITEMKIND_XXX, check: 스킬에만 사용, 20040818, kelovon
 	char dunno1[1];
 	USHORT		Weight;							// 무게
-	char dunno2[2];
 	float		HitRate;						// 명중확률(0~255)	// 2010-07-19 by dhjin, 확률 수식 변경
 	BYTE		Defense;						// 방어력
 	char		ItemName[SIZE_MAX_ITEM_NAME];	// 아이템 이름
-	char dunno3[19];
+	char dunno16[19];
 	BYTE		SpeedPenalty;					// 스피드페널티, 이동속도에미치는 영향(-:감소)
 	char dunno4[1];
 	USHORT		Range;							// 공격범위, 엔진류인 경우에는 부스터 가동 시 속도, 스킬의 경우 적용 범위
-	BYTE		Position;						// 장착위치
-	BYTE		Scarcity;						// 희귀성, 게임상에 나올 확률, define해서 사용, see below
-	char dunno5[2];
+	BYTE		Position;
+	char dunno5[9];
 	INT			ItemNum;						// 아이템 고유번호, 장착 아이템일 때 (ITEM_BASE*)
 	float		Endurance;						// 내구성, 내구도
 	Prob256_t	AbrasionRate;					// 마모율, 내구도가 줄어드는 단위량(0~255)
 	USHORT		Charging;						// 무기류에서는 최대 장탄 수, 에너지는 한번에 적용되는 개수, TANK류는 양
 	char dunno6[2];
 	USHORT		RepeatTime;						// 무기류에서는 남은 총알 수로 사용, 나머지는 개수, 시간형 스킬류에선 남은 시간, 나머지 스킬은 사용 여부
-	USHORT		Material;						// 재질
-	USHORT		ReqMaterial;					// 필요한 재질 수(제작,수리시 필요)
+	char dunno15[6];
 	float		AbilityMax;						// 아이템최대성능
 	USHORT		ReqRace;						// 필요종족
 	BYTE		ShotNum;						// 점사 수,	점사 시 발사 수를 나타낸다.
-	BYTE		MultiNum;						// 동시 발사 탄 수,	1번 발사에 몇발이 동시에 나가느냐
-	USHORT		MinTradeQuantity;				// 최소 거래 수량, Price는 이 수량에 대한 가격이다
-	char dunno7[2];
+	char dunno7[1];
 	UINT		Price;							// 최소 거래 수량의 가격
-	char dunno8[6];
+	char dunno8[7];
 	BYTE		ArrDestParameter[SIZE_MAX_DESPARAM_COUNT_IN_ITEM];	// 2009-04-21 by cmkwon, ITEM에 DesParam 필드 개수 8개로 늘리기 - 
-	char dunno9[2];
+	char dunno9[1];
 	UINT		ReAttacktime;					// 재 공격시간(ms)
 	INT			Time;							// 지속 시간(스킬류 등)
 	GEAR_STAT	ReqGearStat;					// 필요 기어 스탯
 	USHORT		ReqUnitKind;					// 필요유닛종류
 	char dunno10[2];
+	USHORT		AttackTime;
 	BYTE		ReqSP;							// SP 소모량(스킬)
-	char dunno11[15];
+	char dunno11[13];
 	float		RangeAngle;						// 범위각도(0 ~ PI), 화망
 	BYTE		SkillType;						// 스킬형태(시간 및 발동 관련), 지속|클릭|시간|유지
 	char dunno12[3];
 	INT			LinkItem;						// 링크아이템, 아이템과 연관된 아이템(총알)
-	char dunno13[4];
+	char dunno13[8];
 	char		Description[SIZE_MAX_ITEM_DESCRIPTION];	// 아이템 설명
 	char dunno14[4];
 	BYTE		SkillLevel;						// 레벨
-	char dunno15[3];
-	BYTE		Caliber;						// 구경(총알, 탄두 등)
-	BYTE		OrbitType;						// 미사일, 로켓 등의 궤적
-	char dunno16[2];
-	BitFlag64_t	ItemAttribute;					// 아이템의 속성, ITEM_ATTR_XXX
-	FLOAT		BoosterAngle;					// 부스터시에 유닛의 회전각, 현재는 엔진에만 사용
-	INT			CameraPattern;					// 카메라 패턴
-	INT			SourceIndex;					// 2005-08-22 by cmkwon, 이펙트, 아이콘(빅/스몰) 리소스 데이타
-
-
+	char dunno19[3];
+	BYTE		Caliber;
+	BYTE		OrbitType;
+	char dunno21[10];
+	BitFlag64_t	ItemAttribute;
+	FLOAT		BoosterAngle;
+	INT			CameraPattern;
+	INT SourceIndex;
 	char dunno17[36];
-
-	/*
-	float		FractionResistance;				// 2008-10-06 by dhjin, 피어스율로 일단 사용 // 속성저항력(0~255) // 2010-07-19 by dhjin, 확률 수식 변경
-	BYTE		NaturalFaction;					// 천적계열, 종족(몬스터, 캐릭터) Index (천적)
-	BYTE		Luck;							// 행운
-	UINT		CashPrice;						// 최소 거래 수량의 현금 가격
-
-	BYTE		UpgradeNum;						// 업그레이드 수, 업그레이드의 한계를 나타냄.
-	BYTE		MultiTarget;					// 동시에 잡을 수 있는 타겟의 수
-	USHORT		ExplosionRange;					// 폭발반경(폭발 시 데미지의 영향이 미치는 반경)
-	USHORT		ReactionRange;					// 반응반경(마인 등이 반응하는 반경)
-	USHORT		AttackTime;						// 공격시간, 공격을 하기 위해 필요한 시간
-	INT			SummonMonster;					// 2006-06-08 by cmkwon, 유료화 상점의 탭구분자로 사용한다.(CASH_ITEMKIND_XXXX)
-	INT			NextSkill;						// 다음 단계의 스킬 아이템 넘버(스킬)
-
-	Prob256_t	SkillHitRate;					// 스킬명중확률(0~255)
-	BYTE		SkillTargetType;				// 스킬 타켓 타입, SKILLTARGETTYPE_XXX
-
-	vectINT* pParamOverlapIdxList;			// 2010-01-18 by cmkwon, 아이템 사용시 Parameter 중복 체크 시스템 구현 -
-	BYTE		EnchantCheckDestParam;			// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
-	InvokingDestParamID_t	InvokingDestParamID;	// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
-	InvokingDestParamID_t	InvokingDestParamIDByUse;// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
-	InvokingWearItemDestParamList* pInvokingDestParamList;			// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
-	InvokingWearItemDestParamList* pInvokingDestParamByUseList;	// 2009-09-09 ~ 2010-02-10 by dhjin, 인피니티 - 발동류장착아이템
-	BYTE		IsTenderDropItem;				// 2010-04-09 by cmkwon, 인피2차 추가 수정(단계별 보상 추가) - CFieldIOCP::SetTenderItemList#에서 설정됨
-	*/
 };
 #pragma pack(pop)
+
 typedef vector<ITEM*>			vectItemPtr;		// 2009-08-26 by cmkwon, 그래픽 리소스 변경 시스템 구현 - 
 
 

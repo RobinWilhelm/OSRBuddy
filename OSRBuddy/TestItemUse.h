@@ -23,6 +23,7 @@ namespace Features
 
 		void SaveMysterInfoToFile(FILE* fd);
 		void DumpRareItemInfoToFile(FILE* fd);
+		void DumpItems();
 
 	private:
 		bool m_active_switch;

@@ -1290,6 +1290,8 @@ bool OldSchoolRivalsAPI::IsStaffMember(const char* charName)
 	if (strstr(lc_charName, "_layla_"))			return true;
 	if (strstr(lc_charName, "_mangoo_"))		return true;
 	if (strstr(lc_charName, "_masteroogway"))	return true;
+	if (strstr(lc_charName, "_valkyrie"))		return true;
+	if (strstr(lc_charName, "_yearzero"))		return true;
 
 	return false;
 }
