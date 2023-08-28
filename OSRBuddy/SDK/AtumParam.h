@@ -2654,10 +2654,11 @@ struct ITEM
 	char dunno4[1];
 	USHORT		Range;							// 공격범위, 엔진류인 경우에는 부스터 가동 시 속도, 스킬의 경우 적용 범위
 	BYTE		Position;
-	char dunno5[9];
+	char dunno5[7];
 	INT			ItemNum;						// 아이템 고유번호, 장착 아이템일 때 (ITEM_BASE*)
 	float		Endurance;						// 내구성, 내구도
 	Prob256_t	AbrasionRate;					// 마모율, 내구도가 줄어드는 단위량(0~255)
+	char dunno22[2];
 	USHORT		Charging;						// 무기류에서는 최대 장탄 수, 에너지는 한번에 적용되는 개수, TANK류는 양
 	char dunno6[2];
 	USHORT		RepeatTime;						// 무기류에서는 남은 총알 수로 사용, 나머지는 개수, 시간형 스킬류에선 남은 시간, 나머지 스킬은 사용 여부

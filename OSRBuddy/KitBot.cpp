@@ -417,7 +417,7 @@ namespace Features
         if (strstr(lc_itemname, "invincible"))             return SkillType::Invincible;
         if (strstr(lc_itemname, "repair target"))          return SkillType::Repair_Target;
         if (strstr(lc_itemname, "repair field"))           return SkillType::Repair_Field;
-        if (strstr(lc_itemname, "realing target"))         return SkillType::Heal_Target;
+        if (strstr(lc_itemname, "healing target"))         return SkillType::Heal_Target;
         if (strstr(lc_itemname, "release"))                return SkillType::Release;
         if (strstr(lc_itemname, "deploy chaff"))           return SkillType::Deploy_Chaff;
         if (strstr(lc_itemname, "reduce damage"))          return SkillType::Reduce_Damage;
@@ -691,7 +691,7 @@ namespace Features
                 continue;
             }
 
-            if (member->m_pEnemyData->m_infoCharacter.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex()) {
+            if (member->m_ImPartyMemberInfo.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex()) {
                 continue;
             }
 
@@ -715,7 +715,7 @@ namespace Features
         {
             target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
             if (m_settings.target_heal_prio_myself) {
-                return OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+                return target;
             }
         }
 
@@ -738,7 +738,7 @@ namespace Features
                 continue;
             }
 
-            if (member->m_pEnemyData->m_infoCharacter.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex())  {
+            if (member->m_ImPartyMemberInfo.MapChannelIndex != OSR_API->GetCurrentMapChannelIndex())  {
                 continue;
             }
 
@@ -762,7 +762,7 @@ namespace Features
         {
             target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
             if (m_settings.target_heal_prio_myself) {
-                return OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber;
+                return target;
             }
         }
 
@@ -1192,6 +1192,7 @@ namespace Features
                 }
             }   
             break;
+            /*
         case T_FC_SKILL_USE_SKILL_OK: 
             {
                 MSG_FC_SKILL_USE_SKILL_OK* use_skill_ok_msg = (MSG_FC_SKILL_USE_SKILL_OK*)packet;
@@ -1209,6 +1210,7 @@ namespace Features
                     }
                 }
             }
+            */
             break;  
         }
   
@@ -1256,8 +1258,17 @@ namespace Features
             {
                 MSG_FC_SKILL_USE_SKILL* msg_use_skill = (MSG_FC_SKILL_USE_SKILL*)packet;
                 PlayerSkillInfo* pskill = FindPlayerSkill(msg_use_skill->SkillItemID.ItemNum);
-                if (pskill) {
+                if (pskill) 
+                {
                     pskill->last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                    switch (pskill->type)
+                    {
+                    case SkillType::Heal_Target:
+                    case SkillType::Repair_Target:
+                        if (msg_use_skill->AttackIndex != msg_use_skill->TargetIndex) {
+                            m_mgear_targetheal_last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                        }
+                    }
                 }            
             }    
             break;
@@ -1474,7 +1485,9 @@ namespace Features
                             if (TryUseTargetSkill(repair_skill, energize_target))
                             {
                                 currentsp -= repair_skill->skillinfo->ItemInfo->ReqSP;
-                                used_target_repair = true;
+                                if (energize_target = OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber) {
+                                    m_mgear_targetheal_last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                                }
                             }
                         }
                     }
@@ -1496,6 +1509,9 @@ namespace Features
                             if (TryUseTargetSkill(heal_skill, heal_target))
                             {
                                 currentsp -= heal_skill->skillinfo->ItemInfo->ReqSP;
+                                if (heal_target != OSR_API->GetAtumApplication()->m_pShuttleChild->m_myShuttleInfo.CharacterUniqueNumber) {
+                                    m_mgear_targetheal_last_send = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+                                }
                             }             
                         }
                     }
