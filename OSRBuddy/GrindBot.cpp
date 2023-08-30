@@ -150,7 +150,7 @@ namespace Features
                 return;
             }                 
 
-            if (!m_kitbot->ToggleSKill(SkillType::Siege_Mode, true)) {
+            if (OSR_API->GetCurrentSkillp() <= 3 || !m_kitbot->ToggleSKill(SkillType::Siege_Mode, true)) {
                 return;
             }
 
