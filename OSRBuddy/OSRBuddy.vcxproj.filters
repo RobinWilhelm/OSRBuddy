@@ -448,6 +448,9 @@
     <ClInclude Include="SDK\WSlowData.h">
       <Filter>thirdparty\SDK</Filter>
     </ClInclude>
+    <ClInclude Include="Drops.h">
+      <Filter>Features\Implementation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -581,6 +584,9 @@
     </ClCompile>
     <ClCompile Include="SDK\AtumParamProtocol.cpp">
       <Filter>thirdparty\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Drops.cpp">
+      <Filter>Features\Implementation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

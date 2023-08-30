@@ -51,21 +51,46 @@ void BuddyTimer::Reset(std::chrono::milliseconds basetime, std::chrono::millisec
 	m_starttime = std::chrono::system_clock::now();
 }
 
-/*
 StopWatch::StopWatch()
 {
-	Reset();
+	m_starttime = std::chrono::system_clock::now();
+	m_accumulatedtime = 0ms;
+	m_running = false;
+}
+
+StopWatch::~StopWatch()
+{
 }
 
 void StopWatch::Start()
 {
-	std::chrono::milliseconds current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-	m_starttime = current;
+	if (m_running)
+		return;
+
+	m_starttime = std::chrono::system_clock::now();
+	m_running = true;
+}
+
+void StopWatch::Stop()
+{
+	if (!m_running)
+		return;
+
+	m_accumulatedtime += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_starttime);
+	m_running = false;
 }
 
 void StopWatch::Reset()
 {	 
 	m_starttime = std::chrono::system_clock::now();
-	m_totaltime = 0ms;
+	m_accumulatedtime = 0ms;
 }
-*/
+
+std::chrono::milliseconds StopWatch::GetElapsedTime()
+{
+	std::chrono::milliseconds totalTime = m_accumulatedtime;
+	if (m_running)
+		totalTime += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_starttime);
+
+	return totalTime;
+}

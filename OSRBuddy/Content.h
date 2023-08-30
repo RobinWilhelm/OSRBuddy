@@ -19,6 +19,7 @@
 	#define FEATURE_MISCELLANEOUS
 	#define FEATURE_INVENTORYMANAGER
 	#define FEATURE_FACTORYBOT
+	#define FEATURE_DROPS
 #endif
 
 #ifdef RELEASE_DEBUG		
@@ -33,6 +34,7 @@
 	#define	FEATURE_ESP
 	#define FEATURE_TEST
 	#define FEATURE_DEBUGINFO
+	#define FEATURE_DROPS
 #endif
 
 #ifdef OSRBUDDY_MANUALMAP

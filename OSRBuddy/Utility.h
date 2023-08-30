@@ -78,6 +78,8 @@ public:
     }
 
     static void MoveMouse(uint32_t x, uint32_t y);
+
+    static DWORD GetFontColor(char chr);
 };
 
 #ifdef RELEASE

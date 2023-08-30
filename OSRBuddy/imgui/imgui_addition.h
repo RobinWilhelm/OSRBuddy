@@ -35,5 +35,6 @@ namespace ImGui
 
     bool BeginComboLeftSidedText(const char* label, const char* preview_value, ImGuiComboFlags flags);
 
-
+    ImColor ARGB_2_RGBA(unsigned long argb);
+    void AceText(std::string text);
 }

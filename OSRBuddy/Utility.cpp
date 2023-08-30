@@ -140,6 +140,79 @@ void Utility::MoveMouse(uint32_t x, uint32_t y)
     ::SendInput(1, &input, sizeof(INPUT));
 }
 
+DWORD Utility::GetFontColor(char chr)
+{
+    switch (chr)
+    {
+    case RED_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)255, (BYTE)0, (BYTE)0));
+    case GREEN_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)0, (BYTE)255, (BYTE)0));
+    case BLUE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)0, (BYTE)0, (BYTE)255));
+    case YELLOW_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)255, (BYTE)255, (BYTE)0));
+    case CYAN_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)0, (BYTE)255, (BYTE)255));
+    case MAGENTA_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)255, (BYTE)0, (BYTE)255));
+    case WHITE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)255, (BYTE)255, (BYTE)255));
+    case ENCHANT_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)245, (BYTE)185, (BYTE)48));
+    case GRAY_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)208, (BYTE)208, (BYTE)208));
+    case DARKBLUE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)178, (BYTE)190, (BYTE)255));
+#ifdef C_FONT_COLOR_ADD
+    case PINK_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)235, (BYTE)197, (BYTE)238));
+    case LIGHTGREEN_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)130, (BYTE)209, (BYTE)152));
+    case BLACK_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)1, (BYTE)1, (BYTE)1));
+    case TEAL_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)0, (BYTE)128, (BYTE)128));
+    case NAVY_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)176, (BYTE)224, (BYTE)230));
+    case STEELBLUE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)32, (BYTE)178, (BYTE)170));
+    case RBROWN_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)188, (BYTE)143, (BYTE)143));
+#endif
+    case LIGHTBLUE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)0, (BYTE)170, (BYTE)255));
+    case PALEPINK_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)235, (BYTE)197, (BYTE)238));
+    case LIGHTGREEN_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)130, (BYTE)209, (BYTE)152));
+    case BLACK_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)1, (BYTE)1, (BYTE)1));
+    case ORANGE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)255, (BYTE)165, (BYTE)0));
+    case TAN_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)210, (BYTE)180, (BYTE)140));
+    case SALMON_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)250, (BYTE)128, (BYTE)114));
+    case CORNFLOWER_BLUE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)104, (BYTE)147, (BYTE)247));
+    case DARK_TURQUOISE_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)0, (BYTE)206, (BYTE)209));
+    case HOT_PINK_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)255, (BYTE)105, (BYTE)180));
+    case FIREBRICK_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)178, (BYTE)34, (BYTE)34));
+    case GOLDENROD_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)218, (BYTE)165, (BYTE)32));
+    case BROWN_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)143, (BYTE)93, (BYTE)63));
+    case VIOLET_FONT:
+        return (HFONT_ARGB(0x00, (BYTE)127, (BYTE)0, (BYTE)255));
+    default:
+        return (HFONT_ARGB(0x00, (BYTE)0, (BYTE)0, (BYTE)0));
+    }
+}
+
 PBYTE Utility::FindPattern(const PBYTE rangeStart, const PBYTE rangeEnd, const char* pattern)
 {   
     const unsigned char* pat = reinterpret_cast<const unsigned char*>(pattern);

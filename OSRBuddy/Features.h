@@ -10,5 +10,6 @@
 #include "InventoryManager.h"
 #include "ESP.h"
 #include "AntiMTRand.h"
+#include "Drops.h"
 
 #include "FeatureTypes.h"

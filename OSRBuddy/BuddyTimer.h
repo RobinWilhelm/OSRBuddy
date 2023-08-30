@@ -22,19 +22,21 @@ private:
 	std::chrono::system_clock::time_point m_starttime;
 };
 
-/*
+
 class StopWatch
 {
 public:
 	StopWatch();
+	~StopWatch();
 
 	void Start();
 	void Stop();
 	void Reset();
 
-private:
-	std::chrono::system_clock::time_point m_starttime;
-	std::chrono::milliseconds m_totaltime;
-};
-*/
+	std::chrono::milliseconds GetElapsedTime();
 
+private:
+	bool m_running;
+	std::chrono::system_clock::time_point m_starttime;
+	std::chrono::milliseconds m_accumulatedtime;
+};

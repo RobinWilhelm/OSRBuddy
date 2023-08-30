@@ -228,6 +228,7 @@
     <ClInclude Include="Content.h" />
     <ClInclude Include="D3D9Font.h" />
     <ClInclude Include="D3D9Renderer.h" />
+    <ClInclude Include="Drops.h" />
     <ClInclude Include="ESP.h" />
     <ClInclude Include="FactoryBot.h" />
     <ClInclude Include="FeatureTypes.h" />
@@ -376,6 +377,7 @@
     <ClCompile Include="BuddyTimer.cpp" />
     <ClCompile Include="D3D9Font.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
+    <ClCompile Include="Drops.cpp" />
     <ClCompile Include="ESP.cpp" />
     <ClCompile Include="FactoryBot.cpp" />
     <ClCompile Include="HotkeyManager.cpp" />

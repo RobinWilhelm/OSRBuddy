@@ -2,6 +2,8 @@
 #include "imgui_addition.h"
 #include "..\HotkeyManager.h"
 
+#include "..\Utility.h"
+
 #define COLOR_FANCYCHECKBOX_CHECKED     (ImColor(0x5c, 0x80, 0xd6)) 
 #define COLOR_FANCYCHECKBOX_UNCHECKED   (ImColor(0x2d, 0x37, 0x4f)) 
 #define COLOR_FANCYCHECKBOX_CHECKER     (ImColor(0xd5, 0xd9, 0xe3)) 
@@ -362,6 +364,62 @@ bool ImGui::BeginComboLeftSidedText(const char* label, const char* preview_value
         return false;
     }
     return true;
+}
+
+void ImGui::AceText(std::string text)
+{
+    size_t token_begin = 0;
+    char currentColorChar = 'w';
+    ImColor color = ImColor(0xFF, 0xFF, 0xFF);
+
+    if (text[0] == '\\')
+    {
+        currentColorChar = text[1];
+        color = ARGB_2_RGBA(Utility::GetFontColor(currentColorChar));
+        color.Value.w = 255;
+        token_begin += 2;
+    }
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+    while (token_begin != std::string::npos && token_begin < text.size())
+    {
+        size_t token_next = text.find('\\', token_begin);
+
+        ImGui::PushStyleColor(ImGuiCol_Text, color.Value);
+        ImGui::Text("%s", text.substr(token_begin, token_next - token_begin).c_str());
+        ImGui::PopStyleColor();
+
+        if (token_next != std::string::npos && token_next + 2 < text.size())
+        {
+            if (currentColorChar == text[token_next + 1])
+            {
+                // colored token ended -> reset to white
+                currentColorChar = 'w';
+                color = ImColor(0xFF, 0xFF, 0xFF);
+            }
+            else
+            {
+                // color changed mid token -> set new color
+                currentColorChar = text[token_next + 1];
+                color = ARGB_2_RGBA(Utility::GetFontColor(currentColorChar));
+                color.Value.w = 255;
+            }
+            token_begin = token_next + 2;
+            ImGui::SameLine();
+        }
+        else
+        {
+            break;
+        }
+    }
+    ImGui::PopStyleVar();
+}
+
+ImColor ImGui::ARGB_2_RGBA(unsigned long argb)
+{
+    unsigned int rgba = argb & 0x00FFFFFF;
+    rgba += (argb & 0xFF000000) >> 24;
+    return ImColor(rgba);
 }
 
 /*

@@ -1062,23 +1062,42 @@ typedef enum
 enum { INPUT_LANGUAGE_KOR = 1, INPUT_LANGUAGE_ENG, INPUT_LANGUAGE_VIET_TELEX, INPUT_LANGUAGE_VIET_VNI, INPUT_LANGUAGE_CHINA, INPUT_LANGUAGE_END };
 
 // 2006-04-17 by ispark
-#define RED_FONT		'r'
-#define GREEN_FONT		'g'
-#define BLUE_FONT		'b'
-#define YELLOW_FONT		'y'
-#define CYAN_FONT		'c'
-#define MAGENTA_FONT	'm'
-#define WHITE_FONT		'w'
-#define ENCHANT_FONT	'e'
-#define GRAY_FONT		'q'
-#define DARKBLUE_FONT	'a'
-#define OLIVE_FONT		'o'
+// 2006-04-17 by ispark
+#define RED_FONT				'r'
+#define GREEN_FONT				'g'
+#define BLUE_FONT				'b'
+#define YELLOW_FONT				'y'
+#define CYAN_FONT				'c'
+#define MAGENTA_FONT			'm'
+#define WHITE_FONT				'w'
+#define ENCHANT_FONT			'e'
+#define GRAY_FONT				'q'
+#define DARKBLUE_FONT			'a'
+// 2013-10-17 by ssjung 폰트 색생 추가
+#ifdef C_FONT_COLOR_ADD
 #define PINK_FONT		'p'
-#define LIGHTBLUE_FONT	'l'
-#define DARKGREY_FONT	'd'
+#define LIGHTGREEN_FONT 'l'
 #define BLACK_FONT		'z'
-#define GM_FONT			'n'
-//2014-07-31 by St0rmy added new colors
+#define TEAL_FONT       't'
+#define NAVY_FONT       'n'
+#define STEELBLUE_FONT  's'
+#define RBROWN_FONT     'u'
+#endif
+
+#define PALEPINK_FONT			'p'
+#define LIGHTGREEN_FONT			't'
+#define BLACK_FONT				'x'
+#define ORANGE_FONT				'o'
+#define TAN_FONT				'n'
+#define SALMON_FONT				's'
+#define CORNFLOWER_BLUE_FONT	'u'
+#define DARK_TURQUOISE_FONT		'd'
+#define HOT_PINK_FONT			'h'
+#define FIREBRICK_FONT			'z'
+#define GOLDENROD_FONT			'f'
+#define LIGHTBLUE_FONT			'l'
+#define BROWN_FONT				'j'
+#define VIOLET_FONT				'v'
 
 #define HFONT_ARGB(a,r,g,b) \
     ((D3DCOLOR)((((a)&0xff)<<24)|(((b)&0xff)<<16)|(((g)&0xff)<<8)|((r)&0xff)))

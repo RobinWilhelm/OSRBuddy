@@ -15,5 +15,6 @@ namespace Features
 		Miscellaneous,
 		InventoryManager,
 		ESP,
+		Drops,
 	};
 }

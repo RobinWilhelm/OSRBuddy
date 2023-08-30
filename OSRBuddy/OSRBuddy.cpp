@@ -225,6 +225,9 @@ bool OSRBuddyMain::Start()
 #ifdef FEATURE_GRINDBOT
         RegisterFeature(new Features::GrindBot(this));
 #endif
+#ifdef FEATURE_DROPS             
+        RegisterFeature(new Features::Drops(this));
+#endif
 #ifdef FEATURE_INVENTORYMANAGER             
         RegisterFeature(new Features::InventoryManager(this));
 #endif
