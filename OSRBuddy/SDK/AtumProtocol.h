@@ -8291,6 +8291,9 @@ typedef struct
 {
 	UID32_t			FromCharacterUniqueNumber;		// From Possess, 혹은 FromCharacterUniqueNumber
 	BYTE			ItemInsertionType;				// 아이템 삽입 타입, IUT_XXX
+	BYTE			dunno1;
+	BYTE			dunno2;
+	BYTE			dunno3;
 	ITEM_GENERAL	ItemGeneral;
 } MSG_FC_STORE_INSERT_ITEM;
 

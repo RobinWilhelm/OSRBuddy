@@ -72,11 +72,13 @@ void Features::Drops::RenderImGui()
             ImGui::NextColumn();
 
             ImGui::Text("%d", acqItem.second.Amount);
-            ImGui::NextColumn();     
+            ImGui::NextColumn();
         }
     }
     ImGui::EndColumns();
 }
+
+
 
 bool Features::Drops::OnReadPacket(unsigned short msgtype, byte* packet)
 {
@@ -91,17 +93,29 @@ bool Features::Drops::OnReadPacket(unsigned short msgtype, byte* packet)
         MSG_FC_TRADE_INSERT_ITEM* pMsg = (MSG_FC_TRADE_INSERT_ITEM*)packet;
         if (pMsg->ItemInsertionType == IUT_DROP_ITEM)
         {
-            auto pItem = OSR_API->FindItemInInventoryByUniqueNumber(pMsg->ItemGeneral.UniqueNumber);
-            if (pItem)
+            auto pInvenItemInfo = OSR_API->FindItemInInventoryByUniqueNumber(pMsg->ItemGeneral.UniqueNumber);
+            if (pInvenItemInfo)
             {
-                uint32_t deltaAmount = pMsg->ItemGeneral.CurrentCount - pItem->CurrentCount;
+                uint32_t deltaAmount = pMsg->ItemGeneral.CurrentCount - pInvenItemInfo->CurrentCount;
 
                 auto& acqItem = m_acquiredItems.find(pMsg->ItemGeneral.ItemNum);
                 if (acqItem == m_acquiredItems.end()) {
-                    m_acquiredItems[pMsg->ItemGeneral.ItemNum].ItemName = std::string(pItem->ItemInfo->ItemName);
+                    m_acquiredItems[pMsg->ItemGeneral.ItemNum].ItemName = std::string(pInvenItemInfo->ItemInfo->ItemName);
                 }
                 m_acquiredItems[pMsg->ItemGeneral.ItemNum].Amount += deltaAmount;
-            }            
+            }   
+            else
+            {
+                auto pServerItem = OSR_API->GetServerItemInfo(pMsg->ItemGeneral.ItemNum);
+                if (pServerItem)
+                {
+                    auto& acqItem = m_acquiredItems.find(pMsg->ItemGeneral.ItemNum);
+                    if (acqItem == m_acquiredItems.end()) {
+                        m_acquiredItems[pMsg->ItemGeneral.ItemNum].ItemName = std::string(pServerItem->ItemName);
+                    }
+                    m_acquiredItems[pMsg->ItemGeneral.ItemNum].Amount += IS_COUNTABLE_ITEM(pServerItem->Kind) ? pMsg->ItemGeneral.CurrentCount : 1;
+                }
+            }
         }
         break;
     }
@@ -121,6 +135,16 @@ bool Features::Drops::OnReadPacket(unsigned short msgtype, byte* packet)
                     m_acquiredItems[pItem->ItemNum].ItemName = std::string(pItem->ItemInfo->ItemName);
                 }
                 m_acquiredItems[pItem->ItemNum].Amount += deltaAmount;
+            }
+            else if(pMsg->ItemUniqueNumber == OSR_API->GetSPIUniqueNumber())
+            {
+                uint32_t deltaAmount = pMsg->NewCount - OSR_API->GetInventorySPI();
+
+                auto& acqItem = m_acquiredItems.find(MONEY_ITEM_NUMBER);
+                if (acqItem == m_acquiredItems.end()) {
+                    m_acquiredItems[MONEY_ITEM_NUMBER].ItemName = std::string("SPI");
+                }
+                m_acquiredItems[MONEY_ITEM_NUMBER].Amount += deltaAmount;
             }
         }
         break;

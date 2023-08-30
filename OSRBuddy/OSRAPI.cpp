@@ -985,6 +985,11 @@ int OldSchoolRivalsAPI::GetInventorySPI()
 	return m_atumapplication->m_pInterface->m_pGameMain->m_pInven->m_nItemSpi;
 }
 
+UID64_t OldSchoolRivalsAPI::GetSPIUniqueNumber()
+{
+	return m_atumapplication->m_pInterface->m_pGameMain->m_pInven->m_hyItemSpiUniqueNumber;
+}
+
 bool OldSchoolRivalsAPI::IsGoodBossMonster(CMonsterData* monster)
 {
 	if (monster && monster->m_pMonsterInfo)
