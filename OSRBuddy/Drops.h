@@ -1,6 +1,10 @@
 #pragma once
 #include "BuddyFeatureBase.h"
 
+#include <vector>
+#include <map>
+#include <unordered_map>
+
 class StopWatch;
 
 namespace Features
@@ -19,19 +23,16 @@ namespace Features
 
 		virtual bool OnReadPacket(unsigned short msgtype, byte* packet) override;
 
-		void Start();
-		void Stop();
-		void Reset();
-
 	private:
 		struct AcquiredItemInfo
 		{
 			std::string ItemName;
-			uint32_t Amount = 0;
+			int32_t DeltaAmount = 0;
 		};
 
-		std::unordered_map<uint32_t, AcquiredItemInfo> m_acquiredItems;
+		std::unordered_map<uint32_t, std::map<BYTE, AcquiredItemInfo>> m_acquiredItems;
 		std::unique_ptr<StopWatch> m_stopWatch;
+		bool m_DropsFilter[IUT_CITYWAR_BRING_SUMOFTEX];
 	};
 }
 

@@ -606,7 +606,7 @@ struct D3DVERTEX
 {
     D3DXVECTOR3 p;
     D3DXVECTOR3 n;
-    FLOAT       tu, tv;
+    FLOAT       tu = 0.0f, tv = 0.0f;
 };
 struct INTERSECTION
 {

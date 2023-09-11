@@ -354,6 +354,9 @@ public:
 	DWORD						m_unknownCheckTime;
 	DWORD						m_unknown2;
 
+	DWORD						m_AnotherStupidunknownCheckTimeProbably;
+	DWORD						m_unknown2213124;
+
 	CD3DHanFont* m_pFontDebug;				// ÅØ½ºÆ® Ç¥½Ã¿ë ÆùÆ®
 	CD3DHanFont* m_pFontCandidate[CHAR_INF_CANDIDATE];				// ÇÑÆùÆ®
 	// 2007.04.24 by bhsohn China IME Working

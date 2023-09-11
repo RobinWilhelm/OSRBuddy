@@ -13,23 +13,23 @@
 
 class CINFInven;
 
-#define SIZE_MAX_ADDABLE_INVENTORY_COUNT 100
+#define SIZE_MAX_ADDABLE_INVENTORY_COUNT 150
 #define SIZE_MAX_ITEM_GENERAL 60
 #define COUNT_IN_MEMBERSHIP_ADDED_INVENTORY	40
 
 using SendUseItemType = void(__thiscall*)(CINFInvenExtend * ecx, ITEM_BASE * item);
-using SendUseSkillType = void(__thiscall*)(CINFCharacterInfoExtend * ecx, ITEM_BASE * skill);
+using SendUseSkillType = void(__stdcall*)(ITEM_BASE * skill);
 using OnButtonClickType = void(__thiscall*)(CINFCityLab * ecx, int button);
 using InvenToSourceItemType = void(__thiscall*)(CINFCityLab * ecx, CItemInfo * pItemInfo, int nCount, bool useMacroSource);
 using GetServerRareItemInfoType = RARE_ITEM_INFO * (__thiscall*)(CAtumDatabase * ecx, int nCodeNum);
 using ChangeSkillState = void(__thiscall*)(CSkillInfo * ecx, int dwState, int nTempSkillItemNum);
-using CalcObjectSourceScreenCoordsType = void(__thiscall*)(CAtumApplication * ecx, D3DXVECTOR3 vObjPos, int iScreenWidth, int iScreenHeight, int& iCoordX, int& iCoordY, int& iCoordW);
+using CalcObjectSourceScreenCoordsType = void(__stdcall*)(float x, float y, float z, int iScreenWidth, int iScreenHeight, int& iCoordX, int& iCoordY, int& iCoordW);
 using DeleteSelectItemType = void(__thiscall*)(CINFInvenExtend * ecx, int count);
 using SendChangeWearWindowPosType = void(__thiscall*)(CINFInvenExtend* ecx, int nWindowPosition);
 using SetSelectItemType = void(__thiscall*)(CINFInven* ecx, INVEN_DISPLAY_INFO* pDisplayInfo);
-using UpdateItemCountType = void(__thiscall*)(CStoreData* ecx, UID64_t nUniqueNumber, INT nCount, DWORD unknown);
+using UpdateItemCountType = void(__stdcall*)(UID64_t nUniqueNumber, INT nCount, DWORD unknown);
 using GetServerItemInfoType = ITEM * (__thiscall*)(CAtumDatabase* ecx, int nItemNum);
-using RqInvitePartyInfoType = void(__thiscall*)(CINFCommuPartyInvite* ecx);
+using RqInvitePartyInfoType = void(__fastcall*)(CINFCommuPartyInvite* ecx);
 
 
 OldSchoolRivalsAPI* OldSchoolRivalsAPI::instance  = nullptr;
@@ -742,9 +742,9 @@ void OldSchoolRivalsAPI::DeleteItem(ITEM_GENERAL* item, int count)
 void OldSchoolRivalsAPI::SendUseSkill(ITEM_BASE* skill)
 {
 	static SendUseSkillType sendUseSkillFn = reinterpret_cast<SendUseSkillType>(PatternManager::Get(OffsetIdentifier::CINFCharacterInfoExtend__SendUseSkill).address);
-	CINFCharacterInfoExtend* charinfo = m_atumapplication->m_pInterface->m_pGameMain->m_pCharacterInfo;
-	if (sendUseSkillFn && charinfo) {
-		sendUseSkillFn(charinfo, static_cast<ITEM_BASE*>(skill));
+	//CINFCharacterInfoExtend* charinfo = m_atumapplication->m_pInterface->m_pGameMain->m_pCharacterInfo;
+	if (sendUseSkillFn) {
+		sendUseSkillFn(static_cast<ITEM_BASE*>(skill));
 	}
 }
 
@@ -833,10 +833,10 @@ uint32_t OldSchoolRivalsAPI::GetInventoryItemCount(INT itemnum)
 void OldSchoolRivalsAPI::UpdateItemCount(UID64_t nUniqueNumber, INT nCount)
 {
 	static 	UpdateItemCountType updateItemCountFn = reinterpret_cast<UpdateItemCountType>(PatternManager::Get(OffsetIdentifier::CStoreData__UpdateItemCount).address);
-	CStoreData* storedata = m_atumapplication->m_pShuttleChild->m_pStoreData;
-	if (updateItemCountFn && storedata)
+	//CStoreData* storedata = m_atumapplication->m_pShuttleChild->m_pStoreData;
+	if (updateItemCountFn )
 	{
-		updateItemCountFn(storedata, nUniqueNumber, nCount, 0);
+		updateItemCountFn(nUniqueNumber, nCount, 0);
 	}
 }
 
@@ -908,8 +908,8 @@ void OldSchoolRivalsAPI::WorldToScreen(D3DXVECTOR3 world, int& screen_x, int& sc
 {
 	static CalcObjectSourceScreenCoordsType calcObjectSourceScreenCoordsFn = reinterpret_cast<CalcObjectSourceScreenCoordsType>(PatternManager::Get(OffsetIdentifier::CAtumApplication__CalcObjectSourceScreenCoords).address);
 	int screen_w;
-	if (calcObjectSourceScreenCoordsFn && m_atumapplication) {
-		calcObjectSourceScreenCoordsFn(m_atumapplication, world, m_atumapplication->m_d3dsdBackBuffer.Width, m_atumapplication->m_d3dsdBackBuffer.Height, screen_x, screen_y, screen_w);
+	if (calcObjectSourceScreenCoordsFn) {
+		calcObjectSourceScreenCoordsFn(world.x, world.y, world.z, m_atumapplication->m_d3dsdBackBuffer.Width, m_atumapplication->m_d3dsdBackBuffer.Height, screen_x, screen_y, screen_w);
 	}
 }
 

@@ -140,6 +140,7 @@ namespace Features
 		bool TryUseSkill(SkillType skill);
 		bool TryUseSkill(PlayerSkillInfo* skillinfo);
 
+		bool IsTargetSkill(PlayerSkillInfo* skillinfo);
 		bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, ClientIndex_t target);
 		bool TryUseTargetSkill(PlayerSkillInfo* skillinfo, UID32_t characterUID);
 

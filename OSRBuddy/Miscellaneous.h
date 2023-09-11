@@ -23,7 +23,7 @@ namespace Features
 	using CheckWeaponCollisionType = void(__thiscall*)(void* ecx, CItemData* pTargetItem);
 
 	// CWeaponMissileData::CheckTargetByBomb 
-	using CheckTargetByBombType = void(__thiscall*)(CWeaponMissileData* ecx);
+	using CheckTargetByBombType = void(__fastcall*)(CWeaponMissileData* ecx);
 
 
 	class Miscellaneous : public BuddyFeatureBase

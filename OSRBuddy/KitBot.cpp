@@ -483,6 +483,26 @@ namespace Features
         return true;
     }
 
+    /*
+    bool KitBuffBot::IsTargetSkill(PlayerSkillInfo* skillinfo)
+    {
+        if (!skillinfo)
+            return false;
+
+        ITEM* skillItem = skillinfo->skillinfo->ItemInfo;
+
+        if ((skillItem->SkillTargetType == SKILLTARGETTYPE_ONE ||
+            skillItem->SkillTargetType == SKILLTARGETTYPE_ONE_EXCLUDE_ME ||
+            skillItem->SkillTargetType == SKILLTARGETTYPE_PARTY_ONE ||
+            skillItem->SkillTargetType == SKILLTARGETTYPE_PARTY_ONE_EXCLUDE_ME ||
+            skillItem->SkillTargetType == SKILLTARGETTYPE_ONE_EXCEPT_OURS)
+
+        {
+
+        }
+    }
+    */
+
     bool KitBuffBot::TryUseTargetSkill(PlayerSkillInfo* skillinfo, ClientIndex_t target)
     {
         if (!TryUseSkill(skillinfo)) {

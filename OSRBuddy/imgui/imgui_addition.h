@@ -16,6 +16,32 @@ namespace ImGui
 
     using ListVector = std::vector<std::string>;
 
+    // helper to simplify and shorten the use of a simple dropdown box
+// returns true if the selection has changed
+// NOTE: dont add more elements in valueList than selectedIndex can hold 
+    bool SimpleCombo(std::string label, const std::vector<std::string>& valueList, int* selectedIndex, ImGuiComboFlags flags = ImGuiComboFlags_None);
+
+    template <typename KeyType>
+    bool SimpleCombo(std::string label, const std::vector<std::pair<KeyType, std::string>>& keyvalueList, int* selectedIndex, ImGuiComboFlags flags = ImGuiComboFlags_None)
+    {
+        bool selection_changed = false;
+        if (ImGui::BeginCombo(label.c_str(), keyvalueList[*selectedIndex].second.c_str(), flags))
+        {
+            for (int n = 0; n < keyvalueList.size(); n++)
+            {
+                bool is_selected = (*selectedIndex == n);
+                if (ImGui::Selectable(keyvalueList[n].second.c_str(), is_selected))
+                {
+                    *selectedIndex = n;
+                    selection_changed = true;
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        return selection_changed;
+    }
 
     void BeginDisabledMode(bool disabled);
     void EndDisabledMode();
