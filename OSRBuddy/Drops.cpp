@@ -10,7 +10,9 @@ Features::Drops::Drops(OSRBuddyMain* buddy) : BuddyFeatureBase(buddy)
     m_stopWatch = std::make_unique<StopWatch>();
 
     for(int i = 0; i < sizeof(m_DropsFilter); i++)
-        m_DropsFilter[0] = true;
+        m_DropsFilter[i] = false;
+
+    m_DropsFilter[IUT_DROP_ITEM] = true;
 }
 
 Features::Drops::~Drops()
