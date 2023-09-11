@@ -257,7 +257,7 @@ namespace Features
 
 					if (file.good() && file.is_open())
 					{
-						file.write((char*)item.second, 0x208);
+						file.write((char*)item.second, 0x308);
 						file.close();
 					}
 				}

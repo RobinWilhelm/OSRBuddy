@@ -2635,67 +2635,76 @@ struct ITEM
 #pragma pack(push, 1)
 struct ITEM
 {
-	char dunno0[4];
-	float		ArrParameterValue[SIZE_MAX_DESPARAM_COUNT_IN_ITEM];	// 2009-04-21 by cmkwon, ITEM에 DesParam 필드 개수 8개로 늘리기 -
-	BYTE		Kind;							// 아이템 종류(기관포, 빔, 로켓, 스킬.....), ITEMKIND_XXX
-	char dunno2[3];
-	float		AbilityMin;						// 아이템최소성능
-	char dunno3[5];
-	BYTE		ReqMinLevel;					// 필요 최저 레벨
-	char dunno18[2];
-	BYTE		ReqItemKind;					// 필요아이템종류, ITEMKIND_XXX, check: 스킬에만 사용, 20040818, kelovon
-	char dunno1[1];
-	USHORT		Weight;							// 무게
-	float		HitRate;						// 명중확률(0~255)	// 2010-07-19 by dhjin, 확률 수식 변경
-	BYTE		Defense;						// 방어력
-	char		ItemName[SIZE_MAX_ITEM_NAME];	// 아이템 이름
-	char dunno16[19];
-	BYTE		SpeedPenalty;					// 스피드페널티, 이동속도에미치는 영향(-:감소)
-	char dunno4[1];
-	USHORT		Range;							// 공격범위, 엔진류인 경우에는 부스터 가동 시 속도, 스킬의 경우 적용 범위
-	BYTE		Position;
-	char dunno5[7];
-	INT			ItemNum;						// 아이템 고유번호, 장착 아이템일 때 (ITEM_BASE*)
-	float		Endurance;						// 내구성, 내구도
-	Prob256_t	AbrasionRate;					// 마모율, 내구도가 줄어드는 단위량(0~255)
-	char dunno22[2];
-	USHORT		Charging;						// 무기류에서는 최대 장탄 수, 에너지는 한번에 적용되는 개수, TANK류는 양
-	char dunno6[2];
-	USHORT		RepeatTime;						// 무기류에서는 남은 총알 수로 사용, 나머지는 개수, 시간형 스킬류에선 남은 시간, 나머지 스킬은 사용 여부
-	char dunno15[6];
-	float		AbilityMax;						// 아이템최대성능
-	USHORT		ReqRace;						// 필요종족
-	BYTE		ShotNum;						// 점사 수,	점사 시 발사 수를 나타낸다.
-	char dunno7[1];
-	UINT		Price;							// 최소 거래 수량의 가격
-	char dunno8[7];
-	BYTE		ArrDestParameter[SIZE_MAX_DESPARAM_COUNT_IN_ITEM];	// 2009-04-21 by cmkwon, ITEM에 DesParam 필드 개수 8개로 늘리기 - 
-	char dunno9[1];
-	UINT		ReAttacktime;					// 재 공격시간(ms)
-	INT			Time;							// 지속 시간(스킬류 등)
-	GEAR_STAT	ReqGearStat;					// 필요 기어 스탯
-	USHORT		ReqUnitKind;					// 필요유닛종류
-	char dunno10[2];
-	USHORT		AttackTime;
-	BYTE		ReqSP;							// SP 소모량(스킬)
-	char dunno11[13];
-	float		RangeAngle;						// 범위각도(0 ~ PI), 화망
-	BYTE		SkillType;						// 스킬형태(시간 및 발동 관련), 지속|클릭|시간|유지
-	char dunno12[3];
-	INT			LinkItem;						// 링크아이템, 아이템과 연관된 아이템(총알)
-	char dunno13[8];
-	char		Description[SIZE_MAX_ITEM_DESCRIPTION];	// 아이템 설명
-	char dunno14[4];
-	BYTE		SkillLevel;						// 레벨
-	char dunno19[3];
-	BYTE		Caliber;
-	BYTE		OrbitType;
-	char dunno21[10];
-	BitFlag64_t	ItemAttribute;
-	FLOAT		BoosterAngle;
-	INT			CameraPattern;
-	INT SourceIndex;
-	char dunno17[36];
+	char pad0[4];
+	float ArrParameterValue[8];
+	uint8_t Kind;
+	char pad37[3];
+	float AbilityMin;
+	char pad44[4];
+	int32_t SummonMonster;
+	BYTE ArrDestParameter[8];
+	char pad54[152];
+	uint8_t ReqMinLevel;
+	uint8_t ReqMaxLevel;
+	char pad214[1];
+	uint8_t ReqItemKind;
+	uint16_t Weight;
+	char pad218[2];
+	float HitRate;
+	char pad224[1];
+	char ItemName[40];
+	char pad226[3];
+	float FractionResistance;
+	char pad272[12];
+	uint8_t SpeedPenalty;
+	char pad285[3];
+	uint16_t Range;
+	uint8_t Position;
+	uint8_t Scarcity;
+	char pad292[4];
+	int32_t ItemNum;
+	float Endurance;
+	char pad304[4];
+	uint16_t Charging;
+	char pad310[110];
+	uint16_t RepeatTime;
+	char pad422[6];
+	float AbilityMax;
+	uint16_t ReqRace;
+	uint16_t MinTradeQuantity;
+	uint32_t CashPrice;
+	char pad440[5];
+	uint8_t ShotNum;
+	char pad446[9];
+	uint8_t MultiNum;
+	uint32_t ReAttacktime;
+	char pad460[4];
+	int32_t Time;
+	GEAR_STAT ReqGearStat;
+	uint16_t ReqUnitKind;
+	char pad482[4];
+	uint8_t ReqSP;
+	char pad487[13];
+	float RangeAngle;
+	uint8_t SkillType;
+	uint8_t SkillTargetType;
+	char pad506[2];
+	int32_t LinkItem;
+	char pad512[8];
+	char Description[200];
+	uint16_t ExplosionRange;
+	uint16_t ReactionRange;
+	uint8_t SkillLevel;
+	char pad725[1];
+	int16_t SkillHitRate;
+	uint8_t Caliber;
+	uint8_t OrbitType;
+	char pad730[6];
+	uint64_t ItemAttribute;
+	float BoosterAngle;
+	int32_t CameraPattern;
+	int32_t SourceIndex;
+	char pad756[20];
 };
 #pragma pack(pop)
 
