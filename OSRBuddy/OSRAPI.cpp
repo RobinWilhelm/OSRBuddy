@@ -18,7 +18,7 @@ class CINFInven;
 #define COUNT_IN_MEMBERSHIP_ADDED_INVENTORY	40
 
 using SendUseItemType = void(__thiscall*)(CINFInvenExtend * ecx, ITEM_BASE * item);
-using SendUseSkillType = void(__stdcall*)(ITEM_BASE * skill);
+using SendUseSkillType = void(__stdcall*)(ITEM_BASE* skill);
 using OnButtonClickType = void(__thiscall*)(CINFCityLab * ecx, int button);
 using InvenToSourceItemType = void(__thiscall*)(CINFCityLab * ecx, CItemInfo * pItemInfo, int nCount, bool useMacroSource);
 using GetServerRareItemInfoType = RARE_ITEM_INFO * (__thiscall*)(CAtumDatabase * ecx, int nCodeNum);
